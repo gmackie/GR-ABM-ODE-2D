@@ -1,0 +1,60 @@
+<GR	nrKillingsCaseation = "5"
+	nrSources = "50"
+	diffusivityTNF = "4.3722e-7"
+	diffusivityChemokines = "4.1805e-7"
+	degRateTNF = "0.9995"
+	degRateChemokines = "0.9991"
+	thresholdApoptosisTNF = "1200"
+	probApoptosisTNF = "0.04"
+	minChemotaxis = "2"
+	maxChemotaxis = "5787.37"
+	effectRecTNF = "675.748"
+	effectRecCCL2 = "675.748"
+	effectRecCCL5 = "67.5748"
+	effectRecCXCL9 = "67.5748">
+	<Mac	maxAge = "14400"
+		initNumber = "105"
+		maxAgeAct = "1440"
+		dCCL2 = "3550.18"
+		dCCL5 = "3550.18"
+		dCXCL9 = "7100.36"
+		dTNF = "180"
+		thresholdNFkBTNF = "1000"
+		nrExtMtbUptakeRest = "2"
+		probKillExtMtbRest = "0.0187305"
+		nrIntMtbNFkB = "11"
+		nrExtMtbNFkB = "100"
+		nrIntMtbCInf = "10"
+		probStat1Tgam = "0.03"
+		nrIntMtbBurstCInf = "20"
+		nrExtMtbUptakeAct = "10"
+		thresholdRec = "6.50686"
+		probRec = "0.04"/>
+	<Tcell	maxAge = "432"
+		timeRecEnabled = "2880"
+		probRec = "0.09"
+		probMoveToMac = "0.02"
+		probMoveToTcell = "0.08">
+			<Tgam	maxTimeReg = "10"
+				thresholdRec = "1.76737"
+				probApoptosisFasFasL = "0.06"
+				probRec = "0.54"/>
+			<Tcyt	maxTimeReg = "10"
+				probRec = "0.36"
+				thresholdRec = "1.76737"
+				probKillMac = "0.12"
+				probKillMacCleanly = "0.75"
+				probKillMacDirty = "0.2"/>
+			<Treg	probRec = "0.10"
+				thresholdRec = "1.76737"/>
+	</Tcell>
+	<Mtb	growthRateIntMtb = "1.0015"
+		growthRateExtMtb = "1.0007"
+		growthExtMtbBound = "200"/>
+	<Init>
+		<Mac row="50" col="50"/>
+<!--		<Mac row="60" col="60"/>
+		<Mac row="60" col="40"/>
+		<Mac row="40" col="60"/>-->
+	</Init>
+</GR>

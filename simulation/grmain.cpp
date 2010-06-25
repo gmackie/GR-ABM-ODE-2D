@@ -12,6 +12,8 @@
 #include "rand.h"
 #include <time.h>
 #include <boost/program_options.hpp>
+#include "recruitmentlnode.h"
+#include "recruitmentprob.h"
 
 namespace po = boost::program_options;
 
@@ -25,7 +27,7 @@ void printUsage(char* pArgv0, po::options_description& desc)
 	std::cout << "Usage: " << pArgv0 << " [options]\n" << desc << std::endl;
 }
 
-int run(unsigned long seed, const std::string& inputFileName, DiffusionMethod diffMethod)
+int run(unsigned long seed, const std::string& inputFileName, DiffusionMethod diffMethod, RecruitmentBase* pRecr)
 {
 	if (!Params::getInstance()->fromXml(inputFileName.c_str()))
 		return 1;
@@ -34,6 +36,9 @@ int run(unsigned long seed, const std::string& inputFileName, DiffusionMethod di
 
 	const int timeToSimulate = 14400*2;
 	GrSimulation sim;
+
+	sim.setRecruitment(pRecr);
+
 	const GrStat& stats = sim.getStats();
 
 	sim.setDiffusionMethod(diffMethod);
@@ -62,6 +67,8 @@ int main(int argc, char** argv)
 {
 	unsigned long seed;
 	std::string inputFileName;
+	std::string lymphNodeODE;
+	std::string lymphNodeTemp;
 	int diffMethod;
 
 	/* set seed to current time, in case not specified */
@@ -75,6 +82,8 @@ int main(int argc, char** argv)
 		("seed,s", po::value<unsigned long>(&seed)->default_value((unsigned long) curTime), "Seed")
 		("diffusion,d", po::value<int>(&diffMethod)->default_value(0),
 				"Diffusion method:\n0 - FTCS\n1 - BTCS (SOR, correct)\n2 - BTCS (SOR, wrong)")
+		("ln-ode,l", po::value<std::string>(&lymphNodeODE), "Lymph node application")
+		("ln-ode-temp,t", po::value<std::string>(&lymphNodeTemp), "Lymph node temp file")
 		("version,v", "Version number");
 
 	try
@@ -97,14 +106,21 @@ int main(int argc, char** argv)
 			return 0;
 		}
 		
+		//Recruitment recrLN(lymphNodeODE, lymphNodeTemp);
+		//Recruitment
+		//Recruitment* pRecr = (vm.count("ln-ode") && vm.count("ln-ode-temp")) ? &recrLN : NULL;
+
+		RecruitmentProb recr;
+		RecruitmentBase* pRecr = &recr;
+
 		switch (diffMethod)
 		{
 		case 0:
-			return run(seed, inputFileName, DIFF_REC_EQ);
+			return run(seed, inputFileName, DIFF_REC_EQ, pRecr);
 		case 1:
-			return run(seed, inputFileName, DIFF_SOR_CORRECT);
+			return run(seed, inputFileName, DIFF_SOR_CORRECT, pRecr);
 		case 2:
-			return run(seed, inputFileName, DIFF_SOR_WRONG);
+			return run(seed, inputFileName, DIFF_SOR_WRONG, pRecr);
 		default:
 			printUsage(argv[0], desc);
 			return 1;

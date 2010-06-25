@@ -7,6 +7,7 @@
 
 #include "scalaragentgrid.h"
 #include "simulation.h"
+#include "simulation/recruitmentbase.h"
 #include <fstream>
 
 ScalarAgentGrid::ScalarAgentGrid()
@@ -71,19 +72,19 @@ void ScalarAgentGrid::evaluate(const Simulation* pSimulation)
 			{
 				item._bitMask |= SET_BIT(_bitSrc);
 
-				if (GrSimulation::MacRecruitmentThreshold(&cell))
+				if (RecruitmentBase::MacRecruitmentThreshold(&cell))
 				{
 					item._bitMask |= SET_BIT(_bitSrcMac);
 				}
-				if (GrSimulation::TgamRecruitmentThreshold(&cell))
+				if (RecruitmentBase::TgamRecruitmentThreshold(&cell))
 				{
 					item._bitMask |= SET_BIT(_bitSrcTgam);
 				}
-				if (GrSimulation::TcytRecruitmentThreshold(&cell))
+				if (RecruitmentBase::TcytRecruitmentThreshold(&cell))
 				{
 					item._bitMask |= SET_BIT(_bitSrcTcyt);
 				}
-				if (GrSimulation::TregRecruitmentThreshold(&cell))
+				if (RecruitmentBase::TregRecruitmentThreshold(&cell))
 				{
 					item._bitMask |= SET_BIT(_bitSrcTreg);
 				}

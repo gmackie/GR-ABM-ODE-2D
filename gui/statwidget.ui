@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>252</width>
-    <height>427</height>
+    <height>544</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,7 +19,7 @@
      <x>0</x>
      <y>0</y>
      <width>251</width>
-     <height>391</height>
+     <height>541</height>
     </rect>
    </property>
    <property name="title">
@@ -31,7 +31,7 @@
       <x>10</x>
       <y>20</y>
       <width>231</width>
-      <height>371</height>
+      <height>511</height>
      </rect>
     </property>
     <layout class="QGridLayout" name="gridLayout_18">
@@ -154,7 +154,7 @@
      <item row="8" column="0">
       <widget class="QLabel" name="labelSrcCap">
        <property name="text">
-        <string>Sources</string>
+        <string>Sources (thold)</string>
        </property>
       </widget>
      </item>
@@ -166,21 +166,21 @@
         </font>
        </property>
        <property name="toolTip">
-        <string>Active sources (Mac, Tgam, Tcyt, Treg)</string>
+        <string>Active (threshold) sources (Mac, Tgam, Tcyt, Treg)</string>
        </property>
        <property name="text">
         <string>(0,0,0,0)</string>
        </property>
       </widget>
      </item>
-     <item row="9" column="0">
+     <item row="10" column="0">
       <widget class="QLabel" name="labelApoptCap">
        <property name="text">
         <string>Apopt</string>
        </property>
       </widget>
      </item>
-     <item row="9" column="1">
+     <item row="10" column="1">
       <widget class="QLabel" name="labelApoptosis">
        <property name="font">
         <font>
@@ -195,35 +195,35 @@
        </property>
       </widget>
      </item>
-     <item row="11" column="0">
+     <item row="12" column="0">
       <widget class="QLabel" name="labelTNFCap">
        <property name="text">
         <string>TNF</string>
        </property>
       </widget>
      </item>
-     <item row="12" column="0">
+     <item row="13" column="0">
       <widget class="QLabel" name="labelCCL2Cap">
        <property name="text">
         <string>CCL2</string>
        </property>
       </widget>
      </item>
-     <item row="13" column="0">
+     <item row="14" column="0">
       <widget class="QLabel" name="labelCCL5Cap">
        <property name="text">
         <string>CCL5</string>
        </property>
       </widget>
      </item>
-     <item row="14" column="0">
+     <item row="15" column="0">
       <widget class="QLabel" name="labelCXCL9Cap">
        <property name="text">
         <string>CXCL9</string>
        </property>
       </widget>
      </item>
-     <item row="11" column="1">
+     <item row="12" column="1">
       <widget class="QLabel" name="labelTNF">
        <property name="font">
         <font>
@@ -238,7 +238,7 @@
        </property>
       </widget>
      </item>
-     <item row="12" column="1">
+     <item row="13" column="1">
       <widget class="QLabel" name="labelCCL2">
        <property name="font">
         <font>
@@ -253,7 +253,7 @@
        </property>
       </widget>
      </item>
-     <item row="13" column="1">
+     <item row="14" column="1">
       <widget class="QLabel" name="labelCCL5">
        <property name="font">
         <font>
@@ -268,7 +268,7 @@
        </property>
       </widget>
      </item>
-     <item row="14" column="1">
+     <item row="15" column="1">
       <widget class="QLabel" name="labelCXCL9">
        <property name="font">
         <font>
@@ -305,7 +305,7 @@
        </property>
       </widget>
      </item>
-     <item row="15" column="1">
+     <item row="16" column="1">
       <widget class="QLabel" name="labelGranulomaAreaVal">
        <property name="font">
         <font>
@@ -317,8 +317,8 @@
        </property>
       </widget>
      </item>
-     <item row="15" column="0">
-      <widget class="QLabel" name="label_2">
+     <item row="16" column="0">
+      <widget class="QLabel" name="labelGrAreaCap">
        <property name="text">
         <string>Gr area</string>
        </property>
@@ -368,14 +368,14 @@
        </property>
       </widget>
      </item>
-     <item row="10" column="0">
+     <item row="11" column="0">
       <widget class="QLabel" name="labelMacAttractabtCap">
        <property name="text">
         <string>Attractant</string>
        </property>
       </widget>
      </item>
-     <item row="10" column="1">
+     <item row="11" column="1">
       <widget class="QLabel" name="labelMacAttractant">
        <property name="font">
         <font>
@@ -384,6 +384,135 @@
        </property>
        <property name="toolTip">
         <string/>
+       </property>
+       <property name="text">
+        <string>0</string>
+       </property>
+      </widget>
+     </item>
+     <item row="18" column="0">
+      <widget class="QLabel" name="labelTcellQueueCap">
+       <property name="text">
+        <string>T cell queue</string>
+       </property>
+      </widget>
+     </item>
+     <item row="21" column="0">
+      <widget class="QLabel" name="labelTcytFluxCap">
+       <property name="text">
+        <string>Tcyt flux</string>
+       </property>
+      </widget>
+     </item>
+     <item row="18" column="1">
+      <widget class="QLabel" name="labelTcellQueue">
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="toolTip">
+        <string>Recruitment queue (Tgam, Tcyt, Treg)</string>
+       </property>
+       <property name="text">
+        <string>0</string>
+       </property>
+      </widget>
+     </item>
+     <item row="21" column="1">
+      <widget class="QLabel" name="labelTcytFlux">
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="toolTip">
+        <string/>
+       </property>
+       <property name="text">
+        <string>0</string>
+       </property>
+      </widget>
+     </item>
+     <item row="9" column="0">
+      <widget class="QLabel" name="labelSrcActCap">
+       <property name="text">
+        <string>Sources (act)</string>
+       </property>
+      </widget>
+     </item>
+     <item row="9" column="1">
+      <widget class="QLabel" name="labelSourcesAct">
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="toolTip">
+        <string>Active sources (Mac, Tgam, Tcyt, Treg)</string>
+       </property>
+       <property name="text">
+        <string>(0,0,0,0)</string>
+       </property>
+      </widget>
+     </item>
+     <item row="20" column="0">
+      <widget class="QLabel" name="labelTgamFluxCap">
+       <property name="text">
+        <string>Tgam flux</string>
+       </property>
+      </widget>
+     </item>
+     <item row="20" column="1">
+      <widget class="QLabel" name="labelTgamFlux">
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="toolTip">
+        <string/>
+       </property>
+       <property name="text">
+        <string>0</string>
+       </property>
+      </widget>
+     </item>
+     <item row="22" column="0">
+      <widget class="QLabel" name="labelTregFluxCap">
+       <property name="text">
+        <string>Treg flux</string>
+       </property>
+      </widget>
+     </item>
+     <item row="22" column="1">
+      <widget class="QLabel" name="labelTregFlux">
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="toolTip">
+        <string/>
+       </property>
+       <property name="text">
+        <string>0</string>
+       </property>
+      </widget>
+     </item>
+     <item row="19" column="0">
+      <widget class="QLabel" name="labeldMDCCap">
+       <property name="text">
+        <string>MDC flux</string>
+       </property>
+      </widget>
+     </item>
+     <item row="19" column="1">
+      <widget class="QLabel" name="labeldMDC">
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
        </property>
        <property name="text">
         <string>0</string>

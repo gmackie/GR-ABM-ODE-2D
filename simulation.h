@@ -74,6 +74,7 @@ public:
 	const TregList& getTregList() const;
 	void loadState(std::istream& in);
 	void saveState(std::ostream& out) const;
+	void setRecruitment(RecruitmentBase* pRecruitment);
 
 	static QString getTimeStr(int simTime, int time);
 
@@ -222,6 +223,11 @@ inline const TregList& Simulation::getTregList() const
 inline const GrGrid& Simulation::getGrGrid() const
 {
 	return _grid;
+}
+
+inline void Simulation::setRecruitment(RecruitmentBase* pRecruitment)
+{
+	_gr.setRecruitment(pRecruitment);
 }
 
 inline QString Simulation::getTimeStr(int simTime, int time)

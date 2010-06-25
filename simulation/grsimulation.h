@@ -17,6 +17,7 @@
 #include "tregulatory.h"
 #include "ttest.h"
 #include "grdiffusion.h"
+#include "recruitmentbase.h"
 
 class GrSimulation
 {
@@ -31,20 +32,14 @@ private:
 	double _areaThreshold;
 	GrDiffusion* _pDiffusion;
 	TTest* _pTTest[NOUTCOMES];
+	RecruitmentBase* _pRecruitment;
 
-	void recruit();
-	void recruitMac(GridCell* pSource);
-	void recruitTcell(GridCell* pSource);
 	void moveTcells();
 	void moveMacrophages();
 	void updateStates();
 	void updateT_Test();
 	void computeNextStates();
 	void growExtMtb();
-	Mac* createMac(int row, int col, int birthtime, MacState state, bool NFkB, bool stat1);
-	Tgam* createTgam(int row, int col, int birthtime, TgamState state);
-	Tcyt* createTcyt(int row, int col, int birthtime, TcytState state);
-	Treg* createTreg(int row, int col, int birthtime, TregState state);
 
 public:
 	GrSimulation();
@@ -54,7 +49,9 @@ public:
 	void performT_Test();
 	int getTime() const;
 	const GrStat& getStats() const;
+	GrStat& getStats();
 	const GrGrid& getGrid() const;
+	GrGrid& getGrid();
 	const MacList& getMacList() const;
 	const TgamList& getTgamList() const;
 	const TcytList& getTcytList() const;
@@ -68,13 +65,19 @@ public:
 	void setOutcomeMethod(int index, OutcomeMethod method, double alpha, int testPeriod, int samplePeriod);
 	void serialize(std::ostream& out) const;
 	void deserialize(std::istream& in);
+	void setRecruitment	(RecruitmentBase* pRecruitment);
+	Mac* createMac(int row, int col, int birthtime, MacState state, bool NFkB, bool stat1);
+	Tgam* createTgam(int row, int col, int birthtime, TgamState state);
+	Tcyt* createTcyt(int row, int col, int birthtime, TcytState state);
+	Treg* createTreg(int row, int col, int birthtime, TregState state);
 
-	static bool MacRecruitmentThreshold(const GridCell* pSource);
-	static bool TgamRecruitmentThreshold(const GridCell* pSource);
-	static bool TcytRecruitmentThreshold(const GridCell* pSource);
-	static bool TregRecruitmentThreshold(const GridCell* pSource);
 	static void convertSimTime(const int time, int& rDays, int& rHours, int& rMinutes);
 };
+
+inline void GrSimulation::setRecruitment(RecruitmentBase* pRecruitment)
+{
+	_pRecruitment = pRecruitment;
+}
 
 inline void GrSimulation::getOutcomeParameters(int index,
 	int& samplePeriod, int& testPeriod, double& alpha) const
@@ -118,35 +121,6 @@ inline void GrSimulation::convertSimTime(const int time, int& rDays, int& rHours
 	rMinutes = ((time % 144) % 6) * 10;
 }
 
-inline bool GrSimulation::MacRecruitmentThreshold(const GridCell* pSource)
-{
-	return (_PARAM(PARAM_GR_WEIGHT_TNF_RECRUITMENT) * pSource->getTNF() +
-		_PARAM(PARAM_GR_WEIGHT_CCL2_RECRUITMENT) * pSource->getCCL2() +
-		_PARAM(PARAM_GR_WEIGHT_CCL5_RECRUITMENT) * pSource->getCCL5()) >= _PARAM(PARAM_MAC_THRESHOLD_RECRUITMENT);
-}
-
-inline bool GrSimulation::TgamRecruitmentThreshold(const GridCell* pSource)
-{
-	return (_PARAM(PARAM_GR_WEIGHT_TNF_RECRUITMENT) * pSource->getTNF() +
-		_PARAM(PARAM_GR_WEIGHT_CCL2_RECRUITMENT) * pSource->getCCL2() +
-		_PARAM(PARAM_GR_WEIGHT_CCL5_RECRUITMENT) * pSource->getCCL5() +
-		_PARAM(PARAM_GR_WEIGHT_CXCL9_RECRUITMENT) * pSource->getCXCL9()) >= _PARAM(PARAM_TGAM_THRESHOLD_RECRUITMENT);
-}
-
-inline bool GrSimulation::TcytRecruitmentThreshold(const GridCell* pSource)
-{
-	return (_PARAM(PARAM_GR_WEIGHT_TNF_RECRUITMENT) * pSource->getTNF() +
-		_PARAM(PARAM_GR_WEIGHT_CCL2_RECRUITMENT) * pSource->getCCL2() +
-		_PARAM(PARAM_GR_WEIGHT_CCL5_RECRUITMENT) * pSource->getCCL5() +
-		_PARAM(PARAM_GR_WEIGHT_CXCL9_RECRUITMENT) * pSource->getCXCL9()) >= _PARAM(PARAM_TCYT_THRESHOLD_RECRUITMENT);
-}
-
-inline bool GrSimulation::TregRecruitmentThreshold(const GridCell* pSource)
-{
-	return (_PARAM(PARAM_GR_WEIGHT_TNF_RECRUITMENT) * pSource->getTNF() +
-		_PARAM(PARAM_GR_WEIGHT_CCL5_RECRUITMENT) * pSource->getCCL5()) >= _PARAM(PARAM_TREG_THRESHOLD_RECRUITMENT);
-}
-
 inline int GrSimulation::getTime() const
 {
 	return _time;
@@ -182,7 +156,17 @@ inline const GrGrid& GrSimulation::getGrid() const
 	return _grid;
 }
 
+inline GrGrid& GrSimulation::getGrid()
+{
+	return _grid;
+}
+
 inline const GrStat& GrSimulation::getStats() const
+{
+	return _stats;
+}
+
+inline GrStat& GrSimulation::getStats()
 {
 	return _stats;
 }

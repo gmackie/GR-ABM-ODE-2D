@@ -13,6 +13,7 @@
 #include "grdiffusionftcs.h"
 #include "areatest.h"
 #include "mtbtest.h"
+#include "recruitmentprob.h"
 
 GrSimulation::GrSimulation()
 	: _time(0)
@@ -25,6 +26,7 @@ GrSimulation::GrSimulation()
 	, _areaThreshold(DBL_MAX)
 	, _pDiffusion(new GrDiffusionWrongBTCS())
 	, _pTTest()
+	, _pRecruitment(NULL)
 {
 	for (int i = 0; i < NOUTCOMES; i++)
 		_pTTest[i] = NULL;
@@ -230,7 +232,10 @@ void GrSimulation::solve()
 	moveTcells();
 	
 	// recruit agents from vascular sources every 10 minutes
-	recruit();
+	_pRecruitment->recruit(*this);
+
+	// reset statistics
+	_stats.resetAgentStats();
 
 	// compute next state every 10 minutes
 	computeNextStates();
@@ -419,108 +424,6 @@ void GrSimulation::growExtMtb()
 
 			if (cell.getTNF() >= _areaThreshold)
 				_stats.incArea();
-		}
-	}
-}
-
-void GrSimulation::recruit()
-{
-	const int timeTcellRecEnabled = _PARAM(PARAM_TCELL_TIME_RECRUITMENT_ENABLED);
-	GridCellPtrList& sources = _grid.getSources();
-
-	for (GridCellPtrList::iterator it = sources.begin();
-		it != sources.end();
-		it++)
-	{
-		GridCell* pSource = *it;
-		
-		// if the source is caseated continue
-		if (pSource->isCaseated())
-			continue;
-
-		// update stats
-		if (MacRecruitmentThreshold(pSource))
-			_stats.incNrSourcesMac();
-		if (TgamRecruitmentThreshold(pSource))
-			_stats.incNrSourcesTgam();
-		if (TcytRecruitmentThreshold(pSource))
-			_stats.incNrSourcesTcyt();
-		if (TregRecruitmentThreshold(pSource))
-			_stats.incNrSourcesTreg();
-
-		// macrophage recruitment
-		if (pSource->getNumberOfAgents() < 2 && !pSource->hasMac())
-			recruitMac(pSource);
-
-		// T cell recruitment
-		if (pSource->getNumberOfAgents() < 2 && _time >= timeTcellRecEnabled)
-			recruitTcell(pSource);
-	}
-}
-
-void GrSimulation::recruitMac(GridCell* pSource)
-{
-	assert(!pSource->isCaseated() && pSource->getNumberOfAgents() < 2 && !pSource->hasMac());
-
-	// if the number of macrophages on the grid is less than _INITIAL_NUMBER_OF_MACROPHAGES,
-	// recruit a resting macrophage
-	if (_macList.size() < (unsigned int) _PARAM(PARAM_MAC_INIT_NUMBER))
-	{
-		createMac(pSource->getRow(), pSource->getCol(),
-			_time - g_Rand.getInt(_PARAM(PARAM_MAC_AGE)), MAC_RESTING, false, false);
-	}
-	else
-	{
-		bool macThreshold = MacRecruitmentThreshold(pSource);
-
-		if (macThreshold && g_Rand.getReal() < _PARAM(PARAM_MAC_PROB_RECRUITMENT))
-		{
-			pSource->incNrRecruitments();
-			createMac(pSource->getRow(), pSource->getCol(),
-				_time - g_Rand.getInt(_PARAM(PARAM_MAC_AGE)), MAC_RESTING, false, false);
-		}
-	}
-}
-
-void GrSimulation::recruitTcell(GridCell* pSource)
-{
-	assert(!pSource->isCaseated() && pSource->getNumberOfAgents() < 2);
-
-	bool tgamThreshold = TgamRecruitmentThreshold(pSource);
-	bool tregThreshold = TregRecruitmentThreshold(pSource);
-
-	if (g_Rand.getReal() < _PARAM(PARAM_TCELL_PROB_RECRUITMENT))
-	{
-		double r = g_Rand.getReal();
-		if (r < _PARAM(PARAM_TGAM_PROB_RECRUITMENT))
-		{
-			// recruit a Tgam cell if allowed
-			if (tgamThreshold)
-			{
-				pSource->incNrRecruitments();
-				createTgam(pSource->getRow(), pSource->getCol(),
-					_time - g_Rand.getInt(_PARAM(PARAM_TCELL_AGE), 1), TGAM_ACTIVE);
-			}
-		}
-		else if (r < (_PARAM(PARAM_TGAM_PROB_RECRUITMENT) + _PARAM(PARAM_TCYT_PROB_RECRUITMENT)))
-		{
-			// recruit a Tcyt cell if allowed
-			if (tgamThreshold)
-			{
-				pSource->incNrRecruitments();
-				createTcyt(pSource->getRow(), pSource->getCol(),
-					_time - g_Rand.getInt(_PARAM(PARAM_TCELL_AGE), 1), TCYT_ACTIVE);
-			}
-		}
-		else
-		{
-			// recruit a Treg cell if allowed
-			if (tregThreshold)
-			{
-				pSource->incNrRecruitments();
-				createTreg(pSource->getRow(), pSource->getCol(),
-					_time - g_Rand.getInt(_PARAM(PARAM_TCELL_AGE), 1), TREG_ACTIVE);
-			}
 		}
 	}
 }

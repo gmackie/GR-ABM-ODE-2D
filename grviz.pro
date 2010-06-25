@@ -6,7 +6,10 @@ CONFIG += debug_and_release
 QT += core \
     gui \
     opengl
-HEADERS += scalardatasets/scalarcelldensitydataset.h \
+HEADERS += simulation/recruitmentlnode.h \
+    simulation/recruitmentprob.h \
+    simulation/recruitmentbase.h \
+    scalardatasets/scalarcelldensitydataset.h \
     scalardatasets/scalartnfattrextmtb.h \
     scalardatasets/scalarattractantdataset.h \
     scalardatasets/scalaragentgridbase.h \
@@ -80,7 +83,10 @@ HEADERS += scalardatasets/scalarcelldensitydataset.h \
     maininterface.h \
     simulation.h \
     snapshot.h
-SOURCES += gui/agentswidget.cpp \
+SOURCES += simulation/recruitmentlnode.cpp \
+    simulation/recruitmentprob.cpp \
+    simulation/recruitmentbase.cpp \
+    gui/agentswidget.cpp \
     gui/statwidget.cpp \
     colormaps/blackwhite.cpp \
     colormaps/colormap.cpp \

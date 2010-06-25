@@ -67,6 +67,17 @@ private:
 	int _nBactAct;
 	int _area;
 	GrStatus _grStatus[NOUTCOMES];
+	double _MDC;
+	int _queueTgam;
+	int _queueTcyt;
+	int _queueTreg;
+	double _fluxTgam;
+	double _fluxTcyt;
+	double _fluxTreg;
+	int _nSourceMacActive;
+	int _nSourceTgamActive;
+	int _nSourceTcytActive;
+	int _nSourceTregActive;
 
 public:
 	GrStat();
@@ -120,6 +131,7 @@ public:
 	void updateMacNFkBStatistics(MacState state);
 	void updateMacStat1Statistics(MacState state);
 	void updateMacDeactStatistics(MacState state);
+	void resetAgentStats();
 	void reset();
 	void incTotExtMtb(double dExtMtb);
 	void incTotIntMtb(double dIntMtb);
@@ -140,6 +152,14 @@ public:
 	void incNrSourcesTgam();
 	void incNrSourcesTcyt();
 	void incNrSourcesTreg();
+	int getNrSourcesActiveMac() const;
+	int getNrSourcesActiveTgam() const;
+	int getNrSourcesActiveTcyt() const;
+	int getNrSourcesActiveTreg() const;
+	void incNrSourcesActiveMac();
+	void incNrSourcesActiveTgam();
+	void incNrSourcesActiveTcyt();
+	void incNrSourcesActiveTreg();
 	int getNrBactAct() const;
 	void incNrBactAct();
 	int getArea() const;
@@ -148,7 +168,91 @@ public:
 	void setGrStatus(int index, GrStatus status);
 	void serialize(std::ostream& out) const;
 	void deserialize(std::istream& in);
+	int getNrTgamQueued() const;
+	void setNrTgamQueued(int count);
+	int getNrTcytQueued() const;
+	void setNrTcytQueued(int count);
+	int getNrTregQueued() const;
+	void setNrTregQueued(int count);
+	double getFluxTgam() const;
+	void setFluxTgam(double flux);
+	double getFluxTcyt() const;
+	void setFluxTcyt(double flux);
+	double getFluxTreg() const;
+	void setFluxTreg(double flux);
+	double getMDC() const;
+	void setMDC(double MDC);
 };
+
+inline double GrStat::getMDC() const
+{
+	return _MDC;
+}
+
+inline void GrStat::setMDC(double MDC)
+{
+	_MDC = MDC;
+}
+
+inline int GrStat::getNrTgamQueued() const
+{
+	return _queueTgam;
+}
+
+inline void GrStat::setNrTgamQueued(int count)
+{
+	_queueTgam = count;
+}
+
+inline double GrStat::getFluxTgam() const
+{
+	return _fluxTgam;
+}
+
+inline void GrStat::setFluxTgam(double flux)
+{
+	_fluxTgam = flux;
+}
+
+inline int GrStat::getNrTcytQueued() const
+{
+	return _queueTcyt;
+}
+
+inline void GrStat::setNrTcytQueued(int count)
+{
+	_queueTcyt = count;
+}
+
+inline double GrStat::getFluxTcyt() const
+{
+	return _fluxTcyt;
+}
+
+inline void GrStat::setFluxTcyt(double flux)
+{
+	_fluxTcyt = flux;
+}
+
+inline int GrStat::getNrTregQueued() const
+{
+	return _queueTreg;
+}
+
+inline void GrStat::setNrTregQueued(int count)
+{
+	_queueTreg = count;
+}
+
+inline double GrStat::getFluxTreg() const
+{
+	return _fluxTreg;
+}
+
+inline void GrStat::setFluxTreg(double flux)
+{
+	_fluxTreg = flux;
+}
 
 inline int GrStat::getNrBactAct() const
 {
@@ -220,6 +324,46 @@ inline void GrStat::incNrSourcesTcyt()
 inline void GrStat::incNrSourcesTreg()
 {
 	_nSourceTreg++;
+}
+
+inline int GrStat::getNrSourcesActiveMac() const
+{
+	return _nSourceMacActive;
+}
+
+inline int GrStat::getNrSourcesActiveTgam() const
+{
+	return _nSourceTgamActive;
+}
+
+inline int GrStat::getNrSourcesActiveTcyt() const
+{
+	return _nSourceTcytActive;
+}
+
+inline int GrStat::getNrSourcesActiveTreg() const
+{
+	return _nSourceTregActive;
+}
+
+inline void GrStat::incNrSourcesActiveMac()
+{
+	_nSourceMacActive++;
+}
+
+inline void GrStat::incNrSourcesActiveTgam()
+{
+	_nSourceTgamActive++;
+}
+
+inline void GrStat::incNrSourcesActiveTcyt()
+{
+	_nSourceTcytActive++;
+}
+
+inline void GrStat::incNrSourcesActiveTreg()
+{
+	_nSourceTregActive++;
 }
 
 inline int GrStat::getNrApoptosisFasFasL() const

@@ -13,7 +13,7 @@ endif
 
 all: gr
 
-gr: params.o rand.o agent.o gr.o grgrid.o gridcell.o macrophage.o grmain.o grstat.o grsimulation.o onlinestat.o grdiffusion.o grdiffusionftcs.o grdiffusionbtcs.o grdiffusionwrongbtcs.o ttest.o areatest.o mtbtest.o tcell.o tcytotoxic.o tgamma.o tregulatory.o tinyxml/tinystr.o tinyxml/tinyxml.o tinyxml/tinyxmlerror.o tinyxml/tinyxmlparser.o
+gr: params.o rand.o agent.o gr.o grgrid.o gridcell.o macrophage.o grmain.o grstat.o grsimulation.o onlinestat.o grdiffusion.o grdiffusionftcs.o grdiffusionbtcs.o grdiffusionwrongbtcs.o ttest.o areatest.o mtbtest.o tcell.o tcytotoxic.o tgamma.o tregulatory.o recruitmentbase.o recruitmentprob.o recruitmentlnode.o tinyxml/tinystr.o tinyxml/tinyxml.o tinyxml/tinyxmlerror.o tinyxml/tinyxmlparser.o
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
 lhs: gr.o params.o tinyxml/tinystr.o tinyxml/tinyxml.o tinyxml/tinyxmlerror.o tinyxml/tinyxmlparser.o lhs.o rand.o

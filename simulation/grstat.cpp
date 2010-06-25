@@ -58,6 +58,17 @@ GrStat::GrStat()
 	, _nMacDeactDead(0)
 	, _nBactAct(0)
 	, _area(0)
+	, _MDC(0)
+	, _queueTgam(0)
+	, _queueTcyt(0)
+	, _queueTreg(0)
+	, _fluxTgam(0)
+	, _fluxTcyt(0)
+	, _fluxTreg(0)
+	, _nSourceMacActive(0)
+	, _nSourceTgamActive(0)
+	, _nSourceTcytActive(0)
+	, _nSourceTregActive(0)
 {
 	for (int i = 0; i < NOUTCOMES; i++)
 	{
@@ -216,7 +227,7 @@ void GrStat::updateTregStatistics(TregState state)
 	_nTreg++;
 }
 
-void GrStat::reset()
+void GrStat::resetAgentStats()
 {
 	_nMac = _nMacResting = _nMacInfected = 
 		_nMacCInfected = _nMacDead = _nMacActive = 0;
@@ -235,11 +246,16 @@ void GrStat::reset()
 	_nTcyt = _nTcytDead = _nTcytDownRegulated = _nTcytActive = 0;
 	
 	_nTreg = _nTregDead = _nTregActive = 0;
-	
+}
+
+void GrStat::reset()
+{
 	_totIntMtb = _totExtMtb = _totMacAttractant = _totTNF = _totCCL2 = _totCCL5 = _totCXCL9 = 0;
 	
 	_nSourceMac = _nSourceTcyt = _nSourceTgam = _nSourceTreg = 0;
 	
+	_nSourceMacActive = _nSourceTcytActive = _nSourceTgamActive = _nSourceTregActive = 0;
+
 	_area = 0;
 }
 

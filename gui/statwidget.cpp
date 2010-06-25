@@ -57,13 +57,19 @@ void StatWidget::updateLabels(const GrStat& stats)
 	str = QString("(%1,%2)").arg(stats.getNrApoptosisTNF()).arg(stats.getNrApoptosisFasFasL());
 	_ui.labelApoptosis->setText(str);
 
-	int nSrcMac = stats.getNrSourcesMac();
-	int nSrcTgam = stats.getNrSourcesTgam();
-	int nSrcTcyt = stats.getNrSourcesTcyt();
-	int nSrcTreg = stats.getNrSourcesTreg();
-
-	str = QString("(%1,%2,%3,%4)").arg(nSrcMac).arg(nSrcTgam).arg(nSrcTcyt).arg(nSrcTreg);
+	str = QString("(%1,%2,%3,%4)").
+		arg(stats.getNrSourcesMac()).
+		arg(stats.getNrSourcesTgam()).
+		arg(stats.getNrSourcesTcyt()).
+		arg(stats.getNrSourcesTreg());
 	_ui.labelSources->setText(str);
+
+	str = QString("(%1,%2,%3,%4)").
+		arg(stats.getNrSourcesActiveMac()).
+		arg(stats.getNrSourcesActiveTgam()).
+		arg(stats.getNrSourcesActiveTcyt()).
+		arg(stats.getNrSourcesActiveTreg());
+	_ui.labelSourcesAct->setText(str);
 
 	str = QString("%1").arg(stats.getTotMacAttractant(), 0, 'f', 2);
 	_ui.labelMacAttractant->setText(str);
@@ -83,4 +89,21 @@ void StatWidget::updateLabels(const GrStat& stats)
 	// update granuloma area
 	str = QString("%1").arg(stats.getArea());
 	_ui.labelGranulomaAreaVal->setText(str);
+
+	// update ODE stats
+	str = QString("%1").arg(stats.getMDC());
+	_ui.labeldMDC->setText(str);
+
+	str = QString("(%1,%2,%3)").arg(stats.getNrTgamQueued()).
+		arg(stats.getNrTcytQueued()).arg(stats.getNrTregQueued());
+	_ui.labelTcellQueue->setText(str);
+
+	str = QString("%1").arg(stats.getFluxTgam());
+	_ui.labelTgamFlux->setText(str);
+
+	str = QString("%1").arg(stats.getFluxTcyt());
+	_ui.labelTcytFlux->setText(str);
+
+	str = QString("%1").arg(stats.getFluxTreg());
+	_ui.labelTregFlux->setText(str);
 }

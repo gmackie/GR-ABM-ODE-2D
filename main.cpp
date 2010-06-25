@@ -15,6 +15,8 @@
 #include <boost/program_options.hpp>
 #include <string>
 #include "simulation/params.h"
+#include "simulation/recruitmentprob.h"
+#include "simulation/recruitmentlnode.h"
 #include "maininterface.h"
 #include "simulation.h"
 #include "ui_mainwindow.h"
@@ -78,6 +80,8 @@ int main(int argc, char *argv[])
 	std::string outputDir;
 	std::string resolution;
 	std::string outcomeTest[NOUTCOMES];
+	std::string lymphNodeODE;
+	std::string lymphNodeTemp;
 	bool scriptingMode;
 	bool outputEnabled;
 	int nDays;
@@ -131,6 +135,8 @@ int main(int argc, char *argv[])
 				"Resolution of the OpenGL window")
 		("granuloma-visualization,g", po::value<std::string>(&granvizDataSetName), argHelp.c_str())
 		("load-state,l",  po::value<std::string>(&stateFileName), "File name of saved state to load")
+		("ln-ode", po::value<std::string>(&lymphNodeODE), "Lymph node application")
+		("ln-ode-temp", po::value<std::string>(&lymphNodeTemp), "Lymph node temp file")
 		("version,v", "Version number");
 
 	try
@@ -274,6 +280,12 @@ int main(int argc, char *argv[])
 	GLWindow glWindow(&itfc);
 	ParamWindow paramWindow(&itfc);
 	MainWindow w(&itfc, &glWindow, &paramWindow, new StatWidget(), new AgentsWidget(&agentsVisualization));
+
+	/* set recruitment method */
+	if (lymphNodeODE == "" && lymphNodeTemp == "")
+		itfc.getSimulation().setRecruitment(new RecruitmentProb());
+	else
+		itfc.getSimulation().setRecruitment(new RecruitmentLnODE(lymphNodeODE, lymphNodeTemp));
 
 	glWindow.resizeGLWidget(resWidth, resHeight);
 	Ui::MainWindowClass& ui = w.getUI();

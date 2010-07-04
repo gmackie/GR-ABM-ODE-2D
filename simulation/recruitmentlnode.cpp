@@ -93,6 +93,8 @@ void RecruitmentLnODE::updateQueue(GrStat& stats)
 	tcellFlux[TCELL_TYPE_REG] = .1 * tcellFlux[TCELL_TYPE_GAM];
 
 	// Update the T cell queue and the table that contains the next integer to cross
+
+	/* Be careful, increment can be more than 1 */
 	for (int i = 0; i < TCELL_TYPE_COUNT; i++)
 	{
 		TcellType type = (TcellType) i;

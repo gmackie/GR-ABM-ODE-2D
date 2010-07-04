@@ -70,6 +70,35 @@ void ParamWindow::update()
 	newItem(_pGR, PARAM_GR_MAX_CHEMOTAXIS);
 	newItem(_pGR, PARAM_GR_SEC_RATE_ATTRACTANT);
 
+	newItem(_pGR, PARAM_muMDC_LN);
+	newItem(_pGR, PARAM_sn4);
+	newItem(_pGR, PARAM_muN4);
+	newItem(_pGR, PARAM_k13);
+	newItem(_pGR, PARAM_hs13);
+	newItem(_pGR, PARAM_k14);
+	newItem(_pGR, PARAM_k15);
+	newItem(_pGR, PARAM_rho2);
+	newItem(_pGR, PARAM_k20a);
+	newItem(_pGR, PARAM_hs20a);
+	newItem(_pGR, PARAM_csi1);
+	newItem(_pGR, PARAM_csi1a);
+	newItem(_pGR, PARAM_sn8);
+	newItem(_pGR, PARAM_muN8);
+	newItem(_pGR, PARAM_wT80);
+	newItem(_pGR, PARAM_k16);
+	newItem(_pGR, PARAM_hs16);
+	newItem(_pGR, PARAM_k17);
+	newItem(_pGR, PARAM_hs17);
+	newItem(_pGR, PARAM_k18);
+	newItem(_pGR, PARAM_rho3);
+	newItem(_pGR, PARAM_k24a);
+	newItem(_pGR, PARAM_hs24a);
+	newItem(_pGR, PARAM_csi2);
+	newItem(_pGR, PARAM_csi2a);
+	newItem(_pGR, PARAM_csi2b);
+	newItem(_pGR, PARAM_scaling);
+	newItem(_pGR, PARAM_m);
+
 	if (Params::getInstance()->getUseRecruitmentWeights())
 	{
 		newItem(_pGR, PARAM_GR_WEIGHT_TNF_RECRUITMENT);

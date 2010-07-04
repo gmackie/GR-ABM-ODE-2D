@@ -57,6 +57,34 @@ typedef enum {
 	PARAM_INTMTB_GROWTH_RATE,
 	PARAM_EXTMTB_GROWTH_RATE,
 	PARAM_EXTMTB_UPPER_BOUND,
+	PARAM_muMDC_LN,
+	PARAM_sn4,
+	PARAM_muN4,
+	PARAM_k13,
+	PARAM_hs13,
+	PARAM_k14,
+	PARAM_k15,
+	PARAM_rho2,
+	PARAM_k20a,
+	PARAM_hs20a,
+	PARAM_csi1,
+	PARAM_csi1a,
+	PARAM_sn8,
+	PARAM_muN8,
+	PARAM_wT80,
+	PARAM_k16,
+	PARAM_hs16,
+	PARAM_k17,
+	PARAM_hs17,
+	PARAM_k18,
+	PARAM_rho3,
+	PARAM_k24a,
+	PARAM_hs24a,
+	PARAM_csi2,
+	PARAM_csi2a,
+	PARAM_csi2b,
+	PARAM_scaling,
+	PARAM_m,
 	PARAM_DOUBLE_COUNT // dummy for the count
 } ParamDoubleType;
 
@@ -83,6 +111,7 @@ private:
 	static const char* _description[][4];
 	static Params* _pInstance;
 	bool _useRecruitmentWeights;
+	bool _ode;
 	double _doubleParam[PARAM_DOUBLE_COUNT];
 	int _intParam[PARAM_INT_COUNT];
 	PosVector _initialMacs;
@@ -91,7 +120,7 @@ private:
 	enum ClosingTagType { CLOSE_START_TAG, CLOSE_END_TAG, CLOSE_NONE };
 
 protected:
-	Params();
+	Params(bool ode = false);
 	virtual ~Params();
 	bool readParam(const TiXmlElement* pElement, const char* paramName, double* pVar, bool prob);
 	bool readParam(const TiXmlElement* pElement, const char* paramName, double* pVar, double defaultVal, bool prob);
@@ -115,6 +144,7 @@ protected:
 
 public:
 	void printCSV(bool header) const;
+	bool getUseOde() const;
 	bool fromXml(const char* filename);
 	bool toXml(const char* filename) const;
 	double getParam(ParamDoubleType param) const;
@@ -132,14 +162,19 @@ public:
 	const char* getUnit(ParamIntType param) const;
 	const char* getDescription(ParamDoubleType param) const;
 	const char* getDescription(ParamIntType param) const;
-	static Params* getInstance();
+	static Params* getInstance(bool ode = false);
 	static bool reinit(const char* filename);
 };
 
-inline Params* Params::getInstance()
+inline bool Params::getUseOde() const
+{
+	return _ode;
+}
+
+inline Params* Params::getInstance(bool ode)
 {
 	if (!_pInstance)
-		_pInstance = new Params();
+		_pInstance = new Params(ode);
 
 	return _pInstance;
 }

@@ -16,7 +16,7 @@
 
 class RecruitmentLnODE : public RecruitmentBase
 {
-private:
+protected:
 	enum TcellType {TCELL_TYPE_CYT, TCELL_TYPE_REG, TCELL_TYPE_GAM, TCELL_TYPE_COUNT};
 	static const int _nrConditions = 43;
 
@@ -39,7 +39,7 @@ private:
 
 	void init();
 	void updateInitialConditions(GrStat& stats);
-	void solveODE();
+	virtual void solveODE();
 	void updateQueue(GrStat& stats);
 	void recruitMacsGetTcellSources(GrSimulation& sim, GrStat& stats,
 			ThresholdGridCellPtrList tcellSources[TCELL_TYPE_COUNT]);

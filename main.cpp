@@ -17,6 +17,7 @@
 #include "simulation/params.h"
 #include "simulation/recruitmentprob.h"
 #include "simulation/recruitmentlnode.h"
+#include "simulation/recruitmentlnodepure.h"
 #include "maininterface.h"
 #include "simulation.h"
 #include "ui_mainwindow.h"
@@ -73,6 +74,7 @@ int main(int argc, char *argv[])
 {
 	QApplication a(argc, argv);
 
+	bool ode;
 	unsigned long seed;
 	bool seedSpecified;
 	int diffMethod;
@@ -135,6 +137,7 @@ int main(int argc, char *argv[])
 				"Resolution of the OpenGL window")
 		("granuloma-visualization,g", po::value<std::string>(&granvizDataSetName), argHelp.c_str())
 		("load-state,l",  po::value<std::string>(&stateFileName), "File name of saved state to load")
+		("ode", "Use integrated lymph node ODE for recruitment")
 		("ln-ode", po::value<std::string>(&lymphNodeODE), "Lymph node application")
 		("ln-ode-temp", po::value<std::string>(&lymphNodeTemp), "Lymph node temp file")
 		("version,v", "Version number");
@@ -169,6 +172,8 @@ int main(int argc, char *argv[])
 		scriptingMode = vm.count("script");
 		outputEnabled = vm.count("output");
 
+		ode = vm.count("ode");
+
 		if (!vm.count("input-file"))
 		{
 			QString fileName = QFileDialog::getOpenFileName(NULL, "Load parameters", "", "*.xml");
@@ -183,7 +188,7 @@ int main(int argc, char *argv[])
 			}
 		}
 
-		if (!Params::reinit(inputFileName.c_str()))
+		if (!Params::getInstance(ode)->fromXml(inputFileName.c_str()))
 			return 1;
 
 		if (!(0 <= diffMethod && diffMethod < 3))
@@ -282,10 +287,13 @@ int main(int argc, char *argv[])
 	MainWindow w(&itfc, &glWindow, &paramWindow, new StatWidget(), new AgentsWidget(&agentsVisualization));
 
 	/* set recruitment method */
-	if (lymphNodeODE == "" && lymphNodeTemp == "")
+	if (ode)
+		itfc.getSimulation().setRecruitment(new RecruitmentLnODEPure());
+	else if (lymphNodeODE == "" && lymphNodeTemp == "")
 		itfc.getSimulation().setRecruitment(new RecruitmentProb());
 	else
 		itfc.getSimulation().setRecruitment(new RecruitmentLnODE(lymphNodeODE, lymphNodeTemp));
+
 
 	glWindow.resizeGLWidget(resWidth, resHeight);
 	Ui::MainWindowClass& ui = w.getUI();

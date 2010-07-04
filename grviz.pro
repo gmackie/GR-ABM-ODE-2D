@@ -6,7 +6,8 @@ CONFIG += debug_and_release
 QT += core \
     gui \
     opengl
-HEADERS += simulation/recruitmentlnode.h \
+HEADERS += simulation/recruitmentlnodepure.h \
+    simulation/recruitmentlnode.h \
     simulation/recruitmentprob.h \
     simulation/recruitmentbase.h \
     scalardatasets/scalarcelldensitydataset.h \
@@ -83,7 +84,8 @@ HEADERS += simulation/recruitmentlnode.h \
     maininterface.h \
     simulation.h \
     snapshot.h
-SOURCES += simulation/recruitmentlnode.cpp \
+SOURCES += simulation/recruitmentlnodepure.cpp \
+    simulation/recruitmentlnode.cpp \
     simulation/recruitmentprob.cpp \
     simulation/recruitmentbase.cpp \
     gui/agentswidget.cpp \

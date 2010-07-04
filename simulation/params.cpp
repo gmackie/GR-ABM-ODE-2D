@@ -57,6 +57,35 @@ const char* Params::_description[][4] =
 	{ "growthRateIntMtb", "Growth rate of intracellular bacteria", "", "Mtb" },
 	{ "growthRateExtMtb", "Growth rate of extracellular bacteria", "", "Mtb" },
 	{ "growthExtMtbBound", "Upper bound on the number of extracellular bacteria used in growth function", "#bacteria", "Mtb" },
+	{ "muMDC_LN", "ODE stuff", "", "GR" },
+	{ "sn4", "ODE stuff", "", "GR" },
+	{ "muN4", "ODE stuff", "", "GR" },
+	{ "k13", "ODE stuff", "", "GR" },
+	{ "hs13", "ODE stuff", "", "GR" },
+	{ "k14", "ODE stuff", "", "GR" },
+	{ "k15", "ODE stuff", "", "GR" },
+	{ "rho2", "ODE stuff", "", "GR" },
+	{ "k20a", "ODE stuff", "", "GR" },
+	{ "hs20a", "ODE stuff", "", "GR" },
+	{ "csi1", "ODE stuff", "", "GR" },
+	{ "csi1a", "ODE stuff", "", "GR" },
+	{ "sn8", "ODE stuff", "", "GR" },
+	{ "muN8", "ODE stuff", "", "GR" },
+	{ "wT80", "ODE stuff", "", "GR" },
+	{ "k16", "ODE stuff", "", "GR" },
+	{ "hs16", "ODE stuff", "", "GR" },
+	{ "k17", "ODE stuff", "", "GR" },
+	{ "hs17", "ODE stuff", "", "GR" },
+	{ "k18", "ODE stuff", "", "GR" },
+	{ "rho3", "ODE stuff", "", "GR" },
+	{ "k24a", "ODE stuff", "", "GR" },
+	{ "hs24a", "ODE stuff", "", "GR" },
+	{ "csi2", "ODE stuff", "", "GR" },
+	{ "csi2a", "ODE stuff", "", "GR" },
+	{ "csi2b", "ODE stuff", "", "GR" },
+	{ "scaling", "ODE stuff", "", "GR" },
+	{ "m", "ODE stuff", "", "GR" },
+	/* INT */
 	{ "nrSources", "Number of vascular sources on the grid", "", "GR" },
 	{ "nrKillingsCaseation", "Number of killings for a compartment to become caseated", "", "GR" },
 	{ "maxAge", "Maximal macrophage age", "#timesteps", "Mac" },
@@ -72,8 +101,9 @@ const char* Params::_description[][4] =
 	{ "maxTimeReg", "Time span during which a macrophage remains down-regulated", "#timesteps", "Mac" },
 };
 
-Params::Params()
+Params::Params(bool ode)
 	: _useRecruitmentWeights(false)
+	, _ode(ode)
 	, _doubleParam()
 	, _intParam()
 	, _initialMacs()
@@ -432,6 +462,38 @@ bool Params::readGRElement(const TiXmlElement* pGrElement)
 		getParam(PARAM_MAC_SEC_RATE_TNF) / getParam(PARAM_MAC_SEC_RATE_CCL5), false);
 	res &= readParam(pGrElement, PARAM_GR_WEIGHT_CXCL9_RECRUITMENT,
 		getParam(PARAM_MAC_SEC_RATE_TNF) / getParam(PARAM_MAC_SEC_RATE_CXCL9), false);
+
+	if (_ode)
+	{
+		res &= readParam(pGrElement, PARAM_muMDC_LN, false);
+		res &= readParam(pGrElement, PARAM_sn4, false);
+		res &= readParam(pGrElement, PARAM_muN4, false);
+		res &= readParam(pGrElement, PARAM_k13, false);
+		res &= readParam(pGrElement, PARAM_hs13, false);
+		res &= readParam(pGrElement, PARAM_k14, false);
+		res &= readParam(pGrElement, PARAM_k15, false);
+		res &= readParam(pGrElement, PARAM_rho2, false);
+		res &= readParam(pGrElement, PARAM_k20a, false);
+		res &= readParam(pGrElement, PARAM_hs20a, false);
+		res &= readParam(pGrElement, PARAM_csi1, false);
+		res &= readParam(pGrElement, PARAM_csi1a, false);
+		res &= readParam(pGrElement, PARAM_sn8, false);
+		res &= readParam(pGrElement, PARAM_muN8, false);
+		res &= readParam(pGrElement, PARAM_wT80, false);
+		res &= readParam(pGrElement, PARAM_k16, false);
+		res &= readParam(pGrElement, PARAM_hs16, false);
+		res &= readParam(pGrElement, PARAM_k17, false);
+		res &= readParam(pGrElement, PARAM_hs17, false);
+		res &= readParam(pGrElement, PARAM_k18, false);
+		res &= readParam(pGrElement, PARAM_rho3, false);
+		res &= readParam(pGrElement, PARAM_k24a, false);
+		res &= readParam(pGrElement, PARAM_hs24a, false);
+		res &= readParam(pGrElement, PARAM_csi2, false);
+		res &= readParam(pGrElement, PARAM_csi2a, false);
+		res &= readParam(pGrElement, PARAM_csi2b, false);
+		res &= readParam(pGrElement, PARAM_scaling, false);
+		res &= readParam(pGrElement, PARAM_m, false);
+	}
 
 	return res;
 }

@@ -84,7 +84,7 @@ void RecruitmentLnODEPure::solveODE()
 		// y(9), precursor TH1 migration from the LN [TH0lung]
 		double dTH0lung=scaling*csi1*TH0*dt;
 		// y(10), TH1 migration from the LN [TH1lung]
-		double dTH1lung=csi1a*TH1*dt;
+		double dTH1lung=scaling*csi1a*TH1*dt;
 		// y(11), precursor T8 migration from the LN [T80lung]
 		double dT80lung = scaling*csi2*T80*dt;
 		//  y(12), T8 migration from the LN [T8lung]

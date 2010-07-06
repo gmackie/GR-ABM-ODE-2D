@@ -107,7 +107,7 @@ void RecruitmentLnODEPure::solveODE()
 		TClung+=dTClung; // CTL migration from the LN[13]
 	}
 
-	std::cout << "MDC\t" << _odeInitialConditions[_idxMDC] << std::endl;
+	/*std::cout << "MDC\t" << _odeInitialConditions[_idxMDC] << std::endl;
 	std::cout << "N4\t" << _odeInitialConditions[_idxNaiveCD4] << std::endl;
 	std::cout << "TH0\t" << _odeInitialConditions[_idxTH0] << std::endl;
 	std::cout << "TH1\t" << _odeInitialConditions[_idxTH1] << std::endl;
@@ -119,5 +119,5 @@ void RecruitmentLnODEPure::solveODE()
 	std::cout << "TH1l\t" << _odeInitialConditions[_idxEffectorTH1] << std::endl;
 	std::cout << "T80l\t" << _odeInitialConditions[_idxEffectorT80] << std::endl;
 	std::cout << "T8l\t" << _odeInitialConditions[_idxEffectorT8] << std::endl;
-	std::cout << "TCl\t" << _odeInitialConditions[_idxCTL] << std::endl;
+	std::cout << "TCl\t" << _odeInitialConditions[_idxCTL] << std::endl;*/
 }

@@ -18,7 +18,7 @@ RecruitmentLnODEPure::~RecruitmentLnODEPure()
 
 void RecruitmentLnODEPure::solveODE()
 {
-	const double dt = 6;
+	const double dt = 1.0/14400.0;
 
 	static const double muMDC_LN= _PARAM(PARAM_muMDC_LN);
 	static const double sn4     = _PARAM(PARAM_sn4     );
@@ -49,22 +49,22 @@ void RecruitmentLnODEPure::solveODE()
 	static const double scaling = _PARAM(PARAM_scaling );
 	static const double m       = _PARAM(PARAM_m       );
 
+	double& MDC = _odeInitialConditions[_idxMDC];
+	double& N4 = _odeInitialConditions[_idxNaiveCD4];
+	double& TH0 = _odeInitialConditions[_idxTH0];
+	double& TH1 = _odeInitialConditions[_idxTH1];
+	double& N8 = _odeInitialConditions[_idxNaiveCD8];
+	double& T80 = _odeInitialConditions[_idxT80];
+	double& T8 = _odeInitialConditions[_idxT8];
+	double& TC = _odeInitialConditions[_idxPrecursorCTL];
+	double& TH0lung = _odeInitialConditions[_idxEffectorTH0];
+	double& TH1lung = _odeInitialConditions[_idxEffectorTH1];
+	double& T80lung = _odeInitialConditions[_idxEffectorT80];
+	double& T8lung = _odeInitialConditions[_idxEffectorT8];
+	double& TClung = _odeInitialConditions[_idxCTL];
+
 	for (int i = 0; i < 100; i++)
 	{
-		double& MDC = _odeInitialConditions[_idxMDC];
-		double& N4 = _odeInitialConditions[_idxNaiveCD4];
-		double& TH0 = _odeInitialConditions[_idxTH0];
-		double& TH1 = _odeInitialConditions[_idxTH1];
-		double& N8 = _odeInitialConditions[_idxNaiveCD8];
-		double& T80 = _odeInitialConditions[_idxT80];
-		double& T8 = _odeInitialConditions[_idxT8];
-		double& TC = _odeInitialConditions[_idxPrecursorCTL];
-		double& TH0lung = _odeInitialConditions[_idxEffectorTH0];
-		double& TH1lung = _odeInitialConditions[_idxEffectorTH1];
-		double& T80lung = _odeInitialConditions[_idxEffectorT80];
-		double& T8lung = _odeInitialConditions[_idxEffectorT8];
-		double& TClung = _odeInitialConditions[_idxCTL];
-
 		// y(1), MDC LN [MDC] - Mature/Licensed Dendritic Cell (in the Lymph Node)
 		double dMDC = - muMDC_LN*MDC*dt;
 		// y(2), Naive CD4+ T cells in the Lymph Node  [N4]

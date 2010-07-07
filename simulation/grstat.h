@@ -67,7 +67,6 @@ private:
 	int _nBactAct;
 	int _area;
 	GrStatus _grStatus[NOUTCOMES];
-	double _MDC;
 	int _queueTgam;
 	int _queueTcyt;
 	int _queueTreg;
@@ -78,6 +77,19 @@ private:
 	int _nSourceTgamActive;
 	int _nSourceTcytActive;
 	int _nSourceTregActive;
+	double _MDC;
+	double _N4;
+	double _TH0;
+	double _TH1;
+	double _N8;
+	double _T80;
+	double _T8;
+	double _TC;
+	double _TH0lung;
+	double _TH1lung;
+	double _T80lung;
+	double _T8lung;
+	double _TClung;
 
 public:
 	GrStat();
@@ -182,7 +194,151 @@ public:
 	void setFluxTreg(double flux);
 	double getMDC() const;
 	void setMDC(double MDC);
+	double getN4() const;
+	double getTH0() const;
+	double getTH1() const;
+	double getN8() const;
+	double getT80() const;
+	double getT8() const;
+	double getTC() const;
+	double getTH0lung() const;
+	double getTH1lung() const;
+	double getT80lung() const;
+	double getT8lung() const;
+	double getTClung() const;
+	void setN4(double val);
+	void setTH0(double val);
+	void setTH1(double val);
+	void setN8(double val);
+	void setT80(double val);
+	void setT8(double val);
+	void setTC(double val);
+	void setTH0lung(double val);
+	void setTH1lung(double val);
+	void setT80lung(double val);
+	void setT8lung(double val);
+	void setTClung(double val);
 };
+
+inline void GrStat::setN4(double val)
+{
+	_N4 = val;
+}
+
+inline void GrStat::setTH0(double val)
+{
+	_TH0 = val;
+}
+
+inline void GrStat::setTH1(double val)
+{
+	_TH1 = val;
+}
+
+inline void GrStat::setN8(double val)
+{
+	_N8 = val;
+}
+
+inline void GrStat::setT80(double val)
+{
+	_T80 = val;
+}
+
+inline void GrStat::setT8(double val)
+{
+	_T8 = val;
+}
+
+inline void GrStat::setTC(double val)
+{
+	_TC = val;
+}
+
+inline void GrStat::setTH0lung(double val)
+{
+	_TH0lung = val;
+}
+
+inline void GrStat::setTH1lung(double val)
+{
+	_TH1lung = val;
+}
+
+inline void GrStat::setT80lung(double val)
+{
+	_T80lung = val;
+}
+
+inline void GrStat::setT8lung(double val)
+{
+	_T8lung = val;
+}
+
+inline void GrStat::setTClung(double val)
+{
+	_TClung = val;
+}
+
+inline double GrStat::getN4() const
+{
+	return _N4;
+}
+
+inline double GrStat::getTH0() const
+{
+	return _TH0;
+}
+
+inline double GrStat::getTH1() const
+{
+	return _TH1;
+}
+
+inline double GrStat::getN8() const
+{
+	return _N8;
+}
+
+inline double GrStat::getT80() const
+{
+	return _T80;
+}
+
+inline double GrStat::getT8() const
+{
+	return _T8;
+}
+
+inline double GrStat::getTC() const
+{
+	return _TC;
+}
+
+inline double GrStat::getTH0lung() const
+{
+	return _TH0lung;
+}
+
+inline double GrStat::getTH1lung() const
+{
+	return _TH1lung;
+}
+
+inline double GrStat::getT80lung() const
+{
+	return _T80lung;
+}
+
+inline double GrStat::getT8lung() const
+{
+	return _T8lung;
+}
+
+inline double GrStat::getTClung() const
+{
+	return _TClung;
+}
 
 inline double GrStat::getMDC() const
 {

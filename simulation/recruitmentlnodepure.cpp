@@ -16,7 +16,7 @@ RecruitmentLnODEPure::~RecruitmentLnODEPure()
 {
 }
 
-void RecruitmentLnODEPure::solveODE()
+void RecruitmentLnODEPure::solveODE(GrStat& stats)
 {
 	const double dt = 1.0/14400.0;
 
@@ -106,6 +106,21 @@ void RecruitmentLnODEPure::solveODE()
 		T8lung+=dT8lung; // T8 migration from the LN [12]
 		TClung+=dTClung; // CTL migration from the LN[13]
 	}
+
+	stats.setMDC(MDC);
+	stats.setN4(N4);
+	stats.setTH0(TH0);
+	stats.setTH1(TH1);
+	stats.setN8(N8);
+	stats.setT80(T80);
+	stats.setT8(T8);
+	stats.setTC(TC);
+	stats.setTH0lung(TH0lung);
+	stats.setTH1lung(TH1lung);
+	stats.setT80lung(T80lung);
+	stats.setT8lung(T8lung);
+	stats.setTClung(TClung);
+
 
 	/*std::cout << "MDC\t" << _odeInitialConditions[_idxMDC] << std::endl;
 	std::cout << "N4\t" << _odeInitialConditions[_idxNaiveCD4] << std::endl;

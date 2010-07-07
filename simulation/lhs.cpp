@@ -12,8 +12,8 @@
 
 namespace po = boost::program_options;
 
-Lhs::Lhs(int nSamples)
-	: Params()
+Lhs::Lhs(int nSamples, bool ode)
+	: Params(ode)
 	, _nSamples(nSamples)
 	, _lhsDoubleParam()
 	, _lhsIntParam()
@@ -203,6 +203,7 @@ int main(int argc, char** argv)
 	std::string inputFileName;
 	int nSamples;
 	unsigned long seed;
+	bool ode;
 
 	po::options_description desc("Allowed options");
 	desc.add_options()
@@ -210,6 +211,7 @@ int main(int argc, char** argv)
 		("input-file,i", po::value<std::string>(&inputFileName), "Input file name")
 		("seed,s", po::value<unsigned long>(&seed)->default_value(1), "Seed")
 		("samples,n", po::value<int>(&nSamples), "Number of samples")
+		("ode", "Use integrated lymph node ODE for recruitment")
 		("version,v", "Version number");
 
 	try
@@ -231,6 +233,8 @@ int main(int argc, char** argv)
 			printUsage(argv[0], desc);
 			return 0;
 		}
+
+		ode = vm.count("ode");
 
 		if (!vm.count("samples"))
 		{

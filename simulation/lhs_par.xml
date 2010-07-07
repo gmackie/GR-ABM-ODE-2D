@@ -7,7 +7,8 @@
 	thresholdApoptosisTNF = "[60, 80]"
 	probApoptosisTNF = "[0.01, 0.1]"
 	minChemotaxis = "[2, 2]"
-	maxChemotaxis = "[2000, 2000]">
+	maxChemotaxis = "[2000, 2000]"
+	dAttractant = "[0, 0.01]">
 	<Mac	maxAge = "[14400, 14400]"
 		initNumber = "[105, 105]"
 		maxAgeAct = "[1440, 1440]"
@@ -15,6 +16,10 @@
 		dCCL5 = "[35.50, 35.50]"
 		dCXCL9 = "[71.00, 71.00]"
 		dTNF = "[1.80, 1.80]"
+		movementRest = "[10, 100]"
+		movementInf = "[10, 100]"
+		movementAct = "[10, 100]"
+		maxTimeReg = "[1, 144]"
 		thresholdNFkBTNF = "[40, 60]"
 		nrExtMtbUptakeRest = "[1, 1]"
 		probKillExtMtbRest = "[0.01, 0.1]"

@@ -34,7 +34,7 @@ private:
 	void updateParamDouble(ParamDoubleType param, double val);
 
 public:
-	Lhs(int nSamples);
+	Lhs(int nSamples, bool ode = false);
 	bool init(const char* filename);
 	void performLhs();
 };

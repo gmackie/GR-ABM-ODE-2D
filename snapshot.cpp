@@ -65,6 +65,32 @@ Snapshot::Snapshot(const QString& dirName, const QString& fileName)
 		<< ','
 		<< "\"Area\""
 		<< ','
+		<< "\"MDC\""
+		<< ','
+		<< "\"N4\""
+		<< ','
+		<< "\"TH0\""
+		<< ','
+		<< "\"TH1\""
+		<< ','
+		<< "\"N8\""
+		<< ','
+		<< "\"T80\""
+		<< ','
+		<< "\"T8\""
+		<< ','
+		<< "\"TC\""
+		<< ','
+		<< "\"TH0lung\""
+		<< ','
+		<< "\"TH1lung\""
+		<< ','
+		<< "\"T80lung\""
+		<< ','
+		<< "\"T8lung\""
+		<< ','
+		<< "\"TClung\""
+		<< ','
 		<< "\"Outcome (1)\""
 		<< ','
 		<< "\"Outcome (2)\""
@@ -171,7 +197,33 @@ void Snapshot::takeSnapshot(const int time, const GrStat& stats)
 		<< ','
 		<< stats.getTotCXCL9()
 		<< ','
-		<< stats.getArea();
+		<< stats.getArea()
+		<< ','
+		<< stats.getMDC()
+		<< ','
+		<< stats.getN4()
+		<< ','
+		<< stats.getTH0()
+		<< ','
+		<< stats.getTH1()
+		<< ','
+		<< stats.getN8()
+		<< ','
+		<< stats.getT80()
+		<< ','
+		<< stats.getT8()
+		<< ','
+		<< stats.getTC()
+		<< ','
+		<< stats.getTH0lung()
+		<< ','
+		<< stats.getTH1lung()
+		<< ','
+		<< stats.getT80lung()
+		<< ','
+		<< stats.getT8lung()
+		<< ','
+		<< stats.getTClung();
 
 	for (int i = 0; i < NOUTCOMES; i++)
 	{

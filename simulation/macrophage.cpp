@@ -135,8 +135,8 @@ void Mac::computeNextState(const int time, GrGrid& grid, GrStat& stats)
 
 		_nextState = MAC_DEAD;
 	}
-	else if (cell.getTNF() > _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF) &&
-		g_Rand.getReal() < _PARAM(PARAM_GR_PROB_APOPTOSIS_TNF))
+	else if (cell.getTNF() > _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF) &&	
+			 g_Rand.getReal() < 1 - pow(2.7183, -_PARAM(PARAM_GR_K_APOPTOSIS) * (cell.getTNF() - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF))))
 	{
 		// TNF induced apoptosis (with probability _PROB_TNF_APOPTOSIS)
 		stats.incApoptosisTNF();
@@ -153,8 +153,10 @@ void Mac::computeNextState(const int time, GrGrid& grid, GrStat& stats)
 		if (_deactivationTime == -1)
 		{
 			// update _NFkB
-			_NFkB = _state == MAC_CINFECTED || _state == MAC_ACTIVE ||
-				cell.getTNF() > _PARAM(PARAM_MAC_THRESHOLD_NFKB_TNF) ||
+			bool tnfInducedNFkB = cell.getTNF() > _PARAM(PARAM_MAC_THRESHOLD_NFKB_TNF) && 
+			g_Rand.getReal() < 1 - pow(2.7183, -_PARAM(PARAM_MAC_K_NFKB) * (cell.getTNF() - _PARAM(PARAM_MAC_THRESHOLD_NFKB_TNF)));
+			
+			_NFkB = _state == MAC_CINFECTED || _state == MAC_ACTIVE || tnfInducedNFkB ||
 				getExtMtbInMoore(grid) > _PARAM(PARAM_MAC_THRESHOLD_NFKB_EXTMTB);
 				//cell.getExtMtb() > _PARAM(PARAM_MAC_THRESHOLD_NFKB_EXTMTB);
 

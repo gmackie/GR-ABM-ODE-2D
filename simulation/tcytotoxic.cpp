@@ -38,8 +38,8 @@ void Tcyt::computeNextState(const int time, GrGrid& grid, GrStat& stats)
 	{
 		_nextState = TCYT_DEAD;
 	}
-	else if (cell.getTNF() > _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF) &&
-		g_Rand.getReal() < _PARAM(PARAM_GR_PROB_APOPTOSIS_TNF))
+	else if (cell.getTNF() > _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF) &&	
+			 g_Rand.getReal() < 1 - pow(2.7183, -_PARAM(PARAM_GR_K_APOPTOSIS) * (cell.getTNF() - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF))))
 	{
 		// TNF induced apoptosis (with probability PARAM_GR_PROB_APOPTOSIS_TNF)
 		_nextState = TCYT_DEAD;

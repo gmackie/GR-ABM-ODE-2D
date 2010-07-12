@@ -17,6 +17,19 @@ private:
 	TcytState _state;
 	TcytState _nextState;
 	int _deactivationTime;
+	// TNF associated attributes
+	double _mTNF; // No. of mTNF on the cell membrane
+	double _surfTNFR1; // No. of cell surface TNFR1
+	double _surfTNFR2;
+	double _surfBoundTNFR1; // No. of sTNF-bound cell surface TNFR1
+	double _surfBoundTNFR2;
+	double _intBoundTNFR1; // No. of internalized TNF-bound TNFR1
+	double _intBoundTNFR2;
+	double _vTNFR1; // Rate of TNFR1 synthesis by cell
+	double _vTNFR2;
+	double _kSynth; // Rate of mTNF synthesis by cell
+	double _kTACE; // Rate of mTNF release from cell by TACE activity
+	
 	void handleActive(const int time, GrGrid& grid, GrStat& stats);
 	void handleDownRegulated(const int time, GrGrid& grid, GrStat& stats);
 
@@ -27,6 +40,7 @@ public:
 	void secrete(GrGrid& grid);
 	void computeNextState(const int time, GrGrid& grid, GrStat& stats);
 	void updateState();
+	void solveODEs (GrGrid& grid, double dt);
 	TcytState getState() const;
 	TcytState getNextState() const;
 	void deactivate(const int time);

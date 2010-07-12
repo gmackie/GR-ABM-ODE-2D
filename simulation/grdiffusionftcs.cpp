@@ -6,11 +6,11 @@
  */
 
 #include "grdiffusionftcs.h"
+#include "grgrid.h"
 #include "params.h"
 
 GrDiffusionFTCS::GrDiffusionFTCS()
-	: _cutOffValue(0.000001)
-	, _cpyGrid()
+: _cutOffValue(0.000001)
 {
 }
 
@@ -20,112 +20,123 @@ GrDiffusionFTCS::~GrDiffusionFTCS()
 
 void GrDiffusionFTCS::diffuse(GrGrid& grid) const
 {
-	// dt = 6, (dx)^2 = 4e-6, see thesis
 	const double muTNF = _PARAM(PARAM_GR_D_TNF) * 6 / (4e-6);
+	const double muShedTNFR2 = _PARAM(PARAM_GR_D_SHED_TNFR2) * 6 / (4e-6);
 	const double muChemokines = _PARAM(PARAM_GR_D_CHEMOKINES) * 6 / (4e-6);
 	const double degTNF = _PARAM(PARAM_GR_DEG_TNF);
 	const double degChemokines = _PARAM(PARAM_GR_DEG_CHEMOKINES);
+	const double ratioCCL5toCCL2 = _PARAM(PARAM_MAC_SEC_RATE_CCL5) / _PARAM(PARAM_MAC_SEC_RATE_CCL2);
+	const double ratioCXCL9toCCL2 = _PARAM(PARAM_MAC_SEC_RATE_CXCL9) / _PARAM(PARAM_MAC_SEC_RATE_CCL2);
 	const double dAttractant = _PARAM(PARAM_GR_SEC_RATE_ATTRACTANT);
 
-	// TNF and CCs are zero in zeroCell
+	
+	const double dt = 6; // time-step (sec)
+	
+	// TNF and CCs are zero
 	GridCell zeroCell;
-
-	GrGrid* pNewGrid = &_cpyGrid;
-	GrGrid* pOldGrid = &grid;
-
-	// We need to copy the grid before doing diffusion, so the copy has
-	// all the pointers to the agents. Otherwise secretion won't work
-	// when the copy is the "old" grid.
-	*pNewGrid = *pOldGrid;
-
-	// dt = 6s, solve for 10 minutes = 100 * 6 seconds
-	for (int t = 0; t < 100; t++)
+	
+	// we have to use the heap here, since oldGrid does not fit in the stack
+	GrGrid* pOldGrid = (GrGrid*) malloc(sizeof(GrGrid));
+	
+	// dt = 6s, solve for 1 timestep, 6 seconds
+	for (int t = 0; t < 1; t++)
 	{
+		// make a copy of the current grid
+		memcpy(pOldGrid, &grid, sizeof(GrGrid));
+		
 		for (int i = 0; i < NROWS; i++)
 		{
 			for (int j = 0; j < NCOLS; j++)
 			{
-				GridCell& newCell = (*pNewGrid)(i, j);
+				GridCell& newCell = grid(i, j);
+				if (newCell.isCaseated())
+					newCell.incMacAttractant(dAttractant);
+				
 				GridCell& cell = (*pOldGrid)(i, j);
 				GridCell& cell_i_min_1_j = (i > 0) ? (*pOldGrid)(i - 1, j) : zeroCell;
 				GridCell& cell_i_plus_1_j =  (i < NROWS - 1) ? (*pOldGrid)(i + 1, j) : zeroCell;
 				GridCell& cell_i_j_min_1 = (j > 0) ? (*pOldGrid)(i, j - 1) : zeroCell;
 				GridCell& cell_i_j_plus_1 = (j < NCOLS - 1) ? (*pOldGrid)(i, j + 1) : zeroCell;
-
-				// secrete
-				Agent* pAgent = cell.getAgent(0);
-				if (pAgent)
-					pAgent->secrete(*pOldGrid);
-
-				pAgent = cell.getAgent(1);
-				if (pAgent)
-					pAgent->secrete(*pOldGrid);
-
-				if (cell.isCaseated())
-					cell.incMacAttractant(dAttractant);
-
-				/* TNF */
-				double tnf_i_j = cell.getTNF();
-				double res = tnf_i_j +
-					muTNF * (cell_i_min_1_j.getTNF() + cell_i_plus_1_j.getTNF() +
-							cell_i_j_min_1.getTNF() + cell_i_j_plus_1.getTNF() - 4 * tnf_i_j);
-
+				
+				double tnf_i_j_old = cell.getTNF();
+				double tnf_i_min_1_j = cell_i_min_1_j.getTNF();
+				double tnf_i_plus_1_j = cell_i_plus_1_j.getTNF();
+				double tnf_i_j_min_1 = cell_i_j_min_1.getTNF();
+				double tnf_i_j_plus_1 = cell_i_j_plus_1.getTNF();
+				
+				double res = tnf_i_j_old +
+				muTNF * (tnf_i_min_1_j + tnf_i_plus_1_j + tnf_i_j_min_1 + tnf_i_j_plus_1 - 4 * tnf_i_j_old);
+				
 				if (res <= _cutOffValue)
 					res = 0;
-
+				
 				res *= degTNF;
+				
+				// simulate the effect of TNF internalization by cells in the form of degradation
+				double dtnf;
+				if (cell.hasMac())
+				{
+					dtnf = -_PARAM(PARAM_GR_K_INT1) * (res / (res + _PARAM(PARAM_GR_KD1) * 48.16e11)) * 1500 * dt * 0.4;
+					res += dtnf;
+				}
+				dtnf = -_PARAM(PARAM_GR_K_INT1) * (res / (res + _PARAM(PARAM_GR_KD1) * 48.16e11)) * 800 * (cell.hasTcell()) * dt * 0.4;
+				res += dtnf;
+				
 				newCell.setTNF(res);
-
-				/* CCL2 */
-				double ccl2_i_j = cell.getCCL2();
-				res = ccl2_i_j +
-					muChemokines * (cell_i_min_1_j.getCCL2() + cell_i_plus_1_j.getCCL2() +
-							cell_i_j_min_1.getCCL2() + cell_i_j_plus_1.getCCL2() - 4 * ccl2_i_j);
-
+				
+				double shedtnfr2_i_j_old = cell.getShedTNFR2();
+				double shedtnfr2_i_min_1_j = cell_i_min_1_j.getShedTNFR2();
+				double shedtnfr2_i_plus_1_j = cell_i_plus_1_j.getShedTNFR2();
+				double shedtnfr2_i_j_min_1 = cell_i_j_min_1.getShedTNFR2();
+				double shedtnfr2_i_j_plus_1 = cell_i_j_plus_1.getShedTNFR2();
+				
+				res = shedtnfr2_i_j_old +
+				muShedTNFR2 * (shedtnfr2_i_min_1_j + shedtnfr2_i_plus_1_j + shedtnfr2_i_j_min_1 + shedtnfr2_i_j_plus_1 - 4 * shedtnfr2_i_j_old);
+				
 				if (res <= _cutOffValue)
 					res = 0;
-
+				
+				// degradation of shedTNFR2 is neglected because unbinding reaction is much faster
+				res = res * (1 - _PARAM(PARAM_GR_KD2) * _PARAM(PARAM_GR_K_ON2) * dt);
+				newCell.setShedTNFR2(res);
+				double temp = newCell.getTNF();
+				newCell.setTNF(temp + _PARAM(PARAM_GR_KD2) * _PARAM(PARAM_GR_K_ON2) * res * dt);
+				
+				double ccl2_i_j_old = cell.getCCL2();
+				double ccl2_i_min_1_j = cell_i_min_1_j.getCCL2();
+				double ccl2_i_plus_1_j = cell_i_plus_1_j.getCCL2();
+				double ccl2_i_j_min_1 = cell_i_j_min_1.getCCL2();
+				double ccl2_i_j_plus_1 = cell_i_j_plus_1.getCCL2();
+				
+				res = ccl2_i_j_old +
+				muChemokines * (ccl2_i_min_1_j + ccl2_i_plus_1_j + ccl2_i_j_min_1 + ccl2_i_j_plus_1 - 4 * ccl2_i_j_old);
+				
+				if (res <= _cutOffValue)
+					res = 0;
+				
 				res *= degChemokines;
+				
 				newCell.setCCL2(res);
-
-				/* CCL5 */
-				double ccl5_i_j = cell.getCCL5();
-				res = ccl5_i_j +
-					muChemokines * (cell_i_min_1_j.getCCL5() + cell_i_plus_1_j.getCCL5() +
-							cell_i_j_min_1.getCCL5() + cell_i_j_plus_1.getCCL5() - 4 * ccl5_i_j);
-
+				newCell.setCCL5(res * ratioCCL5toCCL2);
+				newCell.setCXCL9(res * ratioCXCL9toCCL2);
+				
+				double macAttractant_i_j_old = cell.getMacAttractant();
+				double macAttractant_i_min_1_j = cell_i_min_1_j.getMacAttractant();
+				double macAttractant_i_plus_1_j = cell_i_plus_1_j.getMacAttractant();
+				double macAttractant_i_j_min_1 = cell_i_j_min_1.getMacAttractant();
+				double macAttractant_i_j_plus_1 = cell_i_j_plus_1.getMacAttractant();
+				
+				res = macAttractant_i_j_old +
+				muChemokines * (macAttractant_i_min_1_j + macAttractant_i_plus_1_j + macAttractant_i_j_min_1 + macAttractant_i_j_plus_1 - 4 * macAttractant_i_j_old);
+				
 				if (res <= _cutOffValue)
 					res = 0;
-
-				res *= degChemokines;
-				newCell.setCCL5(res);
-
-				/* CXCL9 */
-				double cxcl9_i_j = cell.getCXCL9();
-				res = cxcl9_i_j +
-					muChemokines * (cell_i_min_1_j.getCXCL9() + cell_i_plus_1_j.getCXCL9() +
-							cell_i_j_min_1.getCXCL9() + cell_i_j_plus_1.getCXCL9() - 4 * cxcl9_i_j);
-
-				if (res <= _cutOffValue)
-					res = 0;
-
-				res *= degChemokines;
-				newCell.setCXCL9(res);
-
-				/* Mac attractant */
-				double mac_i_j = cell.getMacAttractant();
-				res = mac_i_j +
-					muChemokines * (cell_i_min_1_j.getMacAttractant() + cell_i_plus_1_j.getMacAttractant() +
-							cell_i_j_min_1.getMacAttractant() + cell_i_j_plus_1.getMacAttractant() - 4 * mac_i_j);
-
-				if (res <= _cutOffValue)
-					res = 0;
-
+				
 				res *= degChemokines;
 				newCell.setMacAttractant(res);
 			}	/* j, columns */
 		}	/*i, rows */
-
-		std::swap(pOldGrid, pNewGrid);
 	}	/* t, timesteps */
+	
+	free(pOldGrid);
 }

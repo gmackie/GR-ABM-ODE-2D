@@ -39,6 +39,9 @@ private:
 	void updateStates();
 	void updateT_Test();
 	void computeNextStates();
+	void secreteFromMacrophages();
+	void secreteFromCaseations();
+	void updateReceptorDynamics(double dt);
 	void growExtMtb();
 
 public:

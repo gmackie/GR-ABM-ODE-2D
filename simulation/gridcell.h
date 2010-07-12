@@ -31,6 +31,7 @@ private:
 	double _ccl2;
 	double _ccl5;
 	double _cxcl9;
+	double _shedtnfr2;
 	double _extMtb;
 	Agent* _agent[2];
 
@@ -55,6 +56,9 @@ public:
 	double getCXCL9() const;
 	void setCXCL9(double cxcl9);
 	void incCXCL9(double dCXCL9);
+	double getShedTNFR2() const;
+	void setShedTNFR2(double shedtnfr2);
+	void incShedTNFR2(double dShedTNFR2);
 	double getExtMtb() const;
 	void setExtMtb(double extMtb);
 	void incExtMtb(double dExtMtb);
@@ -178,6 +182,21 @@ inline void GridCell::setCXCL9(double cxcl9)
 inline void GridCell::incCXCL9(double dCXCL9)
 {
 	_cxcl9 += dCXCL9;
+}
+
+inline double GridCell::getShedTNFR2() const
+{
+	return _shedtnfr2;
+}
+
+inline void GridCell::setShedTNFR2(double shedtnfr2)
+{
+	_shedtnfr2 = shedtnfr2;
+}
+
+inline void GridCell::incShedTNFR2(double dShedTNFR2)
+{
+	_shedtnfr2 += dShedTNFR2;
 }
 
 inline double GridCell::getExtMtb() const

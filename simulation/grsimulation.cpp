@@ -223,8 +223,16 @@ void GrSimulation::solve()
 	_stats.reset();
 
 	// calculate diffusion every 10 minutes
-	_pDiffusion->diffuse(_grid);
-
+	// dt = 6s, solve for 10 minutes = 100 * 6 seconds
+	double dt = 6;
+	for (int t = 0; t < 100; t++) 
+	{
+		secreteFromMacrophages();
+		secreteFromCaseations();
+		_pDiffusion->diffuse(_grid);
+		//	updateReceptorDynamics(dt);
+	}
+	
 	// move macrophages
 	moveMacrophages();
 
@@ -354,6 +362,52 @@ void GrSimulation::computeNextStates()
 	for (TregList::iterator it = _tregList.begin(); it != _tregList.end(); it++)
 	{
 		it->computeNextState(_time, _grid, _stats);
+	}
+}
+
+void GrSimulation::secreteFromMacrophages()
+{
+	for (MacList::iterator it = _macList.begin(); it != _macList.end(); it++)
+	{
+		it->secrete(_grid);
+	}
+}
+
+void GrSimulation::secreteFromCaseations()
+{
+	// secrete chemokines from caseated compartments only if infection is not cleared
+	for (int i = 0; i < NROWS; i++)
+	{
+		for (int j = 0; j < NCOLS; j++)
+		{
+			GridCell& cell = _grid(i, j);
+			if (cell.isCaseated())
+			{
+				cell.incCCL2(0.25 * _PARAM(PARAM_MAC_SEC_RATE_CCL2));
+				cell.incCCL5(0.25 * _PARAM(PARAM_MAC_SEC_RATE_CCL5));
+				cell.incCXCL9(0.25 * _PARAM(PARAM_MAC_SEC_RATE_CXCL9));
+			}
+		}
+	}
+}
+
+void GrSimulation::updateReceptorDynamics(double dt)
+{
+	for (MacList::iterator it = _macList.begin(); it != _macList.end(); it++)
+	{
+		it->solveODEs(_grid, dt);
+	}
+	for (TgamList::iterator it = _tgamList.begin(); it != _tgamList.end(); it++)
+	{
+		it->solveODEs(_grid, dt);
+	}
+	for (TcytList::iterator it = _tcytList.begin(); it != _tcytList.end(); it++)
+	{
+		it->solveODEs(_grid, dt);
+	}
+	for (TregList::iterator it = _tregList.begin(); it != _tregList.end(); it++)
+	{
+		it->solveODEs(_grid, dt);
 	}
 }
 

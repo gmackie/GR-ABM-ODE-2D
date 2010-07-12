@@ -16,11 +16,39 @@ Params* Params::_pInstance = NULL;
 const char* Params::_description[][4] =
 {
 	{ "diffusivityTNF", "TNF diffusivity", "cm^2/s", "GR" },
+	{ "diffusivityShedTNFR2", "Shed sTNF/TNFR2 comples diffusivity", "cm^2/s", "GR" },
 	{ "diffusivityChemokines", "Chemokine diffusivity", "cm^2/s", "GR" },
 	{ "degRateTNF", "TNF degradation rate (per 6s)", "", "GR" },
 	{ "degRateChemokines", "Chemokine degradation rate (per 6s)", "", "GR" },
 	{ "minChemotaxis", "Chemotaxis sensivity range (lower bound)", "#molecules", "GR" },
 	{ "maxChemotaxis", "Chemotaxis sensivity range (upper bound)", "#molecules", "GR" },
+	// molecular TNF-associated parameters
+	{ "kSynthMac", "Rate of mTNF synthesis by a macrophage", "#/cell.sec", "GR" },
+	{ "kSynthTcell", "Rate of mTNF synthesis by a T cell", "#/cell.sec", "GR" },
+	{ "kTaceMac", "Rate of mTNF release from a macrophage", "1/sec", "GR" },
+	{ "kTaceTcell", "Rate of mTNF release from a T cell", "1/sec", "GR" },
+	{ "KD1", "sTNF/TNFR1 dissociation equilibrium constant", "M", "GR" },
+	{ "KD2", "sTNF/TNFR2 dissociation equilibrium constant", "M", "GR" },
+	{ "kOn1", "sTNF/TNFR1 association rate constant", "1/M.s", "GR" },
+	{ "kOn2", "sTNF/TNFR2 association rate constant", "1/M.s", "GR" },
+	{ "kInt1", "sTNF/TNFR1 complex internaliation rate constant", "1/s", "GR" },
+	{ "kInt2", "sTNF/TNFR2 complex internaliation rate constant", "1/s", "GR" },
+	{ "kShed", "sTNF/TNFR2 complex shedding rate constant", "1/s", "GR" },
+	{ "kRec1", "TNFR1 recycling rate constant", "1/s", "GR" },
+	{ "kRec2", "TNFR2 recycling rate constant", "1/s", "GR" },
+	{ "kT1", "TNFR1 turn-over rate constant", "1/s", "GR" },
+	{ "kT2", "TNFR2 turn-over rate constant", "1/s", "GR" },
+	{ "kDeg1", "TNFR1 degradtion rate constant", "1/s", "GR" },
+	{ "kDeg2", "TNFR2 degradtion rate constant", "1/s", "GR" },
+	{ "maxTNFR1Mac", "Maximum density of TNFR1 on macrophages", "#/cell", "GR" },
+	{ "minTNFR1Mac", "Minimum density of TNFR1 on macrophages", "#/cell", "GR" },
+	{ "maxTNFR2Mac", "Maximum density of TNFR2 on macrophages", "#/cell", "GR" },
+	{ "minTNFR2Mac", "Minimum density of TNFR2 on macrophages", "#/cell", "GR" },
+	{ "maxTNFR1Tcell", "Maximum density of TNFR1 on T cells", "#/cell", "GR" },
+	{ "minTNFR1Tcell", "Minimum density of TNFR1 on T cells", "#/cell", "GR" },
+	{ "maxTNFR2Tcell", "Maximum density of TNFR2 on T cells", "#/cell", "GR" },
+	{ "minTNFR2Tcell", "Minimum density of TNFR2 on T cells", "#/cell", "GR" },
+	// end of molecular TNF-associated parameters
 	{ "thresholdApoptosisTNF", "TNF threshold for TNF-induced apoptosis", "#molecules", "GR" },
 	{ "kApoptosis", "Rate of apoptosis happening", "1/s", "GR" },
 	{ "probApoptosisTNF", "Probability of TNF-induced apoptosis", "", "GR" },
@@ -318,6 +346,7 @@ bool Params::toXml(const char* filename) const
 	writeParam(outFile, PARAM_GR_NR_KILLINGS_FOR_CASEATION, 1, CLOSE_NONE);
 	writeParam(outFile, PARAM_GR_NR_SOURCES, 1, CLOSE_NONE);
 	writeParam(outFile, PARAM_GR_D_TNF, 1, CLOSE_NONE);
+	writeParam(outFile, PARAM_GR_D_SHED_TNFR2, 1, CLOSE_NONE);
 	writeParam(outFile, PARAM_GR_D_CHEMOKINES, 1, CLOSE_NONE);
 	writeParam(outFile, PARAM_GR_DEG_TNF, 1, CLOSE_NONE);
 	writeParam(outFile, PARAM_GR_DEG_CHEMOKINES, 1, CLOSE_NONE);
@@ -326,7 +355,32 @@ bool Params::toXml(const char* filename) const
 	writeParam(outFile, PARAM_GR_PROB_APOPTOSIS_TNF, 1, CLOSE_NONE);
 	writeParam(outFile, PARAM_GR_MIN_CHEMOTAXIS, 1, CLOSE_NONE);
 	writeParam(outFile, PARAM_GR_SEC_RATE_ATTRACTANT, 1, CLOSE_NONE);
-	writeParam(outFile, PARAM_GR_MAX_CHEMOTAXIS, 1,
+	writeParam(outFile, PARAM_GR_MAX_CHEMOTAXIS, 1, CLOSE_NONE);
+	writeParam(outFile, PARAM_GR_K_SYNTH_MAC, 1, CLOSE_NONE);
+	writeParam(outFile, PARAM_GR_K_SYNTH_TCELL, 1, CLOSE_NONE);
+	writeParam(outFile, PARAM_GR_K_TACE_MAC, 1, CLOSE_NONE);
+	writeParam(outFile, PARAM_GR_K_TACE_TCELL, 1, CLOSE_NONE);
+	writeParam(outFile, PARAM_GR_KD1, 1, CLOSE_NONE);
+	writeParam(outFile, PARAM_GR_KD2, 1, CLOSE_NONE);
+	writeParam(outFile, PARAM_GR_K_ON1, 1, CLOSE_NONE);
+	writeParam(outFile, PARAM_GR_K_ON2, 1, CLOSE_NONE);
+	writeParam(outFile, PARAM_GR_K_INT1, 1, CLOSE_NONE);
+	writeParam(outFile, PARAM_GR_K_INT2, 1, CLOSE_NONE);
+	writeParam(outFile, PARAM_GR_K_SHED, 1, CLOSE_NONE);
+	writeParam(outFile, PARAM_GR_K_REC1, 1, CLOSE_NONE);
+	writeParam(outFile, PARAM_GR_K_REC2, 1, CLOSE_NONE);
+	writeParam(outFile, PARAM_GR_K_T1, 1, CLOSE_NONE);
+	writeParam(outFile, PARAM_GR_K_T2, 1, CLOSE_NONE);
+	writeParam(outFile, PARAM_GR_K_DEG1, 1, CLOSE_NONE);
+	writeParam(outFile, PARAM_GR_K_DEG2, 1, CLOSE_NONE);
+	writeParam(outFile, PARAM_GR_MAX_TNFR1_MAC, 1, CLOSE_NONE);
+	writeParam(outFile, PARAM_GR_MIN_TNFR1_MAC, 1, CLOSE_NONE);
+	writeParam(outFile, PARAM_GR_MAX_TNFR2_MAC, 1, CLOSE_NONE);
+	writeParam(outFile, PARAM_GR_MIN_TNFR2_MAC, 1, CLOSE_NONE);
+	writeParam(outFile, PARAM_GR_MAX_TNFR1_TCELL, 1, CLOSE_NONE);
+	writeParam(outFile, PARAM_GR_MIN_TNFR1_TCELL, 1, CLOSE_NONE);
+	writeParam(outFile, PARAM_GR_MAX_TNFR2_TCELL, 1, CLOSE_NONE);
+	writeParam(outFile, PARAM_GR_MIN_TNFR2_TCELL, 1,
 		_useRecruitmentWeights ? CLOSE_NONE : CLOSE_START_TAG);
 
 	if (_useRecruitmentWeights)
@@ -439,6 +493,7 @@ bool Params::readGRElement(const TiXmlElement* pGrElement)
 	res &= readParam(pGrElement, PARAM_GR_NR_KILLINGS_FOR_CASEATION, true);
 	res &= readParam(pGrElement, PARAM_GR_NR_SOURCES, true);
 	res &= readParam(pGrElement, PARAM_GR_D_TNF, false);
+	res &= readParam(pGrElement, PARAM_GR_D_SHED_TNFR2, false);
 	res &= readParam(pGrElement, PARAM_GR_D_CHEMOKINES, false);
 	res &= readParam(pGrElement, PARAM_GR_DEG_TNF, false);
 	res &= readParam(pGrElement, PARAM_GR_DEG_CHEMOKINES, false);
@@ -447,6 +502,31 @@ bool Params::readGRElement(const TiXmlElement* pGrElement)
 	res &= readParam(pGrElement, PARAM_GR_PROB_APOPTOSIS_TNF, true);
 	res &= readParam(pGrElement, PARAM_GR_MIN_CHEMOTAXIS, false);
 	res &= readParam(pGrElement, PARAM_GR_MAX_CHEMOTAXIS, false);
+	res &= readParam(pGrElement, PARAM_GR_K_SYNTH_MAC, false);
+	res &= readParam(pGrElement, PARAM_GR_K_SYNTH_TCELL, false);
+	res &= readParam(pGrElement, PARAM_GR_K_TACE_MAC, false);
+	res &= readParam(pGrElement, PARAM_GR_K_TACE_TCELL, false);
+	res &= readParam(pGrElement, PARAM_GR_KD1, false);
+	res &= readParam(pGrElement, PARAM_GR_KD2, false);
+	res &= readParam(pGrElement, PARAM_GR_K_ON1, false);
+	res &= readParam(pGrElement, PARAM_GR_K_ON2, false);
+	res &= readParam(pGrElement, PARAM_GR_K_INT1, false);
+	res &= readParam(pGrElement, PARAM_GR_K_INT2, false);
+	res &= readParam(pGrElement, PARAM_GR_K_SHED, false);
+	res &= readParam(pGrElement, PARAM_GR_K_REC1, false);
+	res &= readParam(pGrElement, PARAM_GR_K_REC2, false);
+	res &= readParam(pGrElement, PARAM_GR_K_T1, false);
+	res &= readParam(pGrElement, PARAM_GR_K_T2, false);
+	res &= readParam(pGrElement, PARAM_GR_K_DEG1, false);
+	res &= readParam(pGrElement, PARAM_GR_K_DEG2, false);
+	res &= readParam(pGrElement, PARAM_GR_MAX_TNFR1_MAC, false);
+	res &= readParam(pGrElement, PARAM_GR_MIN_TNFR1_MAC, false);
+	res &= readParam(pGrElement, PARAM_GR_MAX_TNFR2_MAC, false);
+	res &= readParam(pGrElement, PARAM_GR_MIN_TNFR2_MAC, false);
+	res &= readParam(pGrElement, PARAM_GR_MAX_TNFR1_TCELL, false);
+	res &= readParam(pGrElement, PARAM_GR_MIN_TNFR1_TCELL, false);
+	res &= readParam(pGrElement, PARAM_GR_MAX_TNFR2_TCELL, false);
+	res &= readParam(pGrElement, PARAM_GR_MIN_TNFR2_TCELL, false);
 	res &= readParam(pGrElement, PARAM_GR_SEC_RATE_ATTRACTANT, false);
 
 	res &= readMacElement(pMacElement);

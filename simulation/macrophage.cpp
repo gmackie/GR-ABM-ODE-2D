@@ -18,6 +18,17 @@ Mac::Mac(int birthtime, int row, int col, MacState state, double intMtb, bool NF
 	, _stat1(stat1)
 	, _activationTime(-1)
 	, _deactivationTime(-1)
+	, _mTNF(0.0)
+	, _surfTNFR1(g_Rand.getReal(_PARAM(PARAM_GR_MIN_TNFR1_MAC),_PARAM(PARAM_GR_MAX_TNFR1_MAC)))
+	, _surfTNFR2(g_Rand.getReal(_PARAM(PARAM_GR_MIN_TNFR2_MAC),_PARAM(PARAM_GR_MAX_TNFR2_MAC)))
+	, _surfBoundTNFR1(0.0)
+	, _surfBoundTNFR2(0.0)
+	, _intBoundTNFR1(0.0)
+	, _intBoundTNFR2(0.0)
+	, _vTNFR1(_surfTNFR1 * _PARAM(PARAM_GR_K_T1))
+	, _vTNFR2(_surfTNFR2 * _PARAM(PARAM_GR_K_T2))
+	, _kSynth(0.0)
+	, _kTACE(_PARAM(PARAM_GR_K_TACE_MAC))
 {
 }
 
@@ -53,9 +64,9 @@ void Mac::secrete(GrGrid& grid)
 {
 	if (_deactivationTime != -1)
 		return;
-
+	
 	GridCell& cell = grid(_row, _col);
-
+	
 	if (_NFkB)
 	{
 		// if NFkB is turned on, secrete TNF and chemokines
@@ -64,6 +75,7 @@ void Mac::secrete(GrGrid& grid)
 			cell.incCCL2(_PARAM(PARAM_MAC_SEC_RATE_CCL2));
 			cell.incCCL5(_PARAM(PARAM_MAC_SEC_RATE_CCL5));
 			cell.incCXCL9(_PARAM(PARAM_MAC_SEC_RATE_CXCL9));
+			_kSynth = _PARAM(PARAM_GR_K_SYNTH_MAC);
 			cell.incTNF(_PARAM(PARAM_MAC_SEC_RATE_TNF));
 		}
 		else
@@ -71,21 +83,26 @@ void Mac::secrete(GrGrid& grid)
 			cell.incCCL2(0.5 * _PARAM(PARAM_MAC_SEC_RATE_CCL2));
 			cell.incCCL5(0.5 * _PARAM(PARAM_MAC_SEC_RATE_CCL5));
 			cell.incCXCL9(0.5 * _PARAM(PARAM_MAC_SEC_RATE_CXCL9));
+			_kSynth = 0.5 * _PARAM(PARAM_GR_K_SYNTH_MAC);
 			cell.incTNF(0.5 * _PARAM(PARAM_MAC_SEC_RATE_TNF));
 		}
-
+		
 		cell.incNrSecretions();
 	}
+	else if (_state == MAC_RESTING)
+		_kSynth = 0.0;
 	else if (_state == MAC_INFECTED)
 	{
 		cell.incCCL2(0.5 * _PARAM(PARAM_MAC_SEC_RATE_CCL2));
 		cell.incCCL5(0.5 * _PARAM(PARAM_MAC_SEC_RATE_CCL5));
 		cell.incCXCL9(0.5 * _PARAM(PARAM_MAC_SEC_RATE_CXCL9));
+		_kSynth = 0.5 * _PARAM(PARAM_GR_K_SYNTH_MAC);
 		cell.incTNF(0.5 * _PARAM(PARAM_MAC_SEC_RATE_TNF));
-
+		
 		cell.incNrSecretions();
 	}
 }
+
 
 void Mac::updateState()
 {
@@ -119,6 +136,8 @@ void Mac::apoptosis(GrGrid& grid)
 void Mac::computeNextState(const int time, GrGrid& grid, GrStat& stats)
 {
 	GridCell& cell = grid(_row, _col);
+	double tnfBoundFraction = cell.getTNF() / (cell.getTNF() + _PARAM(PARAM_GR_KD1) * 48.16e11);
+	
 	// check if it is time to die
 	if (timeToDie(time))
 	{
@@ -135,10 +154,10 @@ void Mac::computeNextState(const int time, GrGrid& grid, GrStat& stats)
 
 		_nextState = MAC_DEAD;
 	}
-	else if (cell.getTNF() > _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF) &&	
-			 g_Rand.getReal() < 1 - pow(2.7183, -_PARAM(PARAM_GR_K_APOPTOSIS) * (cell.getTNF() - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF))))
+	else if (tnfBoundFraction > _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF) &&
+			 g_Rand.getReal() < 1 - pow(2.7183, -_PARAM(PARAM_GR_K_APOPTOSIS) * (tnfBoundFraction - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF))))
 	{
-		// TNF induced apoptosis (with probability _PROB_TNF_APOPTOSIS)
+		// TNF induced apoptosis
 		stats.incApoptosisTNF();
 		apoptosis(grid);
 	}
@@ -153,8 +172,8 @@ void Mac::computeNextState(const int time, GrGrid& grid, GrStat& stats)
 		if (_deactivationTime == -1)
 		{
 			// update _NFkB
-			bool tnfInducedNFkB = cell.getTNF() > _PARAM(PARAM_MAC_THRESHOLD_NFKB_TNF) && 
-			g_Rand.getReal() < 1 - pow(2.7183, -_PARAM(PARAM_MAC_K_NFKB) * (cell.getTNF() - _PARAM(PARAM_MAC_THRESHOLD_NFKB_TNF)));
+			bool tnfInducedNFkB = tnfBoundFraction > _PARAM(PARAM_MAC_THRESHOLD_NFKB_TNF) && 
+			g_Rand.getReal() < 1 - pow(2.7183, -_PARAM(PARAM_MAC_K_NFKB) * (tnfBoundFraction - _PARAM(PARAM_MAC_THRESHOLD_NFKB_TNF)));
 			
 			_NFkB = _state == MAC_CINFECTED || _state == MAC_ACTIVE || tnfInducedNFkB ||
 				getExtMtbInMoore(grid) > _PARAM(PARAM_MAC_THRESHOLD_NFKB_EXTMTB);
@@ -181,6 +200,56 @@ void Mac::computeNextState(const int time, GrGrid& grid, GrStat& stats)
 			}
 		}
 	}
+}
+
+void Mac::solveODEs(GrGrid& grid, double dt)
+{
+	GridCell& cell = grid(_row, _col);
+	
+	double koff1 = _PARAM(PARAM_GR_K_ON1) * _PARAM(PARAM_GR_KD1);
+	double koff2 = _PARAM(PARAM_GR_K_ON2) * _PARAM(PARAM_GR_KD2);
+	double density = 1.25e11; // used for conversion of conc. unit (M -> #/cell) based on cell and microcompartment volumes 
+	double Nav = 6.02e23; // Avogadro Number
+	double vol = 8.0e-12; // volume of a cell in liter
+	
+	double tnf = cell.getTNF() / (Nav * vol);
+	double shedtnfr2 = cell.getShedTNFR2() / (Nav * vol);
+	
+	double dmTNF;
+	double dsurfTNFR1;
+	double dsurfTNFR2;
+	double dsurfBoundTNFR1;
+	double dsurfBoundTNFR2;
+	double dintBoundTNFR1;
+	double dintBoundTNFR2;
+	double dsTNF;
+	double dshedTNFR2;
+	
+	dmTNF = (_kSynth - _kTACE * _mTNF) * dt;
+	dsurfTNFR1 = (_vTNFR1 - _PARAM(PARAM_GR_K_ON1) * tnf * _surfTNFR1 + koff1 * _surfBoundTNFR1 - _PARAM(PARAM_GR_K_T1) * _surfTNFR1 + _PARAM(PARAM_GR_K_REC1) * _intBoundTNFR1) * dt;
+	dsurfTNFR2 = (_vTNFR2 - _PARAM(PARAM_GR_K_ON2) * tnf * _surfTNFR2 + koff2 * _surfBoundTNFR2 - _PARAM(PARAM_GR_K_T2) * _surfTNFR2 + _PARAM(PARAM_GR_K_REC2) * _intBoundTNFR2) * dt;
+	dsurfBoundTNFR1 = (_PARAM(PARAM_GR_K_ON1) * tnf * _surfTNFR1 - koff1 * _surfBoundTNFR1 - _PARAM(PARAM_GR_K_INT1) * _surfBoundTNFR1) * dt;
+	dsurfBoundTNFR2 = (_PARAM(PARAM_GR_K_ON2) * tnf * _surfTNFR2 - koff2 * _surfBoundTNFR2 - _PARAM(PARAM_GR_K_INT2) * _surfBoundTNFR2 - _PARAM(PARAM_GR_K_SHED) * _surfBoundTNFR2) * dt;
+	dintBoundTNFR1 = (_PARAM(PARAM_GR_K_INT1) * _surfBoundTNFR1 - _PARAM(PARAM_GR_K_DEG1) * _intBoundTNFR1 - _PARAM(PARAM_GR_K_REC1) * _intBoundTNFR1) * dt;
+	dintBoundTNFR2 = (_PARAM(PARAM_GR_K_INT2) * _surfBoundTNFR2 - _PARAM(PARAM_GR_K_DEG2) * _intBoundTNFR2 - _PARAM(PARAM_GR_K_REC2) * _intBoundTNFR2) * dt;
+	dsTNF = ((density/Nav) * (_kTACE * _mTNF - _PARAM(PARAM_GR_K_ON1) * tnf * _surfTNFR1 + koff1 * _surfBoundTNFR1 - _PARAM(PARAM_GR_K_ON2) * tnf * _surfTNFR2 + koff2 * _surfBoundTNFR2)) * dt; 
+	dshedTNFR2 = ((density/Nav) * _PARAM(PARAM_GR_K_SHED) * _surfBoundTNFR2) * dt;
+	
+	_mTNF += dmTNF;
+	_surfTNFR1 += dsurfTNFR1;
+	_surfTNFR2 += dsurfTNFR2;
+	_surfBoundTNFR1 += dsurfBoundTNFR1;
+	_surfBoundTNFR2 += dsurfBoundTNFR2;
+	_intBoundTNFR1 += dintBoundTNFR1;
+	_intBoundTNFR2 += dintBoundTNFR2;
+	tnf += dsTNF;
+	shedtnfr2 += dshedTNFR2;
+	
+	cell.setTNF(Nav * vol * tnf);
+	cell.setShedTNFR2(Nav * vol * shedtnfr2);
+	if (_mTNF < 0 || _surfTNFR1 < 0 || _surfBoundTNFR1 < 0 || _surfTNFR2 < 0 || _surfBoundTNFR2 < 0)
+		std::cout << "Error: Negative Value of Species in TNF/TNFR dynamics" << std::endl;
+	
 }
 
 void Mac::handleResting(const int time, GrGrid& grid, GrStat&)
@@ -376,6 +445,17 @@ void Mac::serialize(std::ostream& out) const
 	out << _stat1 << std::endl;
 	out << _activationTime << std::endl;
 	out << _deactivationTime << std::endl;
+	out << _mTNF << std::endl;
+	out << _surfTNFR1 << std::endl;
+	out << _surfTNFR2 << std::endl;
+	out << _surfBoundTNFR1 << std::endl;
+	out << _surfBoundTNFR2 << std::endl;
+	out << _intBoundTNFR1 << std::endl;
+	out << _intBoundTNFR2 << std::endl;
+	out << _vTNFR1 << std::endl;
+	out << _vTNFR2 << std::endl;
+	out << _kSynth << std::endl;
+	out << _kTACE << std::endl;
 }
 
 void Mac::deserialize(std::istream& in)
@@ -397,6 +477,17 @@ void Mac::deserialize(std::istream& in)
 	in >> _stat1;
 	in >> _activationTime;
 	in >> _deactivationTime;
+	in >> _mTNF;
+	in >> _surfTNFR1;
+	in >> _surfTNFR2;
+	in >> _surfBoundTNFR1;
+	in >> _surfBoundTNFR2;
+	in >> _intBoundTNFR1;
+	in >> _intBoundTNFR2;
+	in >> _vTNFR1;
+	in >> _vTNFR2;
+	in >> _kSynth;
+	in >> _kTACE;
 }
 
 int Mac::getCountTgam(TgamState state, const GrGrid& grid) const

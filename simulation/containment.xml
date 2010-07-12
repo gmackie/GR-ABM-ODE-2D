@@ -30,15 +30,41 @@
 	nrKillingsCaseation = "10"
 	nrSources = "50"
 	diffusivityTNF = "5.2e-08"
+    diffusivityShedTNFR2 = "3.2e-08"
 	diffusivityChemokines = "5.2e-08"
 	degRateTNF = "0.9905"
 	degRateChemokines = "0.9905"
 	dAttractant = "0"
-	thresholdApoptosisTNF = "15"
-    kApoptosis = "2.00382e-06"
+	thresholdApoptosisTNF = "0.0625"
+    kApoptosis = "0.00432456"
 	probApoptosisTNF = "0.04"
 	minChemotaxis = "2"
-	maxChemotaxis = "2000">
+	maxChemotaxis = "2000"
+    kSynthMac = "0.21"
+	kSynthTcell = "0"
+	kTaceMac = "0.00044"
+	kTaceTcell = "0.0000"
+	KD1 = "1.9e-11"
+	KD2 = "4.2e-10"
+	kOn1 = "2.8e+07"
+	kOn2 = "3.5e+07"
+	kInt1 = "0.00077"
+	kInt2 = "0.00046"
+	kShed = "0.0005"
+	kRec1 = "1.8e-05"
+	kRec2 = "1.8e-05"
+	kT1 = "0.00038"
+	kT2 = "0.00038"
+	kDeg1 = "5e-05"
+	kDeg2 = "5e-05"
+	maxTNFR1Mac = "1900"
+	minTNFR1Mac = "1100"
+	maxTNFR2Mac = "800"
+	minTNFR2Mac = "400"
+	maxTNFR1Tcell = "1200"
+	minTNFR1Tcell = "400"
+	maxTNFR2Tcell = "800"
+	minTNFR2Tcell = "600">
 	<Mac
 		initNumber = "105"
 		maxAge = "14400"
@@ -47,34 +73,34 @@
 		movementRest = "2"
 		movementAct = "47"
 		movementInf = "144"
-		dTNF = "1.8"
-		dCCL2 = "35"
-		dCCL5 = "35"
-		dCXCL9 = "70"
-		thresholdNFkBTNF = "10"
-        kNFkB = "2.37973e-05"
+		dTNF = "1.26"
+		dCCL2 = "24.85"
+		dCCL5 = "24.85"
+		dCXCL9 = "49.7"
+		thresholdNFkBTNF = "0.05"
+        kNFkB = "0.016231"
 		nrExtMtbUptakeRest = "1"
-		probKillExtMtbRest = "0.02"
-		nrExtMtbNFkB = "84.1179"
+		probKillExtMtbRest = "0.0147387"
+		nrExtMtbNFkB = "110"
 		nrIntMtbCInf = "10"
 		nrIntMtbBurstCInf = "20"
-		probStat1Tgam = "0.08"
+		probStat1Tgam = "0.0852073"
 		nrExtMtbUptakeAct = "10"
-		thresholdRec = "0.025"
+		thresholdRec = "0.0227148"
 		probRec = "0.04"/>
 	<Tcell
 		maxAge = "432"
 		timeRecEnabled = "2880"
-		probMoveToMac = "0.02"
+		probMoveToMac = "0.0141993"
 		probMoveToTcell = "0.08"
-		probRec = "0.1">
+		probRec = "0.15">
 		<Tgam
-			maxTimeReg = "48"
+			maxTimeReg = "10"
 			probApoptosisFasFasL = "0.06"
 			thresholdRec = "0.4"
 			probRec = "0.54"/>
 		<Tcyt
-			maxTimeReg = "37"
+			maxTimeReg = "10"
 			probKillMac = "0.12"
 			probKillMacCleanly = "0.75"
 			thresholdRec = "0.4"
@@ -84,14 +110,10 @@
 			probRec = "0.1"/>
 	</Tcell>
 	<Mtb
-		growthRateIntMtb = "1.0015"
+		growthRateIntMtb = "1.0014"
 		growthRateExtMtb = "1.0007"
 		growthExtMtbBound = "200"/>
 	<Init>
 		<Mac row = "50" col = "50"/>
-		<ExtMtb row = "45" col = "45"/>
-		<ExtMtb row = "45" col = "55"/>
-		<ExtMtb row = "55" col = "45"/>
-		<ExtMtb row = "55" col = "55"/>
 	</Init>
 </GR>

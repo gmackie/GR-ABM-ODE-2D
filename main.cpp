@@ -298,7 +298,7 @@ int main(int argc, char *argv[])
 		itfc.getSimulation().setRecruitment(new RecruitmentLnODE(lymphNodeODE, lymphNodeTemp));
 	
 	/* set TNF/TNFR dynamics */
-	itfc.getSimulation().setTnfrDynamics(true);
+	itfc.getSimulation().setTnfrDynamics(tnfrDynamics);
 
 
 	glWindow.resizeGLWidget(resWidth, resHeight);

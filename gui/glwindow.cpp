@@ -202,6 +202,8 @@ QString GLWindow::getAgentStr(const Agent* pAgent)
 		}
 
 		res += QString(", Bi = %1").arg(pMac->getIntMtb(), 0, 'f', 2);
+		
+		res += QString(", [sTNF/TNFR1] = %1").arg(pMac->getSurfBoundTNFR1(), 0, 'f', 2);
 	}
 	else if (Tgam::isTgam(pAgent))
 	{

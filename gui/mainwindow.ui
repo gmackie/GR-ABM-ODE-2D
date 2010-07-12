@@ -46,15 +46,15 @@
            </size>
           </property>
           <property name="currentIndex">
-           <number>0</number>
+           <number>1</number>
           </property>
           <widget class="QWidget" name="tabStatistics">
            <property name="geometry">
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>256</width>
-             <height>525</height>
+             <width>243</width>
+             <height>516</height>
             </rect>
            </property>
            <attribute name="label">
@@ -66,8 +66,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>256</width>
-             <height>525</height>
+             <width>243</width>
+             <height>516</height>
             </rect>
            </property>
            <attribute name="label">
@@ -265,8 +265,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>256</width>
-             <height>525</height>
+             <width>96</width>
+             <height>26</height>
             </rect>
            </property>
            <attribute name="label">
@@ -423,7 +423,7 @@
                <x>10</x>
                <y>20</y>
                <width>231</width>
-               <height>64</height>
+               <height>66</height>
               </rect>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -476,8 +476,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>256</width>
-             <height>525</height>
+             <width>96</width>
+             <height>26</height>
             </rect>
            </property>
            <attribute name="label">
@@ -608,8 +608,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>256</width>
-             <height>461</height>
+             <width>243</width>
+             <height>448</height>
             </rect>
            </property>
            <attribute name="label">
@@ -819,8 +819,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>256</width>
-             <height>461</height>
+             <width>96</width>
+             <height>26</height>
             </rect>
            </property>
            <attribute name="label">
@@ -832,8 +832,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>256</width>
-             <height>461</height>
+             <width>96</width>
+             <height>26</height>
             </rect>
            </property>
            <attribute name="label">
@@ -896,7 +896,7 @@
                <x>10</x>
                <y>20</y>
                <width>231</width>
-               <height>178</height>
+               <height>192</height>
               </rect>
              </property>
              <layout class="QGridLayout" name="gridLayout_4">
@@ -1033,8 +1033,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>256</width>
-             <height>461</height>
+             <width>96</width>
+             <height>26</height>
             </rect>
            </property>
            <attribute name="label">
@@ -1102,7 +1102,7 @@
               <rect>
                <x>10</x>
                <y>20</y>
-               <width>233</width>
+               <width>242</width>
                <height>92</height>
               </rect>
              </property>
@@ -1159,8 +1159,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>256</width>
-             <height>461</height>
+             <width>96</width>
+             <height>26</height>
             </rect>
            </property>
            <attribute name="label">
@@ -1236,8 +1236,8 @@
               <rect>
                <x>10</x>
                <y>20</y>
-               <width>231</width>
-               <height>167</height>
+               <width>237</width>
+               <height>170</height>
               </rect>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -1467,8 +1467,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>256</width>
-             <height>461</height>
+             <width>96</width>
+             <height>26</height>
             </rect>
            </property>
            <attribute name="label">
@@ -1491,8 +1491,8 @@
               <rect>
                <x>10</x>
                <y>20</y>
-               <width>231</width>
-               <height>133</height>
+               <width>235</width>
+               <height>136</height>
               </rect>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -1681,7 +1681,7 @@
                <x>10</x>
                <y>20</y>
                <width>231</width>
-               <height>116</height>
+               <height>136</height>
               </rect>
              </property>
              <layout class="QGridLayout" name="gridLayout_6">
@@ -1860,7 +1860,7 @@
      <x>0</x>
      <y>0</y>
      <width>534</width>
-     <height>26</height>
+     <height>22</height>
     </rect>
    </property>
   </widget>

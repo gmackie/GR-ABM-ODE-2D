@@ -57,6 +57,7 @@ public:
 	MacState getNextState() const;
 	double getIntMtb() const;
 	void setIntMtb(double intMtb);
+	double getSurfBoundTNFR1() const;
 	void kill();
 	void deactivate(const int time);
 	void apoptosis(GrGrid& grid);
@@ -113,6 +114,11 @@ inline MacState Mac::getNextState() const
 inline double Mac::getIntMtb() const
 {
 	return _intMtb;
+}
+
+inline double Mac::getSurfBoundTNFR1() const
+{
+	return _surfBoundTNFR1;
 }
 
 inline void Mac::setIntMtb(double intMtb)

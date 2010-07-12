@@ -133,7 +133,7 @@ void Mac::apoptosis(GrGrid& grid)
 	}
 }
 
-void Mac::computeNextState(const int time, GrGrid& grid, GrStat& stats)
+void Mac::computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tnfrDynamics)
 {
 	GridCell& cell = grid(_row, _col);
 	double tnfBoundFraction = cell.getTNF() / (cell.getTNF() + _PARAM(PARAM_GR_KD1) * 48.16e11);
@@ -154,7 +154,14 @@ void Mac::computeNextState(const int time, GrGrid& grid, GrStat& stats)
 
 		_nextState = MAC_DEAD;
 	}
-	else if (tnfBoundFraction > _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF) &&
+	else if (tnfrDynamics && _intBoundTNFR1 > _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR) &&	
+			 g_Rand.getReal() < 1 - pow(2.7183, -_PARAM(PARAM_GR_K_APOPTOSIS_MOLECULAR) * (_intBoundTNFR1 - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR))))
+	{
+		// TNF induced apoptosis
+		stats.incApoptosisTNF();
+		apoptosis(grid);
+	}
+	else if (!tnfrDynamics && tnfBoundFraction > _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF) &&
 			 g_Rand.getReal() < 1 - pow(2.7183, -_PARAM(PARAM_GR_K_APOPTOSIS) * (tnfBoundFraction - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF))))
 	{
 		// TNF induced apoptosis
@@ -172,8 +179,13 @@ void Mac::computeNextState(const int time, GrGrid& grid, GrStat& stats)
 		if (_deactivationTime == -1)
 		{
 			// update _NFkB
-			bool tnfInducedNFkB = tnfBoundFraction > _PARAM(PARAM_MAC_THRESHOLD_NFKB_TNF) && 
-			g_Rand.getReal() < 1 - pow(2.7183, -_PARAM(PARAM_MAC_K_NFKB) * (tnfBoundFraction - _PARAM(PARAM_MAC_THRESHOLD_NFKB_TNF)));
+			bool tnfInducedNFkB;
+			if (tnfrDynamics)
+				tnfInducedNFkB = _surfBoundTNFR1 > _PARAM(PARAM_MAC_THRESHOLD_NFKB_TNF_MOLECULAR) && 
+				g_Rand.getReal() < 1 - pow(2.7183, -_PARAM(PARAM_MAC_K_NFKB_MOLECULAR) * (_surfBoundTNFR1 - _PARAM(PARAM_MAC_THRESHOLD_NFKB_TNF_MOLECULAR)));
+			else
+				tnfInducedNFkB = tnfBoundFraction > _PARAM(PARAM_MAC_THRESHOLD_NFKB_TNF) && 
+					g_Rand.getReal() < 1 - pow(2.7183, -_PARAM(PARAM_MAC_K_NFKB) * (tnfBoundFraction - _PARAM(PARAM_MAC_THRESHOLD_NFKB_TNF)));
 			
 			_NFkB = _state == MAC_CINFECTED || _state == MAC_ACTIVE || tnfInducedNFkB ||
 				getExtMtbInMoore(grid) > _PARAM(PARAM_MAC_THRESHOLD_NFKB_EXTMTB);

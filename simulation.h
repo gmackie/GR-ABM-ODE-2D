@@ -75,6 +75,8 @@ public:
 	void loadState(std::istream& in);
 	void saveState(std::ostream& out) const;
 	void setRecruitment(RecruitmentBase* pRecruitment);
+	
+	void setTnfrDynamics(bool tnfrDynamics);
 
 	static QString getTimeStr(int simTime, int time);
 
@@ -228,6 +230,11 @@ inline const GrGrid& Simulation::getGrGrid() const
 inline void Simulation::setRecruitment(RecruitmentBase* pRecruitment)
 {
 	_gr.setRecruitment(pRecruitment);
+}
+
+inline void Simulation::setTnfrDynamics(bool tnfrDynamics)
+{
+	_gr.setTnfrDynamics(tnfrDynamics);
 }
 
 inline QString Simulation::getTimeStr(int simTime, int time)

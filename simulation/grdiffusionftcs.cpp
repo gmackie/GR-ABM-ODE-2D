@@ -71,17 +71,6 @@ void GrDiffusionFTCS::diffuse(GrGrid& grid) const
 					res = 0;
 				
 				res *= degTNF;
-				
-				// simulate the effect of TNF internalization by cells in the form of degradation
-				double dtnf;
-				if (cell.hasMac())
-				{
-					dtnf = -_PARAM(PARAM_GR_K_INT1) * (res / (res + _PARAM(PARAM_GR_KD1) * 48.16e11)) * 1500 * dt * 0.4;
-					res += dtnf;
-				}
-				dtnf = -_PARAM(PARAM_GR_K_INT1) * (res / (res + _PARAM(PARAM_GR_KD1) * 48.16e11)) * 800 * (cell.hasTcell()) * dt * 0.4;
-				res += dtnf;
-				
 				newCell.setTNF(res);
 				
 				double shedtnfr2_i_j_old = cell.getShedTNFR2();

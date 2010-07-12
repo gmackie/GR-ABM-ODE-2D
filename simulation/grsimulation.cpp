@@ -27,6 +27,8 @@ GrSimulation::GrSimulation()
 	, _pDiffusion(new GrDiffusionWrongBTCS())
 	, _pTTest()
 	, _pRecruitment(NULL)
+	, _tnfrDynamics(false)
+	
 {
 	for (int i = 0; i < NOUTCOMES; i++)
 		_pTTest[i] = NULL;
@@ -230,7 +232,14 @@ void GrSimulation::solve()
 		secreteFromMacrophages();
 		secreteFromCaseations();
 		_pDiffusion->diffuse(_grid);
-		//	updateReceptorDynamics(dt);
+		if (_tnfrDynamics)
+		{
+			updateReceptorDynamics(dt);
+		}
+		else
+		{
+			adjustTNFDegradation(dt);
+		}
 	}
 	
 	// move macrophages
@@ -349,19 +358,19 @@ void GrSimulation::computeNextStates()
 {
 	for (MacList::iterator it = _macList.begin(); it != _macList.end(); it++)
 	{
-		it->computeNextState(_time, _grid, _stats);
+		it->computeNextState(_time, _grid, _stats, _tnfrDynamics);
 	}
 	for (TgamList::iterator it = _tgamList.begin(); it != _tgamList.end(); it++)
 	{
-		it->computeNextState(_time, _grid, _stats);
+		it->computeNextState(_time, _grid, _stats, _tnfrDynamics);
 	}
 	for (TcytList::iterator it = _tcytList.begin(); it != _tcytList.end(); it++)
 	{
-		it->computeNextState(_time, _grid, _stats);
+		it->computeNextState(_time, _grid, _stats, _tnfrDynamics);
 	}
 	for (TregList::iterator it = _tregList.begin(); it != _tregList.end(); it++)
 	{
-		it->computeNextState(_time, _grid, _stats);
+		it->computeNextState(_time, _grid, _stats, _tnfrDynamics);
 	}
 }
 
@@ -478,6 +487,30 @@ void GrSimulation::growExtMtb()
 
 			if (cell.getTNF() >= _areaThreshold)
 				_stats.incArea();
+		}
+	}
+}
+
+void GrSimulation::adjustTNFDegradation(double dt)
+{	
+	for (int row = 0; row < NROWS; row++)
+	{
+		for (int col = 0; col < NCOLS; col++)
+		{
+			GridCell& cell = _grid(row, col);
+			
+			// simulate the effect of TNF internalization by cells in the form of degradation
+			double dtnf;
+			double tnf = cell.getTNF();
+			if (cell.hasMac())
+			{
+				dtnf = -_PARAM(PARAM_GR_K_INT1) * (tnf / (tnf + _PARAM(PARAM_GR_KD1) * 48.16e11)) * 1500 * dt * 0.4;
+				tnf += dtnf;
+			}
+			dtnf = -_PARAM(PARAM_GR_K_INT1) * (tnf / (tnf + _PARAM(PARAM_GR_KD1) * 48.16e11)) * 800 * (cell.hasTcell()) * dt * 0.4;
+			tnf += dtnf;
+			
+			cell.setTNF(tnf);
 		}
 	}
 }

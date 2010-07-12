@@ -38,7 +38,7 @@ public:
 	~Tcyt();
 	void move(GrGrid& grid);
 	void secrete(GrGrid& grid);
-	void computeNextState(const int time, GrGrid& grid, GrStat& stats);
+	void computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tnfrDynamics);
 	void updateState();
 	void solveODEs (GrGrid& grid, double dt);
 	TcytState getState() const;

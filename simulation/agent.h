@@ -26,7 +26,7 @@ public:
 	virtual ~Agent();
 	virtual void move(GrGrid& grid) = 0;
 	virtual void secrete(GrGrid& grid) = 0;
-	virtual void computeNextState(const int time, GrGrid& grid, GrStat& stats) = 0;
+	virtual void computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tnfrDynamics) = 0;
 	virtual void updateState() = 0;
 	virtual void kill() = 0;
 	virtual void deactivate(const int time) = 0;

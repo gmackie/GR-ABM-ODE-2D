@@ -46,7 +46,7 @@ public:
 	~Mac();
 	void move(GrGrid& grid);
 	void secrete(GrGrid& grid);
-	void computeNextState(const int time, GrGrid& grid, GrStat& stats);
+	void computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tnfrDynamics);
 	void solveODEs (GrGrid& grid, double dt);
 	void updateState();
 	int getActivationTime() const;

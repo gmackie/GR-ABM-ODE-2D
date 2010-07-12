@@ -33,6 +33,7 @@ private:
 	GrDiffusion* _pDiffusion;
 	TTest* _pTTest[NOUTCOMES];
 	RecruitmentBase* _pRecruitment;
+	bool _tnfrDynamics;
 
 	void moveTcells();
 	void moveMacrophages();
@@ -42,6 +43,7 @@ private:
 	void secreteFromMacrophages();
 	void secreteFromCaseations();
 	void updateReceptorDynamics(double dt);
+	void adjustTNFDegradation(double dt);
 	void growExtMtb();
 
 public:
@@ -61,6 +63,8 @@ public:
 	const TregList& getTregList() const;
 	DiffusionMethod getDiffusionMethod() const;
 	void setDiffusionMethod(DiffusionMethod method);
+	bool getTnfrDynamics() const;
+	void setTnfrDynamics(bool tnfrDynamics);
 	double getAreaThreshold() const;
 	void setAreaThreshold(double areaThreshold);
 	OutcomeMethod getOutcomeMethod(int index) const;
@@ -132,6 +136,16 @@ inline int GrSimulation::getTime() const
 inline DiffusionMethod GrSimulation::getDiffusionMethod() const
 {
 	return _pDiffusion->getMethod();
+}
+
+inline bool GrSimulation::getTnfrDynamics() const
+{
+	return _tnfrDynamics;
+}
+
+inline void GrSimulation::setTnfrDynamics(bool tnfrDynamics)
+{
+	_tnfrDynamics = tnfrDynamics;
 }
 
 inline const MacList& GrSimulation::getMacList() const

@@ -4,10 +4,10 @@ ifeq ($(CXX),)
 endif
 
 ifeq ($(DEBUG),yes)
-	LDFLAGS = -lm -lboost_program_options-mt
+	LDFLAGS = -lm -lboost_program_options
 	CXXFLAGS = -Wall -g3 -DDEBUG -DVERBOSE
 else
-	LDFLAGS = -lm -lboost_program_options-mt
+	LDFLAGS = -lm -lboost_program_options
 	CXXFLAGS = -Wall -DNDEBUG -ffast-math -fcaller-saves -finline-functions -O3
 endif
 

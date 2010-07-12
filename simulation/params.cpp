@@ -49,8 +49,10 @@ const char* Params::_description[][4] =
 	{ "maxTNFR2Tcell", "Maximum density of TNFR2 on T cells", "#/cell", "GR" },
 	{ "minTNFR2Tcell", "Minimum density of TNFR2 on T cells", "#/cell", "GR" },
 	// end of molecular TNF-associated parameters
-	{ "thresholdApoptosisTNF", "TNF threshold for TNF-induced apoptosis", "#molecules", "GR" },
+	{ "thresholdApoptosisTNF", "TNF threshold for TNF-induced apoptosis", "fraction", "GR" },
 	{ "kApoptosis", "Rate of apoptosis happening", "1/s", "GR" },
+	{ "thresholdApoptosisTNF_Molecular", "TNF threshold for TNF-induced apoptosis", "#molecules", "GR" },
+	{ "kApoptosis_Molecular", "Rate of apoptosis happening", "1/s", "GR" },
 	{ "probApoptosisTNF", "Probability of TNF-induced apoptosis", "", "GR" },
 	{ "effectRecTNF", "Effect of TNF on recruitment", "", "GR" },
 	{ "effectRecCCL2", "Effect of CCL2 on recruitment", "", "GR" },
@@ -61,8 +63,10 @@ const char* Params::_description[][4] =
 	{ "dCCL5", "Secretion rate of CCL5", "#molecules/6s", "Mac" },
 	{ "dCXCL9", "Secretion rate of CXCL9", "#molecules/6s", "Mac" },
 	{ "dTNF", "Secretion rate of TNF", "#molecules/6s", "Mac" },
-	{ "thresholdNFkBTNF", "TNF threshold for NFkB activation", "#molecules", "Mac" },
+	{ "thresholdNFkBTNF", "TNF threshold for NFkB activation", "fraction", "Mac" },
 	{ "kNFkB", "Rate of NFkB activation", "1/s", "Mac" },
+	{ "thresholdNFkBTNF_Molecular", "TNF threshold for NFkB activation", "#molecules", "Mac" },
+	{ "kNFkB_Molecular", "Rate of NFkB activation", "1/s", "Mac" },
 	{ "nrExtMtbUptakeRest", "Number of extracellular bacteria a resting macrophage can uptake/kill", "#bacteria", "Mac" },
 	{ "probKillExtMtbRest", "Probability of a resting macrophage to kill some extracellular bacteria", "", "Mac" },
 	{ "nrExtMtbNFkB", "Number of extracellular bacteria for NFkB activation in an infected macrophage", "#bacteria", "Mac" },
@@ -352,6 +356,8 @@ bool Params::toXml(const char* filename) const
 	writeParam(outFile, PARAM_GR_DEG_CHEMOKINES, 1, CLOSE_NONE);
 	writeParam(outFile, PARAM_GR_THRESHOLD_APOPTOSIS_TNF, 1, CLOSE_NONE);
 	writeParam(outFile, PARAM_GR_K_APOPTOSIS, 1, CLOSE_NONE);
+	writeParam(outFile, PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR, 1, CLOSE_NONE);
+	writeParam(outFile, PARAM_GR_K_APOPTOSIS_MOLECULAR, 1, CLOSE_NONE);
 	writeParam(outFile, PARAM_GR_PROB_APOPTOSIS_TNF, 1, CLOSE_NONE);
 	writeParam(outFile, PARAM_GR_MIN_CHEMOTAXIS, 1, CLOSE_NONE);
 	writeParam(outFile, PARAM_GR_SEC_RATE_ATTRACTANT, 1, CLOSE_NONE);
@@ -405,6 +411,8 @@ bool Params::toXml(const char* filename) const
 	writeParam(outFile, PARAM_MAC_SEC_RATE_CXCL9, 2, CLOSE_NONE);
 	writeParam(outFile, PARAM_MAC_THRESHOLD_NFKB_TNF, 2, CLOSE_NONE);
 	writeParam(outFile, PARAM_MAC_K_NFKB, 2, CLOSE_NONE);
+	writeParam(outFile, PARAM_MAC_THRESHOLD_NFKB_TNF_MOLECULAR, 2, CLOSE_NONE);
+	writeParam(outFile, PARAM_MAC_K_NFKB_MOLECULAR, 2, CLOSE_NONE);
 	writeParam(outFile, PARAM_MAC_NR_UPTAKE_RI_EXTMTB, 2, CLOSE_NONE);
 	writeParam(outFile, PARAM_MAC_PROB_KILL_R_EXTMTB, 2, CLOSE_NONE);
 	writeParam(outFile, PARAM_MAC_THRESHOLD_NFKB_EXTMTB, 2, CLOSE_NONE);
@@ -499,6 +507,8 @@ bool Params::readGRElement(const TiXmlElement* pGrElement)
 	res &= readParam(pGrElement, PARAM_GR_DEG_CHEMOKINES, false);
 	res &= readParam(pGrElement, PARAM_GR_THRESHOLD_APOPTOSIS_TNF, false);
 	res &= readParam(pGrElement, PARAM_GR_K_APOPTOSIS, false);
+	res &= readParam(pGrElement, PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR, false);
+	res &= readParam(pGrElement, PARAM_GR_K_APOPTOSIS_MOLECULAR, false);
 	res &= readParam(pGrElement, PARAM_GR_PROB_APOPTOSIS_TNF, true);
 	res &= readParam(pGrElement, PARAM_GR_MIN_CHEMOTAXIS, false);
 	res &= readParam(pGrElement, PARAM_GR_MAX_CHEMOTAXIS, false);

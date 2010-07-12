@@ -75,6 +75,7 @@ int main(int argc, char *argv[])
 	QApplication a(argc, argv);
 
 	bool ode;
+	bool tnfrDynamics;
 	unsigned long seed;
 	bool seedSpecified;
 	int diffMethod;
@@ -138,6 +139,7 @@ int main(int argc, char *argv[])
 		("granuloma-visualization,g", po::value<std::string>(&granvizDataSetName), argHelp.c_str())
 		("load-state,l",  po::value<std::string>(&stateFileName), "File name of saved state to load")
 		("ode", "Use integrated lymph node ODE for recruitment")
+		("tnfr-dynamics", "Use molecular level TNF/TNFR dynamics in the model")
 		("ln-ode", po::value<std::string>(&lymphNodeODE), "Lymph node application")
 		("ln-ode-temp", po::value<std::string>(&lymphNodeTemp), "Lymph node temp file")
 		("version,v", "Version number");
@@ -173,6 +175,7 @@ int main(int argc, char *argv[])
 		outputEnabled = vm.count("output");
 
 		ode = vm.count("ode");
+		tnfrDynamics = vm.count("tnfr-dynamics");
 
 		if (!vm.count("input-file"))
 		{
@@ -293,6 +296,9 @@ int main(int argc, char *argv[])
 		itfc.getSimulation().setRecruitment(new RecruitmentProb());
 	else
 		itfc.getSimulation().setRecruitment(new RecruitmentLnODE(lymphNodeODE, lymphNodeTemp));
+	
+	/* set TNF/TNFR dynamics */
+	itfc.getSimulation().setTnfrDynamics(true);
 
 
 	glWindow.resizeGLWidget(resWidth, resHeight);

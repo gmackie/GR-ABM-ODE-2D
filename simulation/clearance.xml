@@ -86,8 +86,8 @@
 			probRec = "0.1"/>
 	</Tcell>
 	<Mtb
-		growthRateIntMtb = "1.00188"
-		growthRateExtMtb = "1.0008"
+		growthRateIntMtb = "1.0014"
+		growthRateExtMtb = "1.0007"
 		growthExtMtbBound = "200"/>
 	<Init>
 		<Mac row = "50" col = "50"/>

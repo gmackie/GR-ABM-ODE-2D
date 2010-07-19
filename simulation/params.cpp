@@ -607,6 +607,8 @@ bool Params::readMacElement(const TiXmlElement* pMacElement)
 	res &= readParam(pMacElement, PARAM_MAC_SEC_RATE_CXCL9, false);
 	res &= readParam(pMacElement, PARAM_MAC_THRESHOLD_NFKB_TNF, false);
 	res &= readParam(pMacElement, PARAM_MAC_K_NFKB, false);
+	res &= readParam(pMacElement, PARAM_MAC_THRESHOLD_NFKB_TNF_MOLECULAR, false);
+	res &= readParam(pMacElement, PARAM_MAC_K_NFKB_MOLECULAR, false);
 	res &= readParam(pMacElement, PARAM_MAC_NR_UPTAKE_RI_EXTMTB, false);
 	res &= readParam(pMacElement, PARAM_MAC_PROB_KILL_R_EXTMTB, false);
 	res &= readParam(pMacElement, PARAM_MAC_THRESHOLD_NFKB_EXTMTB, false);

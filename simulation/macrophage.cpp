@@ -60,10 +60,13 @@ void Mac::move(GrGrid& grid)
 	}
 }
 
-void Mac::secrete(GrGrid& grid)
+void Mac::secrete(GrGrid& grid, bool tnfrDynamics)
 {
 	if (_deactivationTime != -1)
+	{
+		_kSynth = 0;
 		return;
+	}
 	
 	GridCell& cell = grid(_row, _col);
 	
@@ -76,7 +79,8 @@ void Mac::secrete(GrGrid& grid)
 			cell.incCCL5(_PARAM(PARAM_MAC_SEC_RATE_CCL5));
 			cell.incCXCL9(_PARAM(PARAM_MAC_SEC_RATE_CXCL9));
 			_kSynth = _PARAM(PARAM_GR_K_SYNTH_MAC);
-			cell.incTNF(_PARAM(PARAM_MAC_SEC_RATE_TNF));
+			if (!tnfrDynamics)
+				cell.incTNF(_PARAM(PARAM_MAC_SEC_RATE_TNF));
 		}
 		else
 		{
@@ -84,7 +88,8 @@ void Mac::secrete(GrGrid& grid)
 			cell.incCCL5(0.5 * _PARAM(PARAM_MAC_SEC_RATE_CCL5));
 			cell.incCXCL9(0.5 * _PARAM(PARAM_MAC_SEC_RATE_CXCL9));
 			_kSynth = 0.5 * _PARAM(PARAM_GR_K_SYNTH_MAC);
-			cell.incTNF(0.5 * _PARAM(PARAM_MAC_SEC_RATE_TNF));
+			if (!tnfrDynamics)
+				cell.incTNF(0.5 * _PARAM(PARAM_MAC_SEC_RATE_TNF));
 		}
 		
 		cell.incNrSecretions();
@@ -97,7 +102,8 @@ void Mac::secrete(GrGrid& grid)
 		cell.incCCL5(0.5 * _PARAM(PARAM_MAC_SEC_RATE_CCL5));
 		cell.incCXCL9(0.5 * _PARAM(PARAM_MAC_SEC_RATE_CXCL9));
 		_kSynth = 0.5 * _PARAM(PARAM_GR_K_SYNTH_MAC);
-		cell.incTNF(0.5 * _PARAM(PARAM_MAC_SEC_RATE_TNF));
+		if (!tnfrDynamics)
+			cell.incTNF(0.5 * _PARAM(PARAM_MAC_SEC_RATE_TNF));
 		
 		cell.incNrSecretions();
 	}

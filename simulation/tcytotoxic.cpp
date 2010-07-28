@@ -22,7 +22,7 @@ Tcyt::Tcyt(int birthtime, int row, int col, TcytState state)
 	, _intBoundTNFR2(0.0)
 	, _vTNFR1(_surfTNFR1 * _PARAM(PARAM_GR_K_T1))
 	, _vTNFR2(_surfTNFR2 * _PARAM(PARAM_GR_K_T2))
-	, _kSynth(0.0)
+	, _kSynth(_PARAM(PARAM_GR_K_SYNTH_TCELL)/10)
 	, _kTACE(_PARAM(PARAM_GR_K_TACE_TCELL))
 {
 }
@@ -36,8 +36,18 @@ void Tcyt::move(GrGrid& grid)
 	Tcell::moveTcell(grid, false, true, true);
 }
 
-void Tcyt::secrete(GrGrid&)
+void Tcyt::secrete(GrGrid& grid, bool tnfrDynamics)
 {
+	if (_deactivationTime != -1)
+	{
+		_kSynth = 0;
+		return;
+	}
+	
+	GridCell& cell = grid(_row, _col);
+	_kSynth = _PARAM(PARAM_GR_K_SYNTH_TCELL)/10;
+	if (!tnfrDynamics)
+		cell.incTNF(_PARAM(PARAM_TCYT_SEC_RATE_TNF));
 }
 
 void Tcyt::computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tnfrDynamics)
@@ -203,6 +213,7 @@ void Tcyt::solveODEs(GrGrid& grid, double dt)
 	if (_mTNF < 0 || _surfTNFR1 < 0 || _surfBoundTNFR1 < 0 || _surfTNFR2 < 0 || _surfBoundTNFR2 < 0)
 		std::cout << "Error: Negative Value of Species in TNF/TNFR dynamics" << std::endl;
 }
+
 
 void Tcyt::kill()
 {

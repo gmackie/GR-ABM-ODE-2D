@@ -41,6 +41,7 @@ private:
 	void updateT_Test();
 	void computeNextStates();
 	void secreteFromMacrophages();
+	void secreteFromTcells();
 	void secreteFromCaseations();
 	void updateReceptorDynamics(double dt);
 	void adjustTNFDegradation(double dt);

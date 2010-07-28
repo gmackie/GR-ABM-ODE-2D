@@ -15,9 +15,9 @@
     minChemotaxis = "1.18978"
 	maxChemotaxis = "2000"
 	kSynthMac = "0.21"
-	kSynthTcell = "0"
+	kSynthTcell = "0.021"
 	kTaceMac = "0.00044"
-	kTaceTcell = "0.0000"
+	kTaceTcell = "0.000044"
 	KD1 = "1.9e-11"
 	KD2 = "4.2e-10"
 	kOn1 = "2.8e+07"
@@ -74,13 +74,15 @@
 			maxTimeReg = "10"
 			probApoptosisFasFasL = "0.06"
 			thresholdRec = "0.4"
-			probRec = "0.54"/>
+			probRec = "0.54"
+            dTNF = "0.126"/>
 		<Tcyt
 			maxTimeReg = "10"
 			probKillMac = "0.0847143"
 			probKillMacCleanly = "0.75"
 			thresholdRec = "0.4"
-			probRec = "0.36"/>
+			probRec = "0.36"
+            dTNF = "0.0126"/>
 		<Treg
 			thresholdRec = "0.05"
 			probRec = "0.1"/>

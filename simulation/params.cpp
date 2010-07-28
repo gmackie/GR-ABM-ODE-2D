@@ -82,8 +82,10 @@ const char* Params::_description[][4] =
 	{ "probApoptosisFasFasL", "Probability of Fas/FasL induced apoptosis by a Tgam cell", "", "Tgam" },
 	{ "thresholdRec", "TNF/chemokine threshold for Tgam recruitment", "", "Tgam" },
 	{ "probRec", "Probability of recruiting a Tgam cell", "", "Tgam" },
+	{ "dTNF", "Secretion rate of TNF by Tgam", "#molecules/6s", "Tgam" },
 	{ "thresholdRec", "TNF/chemokine threshold for Tcyt recruitment", "", "Tcyt" },
 	{ "probRec", "Probability of recruiting a Tcyt cell", "", "Tcyt" },
+	{ "dTNF", "Secretion rate of TNF by Tcyt", "#molecules/6s", "Tcyt" },
 	{ "probKillMac", "Probability of a Tcyt cell killing a (chronically) infected macrophage", "", "Tcyt" },
 	{ "probKillMacCleanly", "Probability of a Tcyt cell killing a chronically infected macrophage cleanly", "", "Tcyt" },
 	{ "thresholdRec", "TNF/chemokine threshold for Treg recruitment", "", "Treg" },
@@ -435,6 +437,7 @@ bool Params::toXml(const char* filename) const
 	writeParam(outFile, PARAM_TGAM_PROB_APOPTOSIS_FAS_FASL, 3, CLOSE_NONE);
 	writeParam(outFile, PARAM_TGAM_THRESHOLD_RECRUITMENT, 3, CLOSE_NONE);
 	writeParam(outFile, PARAM_TGAM_PROB_RECRUITMENT, 3, CLOSE_END_TAG);
+	writeParam(outFile, PARAM_TGAM_SEC_RATE_TNF, 3, CLOSE_NONE);
 
 	outFile << "\t\t<Tcyt\n";
 	writeParam(outFile, PARAM_TCYT_TIMESPAN_REGULATED, 3, CLOSE_NONE);
@@ -442,6 +445,7 @@ bool Params::toXml(const char* filename) const
 	writeParam(outFile, PARAM_TCYT_PROB_KILL_MAC_CLEANLY, 3, CLOSE_NONE);
 	writeParam(outFile, PARAM_TCYT_THRESHOLD_RECRUITMENT, 3, CLOSE_NONE);
 	writeParam(outFile, PARAM_TCYT_PROB_RECRUITMENT, 3, CLOSE_END_TAG);
+	writeParam(outFile, PARAM_TCYT_SEC_RATE_TNF, 3, CLOSE_NONE);
 
 	outFile << "\t\t<Treg\n";
 	writeParam(outFile, PARAM_TREG_THRESHOLD_RECRUITMENT, 3, CLOSE_NONE);
@@ -677,6 +681,7 @@ bool Params::readTgamElement(const TiXmlElement* pTgamElement)
 	res &= readParam(pTgamElement, PARAM_TGAM_PROB_RECRUITMENT, true);
 	res &= readParam(pTgamElement, PARAM_TGAM_THRESHOLD_RECRUITMENT, false);
 	res &= readParam(pTgamElement, PARAM_TGAM_TIMESPAN_REGULATED, true);
+	res &= readParam(pTgamElement, PARAM_TGAM_SEC_RATE_TNF, false);
 
 	return res;
 }
@@ -692,6 +697,7 @@ bool Params::readTcytElement(const TiXmlElement* pTcytElement)
 	res &= readParam(pTcytElement, PARAM_TCYT_PROB_RECRUITMENT, true);
 	res &= readParam(pTcytElement, PARAM_TCYT_THRESHOLD_RECRUITMENT, false);
 	res &= readParam(pTcytElement, PARAM_TCYT_TIMESPAN_REGULATED, true);
+	res &= readParam(pTcytElement, PARAM_TCYT_SEC_RATE_TNF, false);
 
 	return res;
 }

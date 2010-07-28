@@ -48,14 +48,14 @@ void GrDiffusionWrongBTCS::diffuse(GrGrid& grid) const
 				if (pAgent)
 				{
 					printf("SEC (%d,%d)\n", i, j);
-					pAgent->secrete(grid);
+					pAgent->secrete(grid, false);
 				}
 
 				pAgent = cell.getAgent(1);
 				if (pAgent)
 				{
 					printf("SEC (%d,%d)\n", i, j);
-					pAgent->secrete(grid);
+					pAgent->secrete(grid, false);
 				}
 
 				if (cell.isCaseated())

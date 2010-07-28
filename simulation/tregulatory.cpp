@@ -35,7 +35,7 @@ void Treg::move(GrGrid& grid)
 	Tcell::moveTcell(grid, false, true, false);
 }
 
-void Treg::secrete(GrGrid&)
+void Treg::secrete(GrGrid&, bool tnfrDynamics)
 {
 }
 

@@ -22,7 +22,7 @@ Tgam::Tgam(int birthtime, int row, int col, TgamState state)
 	, _intBoundTNFR2(0.0)
 	, _vTNFR1(_surfTNFR1 * _PARAM(PARAM_GR_K_T1))
 	, _vTNFR2(_surfTNFR2 * _PARAM(PARAM_GR_K_T2))
-	, _kSynth(0.0)
+	, _kSynth(_PARAM(PARAM_GR_K_SYNTH_TCELL))
 	, _kTACE(_PARAM(PARAM_GR_K_TACE_TCELL))
 {
 }
@@ -36,11 +36,18 @@ void Tgam::move(GrGrid& grid)
 	Tcell::moveTcell(grid, true, true, true);
 }
 
-void Tgam::secrete(GrGrid&)
+void Tgam::secrete(GrGrid& grid, bool tnfrDynamics)
 {
-	// a macrophage calls this function
-	//grid(_row, _col).incTNF(Params::_INCR_TNF_TGAM);
-	_state = TGAM_ACTIVE;
+	if (_deactivationTime != -1)
+	{
+		_kSynth = 0;
+		return;
+	}
+	
+	GridCell& cell = grid(_row, _col);
+	_kSynth = _PARAM(PARAM_GR_K_SYNTH_TCELL);
+	if (!tnfrDynamics)
+		cell.incTNF(_PARAM(PARAM_TGAM_SEC_RATE_TNF));
 }
 
 void Tgam::computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tnfrDynamics)

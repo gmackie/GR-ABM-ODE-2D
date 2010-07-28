@@ -45,7 +45,7 @@ public:
 	Mac(int birthtime, int row, int col, MacState state, double intMtb, bool NFkB, bool stat1);
 	~Mac();
 	void move(GrGrid& grid);
-	void secrete(GrGrid& grid);
+	void secrete(GrGrid& grid, bool tnfrDynamics);
 	void computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tnfrDynamics);
 	void solveODEs (GrGrid& grid, double dt);
 	void updateState();

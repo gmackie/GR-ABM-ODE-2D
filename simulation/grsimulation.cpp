@@ -230,6 +230,7 @@ void GrSimulation::solve()
 	for (int t = 0; t < 100; t++) 
 	{
 		secreteFromMacrophages();
+		secreteFromTcells();
 		secreteFromCaseations();
 		_pDiffusion->diffuse(_grid);
 		if (_tnfrDynamics)
@@ -378,7 +379,19 @@ void GrSimulation::secreteFromMacrophages()
 {
 	for (MacList::iterator it = _macList.begin(); it != _macList.end(); it++)
 	{
-		it->secrete(_grid);
+		it->secrete(_grid, _tnfrDynamics);
+	}
+}
+
+void GrSimulation::secreteFromTcells()
+{
+	for (TgamList::iterator it = _tgamList.begin(); it != _tgamList.end(); it++)
+	{
+		it->secrete(_grid, _tnfrDynamics);
+	}
+	for (TcytList::iterator it = _tcytList.begin(); it != _tcytList.end(); it++)
+	{
+		it->secrete(_grid, _tnfrDynamics);
 	}
 }
 

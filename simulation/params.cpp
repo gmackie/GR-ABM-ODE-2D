@@ -349,6 +349,34 @@ bool Params::toXml(const char* filename) const
 	}
 
 	outFile << "<GR\n";
+	writeParam(outFile, PARAM_muMDC_LN, 1, CLOSE_NONE);
+	writeParam(outFile, PARAM_sn4, 1, CLOSE_NONE);
+	writeParam(outFile, PARAM_muN4, 1, CLOSE_NONE);
+	writeParam(outFile, PARAM_k13, 1, CLOSE_NONE);
+	writeParam(outFile, PARAM_hs13, 1, CLOSE_NONE);
+	writeParam(outFile, PARAM_k14, 1, CLOSE_NONE);
+	writeParam(outFile, PARAM_k15, 1, CLOSE_NONE);
+	writeParam(outFile, PARAM_rho2, 1, CLOSE_NONE);
+	writeParam(outFile, PARAM_k20a, 1, CLOSE_NONE);
+	writeParam(outFile, PARAM_hs20a, 1, CLOSE_NONE);
+	writeParam(outFile, PARAM_csi1, 1, CLOSE_NONE);
+	writeParam(outFile, PARAM_csi1a, 1, CLOSE_NONE);
+	writeParam(outFile, PARAM_sn8, 1, CLOSE_NONE);
+	writeParam(outFile, PARAM_muN8, 1, CLOSE_NONE);
+	writeParam(outFile, PARAM_wT80, 1, CLOSE_NONE);
+	writeParam(outFile, PARAM_k16, 1, CLOSE_NONE);
+	writeParam(outFile, PARAM_hs16, 1, CLOSE_NONE);
+	writeParam(outFile, PARAM_k17, 1, CLOSE_NONE);
+	writeParam(outFile, PARAM_hs17, 1, CLOSE_NONE);
+	writeParam(outFile, PARAM_k18, 1, CLOSE_NONE);
+	writeParam(outFile, PARAM_rho3, 1, CLOSE_NONE);
+	writeParam(outFile, PARAM_k24a, 1, CLOSE_NONE);
+	writeParam(outFile, PARAM_hs24a, 1, CLOSE_NONE);
+	writeParam(outFile, PARAM_csi2, 1, CLOSE_NONE);
+	writeParam(outFile, PARAM_csi2a, 1, CLOSE_NONE);
+	writeParam(outFile, PARAM_csi2b, 1, CLOSE_NONE);
+	writeParam(outFile, PARAM_scaling, 1, CLOSE_NONE);
+	writeParam(outFile, PARAM_m, 1, CLOSE_NONE);
 	writeParam(outFile, PARAM_GR_NR_KILLINGS_FOR_CASEATION, 1, CLOSE_NONE);
 	writeParam(outFile, PARAM_GR_NR_SOURCES, 1, CLOSE_NONE);
 	writeParam(outFile, PARAM_GR_D_TNF, 1, CLOSE_NONE);
@@ -564,8 +592,8 @@ bool Params::readGRElement(const TiXmlElement* pGrElement)
 	res &= readParam(pGrElement, PARAM_GR_WEIGHT_CXCL9_RECRUITMENT,
 		getParam(PARAM_MAC_SEC_RATE_TNF) / getParam(PARAM_MAC_SEC_RATE_CXCL9), false);
 
-	if (_ode)
-	{
+//	if (_ode)
+//	{
 		res &= readParam(pGrElement, PARAM_muMDC_LN, false);
 		res &= readParam(pGrElement, PARAM_sn4, false);
 		res &= readParam(pGrElement, PARAM_muN4, false);
@@ -594,7 +622,7 @@ bool Params::readGRElement(const TiXmlElement* pGrElement)
 		res &= readParam(pGrElement, PARAM_csi2b, false);
 		res &= readParam(pGrElement, PARAM_scaling, false);
 		res &= readParam(pGrElement, PARAM_m, false);
-	}
+//	}
 
 	return res;
 }

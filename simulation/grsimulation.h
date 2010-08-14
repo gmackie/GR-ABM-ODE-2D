@@ -46,6 +46,7 @@ private:
 	void updateReceptorDynamics(double dt);
 	void adjustTNFDegradation(double dt);
 	void growExtMtb();
+	void shuffleCells();
 
 public:
 	GrSimulation();

@@ -263,6 +263,12 @@ void GrSimulation::solve()
 
 	// update states and remove dead agents from lists and grid
 	updateStates();
+	
+	// shuffle order of cells every hour for randomization in movement
+	if (_time % 6 == 0)
+	{
+		shuffleCells();
+	}
 
 	// perform t-test
 	updateT_Test();
@@ -372,7 +378,7 @@ void GrSimulation::computeNextStates()
 	for (TregList::iterator it = _tregList.begin(); it != _tregList.end(); it++)
 	{
 		it->computeNextState(_time, _grid, _stats, _tnfrDynamics);
-	}
+	} 
 }
 
 void GrSimulation::secreteFromMacrophages()
@@ -438,7 +444,7 @@ void GrSimulation::moveMacrophages()
 	const int timeResting = _PARAM(PARAM_MAC_MOVEMENT_RESTING);
 	const int timeInfected = _PARAM(PARAM_MAC_MOVEMENT_INFECTED);
 	const int timeActive = _PARAM(PARAM_MAC_MOVEMENT_ACTIVE);
-
+	
 	for (MacList::iterator it = _macList.begin(); it != _macList.end(); it++)
 	{
 		// move resting macrophages
@@ -456,11 +462,12 @@ void GrSimulation::moveMacrophages()
 		{
 			it->move(_grid);
 		}
-	}
+	} 
 }
 
 void GrSimulation::moveTcells()
 {
+		
 	for (TgamList::iterator it = _tgamList.begin(); it != _tgamList.end(); it++)
 	{
 		it->move(_grid);
@@ -472,7 +479,7 @@ void GrSimulation::moveTcells()
 	for (TregList::iterator it = _tregList.begin(); it != _tregList.end(); it++)
 	{
 		it->move(_grid);
-	}
+	} 
 }
 
 void GrSimulation::growExtMtb()
@@ -599,4 +606,92 @@ void GrSimulation::setOutcomeMethod(int index, OutcomeMethod method, double alph
 			break;
 		}
 	}
+}
+
+void GrSimulation::shuffleCells()
+{
+	MacList::iterator mac1 = _macList.begin();
+	MacList::iterator mac2 = _macList.end();
+	TgamList::iterator tgam1 = _tgamList.begin();
+	TgamList::iterator tgam2 = _tgamList.end();
+	TcytList::iterator tcyt1 = _tcytList.begin();
+	TcytList::iterator tcyt2 = _tcytList.end();
+	TregList::iterator treg1 = _tregList.begin();
+	TregList::iterator treg2 = _tregList.end();
+	int m = 1;
+	int n = 1;
+	
+	while (m + n < _macList.size() - 1)
+	{
+		if (g_Rand.getReal() < 0.5)
+		{
+			mac1++;
+			m++;
+		}
+		if (g_Rand.getReal() < 0.5)
+		{
+			mac2--;
+			n++;
+		}
+		std::swap(mac1, mac2);
+	}
+	if (_tgamList.size() > 0)
+	{
+		m = 1;
+		n = 1;
+		while (m + n < _tgamList.size() - 1)
+		{
+			if (g_Rand.getReal() < 0.5)
+			{
+				tgam1++;
+				m++;
+			}
+			if (g_Rand.getReal() < 0.5)
+			{
+				tgam2--;
+				n++;
+			}
+			std::swap(tgam1, tgam2);
+		}	
+	}
+	
+	if (_tcytList.size() > 0)
+	{
+		m = 1;
+		n = 1;
+		while (m + n < _tcytList.size() - 1)
+		{
+			if (g_Rand.getReal() < 0.5)
+			{
+				tcyt1++;
+				m++;
+			}
+			if (g_Rand.getReal() < 0.5)
+			{
+				tcyt2--;
+				n++;
+			}
+			std::swap(tcyt1, tcyt2);
+		}
+	}
+	
+	if (_tregList.size() > 0)
+	{
+		m = 1;
+		n = 1;
+		while (m + n < _tregList.size() - 1)
+		{
+			if (g_Rand.getReal() < 0.5)
+			{
+				treg1++;
+				m++;
+			}
+			if (g_Rand.getReal() < 0.5)
+			{
+				treg2--;
+				n++;
+			}
+			std::swap(treg1, treg2);
+		}
+	}	
 }

@@ -618,8 +618,8 @@ void GrSimulation::shuffleCells()
 	TcytList::iterator tcyt2 = _tcytList.end();
 	TregList::iterator treg1 = _tregList.begin();
 	TregList::iterator treg2 = _tregList.end();
-	int m = 1;
-	int n = 1;
+	MacList::size_type m = 1;
+	MacList::size_type n = 1;
 	
 	while (m + n < _macList.size() - 1)
 	{

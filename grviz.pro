@@ -6,7 +6,9 @@ CONFIG += debug_and_release
 QT += core \
     gui \
     opengl
-HEADERS += simulation/recruitmentlnodepure.h \
+HEADERS += simulation/tinyxml/tinyxml.h \
+    simulation/tinyxml/tinystr.h \
+    simulation/recruitmentlnodepure.h \
     simulation/recruitmentlnode.h \
     simulation/recruitmentprob.h \
     simulation/recruitmentbase.h \
@@ -67,8 +69,6 @@ HEADERS += simulation/recruitmentlnodepure.h \
     simulation/tgamma.h \
     simulation/tregulatory.h \
     simulation/ttest.h \
-    simulation/tinyxml/tinystr.h \
-    simulation/tinyxml/tinyxml.h \
     vectordatasets/vector.h \
     vectordatasets/vectordataset.h \
     vectordatasets/vectorgradientdataset.h \
@@ -84,7 +84,11 @@ HEADERS += simulation/recruitmentlnodepure.h \
     maininterface.h \
     simulation.h \
     snapshot.h
-SOURCES += simulation/recruitmentlnodepure.cpp \
+SOURCES += simulation/tinyxml/tinyxmlparser.cpp \
+    simulation/tinyxml/tinyxmlerror.cpp \
+    simulation/tinyxml/tinyxml.cpp \
+    simulation/tinyxml/tinystr.cpp \
+    simulation/recruitmentlnodepure.cpp \
     simulation/recruitmentlnode.cpp \
     simulation/recruitmentprob.cpp \
     simulation/recruitmentbase.cpp \
@@ -125,10 +129,6 @@ SOURCES += simulation/recruitmentlnodepure.cpp \
     simulation/tcell.cpp \
     simulation/tcytotoxic.cpp \
     simulation/tgamma.cpp \
-    simulation/tinyxml/tinystr.cpp \
-    simulation/tinyxml/tinyxml.cpp \
-    simulation/tinyxml/tinyxmlerror.cpp \
-    simulation/tinyxml/tinyxmlparser.cpp \
     simulation/tregulatory.cpp \
     vectordatasets/vectorgrid.cpp \
     visualization/agentsvisualization.cpp \

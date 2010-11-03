@@ -27,6 +27,7 @@
 	csi2b   ="1e-1"
 	scaling ="2e0"
 	m =" .75"
+	scalingMDC = "1"
 	nrKillingsCaseation = "7"
 	nrSources = "50"
 	diffusivityTNF = "5.2e-08"

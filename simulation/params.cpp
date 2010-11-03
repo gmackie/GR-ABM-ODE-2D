@@ -121,6 +121,7 @@ const char* Params::_description[][4] =
 	{ "csi2b", "ODE stuff", "", "GR" },
 	{ "scaling", "ODE stuff", "", "GR" },
 	{ "m", "ODE stuff", "", "GR" },
+	{ "scalingMDC", "ODE stuff", "", "GR" },
 	/* INT */
 	{ "nrSources", "Number of vascular sources on the grid", "", "GR" },
 	{ "nrKillingsCaseation", "Number of killings for a compartment to become caseated", "", "GR" },
@@ -622,6 +623,8 @@ bool Params::readGRElement(const TiXmlElement* pGrElement)
 		res &= readParam(pGrElement, PARAM_csi2b, false);
 		res &= readParam(pGrElement, PARAM_scaling, false);
 		res &= readParam(pGrElement, PARAM_m, false);
+		// optional, defaults to 1
+		readParam(pGrElement, PARAM_scaling_MDC, 1, false);
 //	}
 
 	return res;

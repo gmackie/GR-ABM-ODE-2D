@@ -147,7 +147,7 @@ void RecruitmentLnODE::updateInitialConditions(GrStat& stats)
 	// update MDC, if the delta > 0
 	if (delta > 0)
 	{
-		_odeInitialConditions[_idxMDC] += delta;
+		_odeInitialConditions[_idxMDC] += _PARAM(PARAM_scaling_MDC) * delta;
 	}
 
 	// update _prevMiMci

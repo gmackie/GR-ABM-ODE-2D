@@ -101,6 +101,7 @@ void ParamWindow::update()
 	newItem(_pGR, PARAM_csi2b);
 	newItem(_pGR, PARAM_scaling);
 	newItem(_pGR, PARAM_m);
+	newItem(_pGR, PARAM_scaling_MDC);
 
 	if (Params::getInstance()->getUseRecruitmentWeights())
 	{

@@ -121,6 +121,7 @@ typedef enum {
 	PARAM_csi2b,
 	PARAM_scaling,
 	PARAM_m,
+	PARAM_scaling_MDC,
 	PARAM_DOUBLE_COUNT // dummy for the count
 } ParamDoubleType;
 

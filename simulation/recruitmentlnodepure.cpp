@@ -21,7 +21,8 @@ void RecruitmentLnODEPure::solveODE(GrStat& stats)
 	const double dt = 1.0/14400.0;
 
 	static const double muMDC_LN= _PARAM(PARAM_muMDC_LN);
-	static const double sn4     = _PARAM(PARAM_sn4     );
+	static const double init_n4 = _PARAM(PARAM_initN4  );
+	static const double init_n8 = _PARAM(PARAM_initN8  );
 	static const double muN4    = _PARAM(PARAM_muN4    );
 	static const double k13     = _PARAM(PARAM_k13     );
 	static const double hs13    = _PARAM(PARAM_hs13    );
@@ -32,7 +33,6 @@ void RecruitmentLnODEPure::solveODE(GrStat& stats)
 	static const double hs20a   = _PARAM(PARAM_hs20a   );
 	static const double csi1    = _PARAM(PARAM_csi1    );
 	static const double csi1a   = _PARAM(PARAM_csi1a   );
-	static const double sn8     = _PARAM(PARAM_sn8     );
 	static const double muN8    = _PARAM(PARAM_muN8    );
 	static const double wT80    = _PARAM(PARAM_wT80    );
 	static const double k16     = _PARAM(PARAM_k16     );
@@ -48,6 +48,8 @@ void RecruitmentLnODEPure::solveODE(GrStat& stats)
 	static const double csi2b   = _PARAM(PARAM_csi2b   );
 	static const double scaling = _PARAM(PARAM_scaling );
 	static const double m       = _PARAM(PARAM_m       );
+	static const double sn4     = init_n4 * muN4;
+	static const double sn8     = init_n8 * muN8;
 
 	double& MDC = _odeInitialConditions[_idxMDC];
 	double& N4 = _odeInitialConditions[_idxNaiveCD4];

@@ -27,7 +27,7 @@ protected:
 	static const int _idxEffectorT8 = 41;
 	static const int _idxCTL = 42;
 
-	int _tcellDiscretizedTable[TCELL_TYPE_COUNT]; // this + 1 is the next integer to cross
+	double _tcellTable[TCELL_TYPE_COUNT]; // contains lower bounds
 
 	int _tcellQueueCount[TCELL_TYPE_COUNT];
 	std::vector<TcellType> _tcellQueue;

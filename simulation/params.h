@@ -94,7 +94,6 @@ typedef enum {
 	PARAM_EXTMTB_GROWTH_RATE,
 	PARAM_EXTMTB_UPPER_BOUND,
 	PARAM_muMDC_LN,
-	PARAM_sn4,
 	PARAM_muN4,
 	PARAM_k13,
 	PARAM_hs13,
@@ -105,7 +104,6 @@ typedef enum {
 	PARAM_hs20a,
 	PARAM_csi1,
 	PARAM_csi1a,
-	PARAM_sn8,
 	PARAM_muN8,
 	PARAM_wT80,
 	PARAM_k16,
@@ -122,6 +120,10 @@ typedef enum {
 	PARAM_scaling,
 	PARAM_m,
 	PARAM_scaling_MDC,
+	PARAM_scaling_LUNG,
+	PARAM_scaling_LN,
+	PARAM_initN4,
+	PARAM_initN8,
 	PARAM_DOUBLE_COUNT // dummy for the count
 } ParamDoubleType;
 

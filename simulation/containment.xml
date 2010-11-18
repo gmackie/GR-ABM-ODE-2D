@@ -1,6 +1,9 @@
 <GR
+	initN4  ="1e5"
+	initN8  =".84e5"
+	scalingLung = "1"
+	scalingLN = "1"
 	muMDC_LN="0.3"
-	sn4     ="5e5"
 	muN4    ="2.5"
 	k13     ="1e1"
 	hs13    ="1e3"
@@ -11,7 +14,6 @@
 	hs20a   ="1e3"
 	csi1    ="1e1"
 	csi1a   ="1e-1"
-	sn8     ="4.15e5"
 	muN8    ="2.5"
 	wT80    ="5e-1"
 	k16     ="1e1"

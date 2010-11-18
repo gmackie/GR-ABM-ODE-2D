@@ -94,7 +94,6 @@ const char* Params::_description[][4] =
 	{ "growthRateExtMtb", "Growth rate of extracellular bacteria", "", "Mtb" },
 	{ "growthExtMtbBound", "Upper bound on the number of extracellular bacteria used in growth function", "#bacteria", "Mtb" },
 	{ "muMDC_LN", "ODE stuff", "", "GR" },
-	{ "sn4", "ODE stuff", "", "GR" },
 	{ "muN4", "ODE stuff", "", "GR" },
 	{ "k13", "ODE stuff", "", "GR" },
 	{ "hs13", "ODE stuff", "", "GR" },
@@ -105,7 +104,6 @@ const char* Params::_description[][4] =
 	{ "hs20a", "ODE stuff", "", "GR" },
 	{ "csi1", "ODE stuff", "", "GR" },
 	{ "csi1a", "ODE stuff", "", "GR" },
-	{ "sn8", "ODE stuff", "", "GR" },
 	{ "muN8", "ODE stuff", "", "GR" },
 	{ "wT80", "ODE stuff", "", "GR" },
 	{ "k16", "ODE stuff", "", "GR" },
@@ -122,6 +120,10 @@ const char* Params::_description[][4] =
 	{ "scaling", "ODE stuff", "", "GR" },
 	{ "m", "ODE stuff", "", "GR" },
 	{ "scalingMDC", "ODE stuff", "", "GR" },
+	{ "scalingLung", "ODE stuff - scaling factor for MDC proxy to account for GR size", "", "GR" },
+	{ "scalingLN", "ODE stuff - scaling factor for T cell fluxes to account for GR size", "", "GR" },
+	{ "initN4", "ODE stuff - N4(0)", "", "GR" },
+	{ "initN8", "ODE stuff - N8(0)", "", "GR" },
 	/* INT */
 	{ "nrSources", "Number of vascular sources on the grid", "", "GR" },
 	{ "nrKillingsCaseation", "Number of killings for a compartment to become caseated", "", "GR" },
@@ -351,7 +353,8 @@ bool Params::toXml(const char* filename) const
 
 	outFile << "<GR\n";
 	writeParam(outFile, PARAM_muMDC_LN, 1, CLOSE_NONE);
-	writeParam(outFile, PARAM_sn4, 1, CLOSE_NONE);
+	writeParam(outFile, PARAM_initN4, 1, CLOSE_NONE);
+	writeParam(outFile, PARAM_initN8, 1, CLOSE_NONE);
 	writeParam(outFile, PARAM_muN4, 1, CLOSE_NONE);
 	writeParam(outFile, PARAM_k13, 1, CLOSE_NONE);
 	writeParam(outFile, PARAM_hs13, 1, CLOSE_NONE);
@@ -362,7 +365,6 @@ bool Params::toXml(const char* filename) const
 	writeParam(outFile, PARAM_hs20a, 1, CLOSE_NONE);
 	writeParam(outFile, PARAM_csi1, 1, CLOSE_NONE);
 	writeParam(outFile, PARAM_csi1a, 1, CLOSE_NONE);
-	writeParam(outFile, PARAM_sn8, 1, CLOSE_NONE);
 	writeParam(outFile, PARAM_muN8, 1, CLOSE_NONE);
 	writeParam(outFile, PARAM_wT80, 1, CLOSE_NONE);
 	writeParam(outFile, PARAM_k16, 1, CLOSE_NONE);
@@ -378,6 +380,9 @@ bool Params::toXml(const char* filename) const
 	writeParam(outFile, PARAM_csi2b, 1, CLOSE_NONE);
 	writeParam(outFile, PARAM_scaling, 1, CLOSE_NONE);
 	writeParam(outFile, PARAM_m, 1, CLOSE_NONE);
+	writeParam(outFile, PARAM_scaling_MDC, 1, CLOSE_NONE);
+	writeParam(outFile, PARAM_scaling_LUNG, 1, CLOSE_NONE);
+	writeParam(outFile, PARAM_scaling_LN, 1, CLOSE_NONE);
 	writeParam(outFile, PARAM_GR_NR_KILLINGS_FOR_CASEATION, 1, CLOSE_NONE);
 	writeParam(outFile, PARAM_GR_NR_SOURCES, 1, CLOSE_NONE);
 	writeParam(outFile, PARAM_GR_D_TNF, 1, CLOSE_NONE);
@@ -596,7 +601,6 @@ bool Params::readGRElement(const TiXmlElement* pGrElement)
 //	if (_ode)
 //	{
 		res &= readParam(pGrElement, PARAM_muMDC_LN, false);
-		res &= readParam(pGrElement, PARAM_sn4, false);
 		res &= readParam(pGrElement, PARAM_muN4, false);
 		res &= readParam(pGrElement, PARAM_k13, false);
 		res &= readParam(pGrElement, PARAM_hs13, false);
@@ -607,7 +611,6 @@ bool Params::readGRElement(const TiXmlElement* pGrElement)
 		res &= readParam(pGrElement, PARAM_hs20a, false);
 		res &= readParam(pGrElement, PARAM_csi1, false);
 		res &= readParam(pGrElement, PARAM_csi1a, false);
-		res &= readParam(pGrElement, PARAM_sn8, false);
 		res &= readParam(pGrElement, PARAM_muN8, false);
 		res &= readParam(pGrElement, PARAM_wT80, false);
 		res &= readParam(pGrElement, PARAM_k16, false);
@@ -623,8 +626,12 @@ bool Params::readGRElement(const TiXmlElement* pGrElement)
 		res &= readParam(pGrElement, PARAM_csi2b, false);
 		res &= readParam(pGrElement, PARAM_scaling, false);
 		res &= readParam(pGrElement, PARAM_m, false);
+		res &= readParam(pGrElement, PARAM_initN4, false);
+		res &= readParam(pGrElement, PARAM_initN8, false);
 		// optional, defaults to 1
 		readParam(pGrElement, PARAM_scaling_MDC, 1, false);
+		readParam(pGrElement, PARAM_scaling_LUNG, 1, false);
+		readParam(pGrElement, PARAM_scaling_LN, 1, false);
 //	}
 
 	return res;

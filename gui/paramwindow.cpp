@@ -74,8 +74,11 @@ void ParamWindow::update()
 	newItem(_pGR, PARAM_GR_SEC_RATE_ATTRACTANT);
 
 	newItem(_pGR, PARAM_muMDC_LN);
-	newItem(_pGR, PARAM_sn4);
+	newItem(_pGR, PARAM_initN4);
+	newItem(_pGR, PARAM_initN8);
 	newItem(_pGR, PARAM_muN4);
+	newItem(_pGR, PARAM_scaling_LN);
+	newItem(_pGR, PARAM_scaling_LUNG);
 	newItem(_pGR, PARAM_k13);
 	newItem(_pGR, PARAM_hs13);
 	newItem(_pGR, PARAM_k14);
@@ -85,7 +88,6 @@ void ParamWindow::update()
 	newItem(_pGR, PARAM_hs20a);
 	newItem(_pGR, PARAM_csi1);
 	newItem(_pGR, PARAM_csi1a);
-	newItem(_pGR, PARAM_sn8);
 	newItem(_pGR, PARAM_muN8);
 	newItem(_pGR, PARAM_wT80);
 	newItem(_pGR, PARAM_k16);

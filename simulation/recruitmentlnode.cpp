@@ -28,9 +28,9 @@ void RecruitmentLnODE::init()
 	_tcellQueueCount[TCELL_TYPE_GAM] = 0;
 	_tcellQueueCount[TCELL_TYPE_CYT] = 0;
 
-	_tcellDiscretizedTable[TCELL_TYPE_REG] = 0;
-	_tcellDiscretizedTable[TCELL_TYPE_GAM] = 0;
-	_tcellDiscretizedTable[TCELL_TYPE_CYT] = 0;
+	_tcellTable[TCELL_TYPE_REG] = 0;
+	_tcellTable[TCELL_TYPE_GAM] = 0;
+	_tcellTable[TCELL_TYPE_CYT] = 0;
 
 	_prevMiMci = 0;
 
@@ -38,11 +38,11 @@ void RecruitmentLnODE::init()
 	{
 		switch (i)
 		{
-		case _idxNaiveCD4: // Naive CD4
-			_odeInitialConditions[i] = 1e5;
+		case _idxNaiveCD4: // Naive CD4, used to be 1e5
+			_odeInitialConditions[i] = _PARAM(PARAM_initN4);
 			break;
-		case _idxNaiveCD8: // Naive CD8
-			_odeInitialConditions[i] = .84e5;
+		case _idxNaiveCD8: // Naive CD8, used to be .84e5
+			_odeInitialConditions[i] = _PARAM(PARAM_initN8);
 			break;
 		default:
 			_odeInitialConditions[i] = 0;
@@ -85,29 +85,32 @@ void RecruitmentLnODE::updateQueue(GrStat& stats)
 	// Compute the fluxes
 	double tcellFlux[TCELL_TYPE_COUNT];
 
-	tcellFlux[TCELL_TYPE_GAM] =
-			_odeInitialConditions[_idxEffectorT8] + _odeInitialConditions[_idxEffectorTH1];
+	tcellFlux[TCELL_TYPE_GAM] = _PARAM(PARAM_scaling_LN) *
+			(_odeInitialConditions[_idxEffectorT8] + _odeInitialConditions[_idxEffectorTH1]);
 
-	tcellFlux[TCELL_TYPE_CYT] = _odeInitialConditions[_idxCTL];
+	tcellFlux[TCELL_TYPE_CYT] = _PARAM(PARAM_scaling_LN) * _odeInitialConditions[_idxCTL];
 
 	tcellFlux[TCELL_TYPE_REG] = .1 * tcellFlux[TCELL_TYPE_GAM];
 
-	// Update the T cell queue and the table that contains the next integer to cross
-
-	/* Be careful, increment can be more than 1 */
+	// Update the T cell queue and update the table that contains the lower bounds
 	for (int i = 0; i < TCELL_TYPE_COUNT; i++)
 	{
 		TcellType type = (TcellType) i;
 
-		if (tcellFlux[type] > _tcellDiscretizedTable[type] + 1)
+		if (tcellFlux[type] > _tcellTable[type] + 1)
 		{
-			_tcellQueue.push_back(type);
-			_tcellQueueCount[type]++;
-			_tcellDiscretizedTable[type]++;
+			const int count = tcellFlux[type] -_tcellTable[type];
+			for (int j = 0; j < count; j++)
+			{
+				_tcellQueue.push_back(type);
+				_tcellQueueCount[type]++;
+			}
+
+			_tcellTable[type] += count;
 		}
-		else if (tcellFlux[type] < _tcellDiscretizedTable[type] - 1)
+		else if (tcellFlux[type] < _tcellTable[type])
 		{
-			_tcellDiscretizedTable[type]++;
+			_tcellTable[type] = tcellFlux[type];
 		}
 	}
 
@@ -147,7 +150,7 @@ void RecruitmentLnODE::updateInitialConditions(GrStat& stats)
 	// update MDC, if the delta > 0
 	if (delta > 0)
 	{
-		_odeInitialConditions[_idxMDC] += _PARAM(PARAM_scaling_MDC) * delta;
+		_odeInitialConditions[_idxMDC] += _PARAM(PARAM_scaling_LUNG) * _PARAM(PARAM_scaling_MDC) * delta;
 	}
 
 	// update _prevMiMci

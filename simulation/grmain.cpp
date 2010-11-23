@@ -28,14 +28,14 @@ void printUsage(char* pArgv0, po::options_description& desc)
 	std::cout << "Usage: " << pArgv0 << " [options]\n" << desc << std::endl;
 }
 
-int run(unsigned long seed, const std::string& inputFileName, DiffusionMethod diffMethod, RecruitmentBase* pRecr, bool ode, bool tnfrDynamics)
+int run(unsigned long seed, const std::string& inputFileName, DiffusionMethod diffMethod, int simulationDays, RecruitmentBase* pRecr, bool ode, bool tnfrDynamics)
 {
 	if (!Params::getInstance(true)->fromXml(inputFileName.c_str()))
 		return 1;
 
 	g_Rand.setSeed(seed);
 
-	const int timeToSimulate = 14400*2;
+	const int timeToSimulate = 144 * simulationDays;
 	GrSimulation sim;
 
 	sim.setTnfrDynamics(tnfrDynamics);
@@ -72,6 +72,7 @@ int main(int argc, char** argv)
 	std::string lymphNodeODE;
 	std::string lymphNodeTemp;
 	int diffMethod;
+	int nDays;
 	bool ode;
 	bool tnfrDynamics;
 
@@ -86,6 +87,7 @@ int main(int argc, char** argv)
 		("seed,s", po::value<unsigned long>(&seed)->default_value((unsigned long) curTime), "Seed")
 		("diffusion,d", po::value<int>(&diffMethod)->default_value(0),
 				"Diffusion method:\n0 - FTCS\n1 - BTCS (SOR, correct)\n2 - BTCS (SOR, wrong)\n3 - FTCS Grid Swap")
+		("days", po::value<int>(&nDays)->default_value(200), "Number of days to simulate")
 		("ode", "Use integrated lymph node ODE for recruitment")
 		("tnfr-dynamics", "Use molecular level TNF/TNFR dynamics in the model")
 		("ln-ode,l", po::value<std::string>(&lymphNodeODE), "Lymph node application")
@@ -127,13 +129,13 @@ int main(int argc, char** argv)
 		switch (diffMethod)
 		{
 		case 0:
-			return run(seed, inputFileName, DIFF_REC_EQ, pRecr, ode, tnfrDynamics);
+			return run(seed, inputFileName, DIFF_REC_EQ, nDays, pRecr, ode, tnfrDynamics);
 		case 1:
-			return run(seed, inputFileName, DIFF_SOR_CORRECT, pRecr, ode, tnfrDynamics);
+			return run(seed, inputFileName, DIFF_SOR_CORRECT, nDays, pRecr, ode, tnfrDynamics);
 		case 2:
-			return run(seed, inputFileName, DIFF_SOR_WRONG, pRecr, ode, tnfrDynamics);
+			return run(seed, inputFileName, DIFF_SOR_WRONG, nDays, pRecr, ode, tnfrDynamics);
 		case 3:
-			return run(seed, inputFileName, DIFF_REC_EQ_SWAP, pRecr, ode, tnfrDynamics);
+			return run(seed, inputFileName, DIFF_REC_EQ_SWAP, nDays, pRecr, ode, tnfrDynamics);
 		default:
 			printUsage(argv[0], desc);
 			return 1;

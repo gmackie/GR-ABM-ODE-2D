@@ -6,7 +6,9 @@ CONFIG += debug_and_release
 QT += core \
     gui \
     opengl
-HEADERS += simulation/tinyxml/tinyxml.h \
+HEADERS += simulation/grdiffusionftcsswap.h \
+    simulation/grsimulationgrid.h \
+    simulation/tinyxml/tinyxml.h \
     simulation/tinyxml/tinystr.h \
     simulation/recruitmentlnodepure.h \
     simulation/recruitmentlnode.h \
@@ -84,7 +86,9 @@ HEADERS += simulation/tinyxml/tinyxml.h \
     maininterface.h \
     simulation.h \
     snapshot.h
-SOURCES += simulation/tinyxml/tinyxmlparser.cpp \
+SOURCES += simulation/grdiffusionftcsswap.cpp \
+    simulation/grsimulationgrid.cpp \
+    simulation/tinyxml/tinyxmlparser.cpp \
     simulation/tinyxml/tinyxmlerror.cpp \
     simulation/tinyxml/tinyxml.cpp \
     simulation/tinyxml/tinystr.cpp \

@@ -9,14 +9,14 @@
 #define GRDIFFUSION_H_
 
 #include "gr.h"
-#include "grgrid.h"
+#include "grsimulationgrid.h"
 
 class GrDiffusion
 {
 public:
 	GrDiffusion();
 	virtual ~GrDiffusion();
-	virtual void diffuse(GrGrid& grid) const = 0;
+	virtual void diffuse(GrSimulationGrid& grid) const = 0;
 	virtual DiffusionMethod getMethod() const = 0;
 };
 

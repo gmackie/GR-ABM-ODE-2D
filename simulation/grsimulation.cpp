@@ -11,6 +11,7 @@
 #include "grdiffusionbtcs.h"
 #include "grdiffusionwrongbtcs.h"
 #include "grdiffusionftcs.h"
+#include "grdiffusionftcsswap.h"
 #include "areatest.h"
 #include "mtbtest.h"
 #include "recruitmentprob.h"
@@ -221,6 +222,9 @@ void GrSimulation::solve()
 	// here we perform a timestep, which is 10 minutes
 	_time++;
 
+	// Ensure that both grids have the same state.
+	_grid.updateNextGrid();
+
 	// reset statistics
 	_stats.reset();
 
@@ -365,19 +369,19 @@ void GrSimulation::computeNextStates()
 {
 	for (MacList::iterator it = _macList.begin(); it != _macList.end(); it++)
 	{
-		it->computeNextState(_time, _grid, _stats, _tnfrDynamics);
+		it->computeNextState(_time, _grid.getGrid(), _stats, _tnfrDynamics);
 	}
 	for (TgamList::iterator it = _tgamList.begin(); it != _tgamList.end(); it++)
 	{
-		it->computeNextState(_time, _grid, _stats, _tnfrDynamics);
+		it->computeNextState(_time, _grid.getGrid(), _stats, _tnfrDynamics);
 	}
 	for (TcytList::iterator it = _tcytList.begin(); it != _tcytList.end(); it++)
 	{
-		it->computeNextState(_time, _grid, _stats, _tnfrDynamics);
+		it->computeNextState(_time, _grid.getGrid(), _stats, _tnfrDynamics);
 	}
 	for (TregList::iterator it = _tregList.begin(); it != _tregList.end(); it++)
 	{
-		it->computeNextState(_time, _grid, _stats, _tnfrDynamics);
+		it->computeNextState(_time, _grid.getGrid(), _stats, _tnfrDynamics);
 	} 
 }
 
@@ -385,7 +389,7 @@ void GrSimulation::secreteFromMacrophages()
 {
 	for (MacList::iterator it = _macList.begin(); it != _macList.end(); it++)
 	{
-		it->secrete(_grid, _tnfrDynamics);
+		it->secrete(_grid.getGrid(), _tnfrDynamics);
 	}
 }
 
@@ -393,11 +397,11 @@ void GrSimulation::secreteFromTcells()
 {
 	for (TgamList::iterator it = _tgamList.begin(); it != _tgamList.end(); it++)
 	{
-		it->secrete(_grid, _tnfrDynamics);
+		it->secrete(_grid.getGrid(), _tnfrDynamics);
 	}
 	for (TcytList::iterator it = _tcytList.begin(); it != _tcytList.end(); it++)
 	{
-		it->secrete(_grid, _tnfrDynamics);
+		it->secrete(_grid.getGrid(), _tnfrDynamics);
 	}
 }
 
@@ -423,19 +427,19 @@ void GrSimulation::updateReceptorDynamics(double dt)
 {
 	for (MacList::iterator it = _macList.begin(); it != _macList.end(); it++)
 	{
-		it->solveODEs(_grid, dt);
+		it->solveODEs(_grid.getGrid(), dt);
 	}
 	for (TgamList::iterator it = _tgamList.begin(); it != _tgamList.end(); it++)
 	{
-		it->solveODEs(_grid, dt);
+		it->solveODEs(_grid.getGrid(), dt);
 	}
 	for (TcytList::iterator it = _tcytList.begin(); it != _tcytList.end(); it++)
 	{
-		it->solveODEs(_grid, dt);
+		it->solveODEs(_grid.getGrid(), dt);
 	}
 	for (TregList::iterator it = _tregList.begin(); it != _tregList.end(); it++)
 	{
-		it->solveODEs(_grid, dt);
+		it->solveODEs(_grid.getGrid(), dt);
 	}
 }
 
@@ -450,17 +454,17 @@ void GrSimulation::moveMacrophages()
 		// move resting macrophages
 		if (_time % timeResting == 0 && it->getState() == MAC_RESTING)
 		{
-			it->move(_grid);
+			it->move(_grid.getGrid());
 		}
 		// move active macrophages
 		else if (_time % timeActive == 0 && it->getState() == MAC_ACTIVE)
 		{
-			it->move(_grid);
+			it->move(_grid.getGrid());
 		}
 		// move infected macrophages
 		else if (_time % timeInfected == 0 && it->getState() == MAC_INFECTED)
 		{
-			it->move(_grid);
+			it->move(_grid.getGrid());
 		}
 	} 
 }
@@ -470,15 +474,15 @@ void GrSimulation::moveTcells()
 		
 	for (TgamList::iterator it = _tgamList.begin(); it != _tgamList.end(); it++)
 	{
-		it->move(_grid);
+		it->move(_grid.getGrid());
 	}
 	for (TcytList::iterator it = _tcytList.begin(); it != _tcytList.end(); it++)
 	{
-		it->move(_grid);
+		it->move(_grid.getGrid());
 	}
 	for (TregList::iterator it = _tregList.begin(); it != _tregList.end(); it++)
 	{
-		it->move(_grid);
+		it->move(_grid.getGrid());
 	} 
 }
 
@@ -574,6 +578,9 @@ void GrSimulation::setDiffusionMethod(DiffusionMethod method)
 		case DIFF_SOR_WRONG:
 			_pDiffusion = new GrDiffusionWrongBTCS();
 			break;
+		case DIFF_REC_EQ_SWAP:
+				_pDiffusion = new GrDiffusionFTCS_Swap();
+				break;
 		}
 	}
 }

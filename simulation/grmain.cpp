@@ -132,6 +132,8 @@ int main(int argc, char** argv)
 			return run(seed, inputFileName, DIFF_SOR_CORRECT, pRecr, ode, tnfrDynamics);
 		case 2:
 			return run(seed, inputFileName, DIFF_SOR_WRONG, pRecr, ode, tnfrDynamics);
+		case 3:
+			return run(seed, inputFileName, DIFF_REC_EQ_SWAP, pRecr, ode, tnfrDynamics);
 		default:
 			printUsage(argv[0], desc);
 			return 1;

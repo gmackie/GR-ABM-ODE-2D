@@ -74,7 +74,7 @@ typedef std::vector<Pos> PosVector;
 typedef std::pair<double, GridCell*> ThresholdGridCellPtrPair;
 typedef std::list<ThresholdGridCellPtrPair> ThresholdGridCellPtrList;
 
-typedef enum {DIFF_REC_EQ = 0, DIFF_SOR_CORRECT = 1, DIFF_SOR_WRONG = 2} DiffusionMethod;
+typedef enum {DIFF_REC_EQ = 0, DIFF_SOR_CORRECT = 1, DIFF_SOR_WRONG = 2, DIFF_REC_EQ_SWAP = 3} DiffusionMethod;
 typedef enum {OUTCOME_AREA = 0, OUTCOME_MTB = 1, OUTCOME_NONE = 2} OutcomeMethod;
 //typedef enum {RECR_PROB = 0, RECR_LN_ODE = 1} RecruitmentMethod;
 

@@ -25,7 +25,7 @@ private:
 public:
 	GrDiffusionFTCS();
 	virtual ~GrDiffusionFTCS();
-	void diffuse(GrGrid& grid) const;
+	void diffuse(GrSimulationGrid& grid) const;
 	DiffusionMethod getMethod() const;
 };
 

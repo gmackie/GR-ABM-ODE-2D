@@ -9,7 +9,7 @@
 #define GRSIMULATION_H
 
 #include "gr.h"
-#include "grgrid.h"
+#include "grsimulationgrid.h"
 #include "grstat.h"
 #include "macrophage.h"
 #include "tgamma.h"
@@ -23,7 +23,7 @@ class GrSimulation
 {
 private:
 	int _time;
-	GrGrid _grid;
+	GrSimulationGrid _grid;
 	MacList _macList;
 	TgamList _tgamList;
 	TcytList _tcytList;
@@ -172,12 +172,12 @@ inline const TregList& GrSimulation::getTregList() const
 
 inline const GrGrid& GrSimulation::getGrid() const
 {
-	return _grid;
+	return _grid.getGrid();
 }
 
 inline GrGrid& GrSimulation::getGrid()
 {
-	return _grid;
+	return _grid.getGrid();
 }
 
 inline const GrStat& GrSimulation::getStats() const

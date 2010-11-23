@@ -17,8 +17,10 @@ GrDiffusionWrongBTCS::~GrDiffusionWrongBTCS()
 {
 }
 
-void GrDiffusionWrongBTCS::diffuse(GrGrid& grid) const
+void GrDiffusionWrongBTCS::diffuse(GrSimulationGrid& simGrid) const
 {
+	GrGrid& grid = simGrid.getGrid();
+
 	const double muTNF = _PARAM(PARAM_GR_D_TNF) * 6 / (4e-6);
 	const double muChemokines = _PARAM(PARAM_GR_D_CHEMOKINES) * 6 / (4e-6);
 	const double degTNF = _PARAM(PARAM_GR_DEG_TNF);

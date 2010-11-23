@@ -95,6 +95,7 @@ const QString MainWindow::_GLYPH_TEXTURE = "Texture";
 const QString MainWindow::_DIFF_FTCS = "Recursive eq";
 const QString MainWindow::_DIFF_SOR_CORRECT = "SOR correct";
 const QString MainWindow::_DIFF_SOR_WRONG = "SOR wrong";
+const QString MainWindow::_DIFF_FTCS_SWAP = "Swap Recursive eq";
 
 const QString MainWindow::_OUTCOME_AREA = "Area";
 const QString MainWindow::_OUTCOME_MTB = "Mtb.";
@@ -351,8 +352,7 @@ void MainWindow::initSimulationTab()
 	_ui.comboBoxDiffusion->addItem(_DIFF_FTCS);
 	_ui.comboBoxDiffusion->addItem(_DIFF_SOR_CORRECT);
 	_ui.comboBoxDiffusion->addItem(_DIFF_SOR_WRONG);
-
-	_ui.comboBoxDiffusion->setCurrentIndex(2);
+	_ui.comboBoxDiffusion->addItem(_DIFF_FTCS_SWAP);
 
 	_ui.spinBoxSeed->setValue((int) g_Rand.getSeed());
 
@@ -363,6 +363,14 @@ void MainWindow::initSimulationTab()
 	connect(_ui.checkBoxStopDays, SIGNAL(toggled(bool)), this, SLOT(updateStopCriteria(void)));
 	connect(_ui.checkBoxStopClearance, SIGNAL(toggled(bool)), this, SLOT(updateStopCriteria(void)));
 	connect(_ui.spinBoxStopDays, SIGNAL(valueChanged(int)), this, SLOT(updateStopCriteria(void)));
+
+	// Set the default diffusion method to FTCS swap.
+	// This must be after connecting the currentIndexChanged signal
+	// to the updateDiffusionMethod slot. Otherwise, setting
+	// the combo box doesn't update the simulation object diffusion
+	// method, so it remains whatever the default method is from
+	// the simulation object constructor.
+	_ui.comboBoxDiffusion->setCurrentIndex(3);
 }
 
 void MainWindow::initColorMapTab()
@@ -1236,6 +1244,10 @@ void MainWindow::updateDiffusionMethod(const QString& value)
 	else if (value == _DIFF_SOR_WRONG)
 	{
 		sim.setDiffusionMethod(DIFF_SOR_WRONG);
+	}
+	else if (value == _DIFF_FTCS_SWAP)
+	{
+		sim.setDiffusionMethod(DIFF_REC_EQ_SWAP);
 	}
 	else
 	{

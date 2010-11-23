@@ -114,7 +114,7 @@ int main(int argc, char *argv[])
 		("input-file,i", po::value<std::string>(&inputFileName), "Input file name")
 		("seed,s", po::value<unsigned long>(&seed))
 		("diffusion,d", po::value<int>(&diffMethod)->default_value(0),
-				"Diffusion method:\n0 - FTCS\n1 - BTCS (SOR, correct)\n2 - BTCS (SOR, wrong)")
+				"Diffusion method:\n0 - FTCS\n1 - BTCS (SOR, correct)\n2 - BTCS (SOR, wrong)\n3 - FTCS Grid Swap")
 		("days", po::value<int>(&nDays)->default_value(200), "Number of days to simulate")
 		("script,c", "Scripting mode")
 		("output,o", po::value<std::string>(&outputDir), "Output directory")
@@ -194,7 +194,7 @@ int main(int argc, char *argv[])
 		if (!Params::getInstance(ode)->fromXml(inputFileName.c_str()))
 			return 1;
 
-		if (!(0 <= diffMethod && diffMethod < 3))
+		if (!(0 <= diffMethod && diffMethod < 4))
 		{
 			printUsage(argv[0], desc);
 			return 1;

@@ -81,6 +81,7 @@ public:
     static const QString _DIFF_SOR_WRONG;
     static const QString _DIFF_SOR_CORRECT;
     static const QString _DIFF_FTCS;
+    static const QString _DIFF_FTCS_SWAP;
 
     static const QString _OUTCOME_MTB;
     static const QString _OUTCOME_AREA;

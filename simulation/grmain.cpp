@@ -85,7 +85,7 @@ int main(int argc, char** argv)
 		("input-file,i", po::value<std::string>(&inputFileName), "Input file name")
 		("seed,s", po::value<unsigned long>(&seed)->default_value((unsigned long) curTime), "Seed")
 		("diffusion,d", po::value<int>(&diffMethod)->default_value(0),
-				"Diffusion method:\n0 - FTCS\n1 - BTCS (SOR, correct)\n2 - BTCS (SOR, wrong)")
+				"Diffusion method:\n0 - FTCS\n1 - BTCS (SOR, correct)\n2 - BTCS (SOR, wrong)\n3 - FTCS Grid Swap")
 		("ode", "Use integrated lymph node ODE for recruitment")
 		("tnfr-dynamics", "Use molecular level TNF/TNFR dynamics in the model")
 		("ln-ode,l", po::value<std::string>(&lymphNodeODE), "Lymph node application")

@@ -579,8 +579,8 @@ void GrSimulation::setDiffusionMethod(DiffusionMethod method)
 			_pDiffusion = new GrDiffusionWrongBTCS();
 			break;
 		case DIFF_REC_EQ_SWAP:
-				_pDiffusion = new GrDiffusionFTCS_Swap();
-				break;
+			_pDiffusion = new GrDiffusionFTCS_Swap();
+			break;
 		}
 	}
 }

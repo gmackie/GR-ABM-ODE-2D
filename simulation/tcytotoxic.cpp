@@ -90,7 +90,7 @@ void Tcyt::computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tn
 	}
 }
 
-void Tcyt::handleActive(const int, GrGrid& grid, GrStat&)
+void Tcyt::handleActive(const int time, GrGrid& grid, GrStat&)
 {
 	GridCell& cell = grid(_row, _col);
 

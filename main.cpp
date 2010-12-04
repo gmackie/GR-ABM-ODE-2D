@@ -113,7 +113,7 @@ int main(int argc, char *argv[])
 		("help,h", "Help message")
 		("input-file,i", po::value<std::string>(&inputFileName), "Input file name")
 		("seed,s", po::value<unsigned long>(&seed))
-		("diffusion,d", po::value<int>(&diffMethod)->default_value(0),
+		("diffusion,d", po::value<int>(&diffMethod)->default_value(3),
 				"Diffusion method:\n0 - FTCS\n1 - BTCS (SOR, correct)\n2 - BTCS (SOR, wrong)\n3 - FTCS Grid Swap")
 		("days", po::value<int>(&nDays)->default_value(200), "Number of days to simulate")
 		("script,c", "Scripting mode")

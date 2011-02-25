@@ -261,7 +261,7 @@ inline void GridCell::incNrRecruitments()
 
 inline int GridCell::getNrSecretions() const
 {
-	return _nKillings;
+	return _nSecretions;
 }
 
 inline void GridCell::incNrSecretions()

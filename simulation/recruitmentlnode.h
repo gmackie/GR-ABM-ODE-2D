@@ -30,7 +30,13 @@ protected:
 	double _tcellTable[TCELL_TYPE_COUNT]; // contains lower bounds
 
 	int _tcellQueueCount[TCELL_TYPE_COUNT];
-	std::vector<TcellType> _tcellQueue;
+	struct TcellTypePair
+	{
+		int _birthtime;
+		TcellType _type;
+	};
+
+	std::vector<TcellTypePair> _tcellQueue;
 
 	int _prevMiMci;
 	double _odeInitialConditions[_nrConditions];
@@ -40,7 +46,7 @@ protected:
 	void init();
 	void updateInitialConditions(GrStat& stats);
 	virtual void solveODE(GrStat& stats);
-	void updateQueue(GrStat& stats);
+	void updateQueue(const int time, GrStat& stats);
 	void recruitMacsGetTcellSources(GrSimulation& sim, GrStat& stats,
 			ThresholdGridCellPtrList tcellSources[TCELL_TYPE_COUNT]);
 	void recruitMac(GrSimulation& sim, GridCell* pSource);

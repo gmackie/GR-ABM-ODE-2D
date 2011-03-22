@@ -80,7 +80,7 @@ void RecruitmentLnODE::solveODE(GrStat&)
 	inFile.close();
 }
 
-void RecruitmentLnODE::updateQueue(GrStat& stats)
+void RecruitmentLnODE::updateQueue(const int time, GrStat& stats)
 {
 	// Compute the fluxes
 	double tcellFlux[TCELL_TYPE_COUNT];
@@ -102,7 +102,8 @@ void RecruitmentLnODE::updateQueue(GrStat& stats)
 			const int count = tcellFlux[type] -_tcellTable[type];
 			for (int j = 0; j < count; j++)
 			{
-				_tcellQueue.push_back(type);
+				TcellTypePair tcell = { time - g_Rand.getInt(_PARAM(PARAM_TCELL_AGE), 1), type };
+				_tcellQueue.push_back(tcell);
 				_tcellQueueCount[type]++;
 			}
 
@@ -238,20 +239,24 @@ void RecruitmentLnODE::recruitMacsGetTcellSources(GrSimulation& sim, GrStat& sta
 void RecruitmentLnODE::recruitTcells(GrSimulation& sim, GrStat& stats,
 		ThresholdGridCellPtrList tcellSources[TCELL_TYPE_COUNT])
 {
-	std::vector<TcellType> newTcellQueue;
+	std::vector<TcellTypePair> newTcellQueue;
 
 	// pick a T cell from the queue
 	while (_tcellQueue.size())
 	{
 		int idx = g_Rand.getInt((int) _tcellQueue.size());
 
-		TcellType type = _tcellQueue[idx];
+		TcellTypePair tcell = _tcellQueue[idx];
 		_tcellQueue.erase(_tcellQueue.begin() + idx);
+
+		// check whether the T cell has died while in the queue
+		if (tcell._birthtime + _PARAM(PARAM_TCELL_AGE) < sim.getTime())
+			continue;
 
 		// pick a source
 		GridCell* pSource = NULL;
-		for (ThresholdGridCellPtrList::iterator it = tcellSources[type].begin();
-				it != tcellSources[type].end(); it++)
+		for (ThresholdGridCellPtrList::iterator it = tcellSources[tcell._type].begin();
+				it != tcellSources[tcell._type].end(); it++)
 		{
 			GridCell* pCurSource = it->second;
 			assert (pSource->isSource() && !pSource->isCaseated());
@@ -266,33 +271,32 @@ void RecruitmentLnODE::recruitTcells(GrSimulation& sim, GrStat& stats,
 
 		if (!pSource)
 		{
-			newTcellQueue.push_back(type);
+			newTcellQueue.push_back(tcell);
 		}
 		else
 		{
-			_tcellQueueCount[type]--;
+			_tcellQueueCount[tcell._type]--;
 			pSource->incNrRecruitments();
 
 			// recruit it
-			switch (type)
+			switch (tcell._type)
 			{
 			case TCELL_TYPE_CYT:
-				sim.createTcyt(pSource->getRow(), pSource->getCol(),
-					sim.getTime() - g_Rand.getInt(_PARAM(PARAM_TCELL_AGE), 1), TCYT_ACTIVE);
+				sim.createTcyt(pSource->getRow(), pSource->getCol(), tcell._birthtime, TCYT_ACTIVE);
 				break;
 			case TCELL_TYPE_GAM:
-				sim.createTgam(pSource->getRow(), pSource->getCol(),
-					sim.getTime() - g_Rand.getInt(_PARAM(PARAM_TCELL_AGE), 1), TGAM_ACTIVE);
+				sim.createTgam(pSource->getRow(), pSource->getCol(), tcell._birthtime, TGAM_ACTIVE);
 				break;
 			case TCELL_TYPE_REG:
-				sim.createTreg(pSource->getRow(), pSource->getCol(),
-					sim.getTime() - g_Rand.getInt(_PARAM(PARAM_TCELL_AGE), 1), TREG_ACTIVE);
+				sim.createTreg(pSource->getRow(), pSource->getCol(), tcell._birthtime, TREG_ACTIVE);
 				break;
 			default:
+				assert(false);
 				break;
 			}
 		}
 	}
+
 
 	_tcellQueue = newTcellQueue;
 
@@ -314,7 +318,7 @@ void RecruitmentLnODE::recruit(GrSimulation& sim)
 	solveODE(stats);
 
 	// update T cell queue according to new fluxes
-	updateQueue(stats);
+	updateQueue(sim.getTime(), stats);
 
 	/* Perform the actual recruitment */
 	ThresholdGridCellPtrList tcellSources[TCELL_TYPE_COUNT];

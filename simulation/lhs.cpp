@@ -182,8 +182,10 @@ void Lhs::performLhs()
 		if (!getUseRecruitmentWeights())
 			updateRecruitmentWeights();
 
+		// Number the parameter files wrttin from 1, not 0.
+		// Ex. 1.xml, 2.xml,... rather than 0.xml, 1.xml,...
 		char buf[1024];
-		sprintf(buf, "%d.xml", i);
+		sprintf(buf, "%d.xml", i+1);
 		toXml(buf);
 	}
 }

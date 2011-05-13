@@ -60,7 +60,7 @@ int Agent::moveAgent(GrGrid& grid, bool ccl2, bool ccl5, bool cxcl9, bool attrac
 	double sum = 0;
 	for (int i = 0; i < 9; i++)
 	{
-		if (prob[k] > prob[i])
+		if (prob[k] < prob[i])
 			k = i;
 		sum += prob[i];
 	}

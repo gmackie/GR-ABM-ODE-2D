@@ -38,7 +38,7 @@ Mac::~Mac()
 
 void Mac::move(GrGrid& grid)
 {
-	int k = Agent::moveAgent(grid, true, true, false, true, 1.5);
+	int k = Agent::moveAgent(grid, true, true, false, true, _PARAM(PARAM_MAC_MOVEMENT_BONUSFACTOR));
 
 	/**
 	 * 0 1 2

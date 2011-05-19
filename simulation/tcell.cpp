@@ -20,7 +20,7 @@ Tcell::~Tcell()
 
 void Tcell::moveTcell(GrGrid& grid, bool ccl2, bool ccl5, bool cxcl9)
 {
-	int k = Agent::moveAgent(grid, ccl2, ccl5, cxcl9, false, 1);
+	int k = Agent::moveAgent(grid, ccl2, ccl5, cxcl9, false, _PARAM(PARAM_TCELL_MOVEMENT_BONUSFACTOR));
 	
 	/**
 	 * 0 1 2

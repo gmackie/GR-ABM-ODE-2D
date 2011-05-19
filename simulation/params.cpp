@@ -78,9 +78,11 @@ const char* Params::_description[][4] =
 	{ "nrExtMtbUptakeAct", "Number of extracellular bacteria an active macrophage can uptake and subsequently kill", "#bacteria", "Mac" },
 	{ "thresholdRec", "TNF/chemokine threshold for macrophage recruitment", "", "Mac" },
 	{ "probRec", "Probability of recruiting a macrophage", "", "Mac" },
+	{ "movementBonusFactor", "Bonus factor for neighbor compartment with highest chemical concentration", "", "Mac" },
 	{ "probRec", "Probability of recruiting a T cell", "", "Tcell" },
 	{ "probMoveToMac", "Probability of a T cell moving onto a compartment already containing a macrophage", "", "Tcell" },
 	{ "probMoveToTcell", "Probability of a T cell moving onto a compartment already containing another T cell", "", "Tcell" },
+	{ "movementBonusFactor", "Bonus factor for neighbor compartment with highest chemical concentration", "", "Tcell" },
 	{ "probApoptosisFasFasL", "Probability of Fas/FasL induced apoptosis by a Tgam cell", "", "Tgam" },
 	{ "thresholdRec", "TNF/chemokine threshold for Tgam recruitment", "", "Tgam" },
 	{ "probRec", "Probability of recruiting a Tgam cell", "", "Tgam" },
@@ -663,6 +665,15 @@ bool Params::readMacElement(const TiXmlElement* pMacElement)
 	res &= readParam(pMacElement, PARAM_MAC_A_AGE, true);
 	res &= readParam(pMacElement, PARAM_MAC_THRESHOLD_RECRUITMENT, false);
 	res &= readParam(pMacElement, PARAM_MAC_PROB_RECRUITMENT, true);
+
+	bool bonusFactorRes = readParam(pMacElement, PARAM_MAC_MOVEMENT_BONUSFACTOR, 1.0, false);
+	res &= bonusFactorRes;
+	if (bonusFactorRes && _PARAM(PARAM_MAC_MOVEMENT_BONUSFACTOR) < 1.0)
+	{
+		std::cerr << "The mveoment bonus factor of " << _PARAM(PARAM_MAC_MOVEMENT_BONUSFACTOR) << " is < 1.0." << std::endl;
+		res = false;
+	}
+
 	res &= readParam(pMacElement, PARAM_MAC_MOVEMENT_RESTING, true);
 	res &= readParam(pMacElement, PARAM_MAC_MOVEMENT_INFECTED, true);
 	res &= readParam(pMacElement, PARAM_MAC_MOVEMENT_ACTIVE, true);
@@ -703,6 +714,14 @@ bool Params::readTcellElement(const TiXmlElement* pTcellElement)
 	res &= readParam(pTcellElement, PARAM_TCELL_PROB_MOVE_TO_MAC, true);
 	res &= readParam(pTcellElement, PARAM_TCELL_PROB_MOVE_TO_TCELL, true);
 	res &= readParam(pTcellElement, PARAM_TCELL_PROB_RECRUITMENT, true);
+
+	bool bonusFactorRes = readParam(pTcellElement, PARAM_TCELL_MOVEMENT_BONUSFACTOR, 1.0, false);
+	res &= bonusFactorRes;
+	if (bonusFactorRes && _PARAM(PARAM_TCELL_MOVEMENT_BONUSFACTOR) < 1.0)
+	{
+		std::cerr << "The mveoment bonus factor of " << _PARAM(PARAM_TCELL_MOVEMENT_BONUSFACTOR) << " is < 1.0." << std::endl;
+		res = false;
+	}
 
 	res &= readTgamElement(pTgamElement);
 	res &= readTcytElement(pTcytElement);

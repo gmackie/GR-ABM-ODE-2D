@@ -101,6 +101,12 @@ void Tcyt::handleActive(const int time, GrGrid& grid, GrStat&)
 
 		assert(pMac);
 
+		// If the mac died on this time step ignore it.
+		if (pMac->getNextState() == MAC_DEAD)
+		{
+			return;
+		}
+
 		if (g_Rand.getReal() < _PARAM(PARAM_TCYT_PROB_KILL_MAC))
 		{
 			if (pMac->getState() == MAC_INFECTED)

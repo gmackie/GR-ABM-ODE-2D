@@ -124,11 +124,10 @@ void Mac::apoptosis(GrGrid& grid)
 {
 	_nextState = MAC_DEAD;
 
-	/* Question: Does an infected macrophage undergoing apoptosis contribute to caseation? */
 	if (_state == MAC_INFECTED || _state == MAC_CINFECTED)
 	{
 		// disperse bacteria to the Moore neighborhood
-		// (half of the intracellular bacteria dies, the other half is dispersed
+		// (half of the intracellular bacteria dies, the other half is dispersed)
 		const double dExtMtb = _intMtb / 18.0;
 
 		for (int i = -1; i <= 1; i++)
@@ -151,7 +150,6 @@ void Mac::computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tnf
 		cell.incExtMtb(_intMtb);
 		_intMtb = 0;
 
-		/* Should we call this caseation or necrosis? */
 		// in case active, death contributes to caseation
 		if (_state == MAC_ACTIVE)
 		{

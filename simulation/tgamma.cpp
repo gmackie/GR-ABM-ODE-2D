@@ -94,23 +94,32 @@ void Tgam::handleActive(const int, GrGrid& grid, GrStat& stats)
 {
 	GridCell& cell = grid(_row, _col);
 	
-	// get the macrophage
-	Mac* pMac = dynamic_cast<Mac*>(cell.getAgent(0));
-	if (!pMac) pMac = dynamic_cast<Mac*>(cell.getAgent(1));
-
-	_nextState = TGAM_ACTIVE;
-
-	// Fas/FasL induced apoptosis with probability 
-	if (pMac &&
-		(pMac->getState() == MAC_INFECTED || pMac->getState() == MAC_CINFECTED) &&
-		g_Rand.getReal() < _PARAM(PARAM_TGAM_PROB_APOPTOSIS_FAS_FASL))
+	if (cell.hasMac())
 	{
-		stats.incApoptosisFasFasL();
-		pMac->apoptosis(grid);
-		pMac->kill();
+		// get the macrophage
+		Mac* pMac = dynamic_cast<Mac*>(cell.getAgent(0));
+		if (!pMac) pMac = dynamic_cast<Mac*>(cell.getAgent(1));
 
-		/* Does Fas/FasL induced apoptosis contribute to caseation? */
-		cell.incNrKillings();
+		// If the mac died on this time step ignore it.
+		if (pMac->getNextState() == MAC_DEAD)
+		{
+			return;
+		}
+
+		_nextState = TGAM_ACTIVE;
+
+		// Fas/FasL induced apoptosis with probability
+		if (pMac &&
+			(pMac->getState() == MAC_INFECTED || pMac->getState() == MAC_CINFECTED) &&
+			g_Rand.getReal() < _PARAM(PARAM_TGAM_PROB_APOPTOSIS_FAS_FASL))
+		{
+			stats.incApoptosisFasFasL();
+			pMac->apoptosis(grid);
+			pMac->kill();
+
+			/* Does Fas/FasL induced apoptosis contribute to caseation? */
+			cell.incNrKillings();
+		}
 	}
 }
 

@@ -8,7 +8,7 @@ ifeq ($(DEBUG),yes)
 	CXXFLAGS = -Wall -g3 -DDEBUG -DVERBOSE
 else
 	LDFLAGS = -lm -lboost_program_options-mt
-	CXXFLAGS = -Wall -DNDEBUG -ffast-math -fcaller-saves -finline-functions -O3
+	CXXFLAGS = -Wall -DNDEBUG -ffast-math -fcaller-saves -finline-functions -O3 -march=native
 endif
 
 all: gr

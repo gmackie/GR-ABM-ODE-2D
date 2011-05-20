@@ -628,19 +628,26 @@ void GrSimulation::shuffleCells()
 	MacList::size_type m = 1;
 	MacList::size_type n = 1;
 	
-	while (m + n < _macList.size() - 1)
+	// Don't shuffle an empty list.
+	// The list size is unsigned so the shuffle loop limit, _list size - 1, is also unsigned.
+	// When list size is 0, the limit is a large positive number instead of -1.
+
+	if (_macList.size() > 0)
 	{
-		if (g_Rand.getReal() < 0.5)
+		while (m + n < _macList.size() - 1)
 		{
-			mac1++;
-			m++;
+			if (g_Rand.getReal() < 0.5)
+			{
+				mac1++;
+				m++;
+			}
+			if (g_Rand.getReal() < 0.5)
+			{
+				mac2--;
+				n++;
+			}
+			std::swap(mac1, mac2);
 		}
-		if (g_Rand.getReal() < 0.5)
-		{
-			mac2--;
-			n++;
-		}
-		std::swap(mac1, mac2);
 	}
 	if (_tgamList.size() > 0)
 	{

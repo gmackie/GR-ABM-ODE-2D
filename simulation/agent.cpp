@@ -49,8 +49,7 @@ int Agent::moveAgent(GrGrid& grid, bool ccl2, bool ccl5, bool cxcl9, bool attrac
 			if (attractant)
 				prob[k] += grid(MOD_ROW(_row + i), MOD_COL(_col + j)).getMacAttractant();
 
-			// add 1 just to prevent that cumArray contains only zeros
-			prob[k++]++;
+			k++;
 		}
 	}
 	
@@ -60,27 +59,36 @@ int Agent::moveAgent(GrGrid& grid, bool ccl2, bool ccl5, bool cxcl9, bool attrac
 	double sum = 0;
 	for (int i = 0; i < 9; i++)
 	{
-		if (prob[k] < prob[i])
+		if (prob[i] > prob[k])
 			k = i;
 		sum += prob[i];
 	}
 	sum += (bonusFactor - 1) * prob[k];
 	prob[k] *= bonusFactor;
 
-	// normalize
-	for (int i = 0; i < 9; i++)
-		prob[i] /= sum;
-
-	// compute cumulative array
-	double cumProb[9] = {prob[0], 0, 0, 0, 0, 0, 0, 0, 0};
-	for (int i = 1; i < 9; i++)
+	if (sum > 0.0)
 	{
-		cumProb[i] = (cumProb[i - 1] + prob[i]);
-	}
+		// normalize
+		for (int i = 0; i < 9; i++)
+			prob[i] /= sum;
 
-	// linear search
-	double r = g_Rand.getReal();
-	for (k = 0; cumProb[k] < r && k < 9; k++);
+		// compute cumulative array
+		double cumProb[9] = {prob[0], 0, 0, 0, 0, 0, 0, 0, 0};
+		for (int i = 1; i < 9; i++)
+		{
+			cumProb[i] = (cumProb[i - 1] + prob[i]);
+		}
+
+		// linear search
+		double r = g_Rand.getReal();
+		for (k = 0; cumProb[k] < r && k < 9; k++);
+	}
+	else
+	{
+		// prob[i] = 0 for all i.
+		// Pick from the neighbors with equal probability.
+		k = g_Rand.getInt(MOORE_COUNT, 0);
+	}
 
 	/**
 	 * 0 1 2

@@ -670,7 +670,7 @@ bool Params::readMacElement(const TiXmlElement* pMacElement)
 	res &= bonusFactorRes;
 	if (bonusFactorRes && _PARAM(PARAM_MAC_MOVEMENT_BONUSFACTOR) < 1.0)
 	{
-		std::cerr << "The mveoment bonus factor of " << _PARAM(PARAM_MAC_MOVEMENT_BONUSFACTOR) << " is < 1.0." << std::endl;
+		std::cerr << "The macrophage movement bonus factor of " << _PARAM(PARAM_MAC_MOVEMENT_BONUSFACTOR) << " is < 1.0." << std::endl;
 		res = false;
 	}
 
@@ -719,7 +719,7 @@ bool Params::readTcellElement(const TiXmlElement* pTcellElement)
 	res &= bonusFactorRes;
 	if (bonusFactorRes && _PARAM(PARAM_TCELL_MOVEMENT_BONUSFACTOR) < 1.0)
 	{
-		std::cerr << "The mveoment bonus factor of " << _PARAM(PARAM_TCELL_MOVEMENT_BONUSFACTOR) << " is < 1.0." << std::endl;
+		std::cerr << "The T cell movement bonus factor of " << _PARAM(PARAM_TCELL_MOVEMENT_BONUSFACTOR) << " is < 1.0." << std::endl;
 		res = false;
 	}
 

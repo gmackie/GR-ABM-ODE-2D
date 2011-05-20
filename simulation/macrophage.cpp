@@ -323,8 +323,10 @@ void Mac::handleInfected(const int time, GrGrid& grid, GrStat&)
 	_intMtb *= _PARAM(PARAM_INTMTB_GROWTH_RATE);
 
 	// uptake extracellular bacteria
-	if (cell.getExtMtb() > 0 &&
-		g_Rand.getReal() < (_PARAM(PARAM_MAC_THRESHOLD_BECOME_CI_INTMTB) - _intMtb) / 100)
+	// The probability to uptake decreases linearly as the number of intra-cellular bacteria increases to the threshold
+	// for becoming chronically infected. At that threshold the probability becomes 0.
+	double probExtMtbUptake = (_PARAM(PARAM_MAC_PROB_KILL_R_EXTMTB) *  (1.0 - (_intMtb / _PARAM(PARAM_MAC_THRESHOLD_BECOME_CI_INTMTB)) ));
+	if (cell.getExtMtb() > 0 && g_Rand.getReal() < probExtMtbUptake)
 	{
 		double dExtMtb = std::min(cell.getExtMtb(), _PARAM(PARAM_MAC_NR_UPTAKE_RI_EXTMTB));
 		cell.incExtMtb(-dExtMtb);

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>252</width>
-    <height>544</height>
+    <width>258</width>
+    <height>659</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,7 +19,7 @@
      <x>0</x>
      <y>0</y>
      <width>251</width>
-     <height>541</height>
+     <height>621</height>
     </rect>
    </property>
    <property name="title">
@@ -30,8 +30,8 @@
      <rect>
       <x>10</x>
       <y>20</y>
-      <width>231</width>
-      <height>511</height>
+      <width>253</width>
+      <height>569</height>
      </rect>
     </property>
     <layout class="QGridLayout" name="gridLayout_18">
@@ -121,22 +121,7 @@
        </property>
       </widget>
      </item>
-     <item row="4" column="1">
-      <widget class="QLabel" name="labelMtb">
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
-       </property>
-       <property name="toolTip">
-        <string>(Ext. Mtb, Int. Mtb)</string>
-       </property>
-       <property name="text">
-        <string>(0,0)</string>
-       </property>
-      </widget>
-     </item>
-     <item row="5" column="1">
+     <item row="6" column="1">
       <widget class="QLabel" name="labelMacNFkB">
        <property name="font">
         <font>
@@ -151,14 +136,14 @@
        </property>
       </widget>
      </item>
-     <item row="8" column="0">
+     <item row="9" column="0">
       <widget class="QLabel" name="labelSrcCap">
        <property name="text">
         <string>Sources (thold)</string>
        </property>
       </widget>
      </item>
-     <item row="8" column="1">
+     <item row="9" column="1">
       <widget class="QLabel" name="labelSources">
        <property name="font">
         <font>
@@ -173,14 +158,14 @@
        </property>
       </widget>
      </item>
-     <item row="10" column="0">
+     <item row="11" column="0">
       <widget class="QLabel" name="labelApoptCap">
        <property name="text">
         <string>Apopt</string>
        </property>
       </widget>
      </item>
-     <item row="10" column="1">
+     <item row="11" column="1">
       <widget class="QLabel" name="labelApoptosis">
        <property name="font">
         <font>
@@ -195,35 +180,35 @@
        </property>
       </widget>
      </item>
-     <item row="12" column="0">
+     <item row="13" column="0">
       <widget class="QLabel" name="labelTNFCap">
        <property name="text">
         <string>TNF</string>
        </property>
       </widget>
      </item>
-     <item row="13" column="0">
+     <item row="14" column="0">
       <widget class="QLabel" name="labelCCL2Cap">
        <property name="text">
         <string>CCL2</string>
        </property>
       </widget>
      </item>
-     <item row="14" column="0">
+     <item row="15" column="0">
       <widget class="QLabel" name="labelCCL5Cap">
        <property name="text">
         <string>CCL5</string>
        </property>
       </widget>
      </item>
-     <item row="15" column="0">
+     <item row="16" column="0">
       <widget class="QLabel" name="labelCXCL9Cap">
        <property name="text">
         <string>CXCL9</string>
        </property>
       </widget>
      </item>
-     <item row="12" column="1">
+     <item row="13" column="1">
       <widget class="QLabel" name="labelTNF">
        <property name="font">
         <font>
@@ -238,7 +223,7 @@
        </property>
       </widget>
      </item>
-     <item row="13" column="1">
+     <item row="14" column="1">
       <widget class="QLabel" name="labelCCL2">
        <property name="font">
         <font>
@@ -253,7 +238,7 @@
        </property>
       </widget>
      </item>
-     <item row="14" column="1">
+     <item row="15" column="1">
       <widget class="QLabel" name="labelCCL5">
        <property name="font">
         <font>
@@ -268,7 +253,7 @@
        </property>
       </widget>
      </item>
-     <item row="15" column="1">
+     <item row="16" column="1">
       <widget class="QLabel" name="labelCXCL9">
        <property name="font">
         <font>
@@ -283,14 +268,14 @@
        </property>
       </widget>
      </item>
-     <item row="6" column="0">
+     <item row="7" column="0">
       <widget class="QLabel" name="labelMacStat1Cap">
        <property name="text">
         <string>Mac (stat1)</string>
        </property>
       </widget>
      </item>
-     <item row="6" column="1">
+     <item row="7" column="1">
       <widget class="QLabel" name="labelMacStat1">
        <property name="font">
         <font>
@@ -305,7 +290,7 @@
        </property>
       </widget>
      </item>
-     <item row="16" column="1">
+     <item row="17" column="1">
       <widget class="QLabel" name="labelGranulomaAreaVal">
        <property name="font">
         <font>
@@ -317,7 +302,7 @@
        </property>
       </widget>
      </item>
-     <item row="16" column="0">
+     <item row="17" column="0">
       <widget class="QLabel" name="labelGrAreaCap">
        <property name="text">
         <string>Gr area</string>
@@ -339,21 +324,21 @@
        </property>
       </widget>
      </item>
-     <item row="5" column="0">
+     <item row="6" column="0">
       <widget class="QLabel" name="labelMacNFkBCap">
        <property name="text">
         <string>Mac (NFkB)</string>
        </property>
       </widget>
      </item>
-     <item row="7" column="0">
+     <item row="8" column="0">
       <widget class="QLabel" name="labelMacDeactCap">
        <property name="text">
         <string>Mac (deact)</string>
        </property>
       </widget>
      </item>
-     <item row="7" column="1">
+     <item row="8" column="1">
       <widget class="QLabel" name="labelMacDeact">
        <property name="font">
         <font>
@@ -368,14 +353,14 @@
        </property>
       </widget>
      </item>
-     <item row="11" column="0">
+     <item row="12" column="0">
       <widget class="QLabel" name="labelMacAttractabtCap">
        <property name="text">
         <string>Attractant</string>
        </property>
       </widget>
      </item>
-     <item row="11" column="1">
+     <item row="12" column="1">
       <widget class="QLabel" name="labelMacAttractant">
        <property name="font">
         <font>
@@ -390,21 +375,21 @@
        </property>
       </widget>
      </item>
-     <item row="18" column="0">
+     <item row="19" column="0">
       <widget class="QLabel" name="labelTcellQueueCap">
        <property name="text">
         <string>T cell queue</string>
        </property>
       </widget>
      </item>
-     <item row="21" column="0">
+     <item row="22" column="0">
       <widget class="QLabel" name="labelTcytFluxCap">
        <property name="text">
         <string>Tcyt flux</string>
        </property>
       </widget>
      </item>
-     <item row="18" column="1">
+     <item row="19" column="1">
       <widget class="QLabel" name="labelTcellQueue">
        <property name="font">
         <font>
@@ -419,7 +404,7 @@
        </property>
       </widget>
      </item>
-     <item row="21" column="1">
+     <item row="22" column="1">
       <widget class="QLabel" name="labelTcytFlux">
        <property name="font">
         <font>
@@ -434,14 +419,14 @@
        </property>
       </widget>
      </item>
-     <item row="9" column="0">
+     <item row="10" column="0">
       <widget class="QLabel" name="labelSrcActCap">
        <property name="text">
         <string>Sources (act)</string>
        </property>
       </widget>
      </item>
-     <item row="9" column="1">
+     <item row="10" column="1">
       <widget class="QLabel" name="labelSourcesAct">
        <property name="font">
         <font>
@@ -456,14 +441,14 @@
        </property>
       </widget>
      </item>
-     <item row="20" column="0">
+     <item row="21" column="0">
       <widget class="QLabel" name="labelTgamFluxCap">
        <property name="text">
         <string>Tgam flux</string>
        </property>
       </widget>
      </item>
-     <item row="20" column="1">
+     <item row="21" column="1">
       <widget class="QLabel" name="labelTgamFlux">
        <property name="font">
         <font>
@@ -478,14 +463,14 @@
        </property>
       </widget>
      </item>
-     <item row="22" column="0">
+     <item row="23" column="0">
       <widget class="QLabel" name="labelTregFluxCap">
        <property name="text">
         <string>Treg flux</string>
        </property>
       </widget>
      </item>
-     <item row="22" column="1">
+     <item row="23" column="1">
       <widget class="QLabel" name="labelTregFlux">
        <property name="font">
         <font>
@@ -500,14 +485,14 @@
        </property>
       </widget>
      </item>
-     <item row="19" column="0">
+     <item row="20" column="0">
       <widget class="QLabel" name="labeldMDCCap">
        <property name="text">
         <string>MDC flux</string>
        </property>
       </widget>
      </item>
-     <item row="19" column="1">
+     <item row="20" column="1">
       <widget class="QLabel" name="labeldMDC">
        <property name="font">
         <font>
@@ -519,7 +504,78 @@
        </property>
       </widget>
      </item>
+     <item row="4" column="1">
+      <widget class="QLabel" name="labelMtb">
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="toolTip">
+        <string>(Ext. Mtb, Int. Mtb)</string>
+       </property>
+       <property name="text">
+        <string>(0,0)</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="0">
+      <widget class="QLabel" name="labelMtbNonRepCap">
+       <property name="text">
+        <string>Caseated</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="1">
+      <widget class="QLabel" name="labelMtbNonRep">
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="toolTip">
+        <string>(Caseated compartments, Non-replicating Mtb.)</string>
+       </property>
+       <property name="text">
+        <string>(0,0)</string>
+       </property>
+      </widget>
+     </item>
     </layout>
+   </widget>
+   <widget class="QLabel" name="labelMtb_2">
+    <property name="geometry">
+     <rect>
+      <x>165</x>
+      <y>590</y>
+      <width>130</width>
+      <height>18</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="toolTip">
+     <string>(Ext. Mtb, Int. Mtb)</string>
+    </property>
+    <property name="text">
+     <string>(0,0)</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="labelMtbCap_2">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>590</y>
+      <width>109</width>
+      <height>18</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Mtb.</string>
+    </property>
    </widget>
   </widget>
  </widget>

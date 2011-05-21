@@ -94,6 +94,18 @@ Snapshot::Snapshot(const QString& dirName, const QString& fileName)
 		<< "\"Outcome (1)\""
 		<< ','
 		<< "\"Outcome (2)\""
+		<< ','
+		<< "\"NrSourcesMac\""
+		<< ','
+		<< "\"NrSourcesTgam\""
+		<< ','
+		<< "\"NrSourcesTcyt\""
+		<< ','
+		<< "\"NrSourcesTreg\""
+		<< ","
+		<< "\"NrCaseated\""
+		<< ","
+		<< "\"NonRep Ext. Mtb.\""
 		<< "\n";
 }
 
@@ -255,5 +267,21 @@ void Snapshot::takeSnapshot(const int time, const GrStat& stats)
 		}
 	}
 
-	_outFile << "\n";
+	_outFile
+		<< ','
+		<< stats.getNrSourcesMac()
+		<< ','
+		<< stats.getNrSourcesTgam()
+		<< ','
+		<< stats.getNrSourcesTcyt()
+		<< ','
+		<< stats.getNrSourcesTreg()
+		<< ','
+		<< stats.getNrCaseated()
+		<< ','
+		<< stats.getTotNonRepExtMtb()
+		;
+
+	_outFile << std::endl;
+
 }

@@ -324,7 +324,7 @@ void Mac::handleInfected(const int time, GrGrid& grid, GrStat&)
 	// The probability to uptake decreases linearly as the number of intra-cellular bacteria increases to the threshold
 	// for becoming chronically infected. At that threshold the probability becomes 0.
 	// The probability of uptake is the compliment of the probability of killing.
-	double baseProbExtMtbUptake = 1.0 - _PARAM(PARAM_MAC_PROB_KILL_R_EXTMTB);
+	double baseProbExtMtbUptake = (1.0 - _PARAM(PARAM_MAC_PROB_KILL_R_EXTMTB))/2.0;
 	double probExtMtbUptake = (baseProbExtMtbUptake *  (1.0 - (_intMtb / _PARAM(PARAM_MAC_THRESHOLD_BECOME_CI_INTMTB)) ));
 	if (cell.getExtMtb() > 0 && g_Rand.getReal() < probExtMtbUptake)
 	{

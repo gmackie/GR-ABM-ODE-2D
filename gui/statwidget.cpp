@@ -36,6 +36,11 @@ void StatWidget::updateLabels(const GrStat& stats)
 			arg(stats.getTotIntMtb(), 0, 'f', 2);
 	_ui.labelMtb->setText(str);
 
+	str = QString("(%1,%2)").arg(stats.getNrCaseated()).
+			arg(stats.getTotNonRepExtMtb(), 0, 'f', 2);
+
+	_ui.labelMtbNonRep->setText(str);
+
 	str = QString("%1 - (%2,%3,%4,%5,%6)").arg(stats.getNrOfMacNFkB()).
 			arg(stats.getNrOfMacNFkBResting()).arg(stats.getNrOfMacNFkBInfected()).
 			arg(stats.getNrOfMacNFkBCInfected()).arg(stats.getNrOfMacNFkBActive()).

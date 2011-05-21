@@ -33,7 +33,8 @@ private:
 	int _nTreg;
 	int _nTregActive;
 	int _nTregDead;
-	double _totExtMtb;
+	double _totExtMtb;			// Replicating bacteria: 	 not in caseated compartments.
+	double _totNonRepExtMtb;	// Non-replicating bacteria: in caseated compartments.
 	double _totIntMtb;
 	double _totMacAttractant;
 	double _totTNF;
@@ -66,6 +67,7 @@ private:
 	int _nMacDeactDead;
 	int _nBactAct;
 	int _area;
+	int _nCaseated;
 	GrStatus _grStatus[NOUTCOMES];
 	int _queueTgam;
 	int _queueTcyt;
@@ -130,6 +132,7 @@ public:
 	int getNrOfTregActive() const;
 	int getNrOfTregDead() const;
 	double getTotExtMtb() const;
+	double getTotNonRepExtMtb() const;
 	double getTotIntMtb() const;
 	double getTotMacAttractant() const;
 	double getTotTNF() const;
@@ -146,6 +149,7 @@ public:
 	void resetAgentStats();
 	void reset();
 	void incTotExtMtb(double dExtMtb);
+	void incTotNonRepExtMtb(double dNonRepExtMtb);
 	void incTotIntMtb(double dIntMtb);
 	void incTotMacAttractant(double dMacAttractant);
 	void incTotTNF(double dTNF);
@@ -176,6 +180,8 @@ public:
 	void incNrBactAct();
 	int getArea() const;
 	void incArea();
+	int getNrCaseated() const;
+	void incNrCaseated();
 	GrStatus getGrStatus(int index) const;
 	void setGrStatus(int index, GrStatus status);
 	void serialize(std::ostream& out) const;
@@ -442,6 +448,16 @@ inline void GrStat::incArea()
 	_area++;
 }
 
+inline int GrStat::getNrCaseated() const
+{
+	return _nCaseated;
+}
+
+inline void GrStat::incNrCaseated()
+{
+	_nCaseated++;
+}
+
 inline int GrStat::getNrSourcesMac() const
 {
 	return _nSourceMac;
@@ -547,6 +563,11 @@ inline void GrStat::incTotExtMtb(double dExtMtb)
 	_totExtMtb += dExtMtb;
 }
 
+inline void GrStat::incTotNonRepExtMtb(double dNonRepExtMtb)
+{
+	_totNonRepExtMtb += dNonRepExtMtb;
+}
+
 inline void GrStat::incTotIntMtb(double dIntMtb)
 {
 	_totIntMtb += dIntMtb;
@@ -605,6 +626,11 @@ inline double GrStat::getTotCXCL9() const
 inline double GrStat::getTotExtMtb() const
 {
 	return _totExtMtb;
+}
+
+inline double GrStat::getTotNonRepExtMtb() const
+{
+	return _totNonRepExtMtb;
 }
 
 inline double GrStat::getTotIntMtb() const

@@ -117,7 +117,6 @@ void Tgam::handleActive(const int, GrGrid& grid, GrStat& stats)
 			pMac->apoptosis(grid);
 			pMac->kill();
 
-			/* Does Fas/FasL induced apoptosis contribute to caseation? */
 			cell.incNrKillings();
 		}
 	}

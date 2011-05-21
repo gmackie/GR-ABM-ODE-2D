@@ -498,11 +498,20 @@ void GrSimulation::growExtMtb()
 			GridCell& cell = _grid(row, col);
 			
 			double extMtb = cell.getExtMtb();
-			double dExtMtb = growthRate * extMtb * (1.0 - extMtb / upperBound);
 			
-			cell.incExtMtb(dExtMtb);
+			if (cell.isCaseated())
+			{
+				// Bacteria don't grow in caseated compartments
+				_stats.incNrCaseated();
+				_stats.incTotNonRepExtMtb(extMtb);
+			}
+			else
+			{
+				double dExtMtb = growthRate * extMtb * (1.0 - extMtb / upperBound);
+				cell.incExtMtb(dExtMtb);
+				_stats.incTotExtMtb(cell.getExtMtb());
+			}
 
-			_stats.incTotExtMtb(cell.getExtMtb());
 			_stats.incTotMacAttractant(cell.getMacAttractant());
 			_stats.incTotTNF(cell.getTNF());
 			_stats.incTotCCL2(cell.getCCL2());

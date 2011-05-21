@@ -20,6 +20,7 @@
 #include <fstream>
 
 namespace po = boost::program_options;
+using namespace std;
 
 void printVersion()
 {
@@ -61,73 +62,225 @@ void writeOutputOld(std::ofstream& outputFileStream, GrSimulation& sim, int csvI
 
 void writeOutputHeader(std::ofstream& outputFileStream, std::string inputFileName)
 {
-	outputFileStream
-		<<inputFileName
-		<< "," << "Mac"
-		<< "," << "Mr"
-		<< "," << "Mi"
-		<< "," << "Mci"
-		<< "," << "Ma"
-		<< "," << "Mac dead"
-		<< "," << "Tgam"
-		<< "," << "Tgam a"
-		<< "," << "Tgam reg"
-		<< "," << "Tgam dead"
-		<< "," << "Tcyt"
-		<< "," << "Tcyt a"
-		<< "," << "Tcyt reg"
-		<< "," << "Tcyt dead"
-		<< "," << "Treg"
-		<< "," << "Treg a"
-		<< "," << "Treg dead"
-		<< "," << "Int. Mtb."
-		<< "," << "Ext. Mtb."
-		<< "," << "TNF"
-		<< "," << "CCL2"
-		<< "," << "CCL5"
-		<< "," << "CXCL9"
-		<< "," << "NrSourcesMac"
-		<< "," << "NrSourcesTgam"
-		<< "," << "NrSourcesTcyt"
-		<< "," << "NrSourcesTreg"
-		<< std::endl;
+	outputFileStream << "\"time\""
+			<< ','
+			<< "\"Mac\""
+			<< ','
+			<< "\"Mr\""
+			<< ','
+			<< "\"Mi\""
+			<< ','
+			<< "\"Mci\""
+			<< ','
+			<< "\"Ma\""
+			<< ','
+			<< "\"Md\""
+			<< ','
+			<< "\"Tgam\""
+			<< ','
+			<< "\"Tgam a\""
+			<< ','
+			<< "\"Tgam reg\""
+			<< ','
+			<< "\"Tgam d\""
+			<< ','
+			<< "\"Tcyt\""
+			<< ','
+			<< "\"Tcyt a\""
+			<< ','
+			<< "\"Tcyt reg\""
+			<< ','
+			<< "\"Tcyt d\""
+			<< ','
+			<< "\"Treg\""
+			<< ','
+			<< "\"Treg r\""
+			<< ','
+			<< "\"Treg d\""
+			<< ','
+			<< "\"Int. Mtb.\""
+			<< ','
+			<< "\"Ext. Mtb.\""
+			<< ','
+			<< "\"TNF\""
+			<< ','
+			<< "\"CCL2\""
+			<< ','
+			<< "\"CCL5\""
+			<< ','
+			<< "\"CXCL9\""
+			<< ','
+			<< "\"Area\""
+			<< ','
+			<< "\"MDC\""
+			<< ','
+			<< "\"N4\""
+			<< ','
+			<< "\"TH0\""
+			<< ','
+			<< "\"TH1\""
+			<< ','
+			<< "\"N8\""
+			<< ','
+			<< "\"T80\""
+			<< ','
+			<< "\"T8\""
+			<< ','
+			<< "\"TC\""
+			<< ','
+			<< "\"TH0lung\""
+			<< ','
+			<< "\"TH1lung\""
+			<< ','
+			<< "\"T80lung\""
+			<< ','
+			<< "\"T8lung\""
+			<< ','
+			<< "\"TClung\""
+			<< ','
+			<< "\"Outcome (1)\""
+			<< ','
+			<< "\"Outcome (2)\""
+			<< ','
+			<< "\"NrSourcesMac\""
+			<< ','
+			<< "\"NrSourcesTgam\""
+			<< ','
+			<< "\"NrSourcesTcyt\""
+			<< ','
+			<< "\"NrSourcesTreg\""
+			<< ','
+			<< "\"NrCaseated\""
+			<< ","
+			<< "\"NonRep Ext. Mtb.\""
+			<< "\n";
 }
 
-// The same output as written to the screen.
 void writeOutput(std::ofstream& outputFileStream, GrSimulation& sim, int csvInterval)
 {
 	const GrStat& stats = sim.getStats();
+		outputFileStream << sim.getTime()
+			<< ','
+			<< stats.getNrOfMac()
+			<< ','
+			<< stats.getNrOfMacResting()
+			<< ','
+			<< stats.getNrOfMacInfected()
+			<< ','
+			<< stats.getNrOfMacCInfected()
+			<< ','
+			<< stats.getNrOfMacActive()
+			<< ','
+			<< stats.getNrOfMacDead()
+			<< ','
+			<< stats.getNrOfTgam()
+			<< ','
+			<< stats.getNrOfTgamActive()
+			<< ','
+			<< stats.getNrOfTgamDownRegulated()
+			<< ','
+			<< stats.getNrOfTgamDead()
+			<< ','
+			<< stats.getNrOfTcyt()
+			<< ','
+			<< stats.getNrOfTcytActive()
+			<< ','
+			<< stats.getNrOfTcytDownRegulated()
+			<< ','
+			<< stats.getNrOfTcytDead()
+			<< ','
+			<< stats.getNrOfTreg()
+			<< ','
+			<< stats.getNrOfTregActive()
+			<< ','
+			<< stats.getNrOfTregDead()
+			<< ','
+			<< stats.getTotIntMtb()
+			<< ','
+			<< stats.getTotExtMtb()
+			<< ','
+			<< stats.getTotTNF()
+			<< ','
+			<< stats.getTotCCL2()
+			<< ','
+			<< stats.getTotCCL5()
+			<< ','
+			<< stats.getTotCXCL9()
+			<< ','
+			<< stats.getArea()
+			<< ','
+			<< stats.getMDC()
+			<< ','
+			<< stats.getN4()
+			<< ','
+			<< stats.getTH0()
+			<< ','
+			<< stats.getTH1()
+			<< ','
+			<< stats.getN8()
+			<< ','
+			<< stats.getT80()
+			<< ','
+			<< stats.getT8()
+			<< ','
+			<< stats.getTC()
+			<< ','
+			<< stats.getTH0lung()
+			<< ','
+			<< stats.getTH1lung()
+			<< ','
+			<< stats.getT80lung()
+			<< ','
+			<< stats.getT8lung()
+			<< ','
+			<< stats.getTClung();
+
+		for (int i = 0; i < NOUTCOMES; i++)
+		{
+			outputFileStream << ',';
+
+			switch (stats.getGrStatus(i))
+			{
+				case GR_CLEARANCE:
+					outputFileStream << "\"Clearance\"";
+					break;
+				case GR_CONTAINMENT:
+					outputFileStream << "\"Containment\"";
+					break;
+				case GR_CONTAINMENT_INCONSISTENT:
+					outputFileStream << "\"Containment?\"";
+					break;
+				case GR_DISSEMINATION:
+					outputFileStream << "\"Dissemination\"";
+					break;
+				case GR_DISSEMINATION_INCONSISTENT:
+					outputFileStream << "\"Dissemination?\"";
+					break;
+				case GR_UNKNOWN:
+					outputFileStream << "\"Unknown\"";
+					break;
+				case GR_NONE:
+					outputFileStream << "\"None\"";
+					break;
+			}
+		}
+
 		outputFileStream
-			<< sim.getTime()/csvInterval
-			<< "," << stats.getNrOfMac()
-			<< "," << stats.getNrOfMacResting()
-			<< "," << stats.getNrOfMacInfected()
-			<< "," << stats.getNrOfMacCInfected()
-			<< "," << stats.getNrOfMacActive()
-			<< "," << stats.getNrOfMacDead()
-			<< "," << stats.getNrOfTgam()
-			<< "," << stats.getNrOfTgamActive()
-			<< "," << stats.getNrOfTgamDownRegulated()
-			<< "," << stats.getNrOfTgamDead()
-			<< "," << stats.getNrOfTcyt()
-			<< "," << stats.getNrOfTcytActive()
-			<< "," << stats.getNrOfTcytDownRegulated()
-			<< "," << stats.getNrOfTcytDead()
-			<< "," << stats.getNrOfTreg()
-			<< "," << stats.getNrOfTregActive()
-			<< "," << stats.getNrOfTregDead()
-			<< "," << stats.getTotExtMtb()
-			<< "," << stats.getTotIntMtb()
-			<< "," << stats.getTotTNF() / (NROWS*NCOLS)
-			<< "," << stats.getTotCCL2() / (NROWS*NCOLS)
-			<< "," << stats.getTotCCL5() / (NROWS*NCOLS)
-			<< "," << stats.getTotCXCL9() / (NROWS*NCOLS)
-			<< "," << stats.getNrSourcesMac()
-			<< "," << stats.getNrSourcesTgam()
-			<< "," << stats.getNrSourcesTcyt()
-			<< "," << stats.getNrSourcesTreg()
-			<< std::endl;
-		;
+			<< ','
+			<< stats.getNrSourcesMac()
+			<< ','
+			<< stats.getNrSourcesTgam()
+			<< ','
+			<< stats.getNrSourcesTcyt()
+			<< ','
+			<< stats.getNrSourcesTreg()
+			<< ','
+			<< stats.getNrCaseated()
+			<< ','
+			<< stats.getTotNonRepExtMtb()
+			;
+
+		outputFileStream << std::endl;
 }
 void saveState(const GrSimulation* pSim, int time) {
     int days, hours, minutes;
@@ -145,6 +298,8 @@ void saveState(const GrSimulation* pSim, int time) {
 
 int run(unsigned long seed, const std::string& inputFileName, const std::string& outputFileName, int csvInterval, int stateInterval, DiffusionMethod diffMethod, RecruitmentBase* pRecr, bool ode, bool tnfrDynamics, int timeToSimulate)
 {
+	std::cout << endl << "--seed " << seed << std::endl;
+
 	if (!Params::getInstance(true)->fromXml(inputFileName.c_str()))
 		return 1;
 
@@ -191,7 +346,7 @@ int run(unsigned long seed, const std::string& inputFileName, const std::string&
 		if (time % csvInterval == 0 || time == timeToSimulate)
 		{
 //			printf("%d\t %d - (%d,%d,%d,%d,%d)\t%d - (%d,%d,%d)\t%d - (%d,%d,%d)\t%d - (%d,%d)\t(%f,%f)\t(%f,%f,%f,%f)\n",
-			printf("%d\t %d - (%d,%d,%d,%d,%d)\t%d - (%d,%d,%d)\t%d - (%d,%d,%d)\t%d - (%d,%d)\t(%f,%f)\t(%f,%f,%f,%f)\t(%d,%d,%d,%d)\n",
+			printf("%d\t %d - (%d,%d,%d,%d,%d)\t%d - (%d,%d,%d)\t%d - (%d,%d,%d)\t%d - (%d,%d)\t(%f,%f)\t(%f,%f,%f,%f)\t(%d,%d,%d,%d)\t%d %f\n",
 				sim.getTime(),
 				stats.getNrOfMac(), stats.getNrOfMacResting(), stats.getNrOfMacInfected(),
 				stats.getNrOfMacCInfected(), stats.getNrOfMacActive(), stats.getNrOfMacDead(),
@@ -202,7 +357,8 @@ int run(unsigned long seed, const std::string& inputFileName, const std::string&
 				stats.getTotExtMtb(), stats.getTotIntMtb(),
 				stats.getTotTNF() / (NROWS*NCOLS), stats.getTotCCL2() / (NROWS*NCOLS),
 				stats.getTotCCL5() / (NROWS*NCOLS), stats.getTotCXCL9() / (NROWS*NCOLS),
-				stats.getNrSourcesMac(), stats.getNrSourcesTgam(), stats.getNrSourcesTcyt(), stats.getNrSourcesTreg()
+				stats.getNrSourcesMac(), stats.getNrSourcesTgam(), stats.getNrSourcesTcyt(), stats.getNrSourcesTreg(),
+				stats.getNrCaseated(), stats.getTotNonRepExtMtb()
 			);
 
 			if (fullOutputFileName.size() > 0)

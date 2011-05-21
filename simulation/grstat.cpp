@@ -26,6 +26,7 @@ GrStat::GrStat()
 	, _nTregActive(0)
 	, _nTregDead(0)
 	, _totExtMtb(0)
+	, _totNonRepExtMtb(0)
 	, _totIntMtb(0)
 	, _totMacAttractant(0)
 	, _totTNF(0)
@@ -58,6 +59,7 @@ GrStat::GrStat()
 	, _nMacDeactDead(0)
 	, _nBactAct(0)
 	, _area(0)
+	, _nCaseated(0)
 	, _queueTgam(0)
 	, _queueTcyt(0)
 	, _queueTreg(0)
@@ -262,11 +264,13 @@ void GrStat::resetAgentStats()
 
 void GrStat::reset()
 {
-	_totIntMtb = _totExtMtb = _totMacAttractant = _totTNF = _totCCL2 = _totCCL5 = _totCXCL9 = 0;
+	_totIntMtb = _totExtMtb = _totNonRepExtMtb = _totMacAttractant = _totTNF = _totCCL2 = _totCCL5 = _totCXCL9 = 0;
 	
 	_nSourceMac = _nSourceTcyt = _nSourceTgam = _nSourceTreg = 0;
 	
 	_nSourceMacActive = _nSourceTcytActive = _nSourceTgamActive = _nSourceTregActive = 0;
+
+	_nCaseated = 0;
 
 	_area = 0;
 }
@@ -293,6 +297,7 @@ void GrStat::serialize(std::ostream& out) const
 	out << _nTregActive << std::endl;
 	out << _nTregDead << std::endl;
 	out << _totExtMtb << std::endl;
+	out << _totNonRepExtMtb << std::endl;
 	out << _totIntMtb << std::endl;
 	out << _totMacAttractant << std::endl;
 	out << _totTNF << std::endl;
@@ -317,64 +322,105 @@ void GrStat::serialize(std::ostream& out) const
 	out << _nMacStat1CInfected << std::endl;
 	out << _nMacStat1Active << std::endl;
 	out << _nMacStat1Dead << std::endl;
+	out << _nMacDeact << std::endl;
+	out << _nMacDeactResting << std::endl;
+	out << _nMacDeactInfected << std::endl;
+	out << _nMacDeactCInfected << std::endl;
+	out << _nMacDeactActive << std::endl;
+	out << _nMacDeactDead << std::endl;
 	out << _nBactAct << std::endl;
 	out << _area << std::endl;
+	out << _nCaseated << std::endl;
 
 	for (int i = 0; i < NOUTCOMES; i++)
 	{
 		int intVal = (int) _grStatus[i];
 		out << intVal << std::endl;
 	}
+
+	out << _queueTgam << std::endl;
+	out << _queueTcyt << std::endl;
+	out << _queueTreg << std::endl;
+	out << _fluxTgam << std::endl;
+	out << _fluxTcyt << std::endl;
+	out << _fluxTreg << std::endl;
+	out << _nSourceMacActive << std::endl;
+	out << _nSourceTgamActive << std::endl;
+	out << _nSourceTcytActive << std::endl;
+	out << _nSourceTregActive << std::endl;
+	out << _MDC << std::endl;
+	out << _N4 << std::endl;
+	out << _TH0 << std::endl;
+	out << _TH1 << std::endl;
+	out << _N8 << std::endl;
+	out << _T80 << std::endl;
+	out << _T8 << std::endl;
+	out << _TC << std::endl;
+	out << _TH0lung << std::endl;
+	out << _TH1lung << std::endl;
+	out << _T80lung << std::endl;
+	out << _T8lung << std::endl;
+	out << _TClung << std::endl;
+
 }
 
 void GrStat::deserialize(std::istream& in)
 {
 	assert(in.good());
 
-	in >> _nMac;
-	in >> _nMacResting;
-	in >> _nMacInfected;
-	in >> _nMacCInfected;
-	in >> _nMacActive;
-	in >> _nMacDead;
-	in >> _nTgam;
-	in >> _nTgamActive;
-	in >> _nTgamDownRegulated;
-	in >> _nTgamDead;
-	in >> _nTcyt;
-	in >> _nTcytActive;
-	in >> _nTcytDownRegulated;
-	in >> _nTcytDead;
-	in >> _nTreg;
-	in >> _nTregActive;
-	in >> _nTregDead;
-	in >> _totExtMtb;
-	in >> _totIntMtb;
-	in >> _totMacAttractant;
-	in >> _totTNF;
-	in >> _totCCL2;
-	in >> _totCCL5;
-	in >> _totCXCL9;
-	in >> _nApoptosisFasFasL;
-	in >> _nApoptosisTNF;
-	in >> _nMacNFkB;
-	in >> _nMacNFkBResting;
-	in >> _nMacNFkBInfected;
-	in >> _nMacNFkBCInfected;
-	in >> _nMacNFkBActive;
-	in >> _nMacNFkBDead;
-	in >> _nSourceMac;
-	in >> _nSourceTgam;
-	in >> _nSourceTcyt;
-	in >> _nSourceTreg;
-	in >> _nMacStat1;
-	in >> _nMacStat1Resting;
-	in >> _nMacStat1Infected;
-	in >> _nMacStat1CInfected;
-	in >> _nMacStat1Active;
-	in >> _nMacStat1Dead;
-	in >> _nBactAct;
-	in >> _area;
+	in >>_nMac;
+	in >>_nMacResting;
+	in >>_nMacInfected;
+	in >>_nMacCInfected;
+	in >>_nMacActive;
+	in >>_nMacDead;
+	in >>_nTgam;
+	in >>_nTgamActive;
+	in >>_nTgamDownRegulated;
+	in >>_nTgamDead;
+	in >>_nTcyt;
+	in >>_nTcytActive;
+	in >>_nTcytDownRegulated;
+	in >>_nTcytDead;
+	in >>_nTreg;
+	in >>_nTregActive;
+	in >>_nTregDead;
+	in >>_totExtMtb;
+	in >>_totNonRepExtMtb;
+	in >>_totIntMtb;
+	in >>_totMacAttractant;
+	in >>_totTNF;
+	in >>_totCCL2;
+	in >>_totCCL5;
+	in >>_totCXCL9;
+	in >>_nApoptosisFasFasL;
+	in >>_nApoptosisTNF;
+	in >>_nMacNFkB;
+	in >>_nMacNFkBResting;
+	in >>_nMacNFkBInfected;
+	in >>_nMacNFkBCInfected;
+	in >>_nMacNFkBActive;
+	in >>_nMacNFkBDead;
+	in >>_nSourceMac;
+	in >>_nSourceTgam;
+	in >>_nSourceTcyt;
+	in >>_nSourceTreg;
+	in >>_nMacStat1;
+	in >>_nMacStat1Resting;
+	in >>_nMacStat1Infected;
+	in >>_nMacStat1CInfected;
+	in >>_nMacStat1Active;
+	in >>_nMacStat1Dead;
+	in >>_nMacDeact;
+	in >>_nMacDeactResting;
+	in >>_nMacDeactInfected;
+	in >>_nMacDeactCInfected;
+	in >>_nMacDeactActive;
+	in >>_nMacDeactDead;
+	in >>_nBactAct;
+	in >>_area;
+	in >> _nCaseated;
+
 
 	for (int i = 0; i < NOUTCOMES; i++)
 	{
@@ -382,4 +428,28 @@ void GrStat::deserialize(std::istream& in)
 		in >> intVal;
 		_grStatus[i] = (GrStatus) intVal;
 	}
+
+	in >>_queueTgam;
+	in >>_queueTcyt;
+	in >>_queueTreg;
+	in >>_fluxTgam;
+	in >>_fluxTcyt;
+	in >>_fluxTreg;
+	in >>_nSourceMacActive;
+	in >>_nSourceTgamActive;
+	in >>_nSourceTcytActive;
+	in >>_nSourceTregActive;
+	in >>_MDC;
+	in >>_N4;
+	in >>_TH0;
+	in >>_TH1;
+	in >>_N8;
+	in >>_T80;
+	in >>_T8;
+	in >>_TC;
+	in >>_TH0lung;
+	in >>_TH1lung;
+	in >>_T80lung;
+	in >>_T8lung;
+	in >>_TClung;
 }

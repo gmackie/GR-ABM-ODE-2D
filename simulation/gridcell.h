@@ -242,8 +242,6 @@ inline bool GridCell::incNrKillings()
 		if (Tcell::isTcell(_agent[1]))
 			_agent[1]->kill();
 
-		_extMtb = 0;
-
 		return true;
 	}
 	return false;

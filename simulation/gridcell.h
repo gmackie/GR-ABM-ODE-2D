@@ -201,7 +201,7 @@ inline void GridCell::incShedTNFR2(double dShedTNFR2)
 
 inline double GridCell::getExtMtb() const
 {
-	return isCaseated() ? 0 : _extMtb;
+	return _extMtb;
 }
 
 inline void GridCell::setExtMtb(double extMtb)
@@ -235,12 +235,16 @@ inline bool GridCell::incNrKillings()
 	
 	if (isCaseated())
 	{
-		// clear T cells
-		if (Tcell::isTcell(_agent[0]))
+		// clear all immune cells
+		if (_agent[0])
+		{
 			_agent[0]->kill();
+		}
 
-		if (Tcell::isTcell(_agent[1]))
+		if (_agent[1])
+		{
 			_agent[1]->kill();
+		}
 
 		return true;
 	}

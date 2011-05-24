@@ -152,7 +152,7 @@ void writeOutputHeader(std::ofstream& outputFileStream, std::string inputFileNam
 			<< ','
 			<< "\"NrCaseated\""
 			<< ","
-			<< "\"NonRep Ext. Mtb.\""
+			<< "\"NonRepl Ext. Mtb.\""
 			<< "\n";
 }
 

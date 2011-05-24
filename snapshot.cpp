@@ -105,7 +105,7 @@ Snapshot::Snapshot(const QString& dirName, const QString& fileName)
 		<< ","
 		<< "\"NrCaseated\""
 		<< ","
-		<< "\"NonRep Ext. Mtb.\""
+		<< "\"NonRepl Ext. Mtb.\""
 		<< "\n";
 }
 

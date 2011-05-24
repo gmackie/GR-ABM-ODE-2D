@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>258</width>
-    <height>659</height>
+    <height>567</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,7 +19,7 @@
      <x>0</x>
      <y>0</y>
      <width>251</width>
-     <height>621</height>
+     <height>561</height>
     </rect>
    </property>
    <property name="title">
@@ -31,7 +31,7 @@
       <x>10</x>
       <y>20</y>
       <width>253</width>
-      <height>569</height>
+      <height>531</height>
      </rect>
     </property>
     <layout class="QGridLayout" name="gridLayout_18">
@@ -375,50 +375,6 @@
        </property>
       </widget>
      </item>
-     <item row="19" column="0">
-      <widget class="QLabel" name="labelTcellQueueCap">
-       <property name="text">
-        <string>T cell queue</string>
-       </property>
-      </widget>
-     </item>
-     <item row="22" column="0">
-      <widget class="QLabel" name="labelTcytFluxCap">
-       <property name="text">
-        <string>Tcyt flux</string>
-       </property>
-      </widget>
-     </item>
-     <item row="19" column="1">
-      <widget class="QLabel" name="labelTcellQueue">
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
-       </property>
-       <property name="toolTip">
-        <string>Recruitment queue (Tgam, Tcyt, Treg)</string>
-       </property>
-       <property name="text">
-        <string>0</string>
-       </property>
-      </widget>
-     </item>
-     <item row="22" column="1">
-      <widget class="QLabel" name="labelTcytFlux">
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
-       </property>
-       <property name="toolTip">
-        <string/>
-       </property>
-       <property name="text">
-        <string>0</string>
-       </property>
-      </widget>
-     </item>
      <item row="10" column="0">
       <widget class="QLabel" name="labelSrcActCap">
        <property name="text">
@@ -438,69 +394,6 @@
        </property>
        <property name="text">
         <string>(0,0,0,0)</string>
-       </property>
-      </widget>
-     </item>
-     <item row="21" column="0">
-      <widget class="QLabel" name="labelTgamFluxCap">
-       <property name="text">
-        <string>Tgam flux</string>
-       </property>
-      </widget>
-     </item>
-     <item row="21" column="1">
-      <widget class="QLabel" name="labelTgamFlux">
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
-       </property>
-       <property name="toolTip">
-        <string/>
-       </property>
-       <property name="text">
-        <string>0</string>
-       </property>
-      </widget>
-     </item>
-     <item row="23" column="0">
-      <widget class="QLabel" name="labelTregFluxCap">
-       <property name="text">
-        <string>Treg flux</string>
-       </property>
-      </widget>
-     </item>
-     <item row="23" column="1">
-      <widget class="QLabel" name="labelTregFlux">
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
-       </property>
-       <property name="toolTip">
-        <string/>
-       </property>
-       <property name="text">
-        <string>0</string>
-       </property>
-      </widget>
-     </item>
-     <item row="20" column="0">
-      <widget class="QLabel" name="labeldMDCCap">
-       <property name="text">
-        <string>MDC flux</string>
-       </property>
-      </widget>
-     </item>
-     <item row="20" column="1">
-      <widget class="QLabel" name="labeldMDC">
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>0</string>
        </property>
       </widget>
      </item>
@@ -541,41 +434,114 @@
        </property>
       </widget>
      </item>
+     <item row="18" column="0">
+      <widget class="QLabel" name="labelTcellQueueCap">
+       <property name="text">
+        <string>T cell queue</string>
+       </property>
+      </widget>
+     </item>
+     <item row="18" column="1">
+      <widget class="QLabel" name="labelTcellQueue">
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="toolTip">
+        <string>Recruitment queue (Tgam, Tcyt, Treg)</string>
+       </property>
+       <property name="text">
+        <string>0</string>
+       </property>
+      </widget>
+     </item>
+     <item row="19" column="0">
+      <widget class="QLabel" name="labeldMDCCap">
+       <property name="text">
+        <string>MDC flux</string>
+       </property>
+      </widget>
+     </item>
+     <item row="19" column="1">
+      <widget class="QLabel" name="labeldMDC">
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>0</string>
+       </property>
+      </widget>
+     </item>
+     <item row="20" column="0">
+      <widget class="QLabel" name="labelTgamFluxCap">
+       <property name="text">
+        <string>Tgam flux</string>
+       </property>
+      </widget>
+     </item>
+     <item row="20" column="1">
+      <widget class="QLabel" name="labelTgamFlux">
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="toolTip">
+        <string/>
+       </property>
+       <property name="text">
+        <string>0</string>
+       </property>
+      </widget>
+     </item>
+     <item row="21" column="0">
+      <widget class="QLabel" name="labelTcytFluxCap">
+       <property name="text">
+        <string>Tcyt flux</string>
+       </property>
+      </widget>
+     </item>
+     <item row="21" column="1">
+      <widget class="QLabel" name="labelTcytFlux">
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="toolTip">
+        <string/>
+       </property>
+       <property name="text">
+        <string>0</string>
+       </property>
+      </widget>
+     </item>
+     <item row="22" column="0">
+      <widget class="QLabel" name="labelTregFluxCap">
+       <property name="text">
+        <string>Treg flux</string>
+       </property>
+      </widget>
+     </item>
+     <item row="22" column="1">
+      <widget class="QLabel" name="labelTregFlux">
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="toolTip">
+        <string/>
+       </property>
+       <property name="text">
+        <string>0</string>
+       </property>
+      </widget>
+     </item>
     </layout>
-   </widget>
-   <widget class="QLabel" name="labelMtb_2">
-    <property name="geometry">
-     <rect>
-      <x>165</x>
-      <y>590</y>
-      <width>130</width>
-      <height>18</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>8</pointsize>
-     </font>
-    </property>
-    <property name="toolTip">
-     <string>(Ext. Mtb, Int. Mtb)</string>
-    </property>
-    <property name="text">
-     <string>(0,0)</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="labelMtbCap_2">
-    <property name="geometry">
-     <rect>
-      <x>50</x>
-      <y>590</y>
-      <width>109</width>
-      <height>18</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Mtb.</string>
-    </property>
    </widget>
   </widget>
  </widget>

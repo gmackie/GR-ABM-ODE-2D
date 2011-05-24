@@ -269,7 +269,8 @@ void GrSimulation::solve()
 	// move T cells every 10 minutes
 	moveTcells();
 	
-	// recruit agents from vascular sources every 10 minutes
+	// Shuffle the sources and recruit agents from vascular sources every 10 minutes
+	getGrid().shuffleSources();
 	_pRecruitment->recruit(*this);
 
 	// reset statistics

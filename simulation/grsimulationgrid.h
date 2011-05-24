@@ -33,7 +33,7 @@ public:
 	GrGrid& getGrid();
 	GridCell& operator ()(int row, int col);
 	GridCell operator ()(int row, int col) const;
-	GridCellPtrList& getSources();
+	GridCellPtrVector& getSources();
 	void initSources();
 	void serialize(std::ostream& out) const;
 	void deserialize(std::istream& in);
@@ -84,7 +84,7 @@ inline GridCell GrSimulationGrid::operator ()(int row, int col) const
 	return (*_pCurrentGrid)(row, col);
 }
 
-inline GridCellPtrList& GrSimulationGrid::getSources()
+inline GridCellPtrVector& GrSimulationGrid::getSources()
 {
 	return _pCurrentGrid->getSources();
 }

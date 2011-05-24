@@ -19,10 +19,10 @@ RecruitmentProb::~RecruitmentProb()
 void RecruitmentProb::recruit(GrSimulation& sim)
 {
 	const int timeTcellRecEnabled = _PARAM(PARAM_TCELL_TIME_RECRUITMENT_ENABLED);
-	GridCellPtrList& sources = sim.getGrid().getSources();
+	GridCellPtrVector& sources = sim.getGrid().getSources();
 	GrStat& stats = sim.getStats();
 
-	for (GridCellPtrList::iterator it = sources.begin();
+	for (GridCellPtrVector::iterator it = sources.begin();
 		it != sources.end();
 		it++)
 	{

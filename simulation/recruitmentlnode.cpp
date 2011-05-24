@@ -164,10 +164,10 @@ void RecruitmentLnODE::updateInitialConditions(GrStat& stats)
 void RecruitmentLnODE::recruitMacsGetTcellSources(GrSimulation& sim, GrStat& stats,
 	ThresholdGridCellPtrList tcellSources[TCELL_TYPE_COUNT])
 {
-	GridCellPtrList& sources = sim.getGrid().getSources();
+	GridCellPtrVector& sources = sim.getGrid().getSources();
 
 	// Recruit macs and make ordered lists of source pairs
-	for (GridCellPtrList::iterator it = sources.begin();
+	for (GridCellPtrVector::iterator it = sources.begin();
 		it != sources.end();
 		it++)
 	{

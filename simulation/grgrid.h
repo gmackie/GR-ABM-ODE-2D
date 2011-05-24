@@ -16,15 +16,16 @@ class GrGrid
 {
 private:
 	GridCell _grid[NROWS][NCOLS];
-	GridCellPtrList _sources;
+	GridCellPtrVector _sources;
 
 public:
 	GrGrid();
 	~GrGrid();
 	GridCell& operator ()(int row, int col);
 	GridCell operator ()(int row, int col) const;
-	GridCellPtrList& getSources();
+	GridCellPtrVector& getSources();
 	void initSources();
+	void shuffleSources();
 	void serialize(std::ostream& out) const;
 	void deserialize(std::istream& in);
 };
@@ -43,7 +44,7 @@ inline GridCell GrGrid::operator ()(int row, int col) const
 	return _grid[row][col];
 }
 
-inline GridCellPtrList& GrGrid::getSources()
+inline GridCellPtrVector& GrGrid::getSources()
 {
 	return _sources;
 }

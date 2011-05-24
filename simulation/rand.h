@@ -48,6 +48,10 @@ public:
 	~Rand();
 	void setSeed(unsigned int seed);
 	unsigned int getSeed();
+
+	// Needed so we can use this class with the random_shuffle function in the C++ algorithms library.
+	ptrdiff_t operator() (ptrdiff_t max);
+
 	double getReal();
 	double getReal(double a, double b);
 	int getInt(int b, int a = 0);
@@ -67,6 +71,11 @@ inline void Rand::setSeed(unsigned int seed)
 inline unsigned int Rand::getSeed()
 {
 	return _seed;
+}
+
+inline ptrdiff_t Rand::operator() (ptrdiff_t max)
+{
+	return getInt(max, 0);
 }
 
 inline double Rand::getReal()

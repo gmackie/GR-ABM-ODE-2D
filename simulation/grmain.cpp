@@ -313,7 +313,8 @@ int run(unsigned long seed, const std::string& inputFileName, const std::string&
 	if (outputFileName.size() > 0)
 	{
 		std::ostringstream ofn;
-		ofn << timeToSimulate / 144 << "-" << outputFileName << "-" << seed << ".csv";
+//DBG	ofn << timeToSimulate / 144 << "-" << outputFileName << "-" << seed << ".csv";
+		ofn << outputFileName << "-" << seed << ".csv";
 		fullOutputFileName = ofn.str();
 	    outputFileStream.open(fullOutputFileName.c_str());
 

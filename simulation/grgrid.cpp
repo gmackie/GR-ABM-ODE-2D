@@ -6,6 +6,7 @@
  */
 
 #include "grgrid.h"
+#include <algorithm>
 
 GrGrid::GrGrid()
 	: _grid()
@@ -58,6 +59,11 @@ void GrGrid::initSources()
 			_sources.push_back(pGridCell);
 		}
 	}
+}
+
+void GrGrid::shuffleSources()
+{
+	random_shuffle(_sources.begin(), _sources.end(), g_Rand);
 }
 
 void GrGrid::serialize(std::ostream& out) const

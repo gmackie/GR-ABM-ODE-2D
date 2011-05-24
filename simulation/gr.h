@@ -61,6 +61,7 @@ typedef std::list<Mac*> MacPtrList;
 typedef std::list<Tgam*> TgamPtrList;
 typedef std::list<Tcyt*> TcytPtrList;
 typedef std::list<Treg*> TregPtrList;
+typedef std::vector<GridCell*> GridCellPtrVector;
 typedef std::vector<Mac> MacVector;
 typedef std::vector<Tgam> TgamVector;
 typedef std::vector<Tcyt> TcytVector;

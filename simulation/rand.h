@@ -22,7 +22,7 @@
 	#ifdef _MSC_VER
 		#include <random>
 	#else
-		#include <tr1/random>
+		#include <boost/tr1/random.hpp>
 	#endif
 
 	typedef std::tr1::mt19937 mt19937_t;
@@ -34,10 +34,14 @@
 class Rand
 {
 private:
+	/*
+	 * !!! If the data members change then the serialize and deserialize functions need to be updated !!!
+	 */
+	unsigned int _seed;
 	mt19937_t _eng;
 	ranlux64_base_01_t _realEng;
 	uniform_real_t _uniformDist01;
-	unsigned int _seed;
+
 
 public:
 	Rand(unsigned int seed);
@@ -49,6 +53,8 @@ public:
 	int getInt(int b, int a = 0);
 	void serialize(std::ostream& out) const;
 	void deserialize(std::istream& in);
+	std::size_t getSerialSize() const;
+	void test(int time);
 };
 
 inline void Rand::setSeed(unsigned int seed)
@@ -80,6 +86,12 @@ inline int Rand::getInt(int b, int a)
 
 	uniform_int_t rnd(a, b - 1);
 	return rnd(_eng);
+}
+
+inline std::size_t Rand::getSerialSize() const
+{
+	// We don't serialize _uniformDist01
+	return sizeof(Rand) - sizeof(uniform_real_t);
 }
 
 #endif /* RAND_H */

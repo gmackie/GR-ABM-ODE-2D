@@ -35,6 +35,9 @@ private:
 	RecruitmentBase* _pRecruitment;
 	bool _tnfrDynamics;
 
+	// Inhibits tnf secretion if true and if not using tnfr dynamics.
+	bool _tnfKnockout;
+
 	void moveTcells();
 	void moveMacrophages();
 	void updateStates();

@@ -12,7 +12,11 @@
 
 class Tcell : public Agent
 {
+	/*
+	 * !!! If the data members change then the serialize and deserialize functions need to be updated !!!
+	 */
 public:
+	Tcell();
 	Tcell(int birthTime, int row, int col);
 	virtual ~Tcell();
 	void moveTcell(GrGrid& grid, bool ccl2, bool ccl5, bool cxcl9);

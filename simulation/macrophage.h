@@ -14,6 +14,9 @@
 class Mac : public Agent
 {
 private:
+	/*
+	 * !!! If the data members change then the serialize and deserialize functions need to be updated !!!
+	 */
 	MacState _state;
 	MacState _nextState;
 	double _intMtb;
@@ -42,6 +45,7 @@ private:
 	double getExtMtbInMoore(const GrGrid& grid) const;
 
 public:
+	Mac();
 	Mac(int birthtime, int row, int col, MacState state, double intMtb, bool NFkB, bool stat1);
 	~Mac();
 	void move(GrGrid& grid);

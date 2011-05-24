@@ -602,27 +602,56 @@ void MainWindow::timerEvent(QTimerEvent*)
 	emit updateGL();
 
 	// take remaining snapshots
+
+	// So the simulation doesn't advance while we are saving data.
+	// Specifically needed when saving the simulation state, since that
+	// uses the GrSimulation object, not the data saved from GrSimulation
+	// in the MainInterface object.
+	sim.modelLock();
+
 	if (_pSnapshot)
 	{
 		int picInterval = _ui.spinBoxSnapshotPicInterval->value();
 		int csvInterval = _ui.spinBoxSnapshotCsvInterval->value();
 		int stateInterval = _ui.spinBoxSnapshotStateInterval->value();
 
-		if (picInterval != 0 && simTime % picInterval == 0)
+		if (isTimeForAction(picInterval, simTime))
 		{
 			_pSnapshot->takePicture(simTime, _pGLWindow->grabFrameBuffer());
 		}
 
-		if (csvInterval != 0 && simTime % csvInterval == 0)
+		if (isTimeForAction(csvInterval, simTime))
 		{
 			_pSnapshot->takeSnapshot(simTime, stats);
 		}
 
-		if (stateInterval != 0 && simTime % stateInterval == 0)
+		if (isTimeForAction(stateInterval, simTime))
 		{
 			_pSnapshot->takeStateSnapshot(simTime, sim);
 		}
 	}
+
+	sim.modelUnlock();
+}
+
+// Determine whether or not an action should be taken on this time step,
+// based on an action interval. Actions are generally not part of the
+// model calculation, but doing something with the model state after
+// it has been calculated for a time step, such as saving statistics
+// or saving a graphics snapshot, etc.
+//
+// If the action interval is 0 the action is disabled.
+// Otherwise if that interval of time steps has elapsed since the
+// last time the action was taken then take the action again.
+// We also do the action on the last time step of the simulation,
+// whether that last time step occurred because the simulation reached
+// its time limit or is finished for some other reason, such as
+// clearance occurred.
+
+bool MainWindow::isTimeForAction(int actionInterval, int simTime)
+{
+	bool result = (actionInterval > 0 && ((simTime % actionInterval == 0) || _simStatus == SIM_STOPPED));
+	return result;
 }
 
 void MainWindow::updateWindowStatus()

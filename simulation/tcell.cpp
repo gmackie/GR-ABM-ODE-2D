@@ -9,6 +9,14 @@
 #include "tcell.h"
 #include "grgrid.h"
 
+// Needed for deserializing the model state.
+// Avoids the calls to the random number generator in the normal constructor, allowing the random number generator
+// to remain in synch after deserialization.
+Tcell::Tcell()
+	: Agent()
+{
+}
+
 Tcell::Tcell(int birthtime, int row, int col)
 	: Agent(birthtime, birthtime + _PARAM(PARAM_TCELL_AGE), row, col)
 {

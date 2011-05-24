@@ -51,6 +51,8 @@ public:
 	void stop();
 	void lock() const;
 	void unlock() const;
+	void modelLock() const;
+	void modelUnlock() const;
 	int getTime() const;
 	bool getUpdated() const;
 	double getAreaThreshold() const;
@@ -248,6 +250,16 @@ inline QString Simulation::getTimeStr(int simTime, int time)
 			QString("%1d%2h%3m").arg(days, 3, 10, QChar('0')).
 			arg(hours, 2, 10, QChar('0')).arg(minutes, 2, 10, QChar('0'));
 	return str;
+}
+
+inline void Simulation::modelLock() const
+{
+	_modelMutex.lock();
+}
+
+inline void Simulation::modelUnlock() const
+{
+	_modelMutex.unlock();
 }
 
 #endif /* SMOKESIMULATION_H_ */

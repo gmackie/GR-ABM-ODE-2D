@@ -22,6 +22,7 @@ protected:
 	int moveAgent(GrGrid& grid, bool ccl2, bool ccl5, bool cxcl9, bool attractant, double bonusFactor);
 
 public:
+	Agent();
 	Agent(int birthtime, int deathtime, int row, int col);
 	virtual ~Agent();
 	virtual void move(GrGrid& grid) = 0;

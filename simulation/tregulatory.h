@@ -14,6 +14,9 @@
 class Treg : public Tcell
 {
 private:
+	/*
+	 * !!! If the data members change then the serialize and deserialize functions need to be updated !!!
+	 */
 	TregState _state;
 	TregState _nextState;
 	// TNF associated attributes
@@ -32,6 +35,7 @@ private:
 	void handleResting(const int time, GrGrid& grid, GrStat& stats);
 
 public:
+	Treg();
 	Treg(int birthtime, int row, int col, TregState state);
 	~Treg();
 	void move(GrGrid& grid);

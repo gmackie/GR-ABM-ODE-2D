@@ -66,36 +66,53 @@ void GridCell::serialize(std::ostream& out) const
 {
 	assert(out.good());
 
+	out << getSerialSize() << std::endl;
 	out << _row << std::endl;
 	out << _col << std::endl;
 	out << _source << std::endl;
 	out << _nKillings << std::endl;
 	out << _nRecruitments << std::endl;
+	out << _nSecretions << std::endl;
+	out << _macAttractant << std::endl;
 	out << _tnf << std::endl;
 	out << _ccl2 << std::endl;
 	out << _ccl5 << std::endl;
 	out << _cxcl9 << std::endl;
 	out << _shedtnfr2 << std::endl;
 	out << _extMtb << std::endl;
-	out << _macAttractant << std::endl;
 }
 
 void GridCell::deserialize(std::istream& in)
 {
 	assert(in.good());
 
+	// This check isn't fool proof because of data alignment in memory.
+	// An object's size can be bigger than the sum of the size's of its members.
+	// When a new member is added or an existing one deleted the object size can remain unchanged.
+	std::size_t currentSerialSize = getSerialSize();
+	std::size_t savedSerialSize;
+	in >> savedSerialSize;
+	if (savedSerialSize != currentSerialSize)
+	{
+		std::cerr << "Error deserializing GridCell object."<< std::endl;
+		std::cerr << "The saved serial size of " << savedSerialSize << " does not match the current serial size of " << currentSerialSize << std::endl;
+		exit(1);
+	}
+
 	in >> _row;
 	in >> _col;
 	in >> _source;
 	in >> _nKillings;
 	in >> _nRecruitments;
+	in >> _nSecretions;
+	in >> _macAttractant;
 	in >> _tnf;
 	in >> _ccl2;
 	in >> _ccl5;
 	in >> _cxcl9;
 	in >> _shedtnfr2;
 	in >> _extMtb;
-	in >> _macAttractant;
 
+	// These get assigned when the agent lists are deserialized and processed.
 	_agent[0] = _agent[1] = NULL;
 }

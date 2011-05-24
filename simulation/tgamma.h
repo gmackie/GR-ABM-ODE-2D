@@ -14,6 +14,9 @@
 class Tgam : public Tcell
 {
 private:
+	/*
+	 * !!! If the data members change then the serialize and deserialize functions need to be updated !!!
+	 */
 	TgamState _state;
 	TgamState _nextState;
 	int _deactivationTime;
@@ -34,6 +37,7 @@ private:
 	void handleDownRegulated(const int time, GrGrid& grid, GrStat& stats);
 
 public:
+	Tgam();
 	Tgam(int birthtime, int row, int col, TgamState state);
 	~Tgam();
 	void move(GrGrid& grid);

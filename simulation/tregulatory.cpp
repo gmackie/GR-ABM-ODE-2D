@@ -8,6 +8,27 @@
 #include "tregulatory.h"
 #include "grgrid.h"
 
+// Needed for deserializing the model state.
+// Avoids the calls to the random number generator in the normal constructor, allowing the random number generator
+// to remain in synch after deserialization.
+Treg::Treg()
+	: Tcell()
+	, _state(TREG_DEAD)
+	, _nextState(TREG_DEAD)
+	, _mTNF(-1.0)
+	, _surfTNFR1(-1.0)
+	, _surfTNFR2(-1.0)
+	, _surfBoundTNFR1(-1.0)
+	, _surfBoundTNFR2(-1.0)
+	, _intBoundTNFR1(-1.0)
+	, _intBoundTNFR2(-1.0)
+	, _vTNFR1(-1.0)
+	, _vTNFR2(-1.0 * _PARAM(PARAM_GR_K_T2))
+	, _kSynth(-1.0)
+	, _kTACE(-1.0)
+{
+}
+
 Treg::Treg(int birthtime, int row, int col, TregState state)
 	: Tcell(birthtime, row, col)
 	, _state(state)
@@ -35,7 +56,7 @@ void Treg::move(GrGrid& grid)
 	Tcell::moveTcell(grid, false, true, false);
 }
 
-void Treg::secrete(GrGrid&, bool tnfrDynamics)
+void Treg::secrete(GrGrid&, bool)
 {
 }
 

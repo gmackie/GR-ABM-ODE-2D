@@ -279,55 +279,67 @@ void GrStat::serialize(std::ostream& out) const
 {
 	assert(out.good());
 
+	out << getSerialSize() << std::endl;
 	out << _nMac << std::endl;
 	out << _nMacResting << std::endl;
 	out << _nMacInfected << std::endl;
 	out << _nMacCInfected << std::endl;
 	out << _nMacActive << std::endl;
 	out << _nMacDead << std::endl;
+
 	out << _nTgam << std::endl;
 	out << _nTgamActive << std::endl;
 	out << _nTgamDownRegulated << std::endl;
 	out << _nTgamDead << std::endl;
+
 	out << _nTcyt << std::endl;
 	out << _nTcytActive << std::endl;
 	out << _nTcytDownRegulated << std::endl;
 	out << _nTcytDead << std::endl;
+
 	out << _nTreg << std::endl;
 	out << _nTregActive << std::endl;
 	out << _nTregDead << std::endl;
+
 	out << _totExtMtb << std::endl;
 	out << _totNonRepExtMtb << std::endl;
 	out << _totIntMtb << std::endl;
+
 	out << _totMacAttractant << std::endl;
 	out << _totTNF << std::endl;
 	out << _totCCL2 << std::endl;
 	out << _totCCL5 << std::endl;
 	out << _totCXCL9 << std::endl;
+
 	out << _nApoptosisFasFasL << std::endl;
 	out << _nApoptosisTNF << std::endl;
+
 	out << _nMacNFkB << std::endl;
 	out << _nMacNFkBResting << std::endl;
 	out << _nMacNFkBInfected << std::endl;
 	out << _nMacNFkBCInfected << std::endl;
 	out << _nMacNFkBActive << std::endl;
 	out << _nMacNFkBDead << std::endl;
+
 	out << _nSourceMac << std::endl;
 	out << _nSourceTgam << std::endl;
 	out << _nSourceTcyt << std::endl;
 	out << _nSourceTreg << std::endl;
+
 	out << _nMacStat1 << std::endl;
 	out << _nMacStat1Resting << std::endl;
 	out << _nMacStat1Infected << std::endl;
 	out << _nMacStat1CInfected << std::endl;
 	out << _nMacStat1Active << std::endl;
 	out << _nMacStat1Dead << std::endl;
+
 	out << _nMacDeact << std::endl;
 	out << _nMacDeactResting << std::endl;
 	out << _nMacDeactInfected << std::endl;
 	out << _nMacDeactCInfected << std::endl;
 	out << _nMacDeactActive << std::endl;
 	out << _nMacDeactDead << std::endl;
+
 	out << _nBactAct << std::endl;
 	out << _area << std::endl;
 	out << _nCaseated << std::endl;
@@ -368,55 +380,79 @@ void GrStat::deserialize(std::istream& in)
 {
 	assert(in.good());
 
+	// This check isn't fool proof because of data alignment in memory.
+	// An object's size can be bigger than the sum of the size's of its members.
+	// When a new member is added or an existing one deleted the object size can remain unchanged.
+	std::size_t currentSerialSize = getSerialSize();
+	std::size_t savedSerialSize;
+	in >> savedSerialSize;
+	if (savedSerialSize != currentSerialSize)
+	{
+		std::cerr << "Error deserializing GrStat object."<< std::endl;
+		std::cerr << "The saved serial size of " << savedSerialSize << " does not match the current serial size of " << currentSerialSize << std::endl;
+		exit(1);
+	}
+
 	in >>_nMac;
 	in >>_nMacResting;
 	in >>_nMacInfected;
 	in >>_nMacCInfected;
 	in >>_nMacActive;
 	in >>_nMacDead;
+
 	in >>_nTgam;
 	in >>_nTgamActive;
 	in >>_nTgamDownRegulated;
 	in >>_nTgamDead;
+
 	in >>_nTcyt;
 	in >>_nTcytActive;
 	in >>_nTcytDownRegulated;
 	in >>_nTcytDead;
+
 	in >>_nTreg;
 	in >>_nTregActive;
 	in >>_nTregDead;
+
 	in >>_totExtMtb;
 	in >>_totNonRepExtMtb;
 	in >>_totIntMtb;
+
 	in >>_totMacAttractant;
 	in >>_totTNF;
 	in >>_totCCL2;
 	in >>_totCCL5;
 	in >>_totCXCL9;
+
 	in >>_nApoptosisFasFasL;
 	in >>_nApoptosisTNF;
+
 	in >>_nMacNFkB;
 	in >>_nMacNFkBResting;
 	in >>_nMacNFkBInfected;
 	in >>_nMacNFkBCInfected;
 	in >>_nMacNFkBActive;
 	in >>_nMacNFkBDead;
+
 	in >>_nSourceMac;
 	in >>_nSourceTgam;
 	in >>_nSourceTcyt;
 	in >>_nSourceTreg;
+
 	in >>_nMacStat1;
 	in >>_nMacStat1Resting;
 	in >>_nMacStat1Infected;
 	in >>_nMacStat1CInfected;
 	in >>_nMacStat1Active;
 	in >>_nMacStat1Dead;
+
 	in >>_nMacDeact;
 	in >>_nMacDeactResting;
 	in >>_nMacDeactInfected;
 	in >>_nMacDeactCInfected;
 	in >>_nMacDeactActive;
 	in >>_nMacDeactDead;
+
 	in >>_nBactAct;
 	in >>_area;
 	in >> _nCaseated;

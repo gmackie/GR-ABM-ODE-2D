@@ -29,6 +29,7 @@ GrSimulation::GrSimulation()
 	, _pTTest()
 	, _pRecruitment(NULL)
 	, _tnfrDynamics(false)
+	, _tnfKnockout(false)
 	
 {
 	for (int i = 0; i < NOUTCOMES; i++)
@@ -55,6 +56,9 @@ void GrSimulation::serialize(std::ostream& out) const
 	// serialize diffusion method
 	int intVal = (int) _pDiffusion->getMethod();
 	out << intVal << std::endl;
+
+	out << _tnfrDynamics << std::endl;
+	out << _tnfKnockout << std::endl;
 
 	// serialize random number generator
 	g_Rand.serialize(out);
@@ -110,6 +114,9 @@ void GrSimulation::deserialize(std::istream& in)
 	in >> intVal;
 	setDiffusionMethod((DiffusionMethod) intVal);
 
+	in >> _tnfrDynamics;
+	in >> _tnfKnockout;
+
 	// deserialize random number generator
 	g_Rand.deserialize(in);
 
@@ -122,7 +129,7 @@ void GrSimulation::deserialize(std::istream& in)
 	for (int i = 0; i < intVal; i++)
 	{
 		// create a dummy mac
-		_macList.push_back(Mac(0, 0, 0, MAC_DEAD, 0, false, false));
+		_macList.push_back(Mac());
 		Mac* pMac = &_macList.back();
 
 		// update attributes of dummy mac and add to grid
@@ -136,7 +143,7 @@ void GrSimulation::deserialize(std::istream& in)
 	for (int i = 0; i < intVal; i++)
 	{
 		// create a dummy tgam cell
-		_tgamList.push_back(Tgam(0, 0, 0, TGAM_DEAD));
+		_tgamList.push_back(Tgam());
 		Tgam* pTgam = &_tgamList.back();
 
 		// update attributes of dummy tgam and add to grid
@@ -150,7 +157,7 @@ void GrSimulation::deserialize(std::istream& in)
 	for (int i = 0; i < intVal; i++)
 	{
 		// create a dummy tcyt cell
-		_tcytList.push_back(Tcyt(0, 0, 0, TCYT_DEAD));
+		_tcytList.push_back(Tcyt());
 		Tcyt* pTcyt = &_tcytList.back();
 
 		// update attributes of dummy tcyt and add to grid
@@ -164,7 +171,7 @@ void GrSimulation::deserialize(std::istream& in)
 	for (int i = 0; i < intVal; i++)
 	{
 		// create a dummy treg cell
-		_tregList.push_back(Treg(0, 0, 0, TREG_DEAD));
+		_tregList.push_back(Treg());
 		Treg* pTreg = &_tregList.back();
 
 		// update attributes of dummy mac and add to grid
@@ -221,6 +228,15 @@ void GrSimulation::solve()
 {
 	// here we perform a timestep, which is 10 minutes
 	_time++;
+
+	#if 1
+	//DBG
+	// This is useful for determining whether or not 2 versions of the code are
+	// using the same random number sequence, if they are using the same seed
+	// and run on the same system.
+	g_Rand.test(_time);
+	//DBG
+	#endif
 
 	// Ensure that both grids have the same state.
 	_grid.updateNextGrid();

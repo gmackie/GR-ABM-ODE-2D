@@ -9,6 +9,32 @@
 #include "params.h"
 #include "grgrid.h"
 
+// Needed for deserializing the model state.
+// Avoids the calls to the random number generator in the normal constructor, allowing the random number generator
+// to remain in synch after deserialization.
+Mac::Mac()
+	:Agent()
+	, _state(MAC_DEAD)
+	, _nextState(MAC_DEAD)
+	, _intMtb(-1.0)
+	, _NFkB(0)
+	, _stat1(0)
+	, _activationTime(-1)
+	, _deactivationTime(-1)
+	, _mTNF(-1.0)
+	, _surfTNFR1(-1.0)
+	, _surfTNFR2(-1.0)
+	, _surfBoundTNFR1(-1.0)
+	, _surfBoundTNFR2(-1.0)
+	, _intBoundTNFR1(-1.0)
+	, _intBoundTNFR2(-1.0)
+	, _vTNFR1(-1.0)
+	, _vTNFR2(-1.0)
+	, _kSynth(-1.0)
+	, _kTACE(-1.0)
+{
+}
+
 Mac::Mac(int birthtime, int row, int col, MacState state, double intMtb, bool NFkB, bool stat1)
 	: Agent(birthtime, birthtime + _PARAM(PARAM_MAC_AGE), row, col)
 	, _state(state)

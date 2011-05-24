@@ -169,6 +169,7 @@ private:
 	void updateStatLabels(const GrStat& stats);
 	void switchStatus(SimStatus newStatus);
 	void updateWindowStatus();
+	bool isTimeForAction(int actionInterval, int simTime);
 
 	Ui::MainWindowClass _ui;
 	MainInterface* _pItfc;

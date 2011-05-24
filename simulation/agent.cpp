@@ -8,6 +8,17 @@
 #include "agent.h"
 #include "grgrid.h"
 
+// Needed for deserializing the model state.
+// Avoids the calls to the random number generator in the normal constructor, allowing the random number generator
+// to remain in synch after deserialization.
+Agent::Agent()
+	: _birthTime(-1)
+	, _deathTime(-1)
+	, _row(-1)
+	, _col(-1)
+{
+}
+
 Agent::Agent(int birthtime, int deathtime, int row, int col)
 	: _birthTime(birthtime)
 	, _deathTime(deathtime)

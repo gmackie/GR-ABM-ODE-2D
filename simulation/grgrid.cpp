@@ -64,6 +64,9 @@ void GrGrid::serialize(std::ostream& out) const
 {
 	assert(out.good());
 
+	out << NROWS << std::endl;
+	out << NCOLS << std::endl;
+
 	for (int i = 0; i < NROWS; i++)
 	{
 		for (int j = 0; j < NCOLS; j++)
@@ -76,6 +79,19 @@ void GrGrid::serialize(std::ostream& out) const
 void GrGrid::deserialize(std::istream& in)
 {
 	assert(in.good());
+
+	int savedNrows, savedNcols;
+
+	in >> savedNrows;
+	in >> savedNcols;
+
+	if (savedNrows != NROWS || savedNcols != NCOLS)
+	{
+		std::cerr << "Error deserializing a GrGrid:"<< std::endl;
+		std::cerr << "The number of rows and cols in the saved grid, (" << savedNrows << ","  << savedNcols
+				  << "), does not match the current grid (" << NROWS << ","  << NCOLS << ")."<< std::endl;
+		exit(1);
+	}
 
 	_sources.clear();
 	for (int i = 0; i < NROWS; i++)

@@ -14,6 +14,9 @@
 class Tcyt : public Tcell
 {
 private:
+	/*
+	 * !!! If the data members change then the serialize and deserialize functions need to be updated !!!
+	 */
 	TcytState _state;
 	TcytState _nextState;
 	int _deactivationTime;
@@ -34,6 +37,7 @@ private:
 	void handleDownRegulated(const int time, GrGrid& grid, GrStat& stats);
 
 public:
+	Tcyt();
 	Tcyt(int birthtime, int row, int col, TcytState state);
 	~Tcyt();
 	void move(GrGrid& grid);

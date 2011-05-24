@@ -8,6 +8,28 @@
 #include "tcytotoxic.h"
 #include "grgrid.h"
 
+// Needed for deserializing the model state.
+// Avoids the calls to the random number generator in the normal constructor, allowing the random number generator
+// to remain in synch after deserialization.
+Tcyt::Tcyt()
+	: Tcell()
+	, _state(TCYT_DEAD)
+	, _nextState(TCYT_DEAD)
+	, _deactivationTime(-1)
+	, _mTNF(-1.0)
+	, _surfTNFR1(-1.0)
+	, _surfTNFR2(-1.0)
+	, _surfBoundTNFR1(-1.0)
+	, _surfBoundTNFR2(-1.0)
+	, _intBoundTNFR1(-1.0)
+	, _intBoundTNFR2(-1.0)
+	, _vTNFR1(-1.0)
+	, _vTNFR2(-1.0)
+	, _kSynth(-1.0)
+	, _kTACE(-1.0)
+{
+}
+
 Tcyt::Tcyt(int birthtime, int row, int col, TcytState state)
 	: Tcell(birthtime, row, col)
 	, _state(state)
@@ -90,7 +112,7 @@ void Tcyt::computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tn
 	}
 }
 
-void Tcyt::handleActive(const int time, GrGrid& grid, GrStat&)
+void Tcyt::handleActive(const int, GrGrid& grid, GrStat&)
 {
 	GridCell& cell = grid(_row, _col);
 

@@ -8,6 +8,28 @@
 #include "tgamma.h"
 #include "grgrid.h"
 
+// Needed for deserializing the model state.
+// Avoids the calls to the random number generator in the normal constructor, allowing the random number generator
+// to remain in synch after deserialization.
+Tgam::Tgam()
+	: Tcell()
+	, _state(TGAM_DEAD)
+	, _nextState(TGAM_DEAD)
+	, _deactivationTime(-1)
+	, _mTNF(-1.0)
+	, _surfTNFR1(-1.0)
+	, _surfTNFR2(-1.0)
+	, _surfBoundTNFR1(-1.0)
+	, _surfBoundTNFR2(-1.0)
+	, _intBoundTNFR1(-1.0)
+	, _intBoundTNFR2(-1.0)
+	, _vTNFR1(-1.0)
+	, _vTNFR2(-1.0)
+	, _kSynth(-1.0)
+	, _kTACE(-1.0)
+{
+}
+
 Tgam::Tgam(int birthtime, int row, int col, TgamState state)
 	: Tcell(birthtime, row, col)
 	, _state(state)

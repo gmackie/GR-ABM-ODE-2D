@@ -22,53 +22,66 @@ private:
 	int _nMacCInfected;
 	int _nMacActive;
 	int _nMacDead;
+
 	int _nTgam;
 	int _nTgamActive;
 	int _nTgamDownRegulated;
 	int _nTgamDead;
+
 	int _nTcyt;
 	int _nTcytActive;
 	int _nTcytDownRegulated;
 	int _nTcytDead;
+
 	int _nTreg;
 	int _nTregActive;
 	int _nTregDead;
+
 	double _totExtMtb;			// Replicating bacteria: 	 not in caseated compartments.
 	double _totNonRepExtMtb;	// Non-replicating bacteria: in caseated compartments.
 	double _totIntMtb;
+
 	double _totMacAttractant;
 	double _totTNF;
 	double _totCCL2;
 	double _totCCL5;
 	double _totCXCL9;
+
 	int _nApoptosisFasFasL;
 	int _nApoptosisTNF;
+
 	int _nMacNFkB;
 	int _nMacNFkBResting;
 	int _nMacNFkBInfected;
 	int _nMacNFkBCInfected;
 	int _nMacNFkBActive;
 	int _nMacNFkBDead;
+
 	int _nSourceMac;
 	int _nSourceTgam;
 	int _nSourceTcyt;
 	int _nSourceTreg;
+
 	int _nMacStat1;
 	int _nMacStat1Resting;
 	int _nMacStat1Infected;
 	int _nMacStat1CInfected;
 	int _nMacStat1Active;
 	int _nMacStat1Dead;
+
 	int _nMacDeact;
 	int _nMacDeactResting;
 	int _nMacDeactInfected;
 	int _nMacDeactCInfected;
 	int _nMacDeactActive;
 	int _nMacDeactDead;
+
 	int _nBactAct;
 	int _area;
 	int _nCaseated;
+
 	GrStatus _grStatus[NOUTCOMES];
+
 	int _queueTgam;
 	int _queueTcyt;
 	int _queueTreg;
@@ -186,6 +199,7 @@ public:
 	void setGrStatus(int index, GrStatus status);
 	void serialize(std::ostream& out) const;
 	void deserialize(std::istream& in);
+	std::size_t getSerialSize() const;
 	int getNrTgamQueued() const;
 	void setNrTgamQueued(int count);
 	int getNrTcytQueued() const;
@@ -811,6 +825,11 @@ inline int GrStat::getNrOfMacDeactDead() const
 inline int GrStat::getNrOfMacDeact() const
 {
 	return _nMacDeact;
+}
+
+inline std::size_t GrStat::getSerialSize() const
+{
+	return sizeof(GrStat);
 }
 
 #endif /* GRSTAT_H */

@@ -13,7 +13,7 @@
 
 Simulation::Simulation()
 	: _mutex(QMutex::Recursive)
-	, _modelMutex()
+	, _modelMutex(QMutex::Recursive)
 	, _time(0)
 	, _gr()
 	, _grid()

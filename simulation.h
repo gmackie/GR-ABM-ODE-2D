@@ -30,7 +30,7 @@ private:
 	TcytList _tcytList;
 	TregList _tregList;
 	GrStat _stats;
-	int _daysToSimulate;
+	int _timeStepsToSimulate;
 	bool _mtbClearance;
 	double _areaThreshold;
 	OutcomeMethod _outcomeMethod;
@@ -62,6 +62,7 @@ public:
 	void setUpdated(bool flag);
 	void setDiffusionMethod(DiffusionMethod method);
 	void setDaysToSimulate(int days);
+	void setTimeToSimulate(int steps);
 	void setMtbClearance(bool enable);
 	void setDelay(int delay);
 	void setAreaThreshold(double areaThreshold);
@@ -129,8 +130,13 @@ inline void Simulation::setDelay(int delay)
 
 inline void Simulation::setDaysToSimulate(int days)
 {
+	setTimeToSimulate(TIME_STEPS_PER_DAY*days);
+}
+
+inline void Simulation::setTimeToSimulate(int steps)
+{
 	lock();
-	_daysToSimulate = days;
+	_timeStepsToSimulate = steps;
 	unlock();
 }
 

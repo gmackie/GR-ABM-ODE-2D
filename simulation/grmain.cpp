@@ -282,21 +282,21 @@ void writeOutput(std::ofstream& outputFileStream, GrSimulation& sim, int csvInte
 
 		outputFileStream << std::endl;
 }
-void saveState(const GrSimulation* pSim, int time) {
+void saveState(const GrSimulation* pSim, int time, std::string dir=std::string(".")){
     int days, hours, minutes;
-    char fname[14];
+    char fname[17];
     assert(pSim);
     GrSimulation::convertSimTime(time, days, hours, minutes);
-    sprintf(fname, "%03d%02d%02d.state", days, hours, minutes);
-    std::ofstream out(fname, std::ios_base::trunc);
+    sprintf(fname, "%03dd%02dh%02dm.state", days, hours, minutes);
+    std::ofstream out(((dir+'/')+std::string(fname)).c_str(), std::ios_base::trunc);
     if(!out.good())
-        std::cerr<<"Unable to open output file: "<<fname<<std::endl;
+        std::cerr<<"Unable to open output file: "<<fname<<endl;
     else pSim->serialize(out);
     out.close();    //Don't want to flush here, would slow things down a lot
 }
 
 
-int run(unsigned long seed, const std::string& inputFileName, const std::string& outputFileName, int csvInterval, int stateInterval, DiffusionMethod diffMethod, RecruitmentBase* pRecr, bool ode, bool tnfrDynamics, int timeToSimulate)
+int run(unsigned long seed, const std::string& inputFileName, const std::string& outputFileName, int csvInterval, int stateInterval, DiffusionMethod diffMethod, RecruitmentBase* pRecr, bool ode, bool tnfrDynamics, int timeToSimulate, bool lhs)
 {
 	std::cout << endl << "--seed " << seed << std::endl;
 
@@ -307,21 +307,18 @@ int run(unsigned long seed, const std::string& inputFileName, const std::string&
 
 	// If an output file is requested, construct the complete output file name,
 	// open the output file and write a header line.
-	std::string fullOutputFileName = "";
 	std::ofstream outputFileStream;
 
 	if (outputFileName.size() > 0)
 	{
-		std::ostringstream ofn;
-//DBG	ofn << timeToSimulate / 144 << "-" << outputFileName << "-" << seed << ".csv";
-		ofn << outputFileName << "-" << seed << ".csv";
-		fullOutputFileName = ofn.str();
-	    outputFileStream.open(fullOutputFileName.c_str());
+    	std::ostringstream ofn;
+        ofn << outputFileName << (lhs ? "/seed" : "-") << seed << ".csv";
+        outputFileStream.open(ofn.str().c_str());
 
 		writeOutputHeader(outputFileStream, inputFileName);
 	}
 
-	GrSimulation sim;
+	GrSimulation sim;     //Allocated on heap for larger grids, shouldn't effect runtimes
 
 	sim.setTnfrDynamics(tnfrDynamics);
 	sim.setRecruitment(pRecr);
@@ -331,19 +328,12 @@ int run(unsigned long seed, const std::string& inputFileName, const std::string&
 	sim.setDiffusionMethod(diffMethod);
 	sim.init();
 
-	// Write output at time 0, the initial simulation state.
-	if (fullOutputFileName.size() > 0)
+	for (int time = 0; time <= timeToSimulate; time += 1)
 	{
-		writeOutput(outputFileStream, sim, csvInterval);
-	}
-
-	for (int time = 1; time <= timeToSimulate; time += 1)
-	{
-		sim.solve();
 
 		// Display and write output at the requested interval, and after the last time step.
         if (stateInterval > 0 && time % stateInterval == 0)
-            saveState(&sim, time);
+            saveState(&sim, time, lhs ? outputFileName : ".");
 		if (time % csvInterval == 0 || time == timeToSimulate)
 		{
 //			printf("%d\t %d - (%d,%d,%d,%d,%d)\t%d - (%d,%d,%d)\t%d - (%d,%d,%d)\t%d - (%d,%d)\t(%f,%f)\t(%f,%f,%f,%f)\n",
@@ -362,11 +352,13 @@ int run(unsigned long seed, const std::string& inputFileName, const std::string&
 				stats.getNrCaseated(), stats.getTotNonRepExtMtb()
 			);
 
-			if (fullOutputFileName.size() > 0)
+        	if (outputFileStream.good())
 			{
 				writeOutput(outputFileStream, sim, csvInterval);
 			}
 		}
+        //Run the simulation one step
+		sim.solve();
 	}
 
 	return 0;
@@ -395,7 +387,7 @@ int main(int argc, char** argv)
 	desc.add_options()
 		("help,h", "Help message")
 		("input-file,i", po::value<std::string>(&inputFileName), "Input file name")
-		("output-file,o", po::value<std::string>(&outputFileName), "Output file name")
+		("output-dir,o", po::value<std::string>(&outputFileName), "Output directory")
 		("csv-interval", po::value<int>(&csvInterval)->default_value(1),
 						"CSV update interval (10 min timesteps)")
 		("state-interval", po::value<int>(&stateInterval)->default_value(-1),
@@ -403,12 +395,13 @@ int main(int argc, char** argv)
 		("seed,s", po::value<unsigned long>(&seed)->default_value((unsigned long) curTime), "Seed")
 		("diffusion,d", po::value<int>(&diffMethod)->default_value(3),
 				"Diffusion method:\n0 - FTCS\n1 - BTCS (SOR, correct)\n2 - BTCS (SOR, wrong)\n3 - FTCS Grid Swap")
+		("timesteps,t", po::value<int>(&timeToSimulate), "Number of time steps to simulate\nTakes precedence over --days")
 		("days", po::value<int>(&nDays)->default_value(200), "Number of days to simulate")
 		("ode", "Use integrated lymph node ODE for recruitment")
 		("tnfr-dynamics", "Use molecular level TNF/TNFR dynamics in the model")
 		("ln-ode,l", po::value<std::string>(&lymphNodeODE), "Lymph node application")
 		("ln-ode-temp", po::value<std::string>(&lymphNodeTemp), "Lymph node temp file")
-		("timesteps,t", po::value<int>(&timeToSimulate), "Number of time steps to simulate\nTakes precedence over --days")
+		("lhs", "Running as part of an LHS run")
 		("version,v", "Version number");
 
 	try
@@ -465,7 +458,7 @@ int main(int argc, char** argv)
 			return 1;
 		}
 
-		return run(seed, inputFileName, outputFileName, csvInterval, stateInterval, diffMethodEnum, pRecr, ode, tnfrDynamics, timeToSimulate);
+		return run(seed, inputFileName, outputFileName, csvInterval, stateInterval, diffMethodEnum, pRecr, ode, tnfrDynamics, timeToSimulate, vm.count("lhs"));
 	}
 	catch (std::exception& e)
 	{

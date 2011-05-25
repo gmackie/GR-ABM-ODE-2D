@@ -27,6 +27,7 @@
 #define MOD_ROW(val) ((((val) + NROWS)) % NROWS)
 #define MOD_COL(val) ((((val) + NCOLS)) % NCOLS)
 #define NOUTCOMES 2
+#define TIME_STEPS_PER_DAY 144
 
 // The number of compartments in a Moore neighborhood of a compartment.
 #define MOORE_COUNT 9

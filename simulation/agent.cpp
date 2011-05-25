@@ -92,7 +92,7 @@ int Agent::moveAgent(GrGrid& grid, bool ccl2, bool ccl5, bool cxcl9, bool attrac
 
 		// linear search
 		double r = g_Rand.getReal();
-		for (k = 0; cumProb[k] < r && k < 9; k++);
+		for (k = 0; k < 9 && cumProb[k] < r; k++);
 	}
 	else
 	{

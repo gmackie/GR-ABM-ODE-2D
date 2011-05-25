@@ -134,29 +134,20 @@ void Snapshot::takeStateSnapshot(int time, const Simulation& sim)
 	}
 }
 
-void Snapshot::takePicture(const int time, const QImage& image)
+void Snapshot::takePicture(const int time, const QImage& image, int slice, const QString prefix)
 {
-	int days, hours, minutes;
-	GrSimulation::convertSimTime(time, days, hours, minutes);
+    int days, hours, minutes;
+    GrSimulation::convertSimTime(time, days, hours, minutes);
 
-	QString fileName = _dirName + QDir::separator() +
-			QString("%1d%2h%3m.png").arg(days, 3, 10, QChar('0')).
-			arg(hours, 2, 10, QChar('0')).arg(minutes, 2, 10, QChar('0'));
+    QString fileName = _dirName + QDir::separator() + prefix + 
+            QString("%2d%3h%4m").arg(days, 3, 10, QChar('0')).
+            arg(hours, 2, 10, QChar('0')).arg(minutes, 2, 10, QChar('0'))
+            + (slice > -1 ? QString("-slice%4.png").arg(slice, 3, 10, QChar('0')) : ".png");
 
-	image.save(fileName);
-
-	/*QImage cpyImage = image;
-	QPainter painter(&cpyImage);
-
-	QPen pen(Qt::red);
-	painter.setPen(pen);
-	QString str = QString("%1d%2h%3m").arg(days, 3, 10, QChar('0')).
-			arg(hours, 2, 10, QChar('0')).arg(minutes, 2, 10, QChar('0'));
-
-	painter.setFont(QFont("Arial", 13));
-	painter.drawText(cpyImage.rect(), Qt::AlignTop | Qt::AlignRight, str);
-
-	cpyImage.save(fileName);*/
+    image.save(fileName);
+}
+void Snapshot::takePicture(const int time, const QImage& image, const QString prefix){
+    takePicture(time, image, -1, prefix);
 }
 
 void Snapshot::takeSnapshot(const int time, const GrStat& stats)

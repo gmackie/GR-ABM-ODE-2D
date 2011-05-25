@@ -87,7 +87,7 @@ int main(int argc, char *argv[])
 	std::string lymphNodeTemp;
 	bool scriptingMode;
 	bool outputEnabled;
-	int nDays;
+	int nDays, timesteps;
 	int pngInterval;
 	int csvInterval;
 	int stateInterval;
@@ -115,14 +115,15 @@ int main(int argc, char *argv[])
 		("seed,s", po::value<unsigned long>(&seed))
 		("diffusion,d", po::value<int>(&diffMethod)->default_value(3),
 				"Diffusion method:\n0 - FTCS\n1 - BTCS (SOR, correct)\n2 - BTCS (SOR, wrong)\n3 - FTCS Grid Swap")
+		("timesteps,t", po::value<int>(&timesteps), "Number of time steps to simulate\nTakes precedence over --days")
 		("days", po::value<int>(&nDays)->default_value(200), "Number of days to simulate")
 		("script,c", "Scripting mode")
 		("output,o", po::value<std::string>(&outputDir), "Output directory")
-		("csv-interval", po::value<int>(&csvInterval)->default_value(1),
+		("csv-interval", po::value<int>(&csvInterval)->default_value(0),
 				"CSV update interval (10 min timesteps)")
-		("png-interval", po::value<int>(&pngInterval)->default_value(144*50),
+		("png-interval", po::value<int>(&pngInterval)->default_value(0),
 				"PNG snapshot interval (10 min timesteps)")
-		("state-interval", po::value<int>(&stateInterval)->default_value(144*50),
+		("state-interval", po::value<int>(&stateInterval)->default_value(0),
 				"State snapshot interval (10 min timesteps)")
 		(testName[0], po::value<std::string>(&outcomeTest[0]),
 				"Enable outcome testing based on the granuloma area (%1,%2,%3)\n"
@@ -219,6 +220,9 @@ int main(int argc, char *argv[])
 			return 1;
 		}
 
+		if (!vm.count("timesteps"))
+			timesteps = TIME_STEPS_PER_DAY * nDays;
+
 
 		for (int i = 0; i < NOUTCOMES; i++)
 		{
@@ -305,7 +309,7 @@ int main(int argc, char *argv[])
 	Ui::MainWindowClass& ui = w.getUI();
 
 	ui.comboBoxDiffusion->setCurrentIndex(diffMethod);
-	ui.spinBoxStopDays->setValue(nDays);
+	ui.spinBoxStopTime->setValue(timesteps);
 
 	ui.spinBoxSnapshotCsvInterval->setValue(csvInterval);
 	ui.spinBoxSnapshotPicInterval->setValue(pngInterval);

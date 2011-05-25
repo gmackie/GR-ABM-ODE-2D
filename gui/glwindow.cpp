@@ -355,6 +355,7 @@ void GLWindow::visualize()
 
 void GLWindow::printText()
 {
+    const Simulation* pSim = &(_pItfc->getSimulation());
 	updateSelectedCellStats();
 
 	glColor3f(1.0f, 0.0f, 0.0f);
@@ -364,7 +365,7 @@ void GLWindow::printText()
 	if (_printTime)
 	{
 		_ui.glWidget->renderText(_ui.glWidget->width() - xOffset, 20,
-			Simulation::getTimeStr(_pItfc->getSimTime(), _pItfc->getTime()));
+			Simulation::getTimeStr(pSim->getTime(), _pItfc->getTime()));
 	}
 
 	if (_printOutcome)

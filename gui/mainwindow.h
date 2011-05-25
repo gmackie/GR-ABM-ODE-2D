@@ -92,6 +92,7 @@ public:
     static const int _TIMER_PERIOD = 10; // In milliseconds.
 
 public slots:
+	void updateTimeBox(int);
 	void toggleAnimation();
 	void setBlend();
 	void setDrawAgents(bool checked);

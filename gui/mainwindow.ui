@@ -53,8 +53,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>243</width>
-             <height>516</height>
+             <width>96</width>
+             <height>26</height>
             </rect>
            </property>
            <attribute name="label">
@@ -66,8 +66,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>243</width>
-             <height>516</height>
+             <width>256</width>
+             <height>528</height>
             </rect>
            </property>
            <attribute name="label">
@@ -167,48 +167,66 @@
             <property name="geometry">
              <rect>
               <x>0</x>
-              <y>160</y>
+              <y>140</y>
               <width>251</width>
-              <height>91</height>
+              <height>121</height>
              </rect>
             </property>
             <property name="title">
              <string>Stopping criteria</string>
             </property>
-            <widget class="QWidget" name="layoutWidget_X">
+            <widget class="QWidget" name="verticalLayoutWidget">
              <property name="geometry">
               <rect>
-               <x>10</x>
+               <x>0</x>
                <y>20</y>
-               <width>231</width>
-               <height>61</height>
+               <width>251</width>
+               <height>92</height>
               </rect>
              </property>
-             <layout class="QGridLayout" name="gridLayout_16">
-              <item row="0" column="0">
-               <widget class="QCheckBox" name="checkBoxStopDays">
-                <property name="toolTip">
-                 <string>shortcut: a</string>
-                </property>
-                <property name="text">
-                 <string>Days to simulate</string>
-                </property>
-                <property name="checked">
-                 <bool>true</bool>
-                </property>
-               </widget>
+             <layout class="QVBoxLayout" name="verticalLayout_6">
+              <item>
+               <layout class="QGridLayout" name="gridLayout_16">
+                <item row="0" column="0">
+                 <widget class="QCheckBox" name="checkBoxStopDays">
+                  <property name="toolTip">
+                   <string>shortcut: a</string>
+                  </property>
+                  <property name="text">
+                   <string>Days to simulate</string>
+                  </property>
+                  <property name="checked">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="1">
+                 <widget class="QSpinBox" name="spinBoxStopDays">
+                  <property name="maximum">
+                   <number>2147483647</number>
+                  </property>
+                  <property name="value">
+                   <number>0</number>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="0">
+                 <widget class="QLabel" name="label">
+                  <property name="text">
+                   <string>Timesteps</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="1">
+                 <widget class="QSpinBox" name="spinBoxStopTime">
+                  <property name="maximum">
+                   <number>2147483647</number>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
               </item>
-              <item row="0" column="1">
-               <widget class="QSpinBox" name="spinBoxStopDays">
-                <property name="maximum">
-                 <number>1000</number>
-                </property>
-                <property name="value">
-                 <number>200</number>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="0">
+              <item>
                <widget class="QCheckBox" name="checkBoxStopClearance">
                 <property name="toolTip">
                  <string>shortcut: a</string>
@@ -501,7 +519,7 @@
                <x>10</x>
                <y>20</y>
                <width>231</width>
-               <height>131</height>
+               <height>132</height>
               </rect>
              </property>
              <layout class="QGridLayout" name="gridLayout_20">
@@ -608,8 +626,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>243</width>
-             <height>448</height>
+             <width>256</width>
+             <height>466</height>
             </rect>
            </property>
            <attribute name="label">
@@ -857,7 +875,7 @@
                <x>10</x>
                <y>20</y>
                <width>231</width>
-               <height>31</height>
+               <height>33</height>
               </rect>
              </property>
              <layout class="QGridLayout" name="gridLayout_3">
@@ -1058,7 +1076,7 @@
                <x>10</x>
                <y>20</y>
                <width>231</width>
-               <height>62</height>
+               <height>70</height>
               </rect>
              </property>
              <layout class="QGridLayout" name="gridLayout_8">
@@ -1103,7 +1121,7 @@
                <x>10</x>
                <y>20</y>
                <width>242</width>
-               <height>92</height>
+               <height>94</height>
               </rect>
              </property>
              <layout class="QGridLayout" name="gridLayout_10">
@@ -1184,7 +1202,7 @@
                <x>10</x>
                <y>20</y>
                <width>231</width>
-               <height>62</height>
+               <height>70</height>
               </rect>
              </property>
              <layout class="QGridLayout" name="gridLayout_12">
@@ -1380,7 +1398,7 @@
                <x>10</x>
                <y>20</y>
                <width>231</width>
-               <height>91</height>
+               <height>93</height>
               </rect>
              </property>
              <layout class="QGridLayout" name="gridLayout_15">
@@ -1603,7 +1621,7 @@
                <x>10</x>
                <y>20</y>
                <width>231</width>
-               <height>92</height>
+               <height>94</height>
               </rect>
              </property>
              <layout class="QGridLayout" name="gridLayout_2">
@@ -1681,7 +1699,7 @@
                <x>10</x>
                <y>20</y>
                <width>231</width>
-               <height>136</height>
+               <height>140</height>
               </rect>
              </property>
              <layout class="QGridLayout" name="gridLayout_6">
@@ -1860,11 +1878,108 @@
      <x>0</x>
      <y>0</y>
      <width>534</width>
-     <height>22</height>
+     <height>27</height>
     </rect>
    </property>
   </widget>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>checkBoxStopDays</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>spinBoxStopDays</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>88</x>
+     <y>274</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>195</x>
+     <y>272</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkBoxStopDays</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>spinBoxStopTime</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>54</x>
+     <y>275</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>177</x>
+     <y>311</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkBoxOutput</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>spinBoxSnapshotPicInterval</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>81</x>
+     <y>167</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>186</x>
+     <y>201</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkBoxOutput</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>spinBoxSnapshotStateInterval</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>117</x>
+     <y>169</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>161</x>
+     <y>225</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkBoxOutput</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>spinBoxSnapshotCsvInterval</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>103</x>
+     <y>170</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>162</x>
+     <y>261</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkBoxOutput</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>lineEditOutput</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>47</x>
+     <y>163</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>66</x>
+     <y>288</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

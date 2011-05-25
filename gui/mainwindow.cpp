@@ -362,7 +362,8 @@ void MainWindow::initSimulationTab()
 	connect(_ui.pushButtonShowParams, SIGNAL(clicked(bool)), this, SLOT(showParams(void)));
 	connect(_ui.checkBoxStopDays, SIGNAL(toggled(bool)), this, SLOT(updateStopCriteria(void)));
 	connect(_ui.checkBoxStopClearance, SIGNAL(toggled(bool)), this, SLOT(updateStopCriteria(void)));
-	connect(_ui.spinBoxStopDays, SIGNAL(valueChanged(int)), this, SLOT(updateStopCriteria(void)));
+	connect(_ui.spinBoxStopDays, SIGNAL(valueChanged(int)), this, SLOT(updateTimeBox(int)));
+	connect(_ui.spinBoxStopTime, SIGNAL(valueChanged(int)), this, SLOT(updateStopCriteria(void)));
 
 	// Set the default diffusion method to FTCS swap.
 	// This must be after connecting the currentIndexChanged signal
@@ -371,6 +372,9 @@ void MainWindow::initSimulationTab()
 	// method, so it remains whatever the default method is from
 	// the simulation object constructor.
 	_ui.comboBoxDiffusion->setCurrentIndex(3);
+}
+void MainWindow::updateTimeBox(int x){
+	_ui.spinBoxStopTime->setValue(x*TIME_STEPS_PER_DAY);
 }
 
 void MainWindow::initColorMapTab()
@@ -1290,14 +1294,17 @@ void MainWindow::updateStopCriteria()
 
 	if (_ui.checkBoxStopDays->isChecked())
 	{
-		sim.setDaysToSimulate(_ui.spinBoxStopDays->value());
+		sim.setTimeToSimulate(_ui.spinBoxStopTime->value());
 	}
 	else
 	{
-		sim.setDaysToSimulate(-1);
+		sim.setTimeToSimulate(-1);
 	}
 
 	sim.setMtbClearance(_ui.checkBoxStopClearance->isChecked());
+	disconnect(_ui.spinBoxStopDays,SIGNAL(valueChanged(int)), this, SLOT(updateTimeBox(int)));	//Prevent double signaling
+	_ui.spinBoxStopDays->setValue(_ui.spinBoxStopTime->value()/TIME_STEPS_PER_DAY);
+	connect(_ui.spinBoxStopDays,SIGNAL(valueChanged(int)), this, SLOT(updateTimeBox(int)));
 }
 
 void MainWindow::stop()

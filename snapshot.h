@@ -24,7 +24,8 @@ public:
 	Snapshot(const QString& dirName, const QString& fileName);
 	~Snapshot();
 	bool isGood() const;
-	void takePicture(const int time, const QImage& image);
+	void takePicture(const int time, const QImage& image, int slice=-1, const QString prefix=QString());
+	void takePicture(const int time, const QImage& image, const QString prefix);
 	void takeSnapshot(const int time, const GrStat& stats);
 	void takeStateSnapshot(const int time, const Simulation& sim);
 };

@@ -25,7 +25,7 @@ Simulation::Simulation()
 	, _tcytList()
 	, _tregList()
 	, _stats()
-	, _daysToSimulate(_DAYS_TO_SIMULATE)
+	, _timeStepsToSimulate(_DAYS_TO_SIMULATE)
 	, _mtbClearance(true)
 {
 	_gr.init();
@@ -52,7 +52,7 @@ void Simulation::update()
 
 bool Simulation::stopCondition()
 {
-	return (_daysToSimulate != -1 && _time >= _daysToSimulate * 144) ||
+	return (_timeStepsToSimulate >= 0 && _time >= _timeStepsToSimulate) ||
 			(_mtbClearance && _stats.getTotExtMtb() == 0 &&
 			_stats.getTotIntMtb() == 0 &&
 			_stats.getTotTNF() < DBL_EPSILON * 10.0);

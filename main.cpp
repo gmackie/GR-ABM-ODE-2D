@@ -76,6 +76,7 @@ int main(int argc, char *argv[])
 
 	bool ode;
 	bool tnfrDynamics;
+	bool tnfKnockout;
 	unsigned long seed;
 	bool seedSpecified;
 	int diffMethod;
@@ -141,6 +142,7 @@ int main(int argc, char *argv[])
 		("load-state,l",  po::value<std::string>(&stateFileName), "File name of saved state to load")
 		("ode", "Use integrated lymph node ODE for recruitment")
 		("tnfr-dynamics", "Use molecular level TNF/TNFR dynamics in the model")
+		("tnf-knockout", "Don't secrete tnf, if not using tnfr dynamics")
 		("ln-ode", po::value<std::string>(&lymphNodeODE), "Lymph node application")
 		("ln-ode-temp", po::value<std::string>(&lymphNodeTemp), "Lymph node temp file")
 		("version,v", "Version number");
@@ -177,7 +179,13 @@ int main(int argc, char *argv[])
 
 		ode = vm.count("ode");
 		tnfrDynamics = vm.count("tnfr-dynamics");
+		tnfKnockout = vm.count("tnf-knockout");
 
+		if (tnfrDynamics && tnfKnockout)
+		{
+			std::cerr << "Both tnf dynamics and tnf knockout were specified. Only one is allowed."<< std::endl;
+			exit(1);
+		}
 		if (!vm.count("input-file"))
 		{
 			QString fileName = QFileDialog::getOpenFileName(NULL, "Load parameters", "", "*.xml");
@@ -199,6 +207,17 @@ int main(int argc, char *argv[])
 		{
 			printUsage(argv[0], desc);
 			return 1;
+		}
+
+		if (diffMethod == 1)
+		{
+			std::cerr << "The BTCS diffusion method is not supported in 3D granuloma code." << std::endl;
+			exit(1);
+		}
+		else if (diffMethod == 2)
+		{
+			std::cerr << "The BTCS Wrong diffusion method is not supported in 3D granuloma code." << std::endl;
+			exit(1);
 		}
 
 		if (csvInterval < 0 || pngInterval < 0)
@@ -303,6 +322,8 @@ int main(int argc, char *argv[])
 	
 	/* set TNF/TNFR dynamics */
 	itfc.getSimulation().setTnfrDynamics(tnfrDynamics);
+
+	itfc.getSimulation().setTnfKnockout(tnfKnockout);
 
 
 	glWindow.resizeGLWidget(resWidth, resHeight);

@@ -122,3 +122,10 @@ void Simulation::saveState(std::ostream& out) const
 	_gr.serialize(out);
 	_modelMutex.unlock();
 }
+
+void Simulation::setTnfKnockout(bool tnfKnockout)
+{
+	lock();
+	_gr.setTnfKnockout(tnfKnockout);
+	unlock();
+}

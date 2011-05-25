@@ -58,7 +58,7 @@ void Tgam::move(GrGrid& grid)
 	Tcell::moveTcell(grid, true, true, true);
 }
 
-void Tgam::secrete(GrGrid& grid, bool tnfrDynamics)
+void Tgam::secrete(GrGrid& grid, bool tnfrDynamics, bool tnfKnockout)
 {
 	if (_deactivationTime != -1)
 	{
@@ -68,7 +68,7 @@ void Tgam::secrete(GrGrid& grid, bool tnfrDynamics)
 	
 	GridCell& cell = grid(_row, _col);
 	_kSynth = _PARAM(PARAM_GR_K_SYNTH_TCELL);
-	if (!tnfrDynamics)
+	if (!tnfrDynamics && !tnfKnockout)
 		cell.incTNF(_PARAM(PARAM_TGAM_SEC_RATE_TNF));
 }
 

@@ -30,7 +30,6 @@ GrSimulation::GrSimulation()
 	, _pRecruitment(NULL)
 	, _tnfrDynamics(false)
 	, _tnfKnockout(false)
-	
 {
 	for (int i = 0; i < NOUTCOMES; i++)
 		_pTTest[i] = NULL;
@@ -229,7 +228,7 @@ void GrSimulation::solve()
 	// here we perform a timestep, which is 10 minutes
 	_time++;
 
-	#if 1
+	#if 0
 	//DBG
 	// This is useful for determining whether or not 2 versions of the code are
 	// using the same random number sequence, if they are using the same seed
@@ -406,7 +405,7 @@ void GrSimulation::secreteFromMacrophages()
 {
 	for (MacList::iterator it = _macList.begin(); it != _macList.end(); it++)
 	{
-		it->secrete(_grid.getGrid(), _tnfrDynamics);
+		it->secrete(_grid.getGrid(), _tnfrDynamics, _tnfKnockout);
 	}
 }
 
@@ -414,11 +413,11 @@ void GrSimulation::secreteFromTcells()
 {
 	for (TgamList::iterator it = _tgamList.begin(); it != _tgamList.end(); it++)
 	{
-		it->secrete(_grid.getGrid(), _tnfrDynamics);
+		it->secrete(_grid.getGrid(), _tnfrDynamics, _tnfKnockout);
 	}
 	for (TcytList::iterator it = _tcytList.begin(); it != _tcytList.end(); it++)
 	{
-		it->secrete(_grid.getGrid(), _tnfrDynamics);
+		it->secrete(_grid.getGrid(), _tnfrDynamics, _tnfKnockout);
 	}
 }
 

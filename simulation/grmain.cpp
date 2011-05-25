@@ -296,7 +296,7 @@ void saveState(const GrSimulation* pSim, int time, std::string dir=std::string("
 }
 
 
-int run(unsigned long seed, const std::string& inputFileName, const std::string& outputFileName, int csvInterval, int stateInterval, DiffusionMethod diffMethod, RecruitmentBase* pRecr, bool ode, bool tnfrDynamics, int timeToSimulate, bool lhs)
+int run(unsigned long seed, const std::string& inputFileName, const std::string& outputFileName, int csvInterval, int stateInterval, DiffusionMethod diffMethod, RecruitmentBase* pRecr, bool ode, bool tnfrDynamics, bool tnfKnockout, int timeToSimulate, bool lhs)
 {
 	std::cout << endl << "--seed " << seed << std::endl;
 
@@ -321,6 +321,7 @@ int run(unsigned long seed, const std::string& inputFileName, const std::string&
 	GrSimulation sim;     //Allocated on heap for larger grids, shouldn't effect runtimes
 
 	sim.setTnfrDynamics(tnfrDynamics);
+	sim.setTnfKnockout(tnfKnockout);
 	sim.setRecruitment(pRecr);
 
 	const GrStat& stats = sim.getStats();
@@ -378,6 +379,7 @@ int main(int argc, char** argv)
     int timeToSimulate;
 	bool ode;
 	bool tnfrDynamics;
+	bool tnfKnockout;
 
 	/* set seed to current time, in case not specified */
 	time_t curTime;
@@ -399,6 +401,7 @@ int main(int argc, char** argv)
 		("days", po::value<int>(&nDays)->default_value(200), "Number of days to simulate")
 		("ode", "Use integrated lymph node ODE for recruitment")
 		("tnfr-dynamics", "Use molecular level TNF/TNFR dynamics in the model")
+		("tnf-knockout", "Don't secrete tnf, if not using tnfr dynamics")
 		("ln-ode,l", po::value<std::string>(&lymphNodeODE), "Lymph node application")
 		("ln-ode-temp", po::value<std::string>(&lymphNodeTemp), "Lymph node temp file")
 		("lhs", "Running as part of an LHS run")
@@ -428,6 +431,13 @@ int main(int argc, char** argv)
 		
 		ode = vm.count("ode");
 		tnfrDynamics = vm.count("tnfr-dynamics");
+		tnfKnockout = vm.count("tnf-knockout");
+
+		if (tnfrDynamics && tnfKnockout)
+		{
+			std::cerr << "Both tnf dynamics and tnf knockout were specified. Only one is allowed."<< std::endl;
+			exit(1);
+		}
 
 		//Recruitment recrLN(lymphNodeODE, lymphNodeTemp);
 		//Recruitment
@@ -446,9 +456,13 @@ int main(int argc, char** argv)
 			break;
 		case 1:
 			diffMethodEnum = DIFF_SOR_CORRECT;
+			std::cerr << "The BTCS diffusion method is no longer supported." << std::endl;
+			exit(1);
 			break;
 		case 2:
 			diffMethodEnum = DIFF_SOR_WRONG;
+			std::cerr << "The BTCS Wrong diffusion method is no longer supported." << std::endl;
+			exit(1);
 			break;
 		case 3:
 			diffMethodEnum = DIFF_REC_EQ_SWAP;
@@ -458,7 +472,7 @@ int main(int argc, char** argv)
 			return 1;
 		}
 
-		return run(seed, inputFileName, outputFileName, csvInterval, stateInterval, diffMethodEnum, pRecr, ode, tnfrDynamics, timeToSimulate, vm.count("lhs"));
+		return run(seed, inputFileName, outputFileName, csvInterval, stateInterval, diffMethodEnum, pRecr, ode, tnfrDynamics, tnfKnockout, timeToSimulate, vm.count("lhs"));
 	}
 	catch (std::exception& e)
 	{

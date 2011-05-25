@@ -17,8 +17,12 @@ GrDiffusionWrongBTCS::~GrDiffusionWrongBTCS()
 {
 }
 
-void GrDiffusionWrongBTCS::diffuse(GrSimulationGrid& simGrid) const
+void GrDiffusionWrongBTCS::diffuse(GrSimulationGrid&) const
 {
+	std::cerr << " GrDiffusionWrongBTCS::diffuse no longer supported: not updated for grid swapping or mac attractant" << std::endl;
+	exit(1);
+
+#if 0
 	GrGrid& grid = simGrid.getGrid();
 
 	const double muTNF = _PARAM(PARAM_GR_D_TNF) * 6 / (4e-6);
@@ -167,4 +171,5 @@ void GrDiffusionWrongBTCS::diffuse(GrSimulationGrid& simGrid) const
 
 	//delete pOldGrid;
 	free(pOldGrid);
+#endif
 }

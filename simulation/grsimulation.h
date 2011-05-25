@@ -70,6 +70,8 @@ public:
 	void setDiffusionMethod(DiffusionMethod method);
 	bool getTnfrDynamics() const;
 	void setTnfrDynamics(bool tnfrDynamics);
+	bool getTnfKnockout() const;
+	void setTnfKnockout(bool tnfKnockout);
 	double getAreaThreshold() const;
 	void setAreaThreshold(double areaThreshold);
 	OutcomeMethod getOutcomeMethod(int index) const;
@@ -151,6 +153,16 @@ inline bool GrSimulation::getTnfrDynamics() const
 inline void GrSimulation::setTnfrDynamics(bool tnfrDynamics)
 {
 	_tnfrDynamics = tnfrDynamics;
+}
+
+inline bool GrSimulation::getTnfKnockout() const
+{
+	return _tnfKnockout;
+}
+
+inline void GrSimulation::setTnfKnockout(bool tnfKnockout)
+{
+	_tnfKnockout = tnfKnockout;
 }
 
 inline const MacList& GrSimulation::getMacList() const

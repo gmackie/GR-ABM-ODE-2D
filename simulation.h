@@ -80,6 +80,7 @@ public:
 	void setRecruitment(RecruitmentBase* pRecruitment);
 	
 	void setTnfrDynamics(bool tnfrDynamics);
+	void setTnfKnockout(bool tnfKnockout);
 
 	static QString getTimeStr(int simTime, int time);
 

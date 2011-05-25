@@ -32,8 +32,9 @@
 	scalingMDC = "1"
 	scalingLung = "1"
 	scalingLN = "1"
-	nrKillingsCaseationX = "10"
-	nrKillingsCaseation = "1"
+	nrKillingsCaseationZ = "10"
+	nrKillingsCaseation = "10"
+	nrSourcesZ = "50"
 	nrSources = "50"
 	diffusivityTNF = "5.2e-08"
     	diffusivityShedTNFR2 = "3.2e-08"
@@ -102,7 +103,7 @@
 		probRec = "0.04"/>
 	<Tcell
 		maxAge = "432"
-		timeRecEnabledX = "2880"
+		timeRecEnabledZ = "2880"
 		timeRecEnabled = "0"
 		probMoveToMac = "0.015"
 		probMoveToTcell = "0.08"
@@ -115,7 +116,7 @@
 		<Tcyt
 			maxTimeReg = "10"
 			probKillMac = "0.12"
-			probKillMacX = "1"
+			probKillMacZ = "0.12"
 			probKillMacCleanly = "0.75"
 			thresholdRec = "0.4"
 			probRec = "0.36"/>

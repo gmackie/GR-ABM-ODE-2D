@@ -42,13 +42,27 @@ void RecruitmentProb::recruit(GrSimulation& sim)
 		if (TregRecruitmentThreshold(pSource))
 			stats.incNrSourcesTreg();
 
-		// macrophage recruitment
-		if (pSource->getNumberOfAgents() < 2 && !pSource->hasMac())
-			recruitMac(sim, pSource);
+		// Randomly choose the order of mac and T cell recruitment, so there isn't a bias in favor of one type of cell.
+		if (g_Rand.getReal() < 0.5)
+		{
+			// macrophage recruitment
+			if (pSource->getNumberOfAgents() < 2 && !pSource->hasMac())
+				recruitMac(sim, pSource);
 
-		// T cell recruitment
-		if (pSource->getNumberOfAgents() < 2 && sim.getTime() >= timeTcellRecEnabled)
-			recruitTcell(sim, pSource);
+			// T cell recruitment
+			if (pSource->getNumberOfAgents() < 2 && sim.getTime() >= timeTcellRecEnabled)
+				recruitTcell(sim, pSource);
+		}
+		else
+		{
+			// T cell recruitment
+			if (pSource->getNumberOfAgents() < 2 && sim.getTime() >= timeTcellRecEnabled)
+				recruitTcell(sim, pSource);
+
+			// macrophage recruitment
+			if (pSource->getNumberOfAgents() < 2 && !pSource->hasMac())
+				recruitMac(sim, pSource);
+		}
 	}
 }
 

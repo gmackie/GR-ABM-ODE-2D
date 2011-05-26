@@ -39,14 +39,13 @@ void GrDiffusionFTCS_Swap::diffuse(GrSimulationGrid& grSim) const
 	// dt = 6s, solve for 1 timestep, 6 seconds
 	for (int t = 0; t < 1; t++)
 	{
+        //OpenMP parallel construct, ignored if without -fopenmp
+        #pragma omp parallel for default(shared)
 		for (int i = 0; i < NROWS; i++)
 		{
 			for (int j = 0; j < NCOLS; j++)
 			{
 				GridCell& newCell = nextGrid(i, j);
-
-				if (newCell.isCaseated())
-					newCell.incMacAttractant(dAttractant);
 
 				GridCell& cell = currentGrid(i, j);
 				GridCell& cell_i_min_1_j = (i > 0) ? currentGrid(i - 1, j) : zeroCell;
@@ -104,6 +103,9 @@ void GrDiffusionFTCS_Swap::diffuse(GrSimulationGrid& grSim) const
 				newCell.setCCL2(res);
 				newCell.setCCL5(res * ratioCCL5toCCL2);
 				newCell.setCXCL9(res * ratioCXCL9toCCL2);
+
+				if (cell.isCaseated())
+					cell.incMacAttractant(dAttractant);
 
 				double macAttractant_i_j_old = cell.getMacAttractant();
 				double macAttractant_i_min_1_j = cell_i_min_1_j.getMacAttractant();

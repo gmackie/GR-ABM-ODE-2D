@@ -434,6 +434,7 @@ void GrSimulation::secreteFromCaseations()
 				cell.incCCL2(0.25 * _PARAM(PARAM_MAC_SEC_RATE_CCL2));
 				cell.incCCL5(0.25 * _PARAM(PARAM_MAC_SEC_RATE_CCL5));
 				cell.incCXCL9(0.25 * _PARAM(PARAM_MAC_SEC_RATE_CXCL9));
+			    cell.incMacAttractant(_PARAM(PARAM_GR_SEC_RATE_ATTRACTANT));
 			}
 		}
 	}

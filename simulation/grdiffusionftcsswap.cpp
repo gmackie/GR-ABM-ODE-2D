@@ -28,7 +28,6 @@ void GrDiffusionFTCS_Swap::diffuse(GrSimulationGrid& grSim) const
 	const double degChemokines = _PARAM(PARAM_GR_DEG_CHEMOKINES);
 	const double ratioCCL5toCCL2 = _PARAM(PARAM_MAC_SEC_RATE_CCL5) / _PARAM(PARAM_MAC_SEC_RATE_CCL2);
 	const double ratioCXCL9toCCL2 = _PARAM(PARAM_MAC_SEC_RATE_CXCL9) / _PARAM(PARAM_MAC_SEC_RATE_CCL2);
-	const double dAttractant = _PARAM(PARAM_GR_SEC_RATE_ATTRACTANT);
 
 
 	const double dt = 6; // time-step (sec)
@@ -39,8 +38,6 @@ void GrDiffusionFTCS_Swap::diffuse(GrSimulationGrid& grSim) const
 	// dt = 6s, solve for 1 timestep, 6 seconds
 	for (int t = 0; t < 1; t++)
 	{
-        //OpenMP parallel construct, ignored if without -fopenmp
-        #pragma omp parallel for default(shared)
 		for (int i = 0; i < NROWS; i++)
 		{
 			for (int j = 0; j < NCOLS; j++)
@@ -103,9 +100,6 @@ void GrDiffusionFTCS_Swap::diffuse(GrSimulationGrid& grSim) const
 				newCell.setCCL2(res);
 				newCell.setCCL5(res * ratioCCL5toCCL2);
 				newCell.setCXCL9(res * ratioCXCL9toCCL2);
-
-				if (cell.isCaseated())
-					cell.incMacAttractant(dAttractant);
 
 				double macAttractant_i_j_old = cell.getMacAttractant();
 				double macAttractant_i_min_1_j = cell_i_min_1_j.getMacAttractant();

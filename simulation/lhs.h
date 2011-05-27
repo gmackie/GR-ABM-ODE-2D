@@ -30,7 +30,9 @@ private:
 	LhsDoubleParam _lhsDoubleParam[PARAM_DOUBLE_COUNT];
 	LhsIntParam _lhsIntParam[PARAM_INT_COUNT];
 	bool readParam(const TiXmlElement* pElement, ParamDoubleType param, bool prob);
+	bool readParam(const TiXmlElement* pElement, ParamDoubleType param, double defaultVal, bool prob);
 	bool readParam(const TiXmlElement* pElement, ParamIntType param, bool pos);
+	bool readParam(const TiXmlElement* pElement, ParamIntType param, int defaultVal, bool pos);
 	void updateParamDouble(ParamDoubleType param, double val);
 
 public:

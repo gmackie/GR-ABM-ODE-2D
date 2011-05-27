@@ -149,18 +149,36 @@ Params::Params(bool ode)
 	, _intParam()
 	, _initialMacs()
 	, _initialExtMtb()
+	, _performChecks(false)
 {
-	memset(_doubleParam, 0, sizeof(double) * PARAM_DOUBLE_COUNT);
-	memset(_intParam, 0, sizeof(int) * PARAM_INT_COUNT);
+	init();
+}
+
+Params::Params(bool performChecks, bool ode)
+	: _useRecruitmentWeights(false)
+	, _ode(ode)
+	, _doubleParam()
+	, _intParam()
+	, _initialMacs()
+	, _initialExtMtb()
+	, _performChecks(performChecks)
+{
+	init();
 }
 
 Params::~Params()
 {
 }
 
+void Params::init()
+{
+	memset(_doubleParam, 0, sizeof(double) * PARAM_DOUBLE_COUNT);
+	memset(_intParam, 0, sizeof(int) * PARAM_INT_COUNT);
+}
+
 bool Params::reinit(const char* filename)
 {
-	Params* pNewInstance = new Params();
+	Params* pNewInstance = new Params(false);
 	if (!pNewInstance->fromXml(filename))
 	{
 		delete pNewInstance;
@@ -668,7 +686,7 @@ bool Params::readMacElement(const TiXmlElement* pMacElement)
 
 	bool bonusFactorRes = readParam(pMacElement, PARAM_MAC_MOVEMENT_BONUSFACTOR, 1.0, false);
 	res &= bonusFactorRes;
-	if (bonusFactorRes && _PARAM(PARAM_MAC_MOVEMENT_BONUSFACTOR) < 1.0)
+	if (_performChecks && bonusFactorRes && _PARAM(PARAM_MAC_MOVEMENT_BONUSFACTOR) < 1.0)
 	{
 		std::cerr << "The macrophage movement bonus factor of " << _PARAM(PARAM_MAC_MOVEMENT_BONUSFACTOR) << " is < 1.0." << std::endl;
 		res = false;
@@ -717,7 +735,7 @@ bool Params::readTcellElement(const TiXmlElement* pTcellElement)
 
 	bool bonusFactorRes = readParam(pTcellElement, PARAM_TCELL_MOVEMENT_BONUSFACTOR, 1.0, false);
 	res &= bonusFactorRes;
-	if (bonusFactorRes && _PARAM(PARAM_TCELL_MOVEMENT_BONUSFACTOR) < 1.0)
+	if (_performChecks && bonusFactorRes && _PARAM(PARAM_TCELL_MOVEMENT_BONUSFACTOR) < 1.0)
 	{
 		std::cerr << "The T cell movement bonus factor of " << _PARAM(PARAM_TCELL_MOVEMENT_BONUSFACTOR) << " is < 1.0." << std::endl;
 		res = false;

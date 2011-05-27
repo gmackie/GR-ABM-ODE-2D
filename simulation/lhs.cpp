@@ -13,7 +13,7 @@
 namespace po = boost::program_options;
 
 Lhs::Lhs(int nSamples, bool ode)
-	: Params(ode)
+	: Params(false, ode)
 	, _nSamples(nSamples)
 	, _lhsDoubleParam()
 	, _lhsIntParam()
@@ -51,6 +51,21 @@ bool Lhs::readParam(const TiXmlElement* pElement, ParamDoubleType param, bool pr
 	return true;
 }
 
+// Ignore unspecified parameters with default values.
+bool Lhs::readParam(const TiXmlElement* pElement, ParamDoubleType param, double defaultVal, bool prob)
+{
+	const char* paramName = getName(param);
+	if (pElement->Attribute( paramName ))
+	{
+		bool res = readParam(pElement, param, prob);
+		return res;
+	}
+	else
+	{
+		return true;
+	}
+}
+
 bool Lhs::readParam(const TiXmlElement* pElement, ParamIntType param, bool pos)
 {
 	const char* paramName = getName(param);
@@ -82,6 +97,21 @@ bool Lhs::readParam(const TiXmlElement* pElement, ParamIntType param, bool pos)
 	}
 
 	return true;
+}
+
+// Ignore unspecified parameters with default values.
+bool Lhs::readParam(const TiXmlElement* pElement, ParamIntType param, int defaultVal, bool pos)
+{
+	const char* paramName = getName(param);
+	if (pElement->Attribute( paramName ))
+	{
+		bool res = readParam(pElement, param, pos);
+		return res;
+	}
+	else
+	{
+		return true;
+	}
 }
 
 bool Lhs::init(const char* filename)

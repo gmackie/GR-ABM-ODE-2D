@@ -158,11 +158,20 @@ private:
 	PosVector _initialMacs;
 	PosVector _initialExtMtb;
 
+	// Whether or not to perform extra checks on a parameter value, beyond what the
+	// various "readParam" functions do. We want to perform these checks when reading a regular
+	// parameter file, but don't want to when reading an LHS parameter file. When reading an LHS
+	// parameter file the values read are ranges, not individual numbers, so the extra checks
+	// will always fail in that case.
+	bool _performChecks;
+
 	enum ClosingTagType { CLOSE_START_TAG, CLOSE_END_TAG, CLOSE_NONE };
 
 protected:
-	Params(bool ode = false);
+	Params(bool ode);
+	Params(bool performChecks, bool ode);
 	virtual ~Params();
+	void init();
 	bool readParam(const TiXmlElement* pElement, const char* paramName, double* pVar, bool prob);
 	bool readParam(const TiXmlElement* pElement, const char* paramName, double* pVar, double defaultVal, bool prob);
 	bool readParam(const TiXmlElement* pElement, const char* paramName, int* pVar, bool pos);

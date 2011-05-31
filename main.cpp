@@ -55,11 +55,11 @@ void setupScriptingMode(MainWindow& mainWindow)
 	mainWindow.hide();
 }
 
-Snapshot* setupOutput(MainWindow& mainWindow, const std::string& outputDir)
+Snapshot* setupOutput(MainWindow& mainWindow, const std::string& outputDir, bool outputcsv)
 {
 	Ui::MainWindowClass& ui = mainWindow.getUI();
 	QString dirName = QString(outputDir.c_str()) + QDir::separator();
-	QString fileName = QString("%1%2seed%3.csv").arg(dirName).arg(QDir::separator()).arg(g_Rand.getSeed());
+	QString fileName = outputcsv ? QString("%1%2seed%3.csv").arg(dirName).arg(QDir::separator()).arg(g_Rand.getSeed()) : QString();
 	Snapshot* pSnapshot = new Snapshot(dirName, fileName);
 
 	mainWindow.setSnapshot(pSnapshot);
@@ -330,6 +330,12 @@ int main(int argc, char *argv[])
 	Ui::MainWindowClass& ui = w.getUI();
 
 	ui.comboBoxDiffusion->setCurrentIndex(diffMethod);
+	
+	 // Force a value changed signal to be emitted.
+	 // If timesteps has a value that happens to be the same as the current value in the spinbox
+	 // then no signal is emitted and the Simulation class doesn't get its simulation limit updated.
+	 // It will remain whatever was set in the simulation constructor.
+	ui.spinBoxStopTime->setValue(timesteps+1); 
 	ui.spinBoxStopTime->setValue(timesteps);
 
 	ui.spinBoxSnapshotCsvInterval->setValue(csvInterval);
@@ -365,7 +371,8 @@ int main(int argc, char *argv[])
 	Snapshot* pSnapshot = NULL;
 	if (outputEnabled)
 	{
-		pSnapshot = setupOutput(w, outputDir);
+		bool outputcsv = (csvInterval != 0);
+		pSnapshot = setupOutput(w, outputDir, outputcsv);
 	}
 
 	if (scriptingMode)

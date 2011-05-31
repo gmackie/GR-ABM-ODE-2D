@@ -25,7 +25,7 @@ Simulation::Simulation()
 	, _tcytList()
 	, _tregList()
 	, _stats()
-	, _timeStepsToSimulate(_DAYS_TO_SIMULATE)
+	, _timeStepsToSimulate(_TIMESTEPS_TO_SIMULATE) //_DAYS_TO_SIMULATE _TIMESTEPS_TO_SIMULATE
 	, _mtbClearance(true)
 {
 	_gr.init();

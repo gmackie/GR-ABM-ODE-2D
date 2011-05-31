@@ -8,6 +8,7 @@
 #ifndef GRVIZ_H_
 #define GRVIZ_H_
 
+#include "simulation/gr.h"
 #include <algorithm>
 #include <vector>
 #include <list>
@@ -92,15 +93,16 @@
 /* Outcome */
 #define _DEFAULT_OUTCOME_METHOD OUTCOME_NONE
 #define _OUTCOME_SAMPLE_PERIOD 1
-#define _OUTCOME_TEST_PERIOD 144
+#define _OUTCOME_TEST_PERIOD TIME_STEPS_PER_DAY
 #define _OUTCOME_ALPHA 0.05
 
 /* Output */
-#define _SNAPSHOT_PIC_PERIOD 144
+#define _SNAPSHOT_PIC_PERIOD TIME_STEPS_PER_DAY
 #define _SNAPSHOT_CSV_PERIOD 1
 
 /* Simulation */
 #define _DAYS_TO_SIMULATE 200
+#define _TIMESTEPS_TO_SIMULATE (_DAYS_TO_SIMULATE * TIME_STEPS_PER_DAY)
 
 /* Visualization */
 #define _DRAW_AGENTS true

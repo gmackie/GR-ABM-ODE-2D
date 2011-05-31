@@ -15,7 +15,7 @@ GrDiffusionBTCS::~GrDiffusionBTCS()
 {
 }
 
-void GrDiffusionBTCS::diffuse(GrSimulationGrid& simGrid) const
+void GrDiffusionBTCS::diffuse(GrSimulationGrid&) const
 {
 	std::cerr << " GrDiffusionBTCS::diffuse no longer supported: not updated for grid swapping or mac attractant" << std::endl;
 	exit(1);

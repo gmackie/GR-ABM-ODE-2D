@@ -54,6 +54,7 @@ public:
 	void modelLock() const;
 	void modelUnlock() const;
 	int getTime() const;
+	int getTimeToSimulate() const;
 	bool getUpdated() const;
 	double getAreaThreshold() const;
 	DiffusionMethod getDiffusionMethod() const;
@@ -179,6 +180,17 @@ inline int Simulation::getTime() const
 
 	lock();
 	res = _time;
+	unlock();
+
+	return res;
+}
+
+inline int Simulation::getTimeToSimulate() const
+{
+	int res;
+
+	lock();
+	res = _timeStepsToSimulate;
 	unlock();
 
 	return res;

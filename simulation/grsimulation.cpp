@@ -24,7 +24,8 @@ GrSimulation::GrSimulation()
 	, _tcytList()
 	, _tregList()
 	, _stats()
-	, _areaThreshold(DBL_MAX)
+	, _areaThreshold(0.5f)
+	, _areaThresholdCellDensity(0.5f)
 	, _pDiffusion(new GrDiffusionWrongBTCS())
 	, _pTTest()
 	, _pRecruitment(NULL)
@@ -51,6 +52,7 @@ void GrSimulation::serialize(std::ostream& out) const
 
 	// serialize area threshold
 	out << _areaThreshold << std::endl;
+	out << _areaThresholdCellDensity << std::endl;
 
 	// serialize diffusion method
 	int intVal = (int) _pDiffusion->getMethod();
@@ -108,6 +110,7 @@ void GrSimulation::deserialize(std::istream& in)
 
 	// deserialize area threshold
 	in >> _areaThreshold;
+	in >> _areaThresholdCellDensity;
 
 	// deserialize diffusion method
 	in >> intVal;
@@ -537,6 +540,11 @@ void GrSimulation::growExtMtb()
 
 			if (cell.getTNF() >= _areaThreshold)
 				_stats.incArea();
+
+			if (cell.getCellDensity(_grid.getGrid()) >= _areaThresholdCellDensity)
+			{
+				_stats.incAreaCellDensity();
+			}
 		}
 	}
 }

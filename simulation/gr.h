@@ -31,6 +31,7 @@
 
 // The number of compartments in a Moore neighborhood of a compartment.
 #define MOORE_COUNT 9
+#define MOORE_COUNT_DBL 9.0
 
 #ifdef _DEBUG
 #define assert_res(a) (assert(a))

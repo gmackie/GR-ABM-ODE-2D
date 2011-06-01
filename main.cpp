@@ -379,12 +379,7 @@ int main(int argc, char *argv[])
 	{
 		w.setScriptingMode(true);
 		glWindow.show();
-		if (timesteps == 0)
-		{
-			// Don't show graphics window if just running to load a saved state and save png snapshots.
-			// Must show it first otherwise the png snapshot is all black.
-			glWindow.hide();
-		}
+
 		setupScriptingMode(w);
 
 		int err = a.exec();

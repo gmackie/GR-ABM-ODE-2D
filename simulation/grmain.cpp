@@ -110,7 +110,9 @@ void writeOutputHeader(std::ofstream& outputFileStream, std::string inputFileNam
 			<< ','
 			<< "\"CXCL9\""
 			<< ','
-			<< "\"Area\""
+			<< "\"AreaTNF\""
+			<< ','
+			<< "\"AreaCellDensity\""
 			<< ','
 			<< "\"MDC\""
 			<< ','
@@ -209,6 +211,8 @@ void writeOutput(std::ofstream& outputFileStream, GrSimulation& sim, int csvInte
 			<< ','
 			<< stats.getArea()
 			<< ','
+			<< stats.getAreaCellDensity()
+			<< ','
 			<< stats.getMDC()
 			<< ','
 			<< stats.getN4()
@@ -296,7 +300,10 @@ void saveState(const GrSimulation* pSim, int time, std::string dir=std::string("
 }
 
 
-int run(unsigned long seed, const std::string& inputFileName, const std::string& outputFileName, int csvInterval, int stateInterval, DiffusionMethod diffMethod, RecruitmentBase* pRecr, bool ode, bool tnfrDynamics, bool tnfKnockout, int timeToSimulate, bool lhs)
+int run(unsigned long seed, const std::string& inputFileName, const std::string& outputFileName,
+		int csvInterval, int stateInterval, DiffusionMethod diffMethod, RecruitmentBase* pRecr, bool ode,
+		bool tnfrDynamics, bool tnfKnockout, int timeToSimulate, bool lhs,
+		float areaTNFThreshold, float areaCellDensityThreshold)
 {
 	std::cout << endl << "--seed " << seed << std::endl;
 
@@ -327,6 +334,18 @@ int run(unsigned long seed, const std::string& inputFileName, const std::string&
 	const GrStat& stats = sim.getStats();
 
 	sim.setDiffusionMethod(diffMethod);
+
+	//	Set area thresholds if specified on the command line.
+	if (areaTNFThreshold >= 0)
+	{
+		sim.setAreaThreshold(areaTNFThreshold);
+	}
+
+	if (areaCellDensityThreshold >= 0)
+	{
+		sim.setAreaThresholdCellDensity(areaCellDensityThreshold);
+	}
+
 	sim.init();
 
 	for (int time = 0; time <= timeToSimulate; time += 1)
@@ -371,6 +390,10 @@ int main(int argc, char** argv)
 	std::string inputFileName;
 	std::string outputFileName;
 	int csvInterval; // In time steps
+
+	float areaTNFThreshold = -1;
+	float areaCellDensityThreshold = -1;
+
 	std::string lymphNodeODE;
 	std::string lymphNodeTemp;
 	int diffMethod;
@@ -399,6 +422,8 @@ int main(int argc, char** argv)
 				"Diffusion method:\n0 - FTCS\n1 - BTCS (SOR, correct)\n2 - BTCS (SOR, wrong)\n3 - FTCS Grid Swap")
 		("timesteps,t", po::value<int>(&timeToSimulate), "Number of time steps to simulate\nTakes precedence over --days")
 		("days", po::value<int>(&nDays)->default_value(200), "Number of days to simulate")
+		("area-tnf-threshold", po::value<float>(&areaTNFThreshold)->default_value(0.5),"Threshold for granuloma area defined by TNF, in the range [0.0, 1.0]\n")
+		("area-cell-density-threshold", po::value<float>(&areaCellDensityThreshold)->default_value(0.5),"Threshold for granuloma area defined by cell density, in the range [0.0, 1.0]\n")
 		("ode", "Use integrated lymph node ODE for recruitment")
 		("tnfr-dynamics", "Use molecular level TNF/TNFR dynamics in the model")
 		("tnf-knockout", "Don't secrete tnf, if not using tnfr dynamics")
@@ -472,7 +497,8 @@ int main(int argc, char** argv)
 			return 1;
 		}
 
-		return run(seed, inputFileName, outputFileName, csvInterval, stateInterval, diffMethodEnum, pRecr, ode, tnfrDynamics, tnfKnockout, timeToSimulate, vm.count("lhs"));
+		return run(seed, inputFileName, outputFileName, csvInterval, stateInterval, diffMethodEnum, pRecr, ode,
+				tnfrDynamics, tnfKnockout, timeToSimulate, vm.count("lhs"), areaTNFThreshold, areaCellDensityThreshold );
 	}
 	catch (std::exception& e)
 	{

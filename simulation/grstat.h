@@ -78,6 +78,7 @@ private:
 
 	int _nBactAct;
 	int _area;
+	int _areaCellDensity;
 	int _nCaseated;
 
 	GrStatus _grStatus[NOUTCOMES];
@@ -193,6 +194,8 @@ public:
 	void incNrBactAct();
 	int getArea() const;
 	void incArea();
+	int getAreaCellDensity() const;
+	void incAreaCellDensity();
 	int getNrCaseated() const;
 	void incNrCaseated();
 	GrStatus getGrStatus(int index) const;
@@ -460,6 +463,16 @@ inline int GrStat::getArea() const
 inline void GrStat::incArea()
 {
 	_area++;
+}
+
+inline int GrStat::getAreaCellDensity() const
+{
+	return _areaCellDensity;
+}
+
+inline void GrStat::incAreaCellDensity()
+{
+	_areaCellDensity++;
 }
 
 inline int GrStat::getNrCaseated() const

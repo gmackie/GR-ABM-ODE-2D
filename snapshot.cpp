@@ -63,7 +63,9 @@ Snapshot::Snapshot(const QString& dirName, const QString& fileName)
 		<< ','
 		<< "\"CXCL9\""
 		<< ','
-		<< "\"Area\""
+    	<< "\"AreaTNF\""
+    	<< ','
+    	<< "\"AreaCellDensity\""
 		<< ','
 		<< "\"MDC\""
 		<< ','
@@ -201,6 +203,8 @@ void Snapshot::takeSnapshot(const int time, const GrStat& stats)
 		<< stats.getTotCXCL9()
 		<< ','
 		<< stats.getArea()
+		<< ','
+		<< stats.getAreaCellDensity()
 		<< ','
 		<< stats.getMDC()
 		<< ','

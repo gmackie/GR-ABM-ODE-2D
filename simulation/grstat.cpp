@@ -59,6 +59,7 @@ GrStat::GrStat()
 	, _nMacDeactDead(0)
 	, _nBactAct(0)
 	, _area(0)
+	, _areaCellDensity(0)
 	, _nCaseated(0)
 	, _queueTgam(0)
 	, _queueTcyt(0)
@@ -272,7 +273,7 @@ void GrStat::reset()
 
 	_nCaseated = 0;
 
-	_area = 0;
+	_area = _areaCellDensity = 0;
 }
 
 void GrStat::serialize(std::ostream& out) const
@@ -342,6 +343,7 @@ void GrStat::serialize(std::ostream& out) const
 
 	out << _nBactAct << std::endl;
 	out << _area << std::endl;
+	out << _areaCellDensity << std::endl;
 	out << _nCaseated << std::endl;
 
 	for (int i = 0; i < NOUTCOMES; i++)
@@ -455,7 +457,8 @@ void GrStat::deserialize(std::istream& in)
 
 	in >>_nBactAct;
 	in >>_area;
-	in >> _nCaseated;
+	in >>_areaCellDensity;
+	in >>_nCaseated;
 
 
 	for (int i = 0; i < NOUTCOMES; i++)

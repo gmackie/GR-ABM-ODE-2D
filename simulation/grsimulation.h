@@ -30,6 +30,7 @@ private:
 	TregList _tregList;
 	GrStat _stats;
 	double _areaThreshold;
+	double _areaThresholdCellDensity;
 	GrDiffusion* _pDiffusion;
 	TTest* _pTTest[NOUTCOMES];
 	RecruitmentBase* _pRecruitment;
@@ -74,6 +75,8 @@ public:
 	void setTnfKnockout(bool tnfKnockout);
 	double getAreaThreshold() const;
 	void setAreaThreshold(double areaThreshold);
+	double getAreaThresholdCellDensity() const;
+	void setAreaThresholdCellDensity(double areaThreshold);
 	OutcomeMethod getOutcomeMethod(int index) const;
 	void getOutcomeParameters(int index, int& samplePeriod, int& testPeriod, double& alpha) const;
 	void setOutcomeMethod(int index, OutcomeMethod method, double alpha, int testPeriod, int samplePeriod);
@@ -126,6 +129,16 @@ inline double GrSimulation::getAreaThreshold() const
 inline void GrSimulation::setAreaThreshold(double areaThreshold)
 {
 	_areaThreshold = areaThreshold;
+}
+
+inline double GrSimulation::getAreaThresholdCellDensity() const
+{
+	return _areaThresholdCellDensity;
+}
+
+inline void GrSimulation::setAreaThresholdCellDensity(double areaThreshold)
+{
+	_areaThresholdCellDensity = areaThreshold;
 }
 
 inline void GrSimulation::convertSimTime(const int time, int& rDays, int& rHours, int& rMinutes)

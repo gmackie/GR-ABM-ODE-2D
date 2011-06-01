@@ -91,6 +91,8 @@ public:
 	void deserialize(std::istream& in);
 	std::size_t getSerialSize() const;
 	bool isOccupied() const;
+	int getOccupiedNeighborCount(const GrGrid& grid) const;
+	float getCellDensity(const GrGrid& grid) const;
 };
 
 inline int GridCell::getRow() const

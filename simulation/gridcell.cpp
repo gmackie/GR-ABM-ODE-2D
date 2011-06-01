@@ -6,6 +6,7 @@
  */
 
 #include "gridcell.h"
+#include "grgrid.h"
 
 GridCell::GridCell()
 	: _row(-1)
@@ -115,4 +116,33 @@ void GridCell::deserialize(std::istream& in)
 
 	// These get assigned when the agent lists are deserialized and processed.
 	_agent[0] = _agent[1] = NULL;
+}
+
+int GridCell::getOccupiedNeighborCount(const GrGrid& grid) const
+{
+	int mcCount = 0; // The number of compartments in the Moore neighborhood that are occupied.
+
+	// Check the micro-compartment's Moore neighborhood (including the micro-compartment itself).
+	for (int i = -1; i <= 1; i++)
+	{
+		for (int j = -1; j <= 1; j++)
+		{
+			if (grid(MOD_ROW(_row + i), MOD_COL(_col + j)).isOccupied())
+			{
+				mcCount++;
+			}
+		}
+	}
+
+	return mcCount;
+}
+
+float GridCell::getCellDensity(const GrGrid& grid) const
+{
+	float cellDensity = 0.0; // The cell density in the Moore neighborhood of this micro-compartment.
+	float mcCount = getOccupiedNeighborCount(grid); // The number of compartments in the Moore neighborhood that are occupied.
+
+	cellDensity = mcCount/MOORE_COUNT_DBL;
+
+	return cellDensity;
 }

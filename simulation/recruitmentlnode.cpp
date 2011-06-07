@@ -99,7 +99,7 @@ void RecruitmentLnODE::updateQueue(const int time, GrStat& stats)
 
 		if (tcellFlux[type] > _tcellTable[type] + 1)
 		{
-			const int count = (int) tcellFlux[type] -_tcellTable[type];
+			const int count = (int) (tcellFlux[type] -_tcellTable[type]);
 			for (int j = 0; j < count; j++)
 			{
 				TcellTypePair tcell = { time - g_Rand.getInt(_PARAM(PARAM_TCELL_AGE), 1), type };

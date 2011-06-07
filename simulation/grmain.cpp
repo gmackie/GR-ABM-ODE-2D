@@ -10,7 +10,7 @@
 #include "grsimulation.h"
 #include "grstat.h"
 #include "rand.h"
-#include <time.h>
+#include <sys/time.h>
 #include <boost/program_options.hpp>
 #include "recruitmentlnode.h"
 #include "recruitmentlnodepure.h"
@@ -301,7 +301,7 @@ void saveState(const GrSimulation* pSim, int time, std::string dir=std::string("
 
 
 int run(unsigned long seed, const std::string& inputFileName, const std::string& outputFileName,
-		int csvInterval, int stateInterval, DiffusionMethod diffMethod, RecruitmentBase* pRecr, bool ode,
+		int csvInterval, int stateInterval, bool screenDisplay, DiffusionMethod diffMethod, RecruitmentBase* pRecr, bool ode,
 		bool tnfrDynamics, bool tnfKnockout, int timeToSimulate, bool lhs,
 		float areaTNFThreshold, float areaCellDensityThreshold)
 {
@@ -354,7 +354,7 @@ int run(unsigned long seed, const std::string& inputFileName, const std::string&
 		// Display and write output at the requested interval, and after the last time step.
         if (stateInterval > 0 && time % stateInterval == 0)
             saveState(&sim, time, lhs ? outputFileName : ".");
-		if (time % csvInterval == 0 || time == timeToSimulate)
+		if (screenDisplay && (csvInterval <= 0 || time % csvInterval == 0 || time == timeToSimulate))
 		{
 //			printf("%d\t %d - (%d,%d,%d,%d,%d)\t%d - (%d,%d,%d)\t%d - (%d,%d,%d)\t%d - (%d,%d)\t(%f,%f)\t(%f,%f,%f,%f)\n",
 			printf("%d\t %d - (%d,%d,%d,%d,%d)\t%d - (%d,%d,%d)\t%d - (%d,%d,%d)\t%d - (%d,%d)\t(%f,%f)\t(%f,%f,%f,%f)\t(%d,%d,%d,%d)\t%d %f\n",
@@ -390,6 +390,7 @@ int main(int argc, char** argv)
 	std::string inputFileName;
 	std::string outputFileName;
 	int csvInterval; // In time steps
+	bool screenDisplay; // Whether or not to show statistics on the console.
 
 	float areaTNFThreshold = -1;
 	float areaCellDensityThreshold = -1;
@@ -403,10 +404,29 @@ int main(int argc, char** argv)
 	bool ode;
 	bool tnfrDynamics;
 	bool tnfKnockout;
+	bool lhs;
 
-	/* set seed to current time, in case not specified */
-	time_t curTime;
-	time(&curTime);
+	/*
+	 * Set seed to current time, in case not specified
+	 * The seed adjustment is used for cluster runs.
+	 * When a large number of jobs are submitted to a cluster
+	 * some will start at essentially the same time - they will
+	 * have the same value for curTime and so have the same seed.
+	 * This is especially bad if they are using the same parameter file.
+	 * For cluster jobs the seed adjustment command line argument
+	 * is the cluster job number for that job which is xored with
+	 * curTime to define a unique seed.
+	 *
+	 * */
+	struct timeval curTimeHiRes;
+	int hiResTimeResult = gettimeofday(&curTimeHiRes, NULL);
+	if (hiResTimeResult == -1)
+	{
+		cerr <<" Error getting current high resolution time."<< endl;
+		exit(1);
+	}
+
+	unsigned long seedadj;
 
 	po::options_description desc("Allowed options");
 	desc.add_options()
@@ -417,7 +437,10 @@ int main(int argc, char** argv)
 						"CSV update interval (10 min timesteps)")
 		("state-interval", po::value<int>(&stateInterval)->default_value(-1),
 						"State save interval (10 min timesteps)")
-		("seed,s", po::value<unsigned long>(&seed)->default_value((unsigned long) curTime), "Seed")
+		("no-screen-display", "Suppress printing statistics on the console.\n"
+		                      "This option is implied by --lhs.")
+		("seed,s", po::value<unsigned long>(&seed), "Seed")
+		("seedadj", po::value<unsigned long>(&seedadj), "Seed adjustment for cluster runs")
 		("diffusion,d", po::value<int>(&diffMethod)->default_value(3),
 				"Diffusion method:\n0 - FTCS\n1 - BTCS (SOR, correct)\n2 - BTCS (SOR, wrong)\n3 - FTCS Grid Swap")
 		("timesteps,t", po::value<int>(&timeToSimulate), "Number of time steps to simulate\nTakes precedence over --days")
@@ -453,6 +476,30 @@ int main(int argc, char** argv)
 		}
         if (!vm.count("timesteps"))
             timeToSimulate = 144 * nDays;
+
+		if (csvInterval < 0)
+		{
+			printUsage(argv[0], desc);
+			return 1;
+		}
+
+		// If we just use time in seconds we will get duplicate seeds when doing a large number of runs,
+		// such as running a big LHS on a cluster.
+		// If we use just the micro-second part of the high resolution time we only get seeds that vary
+		// between 1 and 1,000,000.
+		// So we XOR the two times, which gives a larger range of seeds, with the lower order part varying
+		// with a higher resolution than we would get just by using seconds.
+		if (!vm.count("seed"))
+		{
+			seed = curTimeHiRes.tv_sec ^ curTimeHiRes.tv_usec;
+		}
+
+
+		// Adjust the seed if a seed adjustment was specified.
+		if (vm.count("seedadj"))
+		{
+			seed = seed ^ seedadj;
+		}
 		
 		ode = vm.count("ode");
 		tnfrDynamics = vm.count("tnfr-dynamics");
@@ -464,9 +511,13 @@ int main(int argc, char** argv)
 			exit(1);
 		}
 
-		//Recruitment recrLN(lymphNodeODE, lymphNodeTemp);
-		//Recruitment
-		//Recruitment* pRecr = (vm.count("ln-ode") && vm.count("ln-ode-temp")) ? &recrLN : NULL;
+		lhs = vm.count("lhs");
+
+		if (lhs && (outputFileName.size() == 0))
+		{
+			std::cerr << "LHS run but no output name specified." << std::endl;
+			exit(1);
+		}
 
 		RecruitmentProb recr;
 		RecruitmentLnODEPure pureOdeRecr;
@@ -497,8 +548,22 @@ int main(int argc, char** argv)
 			return 1;
 		}
 
-		return run(seed, inputFileName, outputFileName, csvInterval, stateInterval, diffMethodEnum, pRecr, ode,
-				tnfrDynamics, tnfKnockout, timeToSimulate, vm.count("lhs"), areaTNFThreshold, areaCellDensityThreshold );
+	    screenDisplay = !vm.count("no-screen-display");
+
+		// Write the seed to a file, so runs can be repeated, except for lhs runs.
+		if (!lhs)
+		{
+			std::ofstream seedStream;
+			seedStream.open("seed");
+			seedStream << seed << std::endl;
+		}
+	    else {
+	      // For lhs runs, we don't want to print to the screen unless explicitly told otherwise
+	      screenDisplay = false;
+	    }
+
+		return run(seed, inputFileName, outputFileName, csvInterval, stateInterval, screenDisplay, diffMethodEnum, pRecr, ode,
+				tnfrDynamics, tnfKnockout, timeToSimulate, lhs, areaTNFThreshold, areaCellDensityThreshold );
 	}
 	catch (std::exception& e)
 	{

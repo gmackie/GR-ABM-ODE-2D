@@ -45,25 +45,12 @@ bool Params::fromXml(const char* filename)
 {
 	bool res = ParamsBase::fromXml(filename);
 
-	std::cerr << " Params::fromXml calling ParamsBase::computeParams: " << std::endl; //DBG
 	computeParams();
 
 	if (res)
 	{
 		res &= checkParams();
 	}
-
-	#if 1
-	for (int i = 0; i < PARAM_DOUBLE_COUNT; i++)
-	{
-		std::cerr << "i: " << i << " " << _description[i].name << " " << _doubleParam[i] << std::endl;
-	}
-	std::cerr << std::endl;
-	for (int i = PARAM_DOUBLE_COUNT; i < PARAM_DOUBLE_COUNT + PARAM_INT_COUNT; i++)
-	{
-		std::cerr << "i: " << i << " " << _description[i].name << " "  << _intParam[intIndex(i)] << std::endl;
-	}
-	#endif
 
 	return res;
 }

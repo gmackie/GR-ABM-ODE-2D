@@ -473,21 +473,7 @@ bool ParamsBase::fromXml(const char* filename)
 	}
 
 	// Read the "Init" element which specifies the simulation initial conditions.
-	readInitElement(pRootElement);
-
-	std::cerr << std::endl << "ParamsBase::fromXml, res: " << res << std::endl << std::endl;
-
-	#if 0
-	for (int i = 0; i < PARAM_DOUBLE_COUNT; i++)
-	{
-		std::cerr << "i: " << i << " " << _description[i].name << " " << _doubleParam[i] << std::endl;
-	}
-	std::cerr << std::endl;
-	for (int i = PARAM_DOUBLE_COUNT; i < PARAM_DOUBLE_COUNT + PARAM_INT_COUNT; i++)
-	{
-		std::cerr << "i: " << i << " " << _description[i].name << " "  << _intParam[intIndex(i)] << std::endl;
-	}
-	#endif
+	res &= readInitElement(pRootElement);
 
 	return res;
 }
@@ -506,7 +492,6 @@ bool ParamsBase::readElement(const TiXmlElement* pElement, bool paramsRead[])
 		std::string attributeName = std::string(pAttrib->Name());
 
 		int parameterIndex = findParameterDescription(attributeName, pElement);
-		//std::cerr << "attributeName: " << attributeName << " parameterIndex: " << parameterIndex  << " isDouble: " << isDouble(parameterIndex) << " " << pAttrib->Value() << std::endl; //DBG
 
 		if (parameterIndex >= 0)
 		{
@@ -525,31 +510,13 @@ bool ParamsBase::readElement(const TiXmlElement* pElement, bool paramsRead[])
 		pAttrib=pAttrib->Next();
 	}
 
-	//DBG
-	#if 0
-	std::cerr << std::endl << " res: " << res << std::endl;
-	for (int i = 0; i < PARAM_DOUBLE_COUNT; i++)
-	{
-		std::cerr << "i: " << i << " " << _description[i].name << " " << _doubleParam[i] << std::endl;
-	}
-	std::cerr << std::endl;
-	for (int i = PARAM_DOUBLE_COUNT; i < PARAM_DOUBLE_COUNT + PARAM_INT_COUNT; i++)
-	{
-		std::cerr << "i: " << i << " " << _description[i].name << " "  << _intParam[intIndex(i)] << std::endl;
-	}
-	#endif
-	//DBG
-
 	// Read the parameters from the children of this element that are themselves XML elements.
 	const TiXmlNode* child = 0;
 	while( (child = pElement->IterateChildren( child )) )
 	{
-//		std::cerr << "child: " << child->Value() << std::endl; //DBG
-
 		// Ignore children that are not XML elements.
 		if (child->ToElement())
 		{
-//			std::cerr << "element: " << child->Value() << std::endl; //DBG
 			res &= readElement(child->ToElement(), paramsRead);
 		}
 	}
@@ -561,7 +528,6 @@ bool ParamsBase::readElement(const TiXmlElement* pElement, bool paramsRead[])
 // Define any computed parameters including any that are computed based on other parameters.
 void ParamsBase::computeParams()
 {
-	std::cerr << " ParamsBase::computeParams: " << std::endl; //DBG
 	defineRecruitmentWeight(PARAM_GR_WEIGHT_CCL2_RECRUITMENT, PARAM_MAC_SEC_RATE_CCL2);
 	defineRecruitmentWeight(PARAM_GR_WEIGHT_CCL5_RECRUITMENT, PARAM_MAC_SEC_RATE_CCL5);
 	defineRecruitmentWeight(PARAM_GR_WEIGHT_CXCL9_RECRUITMENT, PARAM_MAC_SEC_RATE_CXCL9);
@@ -569,11 +535,8 @@ void ParamsBase::computeParams()
 
 void ParamsBase::defineRecruitmentWeight(ParamDoubleType recruitmentWeightParam, ParamDoubleType secretionParam)
 {
-	std::cerr << " recruitmentWeightParam: " << recruitmentWeightParam << " read: " << _paramsRead[recruitmentWeightParam] << std::endl; //DBG
 	if (!_paramsRead[recruitmentWeightParam])
 	{
-		std::cerr << " ParamsBase::defineRecruitmentWeight: "<< _description[recruitmentWeightParam].name << std::endl;//DBG
-		std::cerr << " PARAM_MAC_SEC_RATE_TNF: " << getParam(PARAM_MAC_SEC_RATE_TNF) << " secretionParam: " << getParam(secretionParam) << std::endl; //DBG
 		setParam(recruitmentWeightParam, getParam(PARAM_MAC_SEC_RATE_TNF) / getParam(secretionParam));
 	}
 }
@@ -687,7 +650,6 @@ void ParamsBase::writeElement(std::ostream& out, const TiXmlElement* pElement, i
 	child = 0;
 	while( (child = pElement->IterateChildren( child )) )
 	{
-//		std::cerr << "child: " << child->Value() << std::endl; //DBG
 
 		// Ignore children that are not XML elements. Also ignore the Init element, since it
 		// has no attributes and its children are read into the _initialMacs and _initialExtMtb lists,

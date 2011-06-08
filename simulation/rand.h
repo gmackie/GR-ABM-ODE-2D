@@ -55,6 +55,7 @@ public:
 	double getReal();
 	double getReal(double a, double b);
 	int getInt(int b, int a = 0);
+	double getLogNormal(double mean, double sigma);
 	void serialize(std::ostream& out) const;
 	void deserialize(std::istream& in);
 	std::size_t getSerialSize() const;
@@ -95,6 +96,12 @@ inline int Rand::getInt(int b, int a)
 
 	uniform_int_t rnd(a, b - 1);
 	return rnd(_eng);
+}
+
+inline double Rand::getLogNormal(double mean, double sigma)
+{
+	boost::lognormal_distribution<double> rnd(mean, sigma);
+	return rnd(_realEng);
 }
 
 inline std::size_t Rand::getSerialSize() const

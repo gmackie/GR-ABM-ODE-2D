@@ -58,7 +58,7 @@ void Tcyt::move(GrGrid& grid)
 	Tcell::moveTcell(grid, false, true, true);
 }
 
-void Tcyt::secrete(GrGrid& grid, bool tnfrDynamics, bool tnfKnockout)
+void Tcyt::secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfKnockout)
 {
 	if (_deactivationTime != -1)
 	{
@@ -72,7 +72,7 @@ void Tcyt::secrete(GrGrid& grid, bool tnfrDynamics, bool tnfKnockout)
 		cell.incTNF(_PARAM(PARAM_TCYT_SEC_RATE_TNF));
 }
 
-void Tcyt::computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tnfrDynamics)
+void Tcyt::computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tnfrDynamics, bool nfkbDynamics)
 {
 	GridCell& cell = grid(_row, _col);
 	double tnfBoundFraction = cell.getTNF() / (cell.getTNF() + _PARAM(PARAM_GR_KD1) * 48.16e11);

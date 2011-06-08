@@ -302,7 +302,7 @@ void saveState(const GrSimulation* pSim, int time, std::string dir=std::string("
 
 int run(unsigned long seed, const std::string& inputFileName, const std::string& outputFileName,
 		int csvInterval, int stateInterval, bool screenDisplay, DiffusionMethod diffMethod, RecruitmentBase* pRecr, bool ode,
-		bool tnfrDynamics, bool tnfKnockout, int timeToSimulate, bool lhs,
+		bool tnfrDynamics, bool nfkbDynamics, bool tnfKnockout, int timeToSimulate, bool lhs,
 		float areaTNFThreshold, float areaCellDensityThreshold)
 {
 	std::cout << endl << "--seed " << seed << std::endl;
@@ -327,7 +327,8 @@ int run(unsigned long seed, const std::string& inputFileName, const std::string&
 
 	GrSimulation sim;     //Allocated on heap for larger grids, shouldn't effect runtimes
 
-	sim.setTnfrDynamics(tnfrDynamics);
+	sim.setTnfrDynamics(tnfrDynamics || nfkbDynamics); // when NFkB is turned on, tnfr dynamics will be on autamatically.
+	sim.setNfkbDynamics(nfkbDynamics);
 	sim.setTnfKnockout(tnfKnockout);
 	sim.setRecruitment(pRecr);
 
@@ -406,6 +407,7 @@ int main(int argc, char** argv)
     int timeToSimulate;
 	bool ode;
 	bool tnfrDynamics;
+	bool nfkbDynamics;
 	bool tnfKnockout;
 	bool lhs;
 
@@ -452,6 +454,7 @@ int main(int argc, char** argv)
 		("area-cell-density-threshold", po::value<float>(&areaCellDensityThreshold)->default_value(0.5),"Threshold for granuloma area defined by cell density, in the range [0.0, 1.0]\n")
 		("ode", "Use integrated lymph node ODE for recruitment")
 		("tnfr-dynamics", "Use molecular level TNF/TNFR dynamics in the model")
+		("NFkB-dynamics", "Use molecular level intracellular NFkB dynamics in the model")
 		("tnf-knockout", "Don't secrete tnf, if not using tnfr dynamics")
 		("ln-ode,l", po::value<std::string>(&lymphNodeODE), "Lymph node application")
 		("ln-ode-temp", po::value<std::string>(&lymphNodeTemp), "Lymph node temp file")
@@ -506,11 +509,17 @@ int main(int argc, char** argv)
 		
 		ode = vm.count("ode");
 		tnfrDynamics = vm.count("tnfr-dynamics");
+		nfkbDynamics = vm.count("NFkB-dynamics");
 		tnfKnockout = vm.count("tnf-knockout");
 
 		if (tnfrDynamics && tnfKnockout)
 		{
 			std::cerr << "Both tnf dynamics and tnf knockout were specified. Only one is allowed."<< std::endl;
+			exit(1);
+		}
+		if (nfkbDynamics && tnfKnockout)
+		{
+			std::cerr << "Both NFkB dynamics and tnf knockout were specified. Only one is allowed."<< std::endl;
 			exit(1);
 		}
 
@@ -566,7 +575,7 @@ int main(int argc, char** argv)
 	    }
 
 		return run(seed, inputFileName, outputFileName, csvInterval, stateInterval, screenDisplay, diffMethodEnum, pRecr, ode,
-				tnfrDynamics, tnfKnockout, timeToSimulate, lhs, areaTNFThreshold, areaCellDensityThreshold );
+				tnfrDynamics, nfkbDynamics, tnfKnockout, timeToSimulate, lhs, areaTNFThreshold, areaCellDensityThreshold );
 	}
 	catch (std::exception& e)
 	{

@@ -338,8 +338,14 @@ void RecruitmentLnODE::recruitMac(GrSimulation& sim, GridCell* pSource)
 	// recruit a resting macrophage
 	if (sim.getStats().getNrOfMac() < _PARAM(PARAM_MAC_INIT_NUMBER))
 	{
-		sim.createMac(pSource->getRow(), pSource->getCol(),
+		Mac* newMac = sim.createMac(pSource->getRow(), pSource->getCol(),
 			sim.getTime() - g_Rand.getInt(_PARAM(PARAM_MAC_AGE)), MAC_RESTING, false, false);
+		if (sim.getNfkbDynamics())
+		{
+			// initialize NF-kB signaling from steady-state
+			for (int i = 0; i < 21600; ++i)
+				newMac->solveNFkBODEsEquilibrium(2);
+		}
 	}
 	else
 	{
@@ -348,8 +354,14 @@ void RecruitmentLnODE::recruitMac(GrSimulation& sim, GridCell* pSource)
 		if (macThreshold && g_Rand.getReal() < _PARAM(PARAM_MAC_PROB_RECRUITMENT))
 		{
 			pSource->incNrRecruitments();
-			sim.createMac(pSource->getRow(), pSource->getCol(),
+			Mac* newMac = sim.createMac(pSource->getRow(), pSource->getCol(),
 				sim.getTime() - g_Rand.getInt(_PARAM(PARAM_MAC_AGE)), MAC_RESTING, false, false);
+			if (sim.getNfkbDynamics())
+			{
+				// initialize NF-kB signaling from steady-state
+				for (int i = 0; i < 21600; ++i)
+					newMac->solveNFkBODEsEquilibrium(2);
+			}
 		}
 	}
 }

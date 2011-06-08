@@ -30,6 +30,7 @@ GrSimulation::GrSimulation()
 	, _pTTest()
 	, _pRecruitment(NULL)
 	, _tnfrDynamics(false)
+	, _nfkbDynamics(false)
 	, _tnfKnockout(false)
 {
 	for (int i = 0; i < NOUTCOMES; i++)
@@ -59,6 +60,7 @@ void GrSimulation::serialize(std::ostream& out) const
 	out << intVal << std::endl;
 
 	out << _tnfrDynamics << std::endl;
+	out << _nfkbDynamics << std::endl;
 	out << _tnfKnockout << std::endl;
 
 	// serialize random number generator
@@ -117,6 +119,7 @@ void GrSimulation::deserialize(std::istream& in)
 	setDiffusionMethod((DiffusionMethod) intVal);
 
 	in >> _tnfrDynamics;
+	in >> _nfkbDynamics;
 	in >> _tnfKnockout;
 
 	// deserialize random number generator
@@ -199,6 +202,13 @@ void GrSimulation::init()
 	{
 		Mac* pMac = createMac(it->first, it->second,
 			g_Rand.getInt(-1, -maxMacAge), MAC_INFECTED, false, false);
+		
+		if (_nfkbDynamics)
+		{
+			// initialize NF-kB signaling from steady-state
+			for (int i = 0; i < 21600; ++i)
+				pMac->solveNFkBODEsEquilibrium(2);
+		}
 
 		pMac->setIntMtb(1);
 		_stats.incTotIntMtb(1);
@@ -220,7 +230,13 @@ void GrSimulation::init()
 		int col = g_Rand.getInt(NCOLS);
 		if (!_grid(row, col).hasMac())
 		{
-			createMac(row, col, g_Rand.getInt(-1, -maxMacAge), MAC_RESTING, false, false);
+			Mac* newMac = createMac(row, col, g_Rand.getInt(-1, -maxMacAge), MAC_RESTING, false, false);
+			if (_nfkbDynamics)
+			{
+				// initialize NF-kB signaling from steady-state
+				for (int i = 0; i < 21600; ++i)
+					newMac->solveNFkBODEsEquilibrium(2);
+			}
 			count--;
 		}
 	}
@@ -255,7 +271,11 @@ void GrSimulation::solve()
 		secreteFromTcells();
 		secreteFromCaseations();
 		_pDiffusion->diffuse(_grid);
-		if (_tnfrDynamics)
+		if (_nfkbDynamics)
+		{
+			updateReceptorAndNFkBDynamics(dt);
+		}
+		else if (_tnfrDynamics)
 		{
 			updateReceptorDynamics(dt);
 		}
@@ -388,19 +408,19 @@ void GrSimulation::computeNextStates()
 {
 	for (MacList::iterator it = _macList.begin(); it != _macList.end(); it++)
 	{
-		it->computeNextState(_time, _grid.getGrid(), _stats, _tnfrDynamics);
+		it->computeNextState(_time, _grid.getGrid(), _stats, _tnfrDynamics, _nfkbDynamics);
 	}
 	for (TgamList::iterator it = _tgamList.begin(); it != _tgamList.end(); it++)
 	{
-		it->computeNextState(_time, _grid.getGrid(), _stats, _tnfrDynamics);
+		it->computeNextState(_time, _grid.getGrid(), _stats, _tnfrDynamics, _nfkbDynamics);
 	}
 	for (TcytList::iterator it = _tcytList.begin(); it != _tcytList.end(); it++)
 	{
-		it->computeNextState(_time, _grid.getGrid(), _stats, _tnfrDynamics);
+		it->computeNextState(_time, _grid.getGrid(), _stats, _tnfrDynamics, _nfkbDynamics);
 	}
 	for (TregList::iterator it = _tregList.begin(); it != _tregList.end(); it++)
 	{
-		it->computeNextState(_time, _grid.getGrid(), _stats, _tnfrDynamics);
+		it->computeNextState(_time, _grid.getGrid(), _stats, _tnfrDynamics, _nfkbDynamics);
 	} 
 }
 
@@ -408,7 +428,7 @@ void GrSimulation::secreteFromMacrophages()
 {
 	for (MacList::iterator it = _macList.begin(); it != _macList.end(); it++)
 	{
-		it->secrete(_grid.getGrid(), _tnfrDynamics, _tnfKnockout);
+		it->secrete(_grid.getGrid(), _tnfrDynamics, _nfkbDynamics, _tnfKnockout);
 	}
 }
 
@@ -416,11 +436,11 @@ void GrSimulation::secreteFromTcells()
 {
 	for (TgamList::iterator it = _tgamList.begin(); it != _tgamList.end(); it++)
 	{
-		it->secrete(_grid.getGrid(), _tnfrDynamics, _tnfKnockout);
+		it->secrete(_grid.getGrid(), _tnfrDynamics, _nfkbDynamics, _tnfKnockout);
 	}
 	for (TcytList::iterator it = _tcytList.begin(); it != _tcytList.end(); it++)
 	{
-		it->secrete(_grid.getGrid(), _tnfrDynamics, _tnfKnockout);
+		it->secrete(_grid.getGrid(), _tnfrDynamics, _nfkbDynamics, _tnfKnockout);
 	}
 }
 
@@ -448,6 +468,29 @@ void GrSimulation::updateReceptorDynamics(double dt)
 	for (MacList::iterator it = _macList.begin(); it != _macList.end(); it++)
 	{
 		it->solveODEs(_grid.getGrid(), dt);
+	}
+	for (TgamList::iterator it = _tgamList.begin(); it != _tgamList.end(); it++)
+	{
+		it->solveODEs(_grid.getGrid(), dt);
+	}
+	for (TcytList::iterator it = _tcytList.begin(); it != _tcytList.end(); it++)
+	{
+		it->solveODEs(_grid.getGrid(), dt);
+	}
+	for (TregList::iterator it = _tregList.begin(); it != _tregList.end(); it++)
+	{
+		it->solveODEs(_grid.getGrid(), dt);
+	}
+}
+
+void GrSimulation::updateReceptorAndNFkBDynamics(double dt)
+{
+	for (MacList::iterator it = _macList.begin(); it != _macList.end(); it++)
+	{
+		for (int i = 0; i < dt; i++)
+		{
+			it->solveReceptorAndNFkBODEs(_grid.getGrid(), 1.00);
+		}
 	}
 	for (TgamList::iterator it = _tgamList.begin(); it != _tgamList.end(); it++)
 	{

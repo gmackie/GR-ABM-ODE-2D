@@ -39,8 +39,8 @@ public:
 	Treg(int birthtime, int row, int col, TregState state);
 	~Treg();
 	void move(GrGrid& grid);
-	void secrete(GrGrid& grid, bool tnfrDynamics, bool tnfKnockout);
-	void computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tnfrDynamics);
+	void secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfKnockout);
+	void computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tnfrDynamics, bool nfkbDynamics);
 	void updateState();
 	void solveODEs (GrGrid& grid, double dt);
 	TregState getState() const;

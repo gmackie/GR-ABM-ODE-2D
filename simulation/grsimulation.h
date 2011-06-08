@@ -35,6 +35,7 @@ private:
 	TTest* _pTTest[NOUTCOMES];
 	RecruitmentBase* _pRecruitment;
 	bool _tnfrDynamics;
+	bool _nfkbDynamics;
 
 	// Inhibits tnf secretion if true and if not using tnfr dynamics.
 	bool _tnfKnockout;
@@ -48,6 +49,7 @@ private:
 	void secreteFromTcells();
 	void secreteFromCaseations();
 	void updateReceptorDynamics(double dt);
+	void updateReceptorAndNFkBDynamics(double dt);
 	void adjustTNFDegradation(double dt);
 	void growExtMtb();
 	void shuffleCells();
@@ -71,6 +73,8 @@ public:
 	void setDiffusionMethod(DiffusionMethod method);
 	bool getTnfrDynamics() const;
 	void setTnfrDynamics(bool tnfrDynamics);
+	bool getNfkbDynamics() const;
+	void setNfkbDynamics(bool nfkbDynamics);
 	bool getTnfKnockout() const;
 	void setTnfKnockout(bool tnfKnockout);
 	double getAreaThreshold() const;
@@ -166,6 +170,16 @@ inline bool GrSimulation::getTnfrDynamics() const
 inline void GrSimulation::setTnfrDynamics(bool tnfrDynamics)
 {
 	_tnfrDynamics = tnfrDynamics;
+}
+
+inline bool GrSimulation::getNfkbDynamics() const
+{
+	return _nfkbDynamics;
+}
+
+inline void GrSimulation::setNfkbDynamics(bool nfkbDynamics)
+{
+	_nfkbDynamics = nfkbDynamics;
 }
 
 inline bool GrSimulation::getTnfKnockout() const

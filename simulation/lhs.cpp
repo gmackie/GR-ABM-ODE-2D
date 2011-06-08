@@ -268,11 +268,15 @@ int main(int argc, char** argv)
 	unsigned long seed;
 	bool ode;
 
+	/* set seed to current time, in case not specified */
+	time_t curTime;
+	time(&curTime);
+
 	po::options_description desc("Allowed options");
 	desc.add_options()
 		("help,h", "Help message")
 		("input-file,i", po::value<std::string>(&inputFileName), "Input file name")
-		("seed,s", po::value<unsigned long>(&seed)->default_value(1), "Seed")
+		("seed,s", po::value<unsigned long>(&seed)->default_value((unsigned long) curTime), "Seed")
 		("samples,n", po::value<int>(&nSamples), "Number of samples")
 		("ode", "Use integrated lymph node ODE for recruitment")
 		("version,v", "Version number");

@@ -11,18 +11,18 @@
 #include <fstream>
 #include <stdio.h>
 
-// For each node, its: node type, parent, text name, whether or not it is required.
-// The first element of this array is considered the root node and must be present in the parameter file as the root node.
+// For each XML element, its XML element type and text name as it appears in a parameter file.
+// The first element of this array is considered the root XML element and must be present in the parameter file as the root XML element.
 const NodeDescription ParamsBase::_element[NODE_COUNT] = {
-   // type			parent		name		required
-	{ GR_NODE, 		NULL_NODE, 	"GR" },
-	{ MAC_NODE, 	GR_NODE, 	"Mac" },
-	{ TCELL_NODE, 	GR_NODE, 	"Tcell" },
-	{ TGAM_NODE, 	TCELL_NODE, "Tgam" },
-	{ TCYT_NODE, 	TCELL_NODE, "Tcyt" },
-	{ TREG_NODE, 	TCELL_NODE, "Treg" },
-	{ MTB_NODE, 	GR_NODE,	"Mtb" },
-	{ INIT_NODE, 	GR_NODE,	"Init", }
+   // type			name
+	{ GR_NODE, 		"GR" },
+	{ MAC_NODE, 	"Mac" },
+	{ TCELL_NODE, 	"Tcell" },
+	{ TGAM_NODE, 	"Tgam" },
+	{ TCYT_NODE, 	"Tcyt" },
+	{ TREG_NODE, 	"Treg" },
+	{ MTB_NODE, 	"Mtb" },
+	{ INIT_NODE, 	"Init", }
 };
 
 const int ParamsBase::_PARAM_COUNT = PARAM_DOUBLE_COUNT + PARAM_INT_COUNT;

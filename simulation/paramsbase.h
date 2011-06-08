@@ -27,9 +27,7 @@ typedef enum {
 struct NodeDescription
 {
 	XmlElement type;
-	XmlElement parent;
 	std::string name;
-	bool required;
 };
 
 // These are used as indices into the _doubleParam array and the _description array.

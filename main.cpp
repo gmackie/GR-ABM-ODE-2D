@@ -76,6 +76,7 @@ int main(int argc, char *argv[])
 
 	bool ode;
 	bool tnfrDynamics;
+	bool nfkbDynamics;
 	bool tnfKnockout;
 	unsigned long seed;
 	bool seedSpecified;
@@ -142,6 +143,7 @@ int main(int argc, char *argv[])
 		("load-state,l",  po::value<std::string>(&stateFileName), "File name of saved state to load")
 		("ode", "Use integrated lymph node ODE for recruitment")
 		("tnfr-dynamics", "Use molecular level TNF/TNFR dynamics in the model")
+		("NFkB-dynamics", "Use molecular level intracellular NFkB dynamics in the model")
 		("tnf-knockout", "Don't secrete tnf, if not using tnfr dynamics")
 		("ln-ode", po::value<std::string>(&lymphNodeODE), "Lymph node application")
 		("ln-ode-temp", po::value<std::string>(&lymphNodeTemp), "Lymph node temp file")
@@ -179,11 +181,18 @@ int main(int argc, char *argv[])
 
 		ode = vm.count("ode");
 		tnfrDynamics = vm.count("tnfr-dynamics");
+		nfkbDynamics = vm.count("NFkB-dynamics");
 		tnfKnockout = vm.count("tnf-knockout");
 
 		if (tnfrDynamics && tnfKnockout)
 		{
 			std::cerr << "Both tnf dynamics and tnf knockout were specified. Only one is allowed."<< std::endl;
+			exit(1);
+		}
+		
+		if (nfkbDynamics && tnfKnockout)
+		{
+			std::cerr << "Both NFkB dynamics and tnf knockout were specified. Only one is allowed."<< std::endl;
 			exit(1);
 		}
 		if (!vm.count("input-file"))
@@ -320,8 +329,11 @@ int main(int argc, char *argv[])
 	else
 		itfc.getSimulation().setRecruitment(new RecruitmentLnODE(lymphNodeODE, lymphNodeTemp));
 	
-	/* set TNF/TNFR dynamics */
-	itfc.getSimulation().setTnfrDynamics(tnfrDynamics);
+	/* set TNF/TNFR and NFkB dynamics */
+	/* When NFkB is turned on, tnfr dynamics will be turned on autamatically */
+	itfc.getSimulation().setTnfrDynamics(tnfrDynamics || nfkbDynamics);
+	
+	itfc.getSimulation().setNfkbDynamics(nfkbDynamics);
 
 	itfc.getSimulation().setTnfKnockout(tnfKnockout);
 

@@ -104,7 +104,6 @@ Mac::Mac(int birthtime, int row, int col, MacState state, double intMtb, bool NF
 	, _IkBn(0.0)
 	, _IkBt(0.0)
 	, _NFkB_IkB(g_Rand.getLogNormal(_PARAM(PARAM_GR_MEAN_NFKB),0.648721*_PARAM(PARAM_GR_MEAN_NFKB)))
-	//	, _NFkB_IkB(100000)
 	, _NFkB_IkBn(0.0)
 	, _GA20(0.0)
 	, _GIkB(0.0)
@@ -158,24 +157,66 @@ void Mac::secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfKn
 	if (_deactivationTime != -1)
 	{
 		_kSynth = 0;
+		_c1rChem = 0;
+		_c1rTNF = 0;
+		_c1rrChemTNF = 0;
 		return;
 	}
-	
 	GridCell& cell = grid(_row, _col);
 	
-	if (_NFkB)
+	if (nfkbDynamics) // TNF and chemokines are secreted as a function of NFkB dynamics
 	{
-		// if NFkB is turned on, secrete TNF and chemokines
-		if (_state != MAC_RESTING)
+		if (_state == MAC_RESTING)
 		{
-			cell.incCCL2(_PARAM(PARAM_MAC_SEC_RATE_CCL2));
-			cell.incCCL5(_PARAM(PARAM_MAC_SEC_RATE_CCL5));
-			cell.incCXCL9(_PARAM(PARAM_MAC_SEC_RATE_CXCL9));
-			_kSynth = _PARAM(PARAM_GR_K_SYNTH_MAC);
-			if (!tnfrDynamics && !tnfKnockout)
-				cell.incTNF(_PARAM(PARAM_MAC_SEC_RATE_TNF));
+			_c1rChem = _PARAM(PARAM_GR_epsilon2) * _PARAM(PARAM_GR_c1r);
+			_c1rTNF = _PARAM(PARAM_GR_epsilon2) * _PARAM(PARAM_GR_c1r);
+			_c1rrChemTNF = 0;
 		}
-		else
+		else if (_state == MAC_INFECTED)
+		{
+			_c1rChem = _PARAM(PARAM_GR_c1r);
+			_c1rTNF = _PARAM(PARAM_GR_c1r);
+			_c1rrChemTNF = _PARAM(PARAM_GR_epsilon1) * _PARAM(PARAM_GR_c1r);
+			cell.incNrSecretions();
+		}
+		else if (_state == MAC_CINFECTED || _state == MAC_ACTIVE)
+		{
+			_c1rChem = _PARAM(PARAM_GR_c1r);
+			_c1rTNF = _PARAM(PARAM_GR_c1r);
+			_c1rrChemTNF = _PARAM(PARAM_GR_c1r);
+			cell.incNrSecretions();
+		}		
+	}
+	else
+	// TNF and chemokines are secreted independent of NFkB dynamics
+	{
+		if (_NFkB)
+		{
+			// if NFkB is turned on, secrete TNF and chemokines
+			if (_state != MAC_RESTING)
+			{
+				cell.incCCL2(_PARAM(PARAM_MAC_SEC_RATE_CCL2));
+				cell.incCCL5(_PARAM(PARAM_MAC_SEC_RATE_CCL5));
+				cell.incCXCL9(_PARAM(PARAM_MAC_SEC_RATE_CXCL9));
+				_kSynth = _PARAM(PARAM_GR_K_SYNTH_MAC);
+				if (!tnfrDynamics && !tnfKnockout)
+					cell.incTNF(_PARAM(PARAM_MAC_SEC_RATE_TNF));
+			}
+			else
+			{
+				cell.incCCL2(0.5 * _PARAM(PARAM_MAC_SEC_RATE_CCL2));
+				cell.incCCL5(0.5 * _PARAM(PARAM_MAC_SEC_RATE_CCL5));
+				cell.incCXCL9(0.5 * _PARAM(PARAM_MAC_SEC_RATE_CXCL9));
+				_kSynth = 0.5 * _PARAM(PARAM_GR_K_SYNTH_MAC);
+				if (!tnfrDynamics && !tnfKnockout)
+					cell.incTNF(0.5 * _PARAM(PARAM_MAC_SEC_RATE_TNF));
+			}
+		
+			cell.incNrSecretions();
+		}
+		else if (_state == MAC_RESTING)
+			_kSynth = 0.0;
+		else if (_state == MAC_INFECTED)
 		{
 			cell.incCCL2(0.5 * _PARAM(PARAM_MAC_SEC_RATE_CCL2));
 			cell.incCCL5(0.5 * _PARAM(PARAM_MAC_SEC_RATE_CCL5));
@@ -183,22 +224,9 @@ void Mac::secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfKn
 			_kSynth = 0.5 * _PARAM(PARAM_GR_K_SYNTH_MAC);
 			if (!tnfrDynamics && !tnfKnockout)
 				cell.incTNF(0.5 * _PARAM(PARAM_MAC_SEC_RATE_TNF));
+		
+			cell.incNrSecretions();
 		}
-		
-		cell.incNrSecretions();
-	}
-	else if (_state == MAC_RESTING)
-		_kSynth = 0.0;
-	else if (_state == MAC_INFECTED)
-	{
-		cell.incCCL2(0.5 * _PARAM(PARAM_MAC_SEC_RATE_CCL2));
-		cell.incCCL5(0.5 * _PARAM(PARAM_MAC_SEC_RATE_CCL5));
-		cell.incCXCL9(0.5 * _PARAM(PARAM_MAC_SEC_RATE_CXCL9));
-		_kSynth = 0.5 * _PARAM(PARAM_GR_K_SYNTH_MAC);
-		if (!tnfrDynamics && !tnfKnockout)
-			cell.incTNF(0.5 * _PARAM(PARAM_MAC_SEC_RATE_TNF));
-		
-		cell.incNrSecretions();
 	}
 }
 
@@ -295,10 +323,10 @@ void Mac::computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tnf
 				_nextState = MAC_DEAD;
 				break;
 			case MAC_RESTING:
-				handleResting(time, grid, stats);
+				handleResting(time, grid, stats, nfkbDynamics);
 				break;
 			case MAC_INFECTED:
-				handleInfected(time, grid, stats);
+				handleInfected(time, grid, stats, nfkbDynamics);
 				break;
 			case MAC_CINFECTED:
 				handleChronicallyInfected(time, grid, stats);
@@ -619,7 +647,7 @@ void Mac::solveNFkBODEsEquilibrium(double dt)
 	 */
 }
 
-void Mac::handleResting(const int time, GrGrid& grid, GrStat&)
+void Mac::handleResting(const int time, GrGrid& grid, GrStat&, bool nfkbDynamics)
 {
 	GridCell& cell = grid(_row, _col);
 
@@ -655,7 +683,28 @@ void Mac::handleResting(const int time, GrGrid& grid, GrStat&)
 	}
 
 	// macrophage may become activated
-	if (_stat1 && _NFkB)
+	if (nfkbDynamics) // macrophage activation dynamics follow NFkB dynamics
+	{
+		if (_stat1)
+		{
+			if (getExtMtbInMoore(grid) > _PARAM(PARAM_MAC_THRESHOLD_NFKB_EXTMTB))
+			{
+				_intMtb = 0;
+				_activationTime = time;
+				_deathTime = time + _PARAM(PARAM_MAC_A_AGE);
+				_nextState = MAC_ACTIVE;
+			}
+			else if (_normalizedACT > _PARAM(PARAM_GR_ACT_THRESHOLD) &&
+					 g_Rand.getReal() < 1 - pow(2.7183, -_PARAM(PARAM_GR_ACT_K) * (_normalizedACT - _PARAM(PARAM_GR_ACT_THRESHOLD))))
+			{
+				_intMtb = 0;
+				_activationTime = time;
+				_deathTime = time + _PARAM(PARAM_MAC_A_AGE);
+				_nextState = MAC_ACTIVE;
+			}
+		}
+	}
+	else if (_stat1 && _NFkB)
 	{
 		_intMtb = 0;
 		_activationTime = time;
@@ -664,7 +713,7 @@ void Mac::handleResting(const int time, GrGrid& grid, GrStat&)
 	}
 }
 
-void Mac::handleInfected(const int time, GrGrid& grid, GrStat&)
+void Mac::handleInfected(const int time, GrGrid& grid, GrStat&, bool nfkbDynamics)
 {
 	GridCell& cell = grid(_row, _col);
 
@@ -693,16 +742,45 @@ void Mac::handleInfected(const int time, GrGrid& grid, GrStat&)
 		_stat1 |= g_Rand.getReal() <
 			getCountTgam(TGAM_ACTIVE, grid) * _PARAM(PARAM_MAC_PROB_STAT1_TGAM);
 
-		if (_stat1 && _NFkB)
+		// macrophage may become activated
+		if (nfkbDynamics) // macrophage activation dynamics follow NFkB dynamics
 		{
-			_intMtb = 0;
-			_activationTime = time;
-			_deathTime = time + _PARAM(PARAM_MAC_A_AGE);
-			_nextState = MAC_ACTIVE;
+			if (_stat1)
+			{
+				if (getExtMtbInMoore(grid) > _PARAM(PARAM_MAC_THRESHOLD_NFKB_EXTMTB))
+				{
+					_intMtb = 0;
+					_activationTime = time;
+					_deathTime = time + _PARAM(PARAM_MAC_A_AGE);
+					_nextState = MAC_ACTIVE;
+				}
+				else if (_normalizedACT > _PARAM(PARAM_GR_ACT_THRESHOLD) &&
+						 g_Rand.getReal() < 1 - pow(2.7183, -_PARAM(PARAM_GR_ACT_K) * (_normalizedACT - _PARAM(PARAM_GR_ACT_THRESHOLD))))
+				{
+					_intMtb = 0;
+					_activationTime = time;
+					_deathTime = time + _PARAM(PARAM_MAC_A_AGE);
+					_nextState = MAC_ACTIVE;
+				}
+				else 
+				{
+					_nextState = MAC_INFECTED;
+				}
+			}
 		}
-		else
+		else 
 		{
-			_nextState = MAC_INFECTED;
+			if (_stat1 && _NFkB)
+			{
+				_intMtb = 0;
+				_activationTime = time;
+				_deathTime = time + _PARAM(PARAM_MAC_A_AGE);
+				_nextState = MAC_ACTIVE;
+			}
+			else
+			{
+				_nextState = MAC_INFECTED;
+			}
 		}
 	}
 }

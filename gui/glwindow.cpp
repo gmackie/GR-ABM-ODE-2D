@@ -204,6 +204,8 @@ QString GLWindow::getAgentStr(const Agent* pAgent)
 		res += QString(", Bi = %1").arg(pMac->getIntMtb(), 0, 'f', 2);
 		
 		res += QString(", [sTNF/TNFR1] = %1").arg(pMac->getSurfBoundTNFR1(), 0, 'f', 2);
+		
+		res += QString(", norACT = %1").arg(pMac->getNormalizedACT(), 0, 'f', 2);
 	}
 	else if (Tgam::isTgam(pAgent))
 	{
@@ -251,7 +253,7 @@ QString GLWindow::getAgentStr(const Agent* pAgent)
 	if (!res.isEmpty())
 	{
 		int days, hours, minutes;
-		GrSimulation::convertSimTime(pAgent->getBirthTime(), days, hours, minutes);
+/*		GrSimulation::convertSimTime(pAgent->getBirthTime(), days, hours, minutes);
 
 		if (pAgent->getBirthTime() < 0)
 		{
@@ -263,7 +265,7 @@ QString GLWindow::getAgentStr(const Agent* pAgent)
 			res += QString(", birth = %1d%2h%3m").arg(days, 3, 10, QChar('0')).
 				arg(hours, 2, 10, QChar('0')).arg(minutes, 2, 10, QChar('0'));
 		}
-
+*/
 		GrSimulation::convertSimTime(pAgent->getDeathTime(), days, hours, minutes);
 
 		if (pAgent->getDeathTime() < 0)

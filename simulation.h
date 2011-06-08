@@ -81,6 +81,7 @@ public:
 	void setRecruitment(RecruitmentBase* pRecruitment);
 	
 	void setTnfrDynamics(bool tnfrDynamics);
+	void setNfkbDynamics(bool nfkbDynamics);
 	void setTnfKnockout(bool tnfKnockout);
 
 	static QString getTimeStr(int simTime, int time);
@@ -256,6 +257,11 @@ inline void Simulation::setRecruitment(RecruitmentBase* pRecruitment)
 inline void Simulation::setTnfrDynamics(bool tnfrDynamics)
 {
 	_gr.setTnfrDynamics(tnfrDynamics);
+}
+
+inline void Simulation::setNfkbDynamics(bool nfkbDynamics)
+{
+	_gr.setNfkbDynamics(nfkbDynamics);
 }
 
 inline QString Simulation::getTimeStr(int simTime, int time)

@@ -69,8 +69,8 @@ private:
 	double _IAPt; // transcript of IAP (inhibitor of apoptosis)
 	double _IAP; 
 	
-	void handleResting(const int time, GrGrid& grid, GrStat& stats);
-	void handleInfected(const int time, GrGrid& grid, GrStat& stats);
+	void handleResting(const int time, GrGrid& grid, GrStat& stats, bool nfkbDynamics);
+	void handleInfected(const int time, GrGrid& grid, GrStat& stats, bool nfkbDynamics);
 	void handleChronicallyInfected(const int time, GrGrid& grid, GrStat& stats);
 	void handleActivated(const int time, GrGrid& grid, GrStat& stats);
 	int getCountTgam(TgamState state, const GrGrid& grid) const;

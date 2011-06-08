@@ -354,23 +354,26 @@ int run(unsigned long seed, const std::string& inputFileName, const std::string&
 		// Display and write output at the requested interval, and after the last time step.
         if (stateInterval > 0 && time % stateInterval == 0)
             saveState(&sim, time, lhs ? outputFileName : ".");
-		if (screenDisplay && (csvInterval <= 0 || time % csvInterval == 0 || time == timeToSimulate))
+		if (csvInterval <= 0 || time % csvInterval == 0 || time == timeToSimulate)
 		{
-//			printf("%d\t %d - (%d,%d,%d,%d,%d)\t%d - (%d,%d,%d)\t%d - (%d,%d,%d)\t%d - (%d,%d)\t(%f,%f)\t(%f,%f,%f,%f)\n",
-			printf("%d\t %d - (%d,%d,%d,%d,%d)\t%d - (%d,%d,%d)\t%d - (%d,%d,%d)\t%d - (%d,%d)\t(%f,%f)\t(%f,%f,%f,%f)\t(%d,%d,%d,%d)\t%d %f\n",
-				sim.getTime(),
-				stats.getNrOfMac(), stats.getNrOfMacResting(), stats.getNrOfMacInfected(),
-				stats.getNrOfMacCInfected(), stats.getNrOfMacActive(), stats.getNrOfMacDead(),
-				stats.getNrOfTgam(), stats.getNrOfTgamActive(),	stats.getNrOfTgamDownRegulated(),
-				stats.getNrOfTgamDead(), stats.getNrOfTcyt(), stats.getNrOfTcytActive(),
-				stats.getNrOfTcytDownRegulated(), stats.getNrOfTcytDead(),
-				stats.getNrOfTreg(), stats.getNrOfTregActive(), stats.getNrOfTregDead(),
-				stats.getTotExtMtb(), stats.getTotIntMtb(),
-				stats.getTotTNF() / (NROWS*NCOLS), stats.getTotCCL2() / (NROWS*NCOLS),
-				stats.getTotCCL5() / (NROWS*NCOLS), stats.getTotCXCL9() / (NROWS*NCOLS),
-				stats.getNrSourcesMac(), stats.getNrSourcesTgam(), stats.getNrSourcesTcyt(), stats.getNrSourcesTreg(),
-				stats.getNrCaseated(), stats.getTotNonRepExtMtb()
-			);
+			if (screenDisplay)
+			{
+	//			printf("%d\t %d - (%d,%d,%d,%d,%d)\t%d - (%d,%d,%d)\t%d - (%d,%d,%d)\t%d - (%d,%d)\t(%f,%f)\t(%f,%f,%f,%f)\n",
+				printf("%d\t %d - (%d,%d,%d,%d,%d)\t%d - (%d,%d,%d)\t%d - (%d,%d,%d)\t%d - (%d,%d)\t(%f,%f)\t(%f,%f,%f,%f)\t(%d,%d,%d,%d)\t%d %f\n",
+					sim.getTime(),
+					stats.getNrOfMac(), stats.getNrOfMacResting(), stats.getNrOfMacInfected(),
+					stats.getNrOfMacCInfected(), stats.getNrOfMacActive(), stats.getNrOfMacDead(),
+					stats.getNrOfTgam(), stats.getNrOfTgamActive(),	stats.getNrOfTgamDownRegulated(),
+					stats.getNrOfTgamDead(), stats.getNrOfTcyt(), stats.getNrOfTcytActive(),
+					stats.getNrOfTcytDownRegulated(), stats.getNrOfTcytDead(),
+					stats.getNrOfTreg(), stats.getNrOfTregActive(), stats.getNrOfTregDead(),
+					stats.getTotExtMtb(), stats.getTotIntMtb(),
+					stats.getTotTNF() / (NROWS*NCOLS), stats.getTotCCL2() / (NROWS*NCOLS),
+					stats.getTotCCL5() / (NROWS*NCOLS), stats.getTotCXCL9() / (NROWS*NCOLS),
+					stats.getNrSourcesMac(), stats.getNrSourcesTgam(), stats.getNrSourcesTcyt(), stats.getNrSourcesTreg(),
+					stats.getNrCaseated(), stats.getTotNonRepExtMtb()
+				);
+			}
 
         	if (outputFileStream.good())
 			{

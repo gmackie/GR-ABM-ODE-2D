@@ -606,15 +606,14 @@ void MainWindow::timerEvent(QTimerEvent*)
 	emit updateGL();
 
 	// take remaining snapshots
-
-	// So the simulation doesn't advance while we are saving data.
-	// Specifically needed when saving the simulation state, since that
-	// uses the GrSimulation object, not the data saved from GrSimulation
-	// in the MainInterface object.
-	sim.modelLock();
-
 	if (_pSnapshot)
 	{
+		// So the simulation doesn't advance while we are saving data.
+		// Specifically needed when saving the simulation state, since that
+		// uses the GrSimulation object, not the data saved from GrSimulation
+		// in the MainInterface object.
+		sim.modelLock();
+
 		int picInterval = _ui.spinBoxSnapshotPicInterval->value();
 		int csvInterval = _ui.spinBoxSnapshotCsvInterval->value();
 		int stateInterval = _ui.spinBoxSnapshotStateInterval->value();
@@ -633,9 +632,10 @@ void MainWindow::timerEvent(QTimerEvent*)
 		{
 			_pSnapshot->takeStateSnapshot(simTime, sim);
 		}
+
+		sim.modelUnlock();
 	}
 
-	sim.modelUnlock();
 }
 
 // Determine whether or not an action should be taken on this time step,

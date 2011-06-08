@@ -32,10 +32,10 @@ void ParamWindow::newItem(QTreeWidgetItem* pParentItem, ParamDoubleType param)
 	const Params* params = Params::getInstance();
 
 	QTreeWidgetItem* pItem = new QTreeWidgetItem(pParentItem, param);
-	pItem->setText(0, QString("%1").arg(params->getName(param)));
+	pItem->setText(0, QString("%1").arg(params->getName(param).c_str()));
 	pItem->setText(1, QString("%1").arg(params->getParam(param)));
-	pItem->setText(2, QString("%1").arg(params->getUnit(param)));
-	pItem->setText(3, QString("%1").arg(params->getDescription(param)));
+	pItem->setText(2, QString("%1").arg(params->getUnit(param).c_str()));
+	pItem->setText(3, QString("%1").arg(params->getDescription(param).c_str()));
 }
 
 void ParamWindow::newItem(QTreeWidgetItem* pParentItem, ParamIntType param)
@@ -43,10 +43,10 @@ void ParamWindow::newItem(QTreeWidgetItem* pParentItem, ParamIntType param)
 	const Params* params = Params::getInstance();
 
 	QTreeWidgetItem* pItem = new QTreeWidgetItem(pParentItem);
-	pItem->setText(0, QString("%1").arg(params->getName(param)));
+	pItem->setText(0, QString("%1").arg(params->getName(param).c_str()));
 	pItem->setText(1, QString("%1").arg(params->getParam(param)));
-	pItem->setText(2, QString("%1").arg(params->getUnit(param)));
-	pItem->setText(3, QString("%1").arg(params->getDescription(param)));
+	pItem->setText(2, QString("%1").arg(params->getUnit(param).c_str()));
+	pItem->setText(3, QString("%1").arg(params->getDescription(param).c_str()));
 }
 
 void ParamWindow::update()

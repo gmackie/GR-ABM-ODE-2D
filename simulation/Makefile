@@ -13,25 +13,25 @@ endif
 
 all: gr
 
-gr: params.o rand.o agent.o gr.o grsimulationgrid.o grgrid.o gridcell.o macrophage.o grmain.o grstat.o grsimulation.o onlinestat.o grdiffusion.o grdiffusionftcs.o grdiffusionbtcs.o grdiffusionwrongbtcs.o grdiffusionftcsswap.o ttest.o areatest.o mtbtest.o tcell.o tcytotoxic.o tgamma.o tregulatory.o recruitmentbase.o recruitmentprob.o recruitmentlnode.o recruitmentlnodepure.o tinyxml/tinystr.o tinyxml/tinyxml.o tinyxml/tinyxmlerror.o tinyxml/tinyxmlparser.o
+gr: paramsbase.o params.o rand.o agent.o gr.o grsimulationgrid.o grgrid.o gridcell.o macrophage.o grmain.o grstat.o grsimulation.o onlinestat.o grdiffusion.o grdiffusionftcs.o grdiffusionbtcs.o grdiffusionwrongbtcs.o grdiffusionftcsswap.o ttest.o areatest.o mtbtest.o tcell.o tcytotoxic.o tgamma.o tregulatory.o recruitmentbase.o recruitmentprob.o recruitmentlnode.o recruitmentlnodepure.o tinyxml/tinystr.o tinyxml/tinyxml.o tinyxml/tinyxmlerror.o tinyxml/tinyxmlparser.o
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
-gr1: params.o rand.o agent.o gr.o grsimulationgrid.o grgrid.o gridcell.o macrophage.o grmain.o grstat.o grsimulation.o onlinestat.o grdiffusion.o grdiffusionftcs.o grdiffusionbtcs.o grdiffusionwrongbtcs.o grdiffusionftcsswap.o ttest.o areatest.o mtbtest.o tcell.o tcytotoxic.o tgamma.o tregulatory.o recruitmentbase.o recruitmentprob.o recruitmentlnode.o recruitmentlnodepure.o tinyxml/tinystr.o tinyxml/tinyxml.o tinyxml/tinyxmlerror.o tinyxml/tinyxmlparser.o
+gr1: paramsbase.o params.o rand.o agent.o gr.o grsimulationgrid.o grgrid.o gridcell.o macrophage.o grmain.o grstat.o grsimulation.o onlinestat.o grdiffusion.o grdiffusionftcs.o grdiffusionbtcs.o grdiffusionwrongbtcs.o grdiffusionftcsswap.o ttest.o areatest.o mtbtest.o tcell.o tcytotoxic.o tgamma.o tregulatory.o recruitmentbase.o recruitmentprob.o recruitmentlnode.o recruitmentlnodepure.o tinyxml/tinystr.o tinyxml/tinyxml.o tinyxml/tinyxmlerror.o tinyxml/tinyxmlparser.o
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
-gr2: params.o rand.o agent.o gr.o grsimulationgrid.o grgrid.o gridcell.o macrophage.o grmain.o grstat.o grsimulation.o onlinestat.o grdiffusion.o grdiffusionftcs.o grdiffusionbtcs.o grdiffusionwrongbtcs.o grdiffusionftcsswap.o ttest.o areatest.o mtbtest.o tcell.o tcytotoxic.o tgamma.o tregulatory.o recruitmentbase.o recruitmentprob.o recruitmentlnode.o recruitmentlnodepure.o tinyxml/tinystr.o tinyxml/tinyxml.o tinyxml/tinyxmlerror.o tinyxml/tinyxmlparser.o
+gr2: paramsbase.o params.o rand.o agent.o gr.o grsimulationgrid.o grgrid.o gridcell.o macrophage.o grmain.o grstat.o grsimulation.o onlinestat.o grdiffusion.o grdiffusionftcs.o grdiffusionbtcs.o grdiffusionwrongbtcs.o grdiffusionftcsswap.o ttest.o areatest.o mtbtest.o tcell.o tcytotoxic.o tgamma.o tregulatory.o recruitmentbase.o recruitmentprob.o recruitmentlnode.o recruitmentlnodepure.o tinyxml/tinystr.o tinyxml/tinyxml.o tinyxml/tinyxmlerror.o tinyxml/tinyxmlparser.o
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
-gr3: params.o rand.o agent.o gr.o grsimulationgrid.o grgrid.o gridcell.o macrophage.o grmain.o grstat.o grsimulation.o onlinestat.o grdiffusion.o grdiffusionftcs.o grdiffusionbtcs.o grdiffusionwrongbtcs.o grdiffusionftcsswap.o ttest.o areatest.o mtbtest.o tcell.o tcytotoxic.o tgamma.o tregulatory.o recruitmentbase.o recruitmentprob.o recruitmentlnode.o recruitmentlnodepure.o tinyxml/tinystr.o tinyxml/tinyxml.o tinyxml/tinyxmlerror.o tinyxml/tinyxmlparser.o
+gr3: paramsbase.o params.o rand.o agent.o gr.o grsimulationgrid.o grgrid.o gridcell.o macrophage.o grmain.o grstat.o grsimulation.o onlinestat.o grdiffusion.o grdiffusionftcs.o grdiffusionbtcs.o grdiffusionwrongbtcs.o grdiffusionftcsswap.o ttest.o areatest.o mtbtest.o tcell.o tcytotoxic.o tgamma.o tregulatory.o recruitmentbase.o recruitmentprob.o recruitmentlnode.o recruitmentlnodepure.o tinyxml/tinystr.o tinyxml/tinyxml.o tinyxml/tinyxmlerror.o tinyxml/tinyxmlparser.o
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
-gr4: params.o rand.o agent.o gr.o grsimulationgrid.o grgrid.o gridcell.o macrophage.o grmain.o grstat.o grsimulation.o onlinestat.o grdiffusion.o grdiffusionftcs.o grdiffusionbtcs.o grdiffusionwrongbtcs.o grdiffusionftcsswap.o ttest.o areatest.o mtbtest.o tcell.o tcytotoxic.o tgamma.o tregulatory.o recruitmentbase.o recruitmentprob.o recruitmentlnode.o recruitmentlnodepure.o tinyxml/tinystr.o tinyxml/tinyxml.o tinyxml/tinyxmlerror.o tinyxml/tinyxmlparser.o
+gr4: paramsbase.o params.o rand.o agent.o gr.o grsimulationgrid.o grgrid.o gridcell.o macrophage.o grmain.o grstat.o grsimulation.o onlinestat.o grdiffusion.o grdiffusionftcs.o grdiffusionbtcs.o grdiffusionwrongbtcs.o grdiffusionftcsswap.o ttest.o areatest.o mtbtest.o tcell.o tcytotoxic.o tgamma.o tregulatory.o recruitmentbase.o recruitmentprob.o recruitmentlnode.o recruitmentlnodepure.o tinyxml/tinystr.o tinyxml/tinyxml.o tinyxml/tinyxmlerror.o tinyxml/tinyxmlparser.o
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
-lhs: gr.o params.o tinyxml/tinystr.o tinyxml/tinyxml.o tinyxml/tinyxmlerror.o tinyxml/tinyxmlparser.o lhs.o rand.o
+lhs: gr.o paramsbase.o params.o tinyxml/tinystr.o tinyxml/tinyxml.o tinyxml/tinyxmlerror.o tinyxml/tinyxmlparser.o lhs.o rand.o
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
-par2csv: gr.o params.o tinyxml/tinystr.o tinyxml/tinyxml.o tinyxml/tinyxmlerror.o tinyxml/tinyxmlparser.o par2csv.o rand.o
+par2csv: gr.o paramsbase.o params.o tinyxml/tinystr.o tinyxml/tinyxml.o tinyxml/tinyxmlerror.o tinyxml/tinyxmlparser.o par2csv.o rand.o
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
 #Makefile.depend: *.h *.cpp Makefile

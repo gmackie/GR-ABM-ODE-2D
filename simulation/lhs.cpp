@@ -6,119 +6,116 @@
  */
 
 #include "lhs.h"
-#include "params.h"
 #include <boost/program_options.hpp>
+#include <iostream>
+#include <fstream>
 #include <stdio.h>
+#include <stack>
 
 namespace po = boost::program_options;
 
+/*
+ * The lhs program calls lhs::init which calls Params::fromXml to read an LHS parameter file.
+ * The calls to readParam functions in fromXml and its sub-functions call the readParam functions
+ * here, which read parameter ranges (i.e. [min,max]) rather than individual parameters. The ranges
+ * are stored in the _lhsDoubleParam and _lhsIntParam arrays. Any parameters not present in the
+ * LHS parameter file have a range of [0,0].
+ *
+ * Then function Lhs:performLhs is called which uses the range arrays to generate the specified
+ * regular parameter files. Function Params::toXml is called for each parameter file to be created.
+ * Function toXml only writes parameters to the generated parameter file that had a range explicitly
+ * specified in the LHS parameter file and that are known to the Params class as defined parameters
+ * (i.e. have an entry in the Params::_description array).
+ */
+
 Lhs::Lhs(int nSamples, bool ode)
-	: Params(false, ode)
+	: ParamsBase(ode)
 	, _nSamples(nSamples)
 	, _lhsDoubleParam()
 	, _lhsIntParam()
 {
 }
 
-bool Lhs::readParam(const TiXmlElement* pElement, ParamDoubleType param, bool prob)
+bool Lhs::readParam(const TiXmlElement* pElement, const TiXmlAttribute* pAttrib,  ParamDoubleType param)
 {
-	const char* paramName = getName(param);
-	const char* str = pElement->Attribute(paramName);
-	if (!str)
-	{
-		std::cerr << "Expected attribute '" << pElement->Value() << "/@"
-			<< paramName << "'" << std::endl;
-		return false;
-	}
-
 	LhsDoubleParam& range = _lhsDoubleParam[param];
+	const char* str  = pAttrib->Value();
 
 	char c;
 	if (sscanf(str, "[%lf, %lf]%c", &range._min, &range._max, &c) != 2)
 	{
-		std::cerr << "Value of attribute '" << pElement->Value() << "/@"
-			<< paramName << "' must be a double range ([%lf, %lf])" << std::endl;
+		std::cerr << "Value '" << str << "' of attribute '" << pElement->Value() << "/@"
+			<< pAttrib->Name() << "' must be a double range ([%lf, %lf])" << std::endl;
 		return false;
 	}
 
-	if (prob && !(0 <= range._min && range._min <= 1 && 0 <= range._max && range._max <= 1))
+	if (_description[param].probPos && !(0 <= range._min && range._min <= 1 && 0 <= range._max && range._max <= 1))
 	{
-		std::cerr << "Values of attribute '" << pElement->Value() << "/@"
-			<< paramName << "' must be in the range [0,1]" << std::endl;
+		std::cerr << "Values '" << str << "' of attribute '" << pElement->Value() << "/@"
+			<< pAttrib->Name() << "' must be in the range [0,1]" << std::endl;
 		return false;
 	}
 
 	return true;
 }
 
-// Ignore unspecified parameters with default values.
-bool Lhs::readParam(const TiXmlElement* pElement, ParamDoubleType param, double defaultVal, bool prob)
+bool Lhs::readParam(const TiXmlElement* pElement, const TiXmlAttribute* pAttrib,  ParamIntType param)
 {
-	const char* paramName = getName(param);
-	if (pElement->Attribute( paramName ))
-	{
-		bool res = readParam(pElement, param, prob);
-		return res;
-	}
-	else
-	{
-		return true;
-	}
-}
-
-bool Lhs::readParam(const TiXmlElement* pElement, ParamIntType param, bool pos)
-{
-	const char* paramName = getName(param);
-	const char* str = pElement->Attribute(paramName);
-	if (!str)
-	{
-		std::cerr << "Expected attribute '" << pElement->Value() << "/@"
-			<< paramName << "'" << std::endl;
-		return false;
-	}
-
-	LhsIntParam& range = _lhsIntParam[param];
+	LhsIntParam& range = _lhsIntParam[intIndex(param)];
+	const char* str  = pAttrib->Value();
 
 	char c;
+	bool pos = _description[param].probPos;
 	if (sscanf(str, "[%d, %d]%c", &range._min, &range._max, &c) != 2)
 	{
-		std::cerr << "Value of attribute '" << pElement->Value() << "/@"
-			<< paramName << "' must be a" << (pos ? " positive" : "n") <<
+		std::cerr << "Value '" << str << "' of attribute '" << pElement->Value() << "/@"
+			<< pAttrib->Name() << "' must be a" << (pos ? " positive" : "n") <<
 			" integer in the range ([%d, %d])" << std::endl;
 		return false;
 	}
 
 	if (pos && !(0 <= range._min && 0 <= range._max))
 	{
-		std::cerr << "Value of attribute '" << pElement->Value() << "/@"
-			<< paramName << "' must be a" << (pos ? " positive" : "n") <<
-			" integer in the range ([%d, %d])" << std::endl;
+		std::cerr << "Value '" << str << "' of attribute '" << pElement->Value() << "/@"
+			<< pAttrib->Name() << "' must be a positive integer in the range ([%d, %d])" << std::endl;
 		return false;
 	}
 
 	return true;
 }
 
-// Ignore unspecified parameters with default values.
-bool Lhs::readParam(const TiXmlElement* pElement, ParamIntType param, int defaultVal, bool pos)
-{
-	const char* paramName = getName(param);
-	if (pElement->Attribute( paramName ))
-	{
-		bool res = readParam(pElement, param, pos);
-		return res;
-	}
-	else
-	{
-		return true;
-	}
-}
-
 bool Lhs::init(const char* filename)
 {
-	return fromXml(filename);
+	if (!fromXml(filename))
+	{
+		return false;
+	}
+
+	// Initialize the range arrays for those parameters that were not present in the parameter file
+	// and for which default values are to be used. Without this parameter checks on a generated
+	// parameter file might fail.
+	for (int i = 0; i < _PARAM_COUNT; i++)
+	{
+		if (_description[i].useDefault && !_paramsRead[i])
+		{
+			if (isDouble(i))
+			{
+				_lhsDoubleParam[i]._min = _description[i].doubleDefault;
+				_lhsDoubleParam[i]._max = _description[i].doubleDefault;
+			}
+			else
+			{
+				_lhsIntParam[intIndex(i)]._min = _description[i].intDefault;
+				_lhsIntParam[intIndex(i)]._max = _description[i].intDefault;
+			}
+		}
+	}
+
+	return true;
 }
 
+// Enforce that the CCL5 secretion rate is the same as the CCL2 secretion rate,
+// and that the CXCL9 secretion rate is twice the CCL2 rate.
 void Lhs::updateParamDouble(ParamDoubleType param, double val)
 {
 	switch (param)
@@ -204,20 +201,54 @@ void Lhs::performLhs()
 			}
 			else
 			{
-				ParamIntType param = (ParamIntType) (j - PARAM_DOUBLE_COUNT);
+				ParamIntType param = (ParamIntType) intIndex(j);
 				setParam(param, k);
 			}
 		}
 
-		if (!getUseRecruitmentWeights())
-			updateRecruitmentWeights();
+		bool res = checkParams();
+		if (!res)
+		{
+			std::cerr << "Parameter check failed for generated parameter file " << (i+1) << "." << std::endl;
+		}
 
-		// Number the parameter files wrttin from 1, not 0.
+		// Number the generated parameter files from 1, not 0.
 		// Ex. 1.xml, 2.xml,... rather than 0.xml, 1.xml,...
 		char buf[1024];
 		sprintf(buf, "%d.xml", i+1);
 		toXml(buf);
 	}
+}
+
+bool Lhs::checkParams() const
+{
+	bool res = true;
+	res &= ParamsBase::checkParams();
+
+	// Check that each generated parameter value is in its proper range.
+	for (int i = 0; i < _PARAM_COUNT; i++)
+	{
+		if (isDouble(i))
+		{
+			if (_doubleParam[i] < _lhsDoubleParam[i]._min || _doubleParam[i] > _lhsDoubleParam[i]._max)
+			{
+				std::cerr << "Generated value of " << _doubleParam[i] << " for parameter " << _description[i].name
+						  << " is outside the specified range of ["  << _lhsDoubleParam[i]._min << ", " << _lhsDoubleParam[i]._max << "]." << std::endl;
+				res = false;
+			}
+		}
+		else
+		{
+			if (_intParam[intIndex(i)] < _lhsIntParam[intIndex(i)]._min || _intParam[intIndex(i)] > _lhsIntParam[intIndex(i)]._max)
+			{
+				std::cerr << "Generated value of " << _intParam[intIndex(i)] << " for parameter " << _description[i].name
+						  << " is outside the specified range of ["  << _lhsIntParam[intIndex(i)]._min << ", " << _lhsIntParam[intIndex(i)]._max << "]." << std::endl;
+				res = false;
+			}
+		}
+	}
+
+	return res;
 }
 
 void printUsage(char* pArgv0, po::options_description& desc)

@@ -6,7 +6,9 @@ CONFIG += debug_and_release
 QT += core \
     gui \
     opengl
-HEADERS += simulation/grdiffusionftcsswap.h \
+HEADERS += simulation/params.h \
+    simulation/paramsbase.h \
+    simulation/grdiffusionftcsswap.h \
     simulation/grsimulationgrid.h \
     simulation/tinyxml/tinyxml.h \
     simulation/tinyxml/tinystr.h \
@@ -64,7 +66,6 @@ HEADERS += simulation/grdiffusionftcsswap.h \
     simulation/macrophage.h \
     simulation/mtbtest.h \
     simulation/onlinestat.h \
-    simulation/params.h \
     simulation/rand.h \
     simulation/tcell.h \
     simulation/tcytotoxic.h \
@@ -86,7 +87,9 @@ HEADERS += simulation/grdiffusionftcsswap.h \
     maininterface.h \
     simulation.h \
     snapshot.h
-SOURCES += simulation/grdiffusionftcsswap.cpp \
+SOURCES += simulation/params.cpp \
+    simulation/paramsbase.cpp \
+    simulation/grdiffusionftcsswap.cpp \
     simulation/grsimulationgrid.cpp \
     simulation/tinyxml/tinyxmlparser.cpp \
     simulation/tinyxml/tinyxmlerror.cpp \
@@ -129,7 +132,6 @@ SOURCES += simulation/grdiffusionftcsswap.cpp \
     simulation/grsimulation.cpp \
     simulation/gr.cpp \
     simulation/macrophage.cpp \
-    simulation/params.cpp \
     simulation/tcell.cpp \
     simulation/tcytotoxic.cpp \
     simulation/tgamma.cpp \

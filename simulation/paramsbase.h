@@ -41,6 +41,7 @@ typedef enum {
 	PARAM_GR_MAX_CHEMOTAXIS,
 	PARAM_TGAM_SEC_RATE_TNF,
 	PARAM_TCYT_SEC_RATE_TNF,
+
 	// molecular TNF-associated parameters
 	PARAM_GR_K_SYNTH_MAC,
 	PARAM_GR_K_SYNTH_TCELL,
@@ -68,6 +69,7 @@ typedef enum {
 	PARAM_GR_MAX_TNFR2_TCELL,
 	PARAM_GR_MIN_TNFR2_TCELL,
 	// end of molecular TNF-associated parameters
+
 	// intracellular NFkB signaling pathway parameters
 	PARAM_GR_KN,
 	PARAM_GR_KNN,
@@ -120,6 +122,7 @@ typedef enum {
 	PARAM_GR_c4IAP,
 	PARAM_GR_c5IAP,
 	// End of intracellular NFkB signaling pathway parameters
+
 	PARAM_GR_THRESHOLD_APOPTOSIS_TNF,
 	PARAM_GR_K_APOPTOSIS,
 	PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR,

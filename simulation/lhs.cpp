@@ -10,7 +10,6 @@
 #include <iostream>
 #include <fstream>
 #include <stdio.h>
-#include <stack>
 
 namespace po = boost::program_options;
 
@@ -228,7 +227,8 @@ bool Lhs::checkParams() const
 	// Check that each generated parameter value is in its proper range.
 	for (int i = 0; i < _PARAM_COUNT; i++)
 	{
-		if (isDouble(i))
+		// Don't check parameters calculated in updateParamDouble since they might not match any range specified.
+		if (isDouble(i) && (i != PARAM_MAC_SEC_RATE_CCL5) && (i != PARAM_MAC_SEC_RATE_CXCL9))
 		{
 			if (_doubleParam[i] < _lhsDoubleParam[i]._min || _doubleParam[i] > _lhsDoubleParam[i]._max)
 			{

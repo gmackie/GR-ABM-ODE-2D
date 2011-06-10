@@ -62,7 +62,7 @@ void ParamWindow::processElement(const TiXmlElement* pElement, QTreeWidgetItem* 
 
 	// Process the parameters for the element attributes.
 	// If an attribute name does not match any parameter name then ignore it.
-	// If an attribute name does match a parameter name then write it.
+	// If an attribute name does match a parameter name then display it.
 	const TiXmlAttribute* pAttrib=pElement->FirstAttribute();
 	while (pAttrib)
 	{

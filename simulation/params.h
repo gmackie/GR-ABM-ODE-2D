@@ -26,8 +26,6 @@ protected:
 	Params(bool ode);
 	virtual ~Params();
 
-	enum ClosingTagType { CLOSE_START_TAG, CLOSE_END_TAG, CLOSE_NONE };
-
 	bool readParam(const TiXmlElement* pElement, const TiXmlAttribute* pAttrib,  ParamDoubleType param);
 	bool readParam(const TiXmlElement* pElement, const TiXmlAttribute* pAttrib,  ParamIntType param);
 

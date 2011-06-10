@@ -28,6 +28,7 @@ struct NodeDescription
 {
 	XmlElement type;
 	std::string name;
+	std::string description;
 };
 
 // These are used as indices into the _doubleParam array and the _description array.
@@ -263,7 +264,6 @@ protected:
 	ParamsBase(bool ode);
 	virtual ~ParamsBase();
 
-	int intIndex(int i) const;
 	void defineDefaults();
 
 	bool readElement(const TiXmlElement* pElement, bool paramsRead[]);
@@ -288,10 +288,13 @@ protected:
 
 public:
 
-	static const std::string& getNodeName(XmlElement element);
+	static const std::string& getXmlElementName(XmlElement element);
+	static const std::string& getXmlElementDescription(XmlElement element);
+
 	bool getUseOde() const;
 	bool fromXml(const char* filename);
 	bool toXml(const char* filename) const;
+	const TiXmlDocument& getXmlDoc() const;
 	double getParam(ParamDoubleType param) const;
 	int getParam(ParamIntType param) const;
 	void setParam(ParamDoubleType param, double val);
@@ -301,6 +304,7 @@ public:
 	int findParameterDescription(std::string name, const TiXmlElement* pElement) const;
 	XmlElement findElementDescription(std::string name) const;
 	bool isDouble(int param) const;
+	int intIndex(int i) const;
 	const std::string& getName(ParamDoubleType param) const;
 	const std::string& getName(ParamIntType param) const;
 	const XmlElement& getXmlElement(ParamDoubleType param) const;
@@ -310,8 +314,14 @@ public:
 	const std::string& getUnit(ParamIntType param) const;
 	const std::string& getDescription(ParamDoubleType param) const;
 	const std::string& getDescription(ParamIntType param) const;
+	const TiXmlElement* getRootElement() const;
 };
 
+
+inline const TiXmlDocument& ParamsBase::getXmlDoc() const
+{
+	return _xmlDoc;
+}
 
 // Given an index into the _description array for an integer parameter,
 // return the index into the _intParam array for that parameter.
@@ -320,9 +330,14 @@ inline 	int ParamsBase::intIndex(int i) const
 	return i - PARAM_DOUBLE_COUNT;
 }
 
-inline const std::string& ParamsBase::getNodeName(XmlElement element)
+inline const std::string& ParamsBase::getXmlElementName(XmlElement element)
 {
 	return _element[element].name;
+}
+
+inline const std::string& ParamsBase::getXmlElementDescription(XmlElement element)
+{
+	return _element[element].description;
 }
 
 inline bool ParamsBase::getUseOde() const
@@ -396,7 +411,7 @@ inline 	bool ParamsBase::isDouble(int param) const
 
 inline const std::string& ParamsBase::getName(ParamDoubleType param) const
 {
-	assert(param < PARAM_DOUBLE_COUNT + PARAM_DOUBLE_COUNT);
+	assert(param != PARAM_DOUBLE_COUNT);
 	return _description[param].name;
 }
 
@@ -428,6 +443,11 @@ inline const std::string& ParamsBase::getDescription(ParamIntType param) const
 {
 	assert(param != PARAM_INT_COUNT);
 	return _description[param + PARAM_DOUBLE_COUNT].description;
+}
+
+inline const TiXmlElement* ParamsBase::getRootElement() const
+{
+	return _xmlDoc.RootElement();
 }
 
 #endif /* PARAMS_H */

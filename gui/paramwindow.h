@@ -23,15 +23,10 @@ public slots:
 private:
 	MainInterface* _pItfc;
     Ui::ParamWindowClass _ui;
-    QTreeWidgetItem* _pGR;
-    QTreeWidgetItem* _pMac;
-    QTreeWidgetItem* _pTcell;
-    QTreeWidgetItem* _pTgam;
-    QTreeWidgetItem* _pTcyt;
-    QTreeWidgetItem* _pTreg;
-    QTreeWidgetItem* _pMtb;
+
     void newItem(QTreeWidgetItem* pParentItem, ParamDoubleType param);
     void newItem(QTreeWidgetItem* pParentItem, ParamIntType param);
+    void processElement(const TiXmlElement* pElement, QTreeWidgetItem* pParentTreeWidgetItem);
 };
 
 #endif // PARAMWINDOW_H

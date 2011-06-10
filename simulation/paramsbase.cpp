@@ -14,15 +14,15 @@
 // For each XML element, its XML element type and text name as it appears in a parameter file.
 // The first element of this array is considered the root XML element and must be present in the parameter file as the root XML element.
 const NodeDescription ParamsBase::_element[NODE_COUNT] = {
-   // type			name
-	{ GR_NODE, 		"GR" },
-	{ MAC_NODE, 	"Mac" },
-	{ TCELL_NODE, 	"Tcell" },
-	{ TGAM_NODE, 	"Tgam" },
-	{ TCYT_NODE, 	"Tcyt" },
-	{ TREG_NODE, 	"Treg" },
-	{ MTB_NODE, 	"Mtb" },
-	{ INIT_NODE, 	"Init", }
+   // type			name		Description
+	{ GR_NODE, 		"GR",		"" },
+	{ MAC_NODE, 	"Mac",		"Macrophage specific parameters" },
+	{ TCELL_NODE, 	"Tcell",	"Tcell specific parameters" },
+	{ TGAM_NODE, 	"Tgam",		"Tgam specific parameters" },
+	{ TCYT_NODE, 	"Tcyt",		"Tcyt specific parameters" },
+	{ TREG_NODE, 	"Treg",		"Treg specific parameters" },
+	{ MTB_NODE, 	"Mtb",		"Mtb specific parameters" },
+	{ INIT_NODE, 	"Init",		""}
 };
 
 const int ParamsBase::_PARAM_COUNT = PARAM_DOUBLE_COUNT + PARAM_INT_COUNT;
@@ -64,7 +64,7 @@ const int ParamsBase::_PARAM_COUNT = PARAM_DOUBLE_COUNT + PARAM_INT_COUNT;
 const ParamDescription ParamsBase::_description[_PARAM_COUNT] =
 {
 	// 														     use	  default
-	// 										XmlElement	probPos	Default	double	int	  unit				description
+	// Name									XmlElement	probPos	Default	double	int	  unit				description
 	{ "diffusivityTNF",						GR_NODE,	false,	false,	0.0,	0,	"cm^2/s",			"TNF diffusivity" },
 	{ "diffusivityShedTNFR2",				GR_NODE,	false,	false,	0.0,	0,	"cm^2/s",			"Shed sTNF/TNFR2 comples diffusivity" },
 	{ "diffusivityChemokines",				GR_NODE,	false,	false,	0.0,	0,	"cm^2/s",			"Chemokine diffusivity" },

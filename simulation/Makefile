@@ -1,18 +1,23 @@
+SVNREV = $(shell svn info | grep "Last Changed Rev:" | cut -d" " -f4)
+CXX := g++
+CXXFLAGS += $(GPUFLAG) -DSVN_VERSION="\"\\\"$(SVNREV)\\\"\"" -msse -Wall
+LDFLAGS += -lm -lboost_program_options-mt
 
-ifeq ($(CXX),)
-	CXX = g++
-endif
+all: release
 
-ifeq ($(DEBUG),yes)
-	LDFLAGS = -lm -lboost_program_options-mt
-	CXXFLAGS = -Wall -g3 -DDEBUG -DVERBOSE
-else
-	LDFLAGS = -lm -lboost_program_options-mt
-	CXXFLAGS = -Wall -DNDEBUG -ffast-math -fcaller-saves -finline-functions -O3 -march=native
-endif
+.PHONY:	release debug profile
 
-all: gr
-
+debug:
+	@$(MAKE) CXXFLAGS="$(CXXFLAGS) $(PROFILE_FLAGS) -DDEBUG -DVERBOSE -O0 -g3" gr
+release:
+	@$(MAKE) CXXFLAGS="$(CXXFLAGS) -DNDEBUG -O3 -march=native" gr
+	
+# PROFILE_FLAGS instead of using  CXXFLAGS="$(CXXFLAGS) -pg" avoids problems
+# with the quotes surrounding the version number getting stripped on the recursive
+# make invokation.
+profile:
+	@$(MAKE) PROFILE_FLAGS="-pg" debug
+	
 gr: paramsbase.o params.o rand.o agent.o gr.o grsimulationgrid.o grgrid.o gridcell.o macrophage.o grmain.o grstat.o grsimulation.o onlinestat.o grdiffusion.o grdiffusionftcs.o grdiffusionbtcs.o grdiffusionwrongbtcs.o grdiffusionftcsswap.o ttest.o areatest.o mtbtest.o tcell.o tcytotoxic.o tgamma.o tregulatory.o recruitmentbase.o recruitmentprob.o recruitmentlnode.o recruitmentlnodepure.o tinyxml/tinystr.o tinyxml/tinyxml.o tinyxml/tinyxmlerror.o tinyxml/tinyxmlparser.o
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 

@@ -305,6 +305,7 @@ int run(unsigned long seed, const std::string& inputFileName, const std::string&
 		bool tnfrDynamics, bool nfkbDynamics, bool tnfKnockout, int timeToSimulate, bool lhs,
 		float areaTNFThreshold, float areaCellDensityThreshold)
 {
+	printVersion();
 	std::cout << endl << "--seed " << seed << std::endl;
 
 	if (!Params::getInstance(true)->fromXml(inputFileName.c_str()))

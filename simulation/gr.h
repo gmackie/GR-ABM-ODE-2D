@@ -21,7 +21,12 @@
 #include <utility>
 #include "rand.h"
 
+#ifndef SVN_VERSION
 #define GR_VERSION "12022010"
+#else
+#define GR_VERSION "r" SVN_VERSION
+#endif
+
 #define NROWS 100
 #define NCOLS 100
 #define MOD_ROW(val) ((((val) + NROWS)) % NROWS)

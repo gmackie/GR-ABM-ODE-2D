@@ -48,6 +48,9 @@ void GrSimulation::serialize(std::ostream& out) const
 {
 	assert(out.good());
 
+	// Model version
+	out << GR_VERSION << std::endl;
+
 	// serialize time
 	out << _time << std::endl;
 
@@ -106,6 +109,9 @@ void GrSimulation::deserialize(std::istream& in)
 	assert(in.good());
 
 	int intVal;
+
+	std::string svnVersion;
+	in >> svnVersion;
 
 	// deserialize time
 	in >> _time;

@@ -103,7 +103,7 @@ Mac::Mac(int birthtime, int row, int col, MacState state, double intMtb, bool NF
 	, _IkB(0.0)
 	, _IkBn(0.0)
 	, _IkBt(0.0)
-	, _NFkB_IkB(g_Rand.getLogNormal(_PARAM(PARAM_GR_MEAN_NFKB),0.648721*_PARAM(PARAM_GR_MEAN_NFKB)))
+	, _NFkB_IkB(g_Rand.getLogNormal(_PARAM(PARAM_GR_MEAN_NFKB),0.805432*_PARAM(PARAM_GR_MEAN_NFKB)))
 	, _NFkB_IkBn(0.0)
 	, _GA20(0.0)
 	, _GIkB(0.0)

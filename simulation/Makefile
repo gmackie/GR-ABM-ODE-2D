@@ -1,7 +1,15 @@
+UBUNTU = $(shell uname -a | egrep "Ubuntu")
+
 SVNREV = $(shell svn info | grep "Last Changed Rev:" | cut -d" " -f4)
 CXX := g++
 CXXFLAGS += $(GPUFLAG) -DSVN_VERSION="\"\\\"$(SVNREV)\\\"\"" -msse -Wall
+
+
+ifeq ($(UBUNTU), )
+LDFLAGS += -lm -lboost_program_options
+else
 LDFLAGS += -lm -lboost_program_options-mt
+endif
 
 all: release
 
@@ -34,9 +42,6 @@ gr4: paramsbase.o params.o rand.o agent.o gr.o grsimulationgrid.o grgrid.o gridc
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
 lhs: gr.o paramsbase.o params.o tinyxml/tinystr.o tinyxml/tinyxml.o tinyxml/tinyxmlerror.o tinyxml/tinyxmlparser.o lhs.o rand.o
-	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
-
-par2csv: gr.o paramsbase.o params.o tinyxml/tinystr.o tinyxml/tinyxml.o tinyxml/tinyxmlerror.o tinyxml/tinyxmlparser.o par2csv.o rand.o
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
 #Makefile.depend: *.h *.cpp Makefile

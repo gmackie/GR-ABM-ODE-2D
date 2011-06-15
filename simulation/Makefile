@@ -48,6 +48,6 @@ lhs: gr.o paramsbase.o params.o tinyxml/tinystr.o tinyxml/tinyxml.o tinyxml/tiny
 #	$(CC) -M *.cpp > Makefile.depend
 
 clean:
-	rm -f *.o tinyxml/*.o gr gr1 gr2 gr3 gr4 lhs par2csv
+	rm -f *.o tinyxml/*.o gr gr1 gr2 gr3 gr4 lhs
 
 -include Makefile.depend

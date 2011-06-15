@@ -304,12 +304,12 @@ public:
 	int findParameterDescription(std::string name, const TiXmlElement* pElement) const;
 	XmlElement findElementDescription(std::string name) const;
 	bool isDouble(int param) const;
-	int intIndex(int i) const;
+	ParamIntType intIndex(int i) const;
+	int paramIndex(ParamIntType intIndex) const;
 	const std::string& getName(ParamDoubleType param) const;
 	const std::string& getName(ParamIntType param) const;
 	const XmlElement& getXmlElement(ParamDoubleType param) const;
 	const XmlElement& getXmlElement(ParamIntType param) const;
-	const XmlElement& getXmlElement(int param) const;
 	const std::string& getUnit(ParamDoubleType param) const;
 	const std::string& getUnit(ParamIntType param) const;
 	const std::string& getDescription(ParamDoubleType param) const;
@@ -325,9 +325,16 @@ inline const TiXmlDocument& ParamsBase::getXmlDoc() const
 
 // Given an index into the _description array for an integer parameter,
 // return the index into the _intParam array for that parameter.
-inline 	int ParamsBase::intIndex(int i) const
+inline 	ParamIntType ParamsBase::intIndex(int paramIndex) const
 {
-	return i - PARAM_DOUBLE_COUNT;
+	return (ParamIntType) (paramIndex - PARAM_DOUBLE_COUNT);
+}
+
+// Given an index into the _intParam array for an integer parameter,
+// return the index into the _description array for that parameter.
+inline int ParamsBase:: paramIndex(ParamIntType intIndex) const
+{
+	return intIndex + PARAM_DOUBLE_COUNT;
 }
 
 inline const std::string& ParamsBase::getXmlElementName(XmlElement element)
@@ -388,13 +395,7 @@ inline const XmlElement& ParamsBase::getXmlElement(ParamDoubleType param) const
 inline const XmlElement& ParamsBase::getXmlElement(ParamIntType param) const
 {
 	assert(param != PARAM_INT_COUNT);
-	return _description[param + PARAM_DOUBLE_COUNT].xmlElement;
-}
-
-inline const XmlElement& ParamsBase::getXmlElement(int param) const
-{
-	assert(param <=  PARAM_INT_COUNT);
-	return _description[param + PARAM_DOUBLE_COUNT].xmlElement;
+	return _description[paramIndex(param)].xmlElement;
 }
 
 inline 	bool ParamsBase::isDouble(int param) const
@@ -418,7 +419,7 @@ inline const std::string& ParamsBase::getName(ParamDoubleType param) const
 inline const std::string& ParamsBase::getName(ParamIntType param) const
 {
 	assert(param != PARAM_INT_COUNT);
-	return _description[param + PARAM_DOUBLE_COUNT].name;
+	return _description[paramIndex(param)].name;
 }
 
 inline const std::string& ParamsBase::getUnit(ParamDoubleType param) const
@@ -430,7 +431,7 @@ inline const std::string& ParamsBase::getUnit(ParamDoubleType param) const
 inline const std::string& ParamsBase::getUnit(ParamIntType param) const
 {
 	assert(param != PARAM_INT_COUNT);
-	return _description[param + PARAM_DOUBLE_COUNT].unit;
+	return _description[paramIndex(param)].unit;
 }
 
 inline const std::string& ParamsBase::getDescription(ParamDoubleType param) const
@@ -442,7 +443,7 @@ inline const std::string& ParamsBase::getDescription(ParamDoubleType param) cons
 inline const std::string& ParamsBase::getDescription(ParamIntType param) const
 {
 	assert(param != PARAM_INT_COUNT);
-	return _description[param + PARAM_DOUBLE_COUNT].description;
+	return _description[paramIndex(param)].description;
 }
 
 inline const TiXmlElement* ParamsBase::getRootElement() const

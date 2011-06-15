@@ -76,10 +76,10 @@ bool Params::readParam(const TiXmlElement* pElement, const TiXmlAttribute* pAttr
 	return true;
 }
 
-bool Params::readParam(const TiXmlElement* pElement, const TiXmlAttribute* pAttrib,  ParamIntType param)
+bool Params::readParam(const TiXmlElement* pElement, const TiXmlAttribute* pAttrib,  ParamIntType paramIntIndex)
 {
-	int* pVar = _intParam + intIndex(param);
-	bool pos = _description[param].probPos;
+	int* pVar = _intParam + paramIntIndex;
+	bool pos = _description[paramIndex(paramIntIndex)].probPos;
 
 	if(pAttrib->QueryIntValue(pVar) == TIXML_WRONG_TYPE)
 	{

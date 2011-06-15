@@ -31,6 +31,8 @@ namespace po = boost::program_options;
  *
  * An LHS parameter file is an XML file that contains ranges for some or all parameters.
  * A range is specified as [min,max], ex. thresholdApoptosisTNF = "[0.0525,0.0725]".
+ * If a parameter has a single value specified instead of a range then that value
+ * is used as the min and max for the range.
  * If a parameter does not appear in an LHS parameter file then its range is [0,0].
  *
  * For each parameter, its range is divided into N sub-ranges, where N is the number
@@ -137,9 +139,18 @@ bool Lhs::readParam(const TiXmlElement* pElement, const TiXmlAttribute* pAttrib,
 	char c;
 	if (sscanf(str, "[%lf, %lf]%c", &range._min, &range._max, &c) != 2)
 	{
-		std::cerr << "Value '" << str << "' of attribute '" << pElement->Value() << "/@"
-			<< pAttrib->Name() << "' must be a double range ([%lf, %lf])" << std::endl;
-		return false;
+		double val;
+		if (sscanf(str, "%lf", &val) == 1)
+		{
+			range._min = val;
+			range._max = val;
+		}
+		else
+		{
+			std::cerr << "Value '" << str << "' of attribute '" << pElement->Value() << "/@"
+				<< pAttrib->Name() << "' must be a double range ([%lf, %lf])" << std::endl;
+			return false;
+		}
 	}
 
 	if (range._min > range._max)
@@ -159,19 +170,29 @@ bool Lhs::readParam(const TiXmlElement* pElement, const TiXmlAttribute* pAttrib,
 	return true;
 }
 
-bool Lhs::readParam(const TiXmlElement* pElement, const TiXmlAttribute* pAttrib,  ParamIntType param)
+bool Lhs::readParam(const TiXmlElement* pElement, const TiXmlAttribute* pAttrib,  ParamIntType paramIntIndex)
 {
-	LhsIntParam& range = _lhsIntParam[intIndex(param)];
+	LhsIntParam& range = _lhsIntParam[paramIntIndex];
 	const char* str  = pAttrib->Value();
 
 	char c;
-	bool pos = _description[param].probPos;
+	bool pos = _description[paramIndex(paramIntIndex)].probPos;
+
 	if (sscanf(str, "[%d, %d]%c", &range._min, &range._max, &c) != 2)
 	{
-		std::cerr << "Value '" << str << "' of attribute '" << pElement->Value() << "/@"
-			<< pAttrib->Name() << "' must be a" << (pos ? " positive" : "n") <<
-			" integer in the range ([%d, %d])" << std::endl;
-		return false;
+		int val;
+		if (sscanf(str, "%d", &val) == 1)
+		{
+			range._min = val;
+			range._max = val;
+		}
+		else
+		{
+			std::cerr << "Value '" << str << "' of attribute '" << pElement->Value() << "/@"
+				<< pAttrib->Name() << "' must be a" << (pos ? " positive" : "n") <<
+				" integer in the range ([%d, %d])" << std::endl;
+			return false;
+		}
 	}
 
 	if (range._min > range._max)
@@ -328,6 +349,8 @@ void Lhs::performLhs()
 
 	for (int i = 0; i < PARAM_INT_COUNT; i++)
 	{
+		int paramindex = paramIndex((ParamIntType) i);
+
 		for (int j = 0; j < _nSamples; j++)
 		{
 			int count = _nSamples / (_lhsIntParam[i]._max - _lhsIntParam[i]._min + 1);
@@ -341,7 +364,7 @@ void Lhs::performLhs()
 				int min = j * count + _lhsIntParam[i]._min;
 				int max = (j + 1 == _nSamples) ? _lhsIntParam[i]._max + 1 : (j + 1) * count + _lhsIntParam[i]._min;
 
-				bins[i + PARAM_DOUBLE_COUNT][j] = g_Rand.getInt(max, min);
+				bins[paramindex][j] = g_Rand.getInt(max, min);
 			}
 			else
 			{
@@ -351,11 +374,11 @@ void Lhs::performLhs()
 
 				if (val <= _lhsIntParam[i]._max)
 				{
-					bins[i + PARAM_DOUBLE_COUNT][j] = val;
+					bins[paramindex][j] = val;
 				}
 				else
 				{
-					bins[i + PARAM_DOUBLE_COUNT][j] =
+					bins[paramindex][j] =
 						g_Rand.getInt(_lhsIntParam[i]._max + 1, _lhsIntParam[i]._min);
 				}
 			}
@@ -415,10 +438,10 @@ bool Lhs::checkParams() const
 	// Check that each generated parameter value is in its proper range.
 	for (int i = 0; i < _PARAM_COUNT; i++)
 	{
-		// Don't check parameters calculated in updateParamDouble since they might not match any range specified.
-		if (isDouble(i) && (i != PARAM_MAC_SEC_RATE_CCL5) && (i != PARAM_MAC_SEC_RATE_CXCL9))
+		if (isDouble(i))
 		{
-			if (_doubleParam[i] < _lhsDoubleParam[i]._min || _doubleParam[i] > _lhsDoubleParam[i]._max)
+			// Don't check parameters calculated in updateParamDouble since they might not match any range specified.
+			if ( ((i != PARAM_MAC_SEC_RATE_CCL5) && (i != PARAM_MAC_SEC_RATE_CXCL9))  && (_doubleParam[i] < _lhsDoubleParam[i]._min || _doubleParam[i] > _lhsDoubleParam[i]._max) )
 			{
 				std::cerr << "Generated value of " << _doubleParam[i] << " for parameter " << _description[i].name
 						  << " is outside the specified range of ["  << _lhsDoubleParam[i]._min << ", " << _lhsDoubleParam[i]._max << "]." << std::endl;
@@ -427,7 +450,7 @@ bool Lhs::checkParams() const
 		}
 		else
 		{
-			if (_intParam[intIndex(i)] < _lhsIntParam[intIndex(i)]._min || _intParam[intIndex(i)] > _lhsIntParam[intIndex(i)]._max)
+			if ((_intParam[intIndex(i)] < _lhsIntParam[intIndex(i)]._min || _intParam[intIndex(i)] > _lhsIntParam[intIndex(i)]._max))
 			{
 				std::cerr << "Generated value of " << _intParam[intIndex(i)] << " for parameter " << _description[i].name
 						  << " is outside the specified range of ["  << _lhsIntParam[intIndex(i)]._min << ", " << _lhsIntParam[intIndex(i)]._max << "]." << std::endl;

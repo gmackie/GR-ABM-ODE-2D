@@ -558,7 +558,7 @@ bool ParamsBase::readElement(const TiXmlElement* pElement, bool paramsRead[])
 			}
 			else
 			{
-				res &= readParam(pElement, pAttrib, (ParamIntType) parameterIndex);
+				res &= readParam(pElement, pAttrib, (ParamIntType) intIndex(parameterIndex));
 			}
 		}
 

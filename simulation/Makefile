@@ -18,7 +18,7 @@ all: release
 debug:
 	@$(MAKE) CXXFLAGS="$(CXXFLAGS) $(PROFILE_FLAGS) -DDEBUG -DVERBOSE -O0 -g3" gr
 release:
-	@$(MAKE) CXXFLAGS="$(CXXFLAGS) -DNDEBUG -O3 -march=native" gr
+	@$(MAKE) CXXFLAGS="$(CXXFLAGS) -DNDEBUG -O3" gr
 	
 # PROFILE_FLAGS instead of using  CXXFLAGS="$(CXXFLAGS) -pg" avoids problems
 # with the quotes surrounding the version number getting stripped on the recursive

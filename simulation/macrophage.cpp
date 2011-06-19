@@ -64,6 +64,7 @@ Mac::Mac()
 	, _normalizedACT(-1.0)
 	, _IAPt(-1.0)
 	, _IAP(-1.0)
+	, _normalizedIAP(-1.0)
 
 {
 }
@@ -78,8 +79,8 @@ Mac::Mac(int birthtime, int row, int col, MacState state, double intMtb, bool NF
 	, _activationTime(-1)
 	, _deactivationTime(-1)
 	, _mTNF(0.0)
-	, _surfTNFR1(g_Rand.getReal(_PARAM(PARAM_GR_MIN_TNFR1_MAC),_PARAM(PARAM_GR_MAX_TNFR1_MAC)))
-	, _surfTNFR2(g_Rand.getReal(_PARAM(PARAM_GR_MIN_TNFR2_MAC),_PARAM(PARAM_GR_MAX_TNFR2_MAC)))
+	, _surfTNFR1(g_Rand.getLogNormal(_PARAM(PARAM_GR_MEAN_TNFR1_MAC),_PARAM(PARAM_GR_STD_TNFR1_MAC)))
+	, _surfTNFR2(g_Rand.getLogNormal(_PARAM(PARAM_GR_MEAN_TNFR2_MAC),_PARAM(PARAM_GR_STD_TNFR2_MAC)))
 	, _surfBoundTNFR1(0.0)
 	, _surfBoundTNFR2(0.0)
 	, _intBoundTNFR1(0.0)
@@ -120,6 +121,7 @@ Mac::Mac(int birthtime, int row, int col, MacState state, double intMtb, bool NF
 	, _normalizedACT(0.0)
 	, _IAPt(0.0)
 	, _IAP(0.0)
+	, _normalizedIAP(0.0)
 
 {
 }
@@ -263,6 +265,8 @@ void Mac::computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tnf
 {
 	GridCell& cell = grid(_row, _col);
 	double tnfBoundFraction = cell.getTNF() / (cell.getTNF() + _PARAM(PARAM_GR_KD1) * 48.16e11);
+	double nfkb_adjusted_k_apoptosis = _PARAM(PARAM_GR_K_APOPTOSIS_NFKB_MOLECULAR) * (_PARAM(PARAM_GR_K_IAP)/(_PARAM(PARAM_GR_K_IAP) + _normalizedIAP));
+	
 	
 	// check if it is time to die
 	if (timeToDie(time))
@@ -279,8 +283,15 @@ void Mac::computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tnf
 
 		_nextState = MAC_DEAD;
 	}
-	else if (tnfrDynamics && _intBoundTNFR1 > _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR) &&	
+	else if (!nfkbDynamics && tnfrDynamics && _intBoundTNFR1 > _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR) &&	
 			 g_Rand.getReal() < 1 - pow(2.7183, -_PARAM(PARAM_GR_K_APOPTOSIS_MOLECULAR) * (_intBoundTNFR1 - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR))))
+	{
+		// TNF induced apoptosis
+		stats.incApoptosisTNF();
+		apoptosis(grid);
+	}
+	else if (nfkbDynamics && _intBoundTNFR1 > _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR) &&	
+			 g_Rand.getReal() < 1 - pow(2.7183, -nfkb_adjusted_k_apoptosis * (_intBoundTNFR1 - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR))))
 	{
 		// TNF induced apoptosis
 		stats.incApoptosisTNF();
@@ -523,6 +534,7 @@ void Mac::solveReceptorAndNFkBODEs(GrGrid& grid, double dt)
 	_normalizedACT = _ACT*_PARAM(PARAM_GR_c3rACT);
 	_IAPt += dIAPt; 
 	_IAP += dIAP;
+	_normalizedIAP = _IAP*_PARAM(PARAM_GR_c3rIAP);
 	
 	if (_mTNF < 0 || _surfTNFR1 < 0 || _surfBoundTNFR1 < 0 || _surfTNFR2 < 0 || _surfBoundTNFR2 < 0)
 		std::cout << "Error: Negative Value of Species in TNF/TNFR dynamics" << std::endl;
@@ -638,6 +650,7 @@ void Mac::solveNFkBODEsEquilibrium(double dt)
 	_normalizedACT = _ACT*_PARAM(PARAM_GR_c3rACT);
 	_IAPt += dIAPt; 
 	_IAP += dIAP;
+	_normalizedIAP = _IAP*_PARAM(PARAM_GR_c3rIAP);
 	/*	
 	 if (_IKKKa < 0 || _IKKn < 0 || _IKKa < 0 || _IKKa < 0 || _IKKi < 0 || _IkBp < 0 || _NFkB_IkBp < 0 || 
 	 _NFkBc < 0 || _NFkBn < 0 || _A20 < 0 || _A20t < 0 || _IkB < 0 || _IkBn < 0 || _IkBt < 0 ||
@@ -936,6 +949,7 @@ void Mac::serialize(std::ostream& out) const
 	out << _normalizedACT << std::endl;
 	out << _IAPt << std::endl;
 	out << _IAP << std::endl;
+	out << _normalizedIAP << std::endl;
 }
 
 void Mac::deserialize(std::istream& in)
@@ -999,6 +1013,7 @@ void Mac::deserialize(std::istream& in)
 	in >> _normalizedACT;
 	in >> _IAPt;
 	in >> _IAP;
+	in >> _normalizedIAP;
 	
 }
 

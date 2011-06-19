@@ -93,14 +93,14 @@ const ParamDescription ParamsBase::_description[_PARAM_COUNT] =
 	{ "kT2",								GR_NODE,	false,	false,	0.0,	0,	"1/s",				"TNFR2 turn-over rate constant" },
 	{ "kDeg1",								GR_NODE,	false,	false,	0.0,	0,	"1/s",				"TNFR1 degradtion rate constant" },
 	{ "kDeg2",								GR_NODE,	false,	false,	0.0,	0,	"1/s",				"TNFR2 degradtion rate constant" },
-	{ "maxTNFR1Mac",						GR_NODE,	false,	false,	0.0,	0,	"#/cell",			"Maximum density of TNFR1 on macrophages" },
-	{ "minTNFR1Mac",						GR_NODE,	false,	false,	0.0,	0,	"#/cell",			"Minimum density of TNFR1 on macrophages" },
-	{ "maxTNFR2Mac",						GR_NODE,	false,	false,	0.0,	0,	"#/cell",			"Maximum density of TNFR2 on macrophages" },
-	{ "minTNFR2Mac",						GR_NODE,	false,	false,	0.0,	0,	"#/cell",			"Minimum density of TNFR2 on macrophages" },
-	{ "maxTNFR1Tcell",						GR_NODE,	false,	false,	0.0,	0,	"#/cell",			"Maximum density of TNFR1 on T cells" },
-	{ "minTNFR1Tcell",						GR_NODE,	false,	false,	0.0,	0,	"#/cell",			"Minimum density of TNFR1 on T cells" },
-	{ "maxTNFR2Tcell",						GR_NODE,	false,	false,	0.0,	0,	"#/cell",			"Maximum density of TNFR2 on T cells" },
-	{ "minTNFR2Tcell",						GR_NODE,	false,	false,	0.0,	0,	"#/cell",			"Minimum density of TNFR2 on T cells" },
+	{ "meanTNFR1Mac",						GR_NODE,	false,	false,	0.0,	0,	"#/cell",			"Mean density of TNFR1 on macrophages" },
+	{ "stdTNFR1Mac",						GR_NODE,	false,	false,	0.0,	0,	"#/cell",			"Standard deviation of density of TNFR1 on macrophages" },
+	{ "meanTNFR2Mac",						GR_NODE,	false,	false,	0.0,	0,	"#/cell",			"Mean density of TNFR2 on macrophages" },
+	{ "stdTNFR2Mac",						GR_NODE,	false,	false,	0.0,	0,	"#/cell",			"Standard deviation of density of TNFR2 on macrophages" },
+	{ "meanTNFR1Tcell",						GR_NODE,	false,	false,	0.0,	0,	"#/cell",			"Mean density of TNFR1 on T cells" },
+	{ "stdTNFR1Tcell",						GR_NODE,	false,	false,	0.0,	0,	"#/cell",			"Standard deviation of density of TNFR1 on T cells" },
+	{ "meanTNFR2Tcell",						GR_NODE,	false,	false,	0.0,	0,	"#/cell",			"Mean density of TNFR2 on T cells" },
+	{ "stdTNFR2Tcell",						GR_NODE,	false,	false,	0.0,	0,	"#/cell",			"Standard deviation of density of TNFR2 on T cells" },
 	// end of molecular TNF-associated parameters
 
 	// intracellular NFkB signaling pathway parameters
@@ -154,12 +154,14 @@ const ParamDescription ParamsBase::_description[_PARAM_COUNT] =
 	{ "c3rIAP",								GR_NODE,	false,	true,	0.0,	0,	"1/s",				"IAP mRNA degradation rate" },
 	{ "c4IAP",								GR_NODE,	false,	true,	0.0,	0,	"1/s",				"IAP translation" },
 	{ "c5IAP",								GR_NODE,	false,	true,	0.0,	0,	"1/s",				"IAP degradation rate" },
+	{ "kIAP",								GR_NODE,	false,	true,	0.0,	0,	"-",				"IAP inhibitory effect on k_apoptosis" },
 	// End of intracellular NFkB signaling pathway parameters
 
 	{ "thresholdApoptosisTNF",				GR_NODE,	false,	false,	0.0,	0,	"fraction",			"TNF threshold for TNF-induced apoptosis" },
 	{ "kApoptosis",							GR_NODE,	false,	false,	0.0,	0,	"1/s",				"Rate of apoptosis happening" },
 	{ "thresholdApoptosisTNF_Molecular",	GR_NODE,	false,	false,	0.0,	0,	"#molecules",		"TNF threshold for TNF-induced apoptosis" },
 	{ "kApoptosis_Molecular",				GR_NODE,	false,	false,	0.0,	0,	"1/s",				"Rate of apoptosis happening" },
+	{ "kApoptosis_NFkB_Molecular",			GR_NODE,	false,	false,	0.0,	0,	"1/s",				"Rate of apoptosis happening when NFkB dynamics are on" },
 	{ "probApoptosisTNF",					GR_NODE,	true,	false,	0.0,	0,	"",					"Probability of TNF-induced apoptosis" },
 	{ "effectRecTNF",						GR_NODE,	false,	true,	1.0,	1,	"",					"Effect of TNF on recruitment" },
 	{ "effectRecCCL2",						GR_NODE,	false,	true,	0.0,	0,	"",					"Effect of CCL2 on recruitment" },

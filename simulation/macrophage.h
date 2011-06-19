@@ -68,6 +68,7 @@ private:
 	double _normalizedACT;
 	double _IAPt; // transcript of IAP (inhibitor of apoptosis)
 	double _IAP; 
+	double _normalizedIAP;
 	
 	void handleResting(const int time, GrGrid& grid, GrStat& stats, bool nfkbDynamics);
 	void handleInfected(const int time, GrGrid& grid, GrStat& stats, bool nfkbDynamics);
@@ -108,6 +109,7 @@ public:
 	bool isDeactivated() const;
 	double getNFkBn() const;
 	double getNFkBc() const;
+	double getNFkB_IkB() const;
 	double getChemt() const;
 	double getNormalizedACT() const;
 	void setC1rrChemTNF(double value);
@@ -200,6 +202,11 @@ inline double Mac::getNFkBn() const
 inline double Mac::getNFkBc() const
 {
 	return _NFkBc;
+}
+
+inline double Mac::getNFkB_IkB() const
+{
+	return _NFkB_IkB;
 }
 
 inline double Mac::getChemt() const

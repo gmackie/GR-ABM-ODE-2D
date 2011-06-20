@@ -7,6 +7,9 @@
 
 #include "gridcell.h"
 #include "grgrid.h"
+#include "serialization.h"
+
+const std::string GridCell::_ClassName = "GridCell";
 
 GridCell::GridCell()
 	: _row(-1)
@@ -67,7 +70,8 @@ void GridCell::serialize(std::ostream& out) const
 {
 	assert(out.good());
 
-	out << getSerialSize() << std::endl;
+	Serialization::writeHeader(out, GridCell::_ClassName);
+
 	out << _row << std::endl;
 	out << _col << std::endl;
 	out << _source << std::endl;
@@ -81,22 +85,16 @@ void GridCell::serialize(std::ostream& out) const
 	out << _cxcl9 << std::endl;
 	out << _shedtnfr2 << std::endl;
 	out << _extMtb << std::endl;
+
+	Serialization::writeFooter(out, GridCell::_ClassName);
 }
 
 void GridCell::deserialize(std::istream& in)
 {
 	assert(in.good());
 
-	// This check isn't fool proof because of data alignment in memory.
-	// An object's size can be bigger than the sum of the size's of its members.
-	// When a new member is added or an existing one deleted the object size can remain unchanged.
-	std::size_t currentSerialSize = getSerialSize();
-	std::size_t savedSerialSize;
-	in >> savedSerialSize;
-	if (savedSerialSize != currentSerialSize)
+	if (!Serialization::readHeader(in, GridCell::_ClassName))
 	{
-		std::cerr << "Error deserializing GridCell object."<< std::endl;
-		std::cerr << "The saved serial size of " << savedSerialSize << " does not match the current serial size of " << currentSerialSize << std::endl;
 		exit(1);
 	}
 
@@ -113,6 +111,11 @@ void GridCell::deserialize(std::istream& in)
 	in >> _cxcl9;
 	in >> _shedtnfr2;
 	in >> _extMtb;
+
+	if (!Serialization::readFooter(in, GridCell::_ClassName))
+	{
+		exit(1);
+	}
 
 	// These get assigned when the agent lists are deserialized and processed.
 	_agent[0] = _agent[1] = NULL;

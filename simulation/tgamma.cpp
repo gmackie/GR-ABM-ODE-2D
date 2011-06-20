@@ -7,6 +7,10 @@
 
 #include "tgamma.h"
 #include "grgrid.h"
+#include "serialization.h"
+
+const std::string Tgam::_ClassName = "Tgam";
+
 
 // Needed for deserializing the model state.
 // Avoids the calls to the random number generator in the normal constructor, allowing the random number generator
@@ -243,6 +247,8 @@ void Tgam::serialize(std::ostream& out) const
 {
 	assert(out.good());
 
+	Serialization::writeHeader(out, Tgam::_ClassName);
+
 	Tcell::serialize(out);
 
 	int intVal = (int) _state;
@@ -264,11 +270,17 @@ void Tgam::serialize(std::ostream& out) const
 	out << _kSynth << std::endl;
 	out << _kTACE << std::endl;
 	
+	Serialization::writeFooter(out, Tgam::_ClassName);
 }
 
 void Tgam::deserialize(std::istream& in)
 {
 	assert(in.good());
+
+	if (!Serialization::readHeader(in, Tgam::_ClassName))
+	{
+		exit(1);
+	}
 
 	int intVal;
 
@@ -292,4 +304,9 @@ void Tgam::deserialize(std::istream& in)
 	in >> _vTNFR2;
 	in >> _kSynth;
 	in >> _kTACE;
+
+	if (!Serialization::readFooter(in, Tgam::_ClassName))
+	{
+		exit(1);
+	}
 }

@@ -7,6 +7,10 @@
 
 #include "tregulatory.h"
 #include "grgrid.h"
+#include "serialization.h"
+
+const std::string Treg::_ClassName = "Treg";
+
 
 // Needed for deserializing the model state.
 // Avoids the calls to the random number generator in the normal constructor, allowing the random number generator
@@ -201,6 +205,8 @@ void Treg::serialize(std::ostream& out) const
 {
 	assert(out.good());
 
+	Serialization::writeHeader(out, Treg::_ClassName);
+
 	Tcell::serialize(out);
 
 	int intVal = (int) _state;
@@ -220,11 +226,18 @@ void Treg::serialize(std::ostream& out) const
 	out << _vTNFR2 << std::endl;
 	out << _kSynth << std::endl;
 	out << _kTACE << std::endl;
+
+	Serialization::writeFooter(out, Treg::_ClassName);
 }
 
 void Treg::deserialize(std::istream& in)
 {
 	assert(in.good());
+
+	if (!Serialization::readHeader(in, Treg::_ClassName))
+	{
+		exit(1);
+	}
 
 	int intVal;
 
@@ -247,4 +260,9 @@ void Treg::deserialize(std::istream& in)
 	in >> _vTNFR2;
 	in >> _kSynth;
 	in >> _kTACE;
+
+	if (!Serialization::readFooter(in, Treg::_ClassName))
+	{
+		exit(1);
+	}
 }

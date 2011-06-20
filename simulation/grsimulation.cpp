@@ -15,6 +15,9 @@
 #include "areatest.h"
 #include "mtbtest.h"
 #include "recruitmentprob.h"
+#include "serialization.h"
+
+const std::string GrSimulation::_ClassName = "GrSimulation";
 
 GrSimulation::GrSimulation()
 	: _time(0)
@@ -48,6 +51,8 @@ void GrSimulation::serialize(std::ostream& out) const
 {
 	assert(out.good());
 
+	Serialization::writeHeader(out, GrSimulation::_ClassName);
+
 	// Model version
 	out << GR_VERSION << std::endl;
 
@@ -65,9 +70,6 @@ void GrSimulation::serialize(std::ostream& out) const
 	out << _tnfrDynamics << std::endl;
 	out << _nfkbDynamics << std::endl;
 	out << _tnfKnockout << std::endl;
-
-	// serialize random number generator
-	g_Rand.serialize(out);
 
 	// serialize grid
 	_grid.serialize(out);
@@ -102,13 +104,23 @@ void GrSimulation::serialize(std::ostream& out) const
 
 	// serialize statistics
 	_stats.serialize(out);
+
+	// serialize random number generator
+	// Do this last so that when de-serializing any random number generation performed as part
+	// de-serialization won't affect the simulation state.
+	g_Rand.serialize(out);
+
+	Serialization::writeFooter(out, GrSimulation::_ClassName);
 }
 
 void GrSimulation::deserialize(std::istream& in)
 {
 	assert(in.good());
 
-	int intVal;
+	if (!Serialization::readHeader(in, GrSimulation::_ClassName))
+	{
+		exit(1);
+	}
 
 	std::string svnVersion;
 	in >> svnVersion;
@@ -121,15 +133,13 @@ void GrSimulation::deserialize(std::istream& in)
 	in >> _areaThresholdCellDensity;
 
 	// deserialize diffusion method
+	int intVal;
 	in >> intVal;
 	setDiffusionMethod((DiffusionMethod) intVal);
 
 	in >> _tnfrDynamics;
 	in >> _nfkbDynamics;
 	in >> _tnfKnockout;
-
-	// deserialize random number generator
-	g_Rand.deserialize(in);
 
 	// deserialize grid
 	_grid.deserialize(in);
@@ -192,6 +202,14 @@ void GrSimulation::deserialize(std::istream& in)
 
 	// deserialize statistics
 	_stats.deserialize(in);
+
+	// deserialize random number generator
+	g_Rand.deserialize(in);
+
+	if (!Serialization::readFooter(in, GrSimulation::_ClassName))
+	{
+		exit(1);
+	}
 }
 
 void GrSimulation::init()

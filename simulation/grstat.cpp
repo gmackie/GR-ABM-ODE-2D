@@ -6,6 +6,9 @@
  */
 
 #include "grstat.h"
+#include "serialization.h"
+
+const std::string GrStat::_ClassName = "GrStat";
 
 GrStat::GrStat()
 	: _nMac(0)
@@ -280,7 +283,8 @@ void GrStat::serialize(std::ostream& out) const
 {
 	assert(out.good());
 
-	out << getSerialSize() << std::endl;
+	Serialization::writeHeader(out, GrStat::_ClassName);
+
 	out << _nMac << std::endl;
 	out << _nMacResting << std::endl;
 	out << _nMacInfected << std::endl;
@@ -376,22 +380,15 @@ void GrStat::serialize(std::ostream& out) const
 	out << _T8lung << std::endl;
 	out << _TClung << std::endl;
 
+	Serialization::writeFooter(out, GrStat::_ClassName);
 }
 
 void GrStat::deserialize(std::istream& in)
 {
 	assert(in.good());
 
-	// This check isn't fool proof because of data alignment in memory.
-	// An object's size can be bigger than the sum of the size's of its members.
-	// When a new member is added or an existing one deleted the object size can remain unchanged.
-	std::size_t currentSerialSize = getSerialSize();
-	std::size_t savedSerialSize;
-	in >> savedSerialSize;
-	if (savedSerialSize != currentSerialSize)
+	if (!Serialization::readHeader(in, GrStat::_ClassName))
 	{
-		std::cerr << "Error deserializing GrStat object."<< std::endl;
-		std::cerr << "The saved serial size of " << savedSerialSize << " does not match the current serial size of " << currentSerialSize << std::endl;
 		exit(1);
 	}
 
@@ -491,4 +488,9 @@ void GrStat::deserialize(std::istream& in)
 	in >>_T80lung;
 	in >>_T8lung;
 	in >>_TClung;
+
+	if (!Serialization::readFooter(in, GrStat::_ClassName))
+	{
+		exit(1);
+	}
 }

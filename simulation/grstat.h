@@ -16,6 +16,8 @@ typedef enum {	GR_CONTAINMENT, GR_CONTAINMENT_INCONSISTENT, GR_CLEARANCE,
 class GrStat
 {
 private:
+	static const std::string _ClassName;
+
 	int _nMac;
 	int _nMacResting;
 	int _nMacInfected;
@@ -202,7 +204,6 @@ public:
 	void setGrStatus(int index, GrStatus status);
 	void serialize(std::ostream& out) const;
 	void deserialize(std::istream& in);
-	std::size_t getSerialSize() const;
 	int getNrTgamQueued() const;
 	void setNrTgamQueued(int count);
 	int getNrTcytQueued() const;
@@ -838,11 +839,6 @@ inline int GrStat::getNrOfMacDeactDead() const
 inline int GrStat::getNrOfMacDeact() const
 {
 	return _nMacDeact;
-}
-
-inline std::size_t GrStat::getSerialSize() const
-{
-	return sizeof(GrStat);
 }
 
 #endif /* GRSTAT_H */

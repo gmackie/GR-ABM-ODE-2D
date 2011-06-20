@@ -605,7 +605,7 @@ void MainWindow::timerEvent(QTimerEvent*)
 
 	emit updateGL();
 
-	// take remaining snapshots
+	// Take snapshots if requested and it is time.
 	if (_pSnapshot)
 	{
 		// So the simulation doesn't advance while we are saving data.

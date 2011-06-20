@@ -8,6 +8,9 @@
 #include "macrophage.h"
 #include "params.h"
 #include "grgrid.h"
+#include "serialization.h"
+
+const std::string Mac::_ClassName = "Mac";
 
 // Needed for deserializing the model state.
 // Avoids the calls to the random number generator in the normal constructor, allowing the random number generator
@@ -104,7 +107,7 @@ Mac::Mac(int birthtime, int row, int col, MacState state, double intMtb, bool NF
 	, _IkB(0.0)
 	, _IkBn(0.0)
 	, _IkBt(0.0)
-	, _NFkB_IkB(g_Rand.getLogNormal(_PARAM(PARAM_GR_MEAN_NFKB),0.805432*_PARAM(PARAM_GR_MEAN_NFKB)))
+	, _NFkB_IkB((_PARAM(PARAM_GR_MEAN_NFKB) > 0 ) ? g_Rand.getLogNormal(_PARAM(PARAM_GR_MEAN_NFKB),0.805432*_PARAM(PARAM_GR_MEAN_NFKB)) : 0)
 	, _NFkB_IkBn(0.0)
 	, _GA20(0.0)
 	, _GIkB(0.0)
@@ -894,6 +897,8 @@ void Mac::serialize(std::ostream& out) const
 {
 	assert(out.good());
 
+	Serialization::writeHeader(out, Mac::_ClassName);
+
 	Agent::serialize(out);
 
 	int intVal = (int) _state;
@@ -950,11 +955,18 @@ void Mac::serialize(std::ostream& out) const
 	out << _IAPt << std::endl;
 	out << _IAP << std::endl;
 	out << _normalizedIAP << std::endl;
+
+	Serialization::writeFooter(out, Mac::_ClassName);
 }
 
 void Mac::deserialize(std::istream& in)
 {
 	assert(in.good());
+
+	if (!Serialization::readHeader(in, Mac::_ClassName))
+	{
+		exit(1);
+	}
 
 	int intVal;
 
@@ -1015,6 +1027,10 @@ void Mac::deserialize(std::istream& in)
 	in >> _IAP;
 	in >> _normalizedIAP;
 	
+	if (!Serialization::readFooter(in, Mac::_ClassName))
+	{
+		exit(1);
+	}
 }
 
 int Mac::getCountTgam(TgamState state, const GrGrid& grid) const

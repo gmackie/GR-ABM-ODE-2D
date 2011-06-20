@@ -6,6 +6,9 @@
  */
 
 #include "rand.h"
+#include "serialization.h"
+
+const std::string Rand::_ClassName = "Rand";
 
 Rand::Rand(unsigned int	seed)
 	: _seed(seed)
@@ -25,27 +28,21 @@ void Rand::serialize(std::ostream& out) const
 {
 	assert(out.good());
 
-	out << getSerialSize() << std::endl;
+	Serialization::writeHeader(out, Rand::_ClassName);
+
 	out << _seed << std::endl;
 	out << _eng << std::endl;
 	out << _realEng << std::endl;
 
+	Serialization::writeFooter(out, Rand::_ClassName);
 }
 
 void Rand::deserialize(std::istream& in)
 {
 	assert(in.good());
 
-	// This check isn't fool proof because of data alignment in memory.
-	// An object's size can be bigger than the sum of the size's of its members.
-	// When a new member is added or an existing one deleted the object size can remain unchanged.
-	std::size_t currentSerialSize = getSerialSize();
-	std::size_t savedSerialSize;
-	in >> savedSerialSize;
-	if (savedSerialSize != currentSerialSize)
+	if (!Serialization::readHeader(in, Rand::_ClassName))
 	{
-		std::cerr << "Error deserializing Rand object."<< std::endl;
-		std::cerr << "The saved serial size of " << savedSerialSize << " does not match the current serial size of " << currentSerialSize << std::endl;
 		exit(1);
 	}
 
@@ -53,6 +50,10 @@ void Rand::deserialize(std::istream& in)
 	in >> _eng;
 	in >> _realEng;
 
+	if (!Serialization::readFooter(in, Rand::_ClassName))
+	{
+		exit(1);
+	}
 }
 
 // For debugging problems with random number generation being out of synch between

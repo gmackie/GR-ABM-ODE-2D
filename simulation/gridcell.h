@@ -22,6 +22,8 @@ class GridCell
 	static const int MAX_AGENTS_PER_CELL = 2;
 
 private:
+	static const std::string _ClassName;
+
 	int _row;
 	int _col;
 	bool _source;
@@ -89,7 +91,6 @@ public:
 	int getNumberOfAgents() const;
 	void serialize(std::ostream& out) const;
 	void deserialize(std::istream& in);
-	std::size_t getSerialSize() const;
 	bool isOccupied() const;
 	int getOccupiedNeighborCount(const GrGrid& grid) const;
 	float getCellDensity(const GrGrid& grid) const;
@@ -369,12 +370,6 @@ inline bool GridCell::isOccupied() const
 
 	bool result = caseated || (agentCount > 0) || (extMtb > 0.0);
 	return result;
-}
-
-inline std::size_t GridCell::getSerialSize() const
-{
-	// We don't serialize the agent pointers or the gpuMutex.
-	return sizeof(GridCell) - MAX_AGENTS_PER_CELL * sizeof(Agent*) - sizeof(int);
 }
 
 #endif /* GRIDCELL_H */

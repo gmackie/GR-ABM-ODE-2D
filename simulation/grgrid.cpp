@@ -6,7 +6,10 @@
  */
 
 #include "grgrid.h"
-#include <algorithm>
+#include "serialization.h"
+
+const std::string GrGrid::_ClassName = "GrGrid";
+
 
 GrGrid::GrGrid()
 	: _grid()
@@ -25,6 +28,14 @@ GrGrid::~GrGrid()
 void GrGrid::initSources()
 {
 	int nSources = _PARAM(PARAM_GR_NR_SOURCES);
+
+	// Useful for testing and debugging.
+	// Prevents recruitment and can just watch initial macs without the sources cluttering the screen.
+	if (nSources == 0)
+	{
+		return;
+	}
+
 	int n = (int)floor(sqrtf((float) nSources));
 
 	int dRow = NROWS / n;
@@ -70,6 +81,8 @@ void GrGrid::serialize(std::ostream& out) const
 {
 	assert(out.good());
 
+	Serialization::writeHeader(out, GrGrid::_ClassName);
+
 	out << NROWS << std::endl;
 	out << NCOLS << std::endl;
 
@@ -80,11 +93,19 @@ void GrGrid::serialize(std::ostream& out) const
 			_grid[i][j].serialize(out);
 		}
 	}
+
+	Serialization::writeFooter(out, GrGrid::_ClassName);
 }
 
 void GrGrid::deserialize(std::istream& in)
 {
 	assert(in.good());
+
+	if (!Serialization::readHeader(in, GrGrid::_ClassName))
+	{
+		exit(1);
+	}
+
 
 	int savedNrows, savedNcols;
 
@@ -93,7 +114,7 @@ void GrGrid::deserialize(std::istream& in)
 
 	if (savedNrows != NROWS || savedNcols != NCOLS)
 	{
-		std::cerr << "Error deserializing a GrGrid:"<< std::endl;
+		std::cerr << "Error deserializing GrGrid:"<< std::endl;
 		std::cerr << "The number of rows and cols in the saved grid, (" << savedNrows << ","  << savedNcols
 				  << "), does not match the current grid (" << NROWS << ","  << NCOLS << ")."<< std::endl;
 		exit(1);
@@ -109,5 +130,10 @@ void GrGrid::deserialize(std::istream& in)
 			if (_grid[i][j].isSource())
 				_sources.push_back(&_grid[i][j]);
 		}
+	}
+
+	if (!Serialization::readFooter(in, GrGrid::_ClassName))
+	{
+		exit(1);
 	}
 }

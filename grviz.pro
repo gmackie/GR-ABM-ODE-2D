@@ -6,7 +6,8 @@ CONFIG += debug_and_release
 QT += core \
     gui \
     opengl
-HEADERS += simulation/params.h \
+HEADERS += simulation/serialization.h \
+    simulation/params.h \
     simulation/paramsbase.h \
     simulation/grdiffusionftcsswap.h \
     simulation/grsimulationgrid.h \
@@ -87,7 +88,8 @@ HEADERS += simulation/params.h \
     maininterface.h \
     simulation.h \
     snapshot.h
-SOURCES += simulation/params.cpp \
+SOURCES += simulation/serialization.cpp \
+    simulation/params.cpp \
     simulation/paramsbase.cpp \
     simulation/grdiffusionftcsswap.cpp \
     simulation/grsimulationgrid.cpp \

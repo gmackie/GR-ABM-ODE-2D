@@ -7,6 +7,9 @@
 
 #include "tcytotoxic.h"
 #include "grgrid.h"
+#include "serialization.h"
+
+const std::string Tcyt::_ClassName = "Tcyt";
 
 // Needed for deserializing the model state.
 // Avoids the calls to the random number generator in the normal constructor, allowing the random number generator
@@ -269,6 +272,8 @@ void Tcyt::serialize(std::ostream& out) const
 {
 	assert(out.good());
 
+	Serialization::writeHeader(out, Tcyt::_ClassName);
+
 	Tcell::serialize(out);
 
 	int intVal = (int) _state;
@@ -289,11 +294,18 @@ void Tcyt::serialize(std::ostream& out) const
 	out << _vTNFR2 << std::endl;
 	out << _kSynth << std::endl;
 	out << _kTACE << std::endl;
+
+	Serialization::writeFooter(out, Tcyt::_ClassName);
 }
 
 void Tcyt::deserialize(std::istream& in)
 {
 	assert(in.good());
+
+	if (!Serialization::readHeader(in, Tcyt::_ClassName))
+	{
+		exit(1);
+	}
 
 	int intVal;
 
@@ -317,4 +329,9 @@ void Tcyt::deserialize(std::istream& in)
 	in >> _vTNFR2;
 	in >> _kSynth;
 	in >> _kTACE;
+
+	if (!Serialization::readFooter(in, Tcyt::_ClassName))
+	{
+		exit(1);
+	}
 }

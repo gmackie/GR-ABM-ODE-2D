@@ -34,6 +34,8 @@
 class Rand
 {
 private:
+	static const std::string _ClassName;
+
 	/*
 	 * !!! If the data members change then the serialize and deserialize functions need to be updated !!!
 	 */
@@ -58,7 +60,6 @@ public:
 	double getLogNormal(double mean, double sigma);
 	void serialize(std::ostream& out) const;
 	void deserialize(std::istream& in);
-	std::size_t getSerialSize() const;
 	void test(int time);
 };
 
@@ -102,12 +103,6 @@ inline double Rand::getLogNormal(double mean, double sigma)
 {
 	boost::lognormal_distribution<double> rnd(mean, sigma);
 	return rnd(_realEng);
-}
-
-inline std::size_t Rand::getSerialSize() const
-{
-	// We don't serialize _uniformDist01
-	return sizeof(Rand) - sizeof(uniform_real_t);
 }
 
 #endif /* RAND_H */

@@ -14,6 +14,8 @@
 class Mac : public Agent
 {
 private:
+	static const std::string _ClassName;
+
 	/*
 	 * !!! If the data members change then the serialize and deserialize functions need to be updated !!!
 	 */

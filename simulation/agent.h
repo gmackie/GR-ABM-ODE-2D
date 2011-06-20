@@ -14,6 +14,9 @@
 
 class Agent
 {
+private:
+	static const std::string _ClassName;
+
 protected:
 	int _birthTime;
 	int _deathTime;

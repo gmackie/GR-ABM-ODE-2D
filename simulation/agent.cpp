@@ -7,6 +7,9 @@
 
 #include "agent.h"
 #include "grgrid.h"
+#include "serialization.h"
+
+const std::string Agent::_ClassName = "Agent";
 
 // Needed for deserializing the model state.
 // Avoids the calls to the random number generator in the normal constructor, allowing the random number generator
@@ -113,18 +116,32 @@ void Agent::serialize(std::ostream& out) const
 {
 	assert(out.good());
 
+	Serialization::writeHeader(out, Agent::_ClassName);
+
 	out << _birthTime << std::endl;
 	out << _deathTime << std::endl;
 	out << _row << std::endl;
 	out << _col << std::endl;
+
+	Serialization::writeFooter(out, Agent::_ClassName);
 }
 
 void Agent::deserialize(std::istream& in)
 {
 	assert(in.good());
 
+	if (!Serialization::readHeader(in, Agent::_ClassName))
+	{
+		exit(1);
+	}
+
 	in >> _birthTime;
 	in >> _deathTime;
 	in >> _row;
 	in >> _col;
+
+	if (!Serialization::readFooter(in, Agent::_ClassName))
+	{
+		exit(1);
+	}
 }

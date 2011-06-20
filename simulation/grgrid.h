@@ -15,6 +15,8 @@
 class GrGrid
 {
 private:
+	static const std::string _ClassName;
+
 	GridCell _grid[NROWS][NCOLS];
 	GridCellPtrVector _sources;
 

@@ -402,8 +402,10 @@ int main(int argc, char *argv[])
 			int time = itfc.getSimulation().getTime();
 			const GrStat& stats = itfc.getSimulation().getStats();
 
-			if (pngInterval != 0)
+			if (pngInterval != 0){
+        glWindow.updateWindow();  //Update the graphics window before taking the picture
 				pSnapshot->takePicture(time, glWindow.grabFrameBuffer());
+      }
 
 			if (csvInterval != 0)
 				pSnapshot->takeSnapshot(time, stats);

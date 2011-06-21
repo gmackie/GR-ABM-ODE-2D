@@ -34,7 +34,7 @@ void GLWindow::setColorMap(ColorMap* pCurrentColorMap)
 
 void GLWindow::updateWindow()
 {
-	_ui.glWidget->updateWindow();
+	_ui.glWidget->updateGL();
 }
 
 void GLWindow::toggleFullScreen()

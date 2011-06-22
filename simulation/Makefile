@@ -1,14 +1,14 @@
-UBUNTU = $(shell uname -a | egrep "Ubuntu")
+OS = $(shell uname)
 
 SVNREV = $(shell svn info | grep "Last Changed Rev:" | cut -d" " -f4)
 CXX := g++
 CXXFLAGS += $(GPUFLAG) -DSVN_VERSION="\"\\\"$(SVNREV)\\\"\"" -msse -Wall
 
 
-ifeq ($(UBUNTU), )
-LDFLAGS += -lm -lboost_program_options
-else
+ifeq ($(OS), Linux)
 LDFLAGS += -lm -lboost_program_options-mt
+else
+LDFLAGS += -lm -lboost_program_options
 endif
 
 all: release
@@ -41,7 +41,7 @@ gr3: paramsbase.o params.o rand.o agent.o gr.o grsimulationgrid.o grgrid.o gridc
 gr4: paramsbase.o params.o rand.o agent.o gr.o grsimulationgrid.o grgrid.o gridcell.o macrophage.o grmain.o grstat.o grsimulation.o onlinestat.o grdiffusion.o grdiffusionftcs.o grdiffusionbtcs.o grdiffusionwrongbtcs.o grdiffusionftcsswap.o ttest.o areatest.o mtbtest.o tcell.o tcytotoxic.o tgamma.o tregulatory.o recruitmentbase.o recruitmentprob.o recruitmentlnode.o recruitmentlnodepure.o serialization.o tinyxml/tinystr.o tinyxml/tinyxml.o tinyxml/tinyxmlerror.o tinyxml/tinyxmlparser.o
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
-lhs: gr.o paramsbase.o params.o tinyxml/tinystr.o tinyxml/tinyxml.o tinyxml/tinyxmlerror.o tinyxml/tinyxmlparser.o lhs.o rand.o
+lhs: gr.o paramsbase.o params.o tinyxml/tinystr.o tinyxml/tinyxml.o tinyxml/tinyxmlerror.o tinyxml/tinyxmlparser.o lhs.o rand.o serialization.o
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
 #Makefile.depend: *.h *.cpp Makefile

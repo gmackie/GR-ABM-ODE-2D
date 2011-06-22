@@ -122,10 +122,10 @@
     actThreshod = "24.8079"
     activationRate = "4.62441e-03"
     c1rrIAP = "1.0e-03"
-    c3rIAP = "2.0e-04"
+    c3rIAP = "1.78006e-04"
     c4IAP = "0.5"
     c5IAP = "5.0e-04"
-    kIAP = "32.9">
+    kIAP = "24.8079">
 	<Mac
 		initNumber = "105"
 		maxAge = "14400"

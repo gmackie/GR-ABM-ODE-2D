@@ -158,6 +158,12 @@ unix:LIBS += -lboost_program_options-mt
 macx { 
     LIBS -= -lboost_program_options-mt
     LIBS += -lboost_program_options
+
+    # Have qmake create make files that put the executable
+    # in a file in the build directory, rather than in a Mac
+    # application bundle. Ex. put the executable in grviz-lung
+    # rather than in grviz-lung.app/Contents/MacOS/grviz-lung.
+    CONFIG -= app_bundle
 }
 win32 { 
     CONFIG -= flat

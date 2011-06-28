@@ -454,8 +454,7 @@ void Mac::solveReceptorAndNFkBODEs(GrGrid& grid, double dt)
 	double dIAPt; 
 	double dIAP;
 	
-	//dmTNF = ( _PARAM(PARAM_GR_e3TNF)*_TNF - _kTACE * _mTNF) * dt;
-	dmTNF = ( 0.006475*_PARAM(PARAM_GR_c3rTNF)*_TNF - _kTACE * _mTNF) * dt;
+	dmTNF = ( _PARAM(PARAM_GR_e3TNF)*_TNF - _kTACE * _mTNF) * dt;
 	dsurfTNFR1 = (_vTNFR1 - _PARAM(PARAM_GR_K_ON1) * tnf * _surfTNFR1 + (koff1+kdeg) * _surfBoundTNFR1 - _PARAM(PARAM_GR_K_T1) * _surfTNFR1 + _PARAM(PARAM_GR_K_REC1) * _intBoundTNFR1) * dt;
 	dsurfTNFR2 = (_vTNFR2 - _PARAM(PARAM_GR_K_ON2) * tnf * _surfTNFR2 + (koff2+kdeg) * _surfBoundTNFR2 - _PARAM(PARAM_GR_K_T2) * _surfTNFR2 + _PARAM(PARAM_GR_K_REC2) * _intBoundTNFR2) * dt;
 	dsurfBoundTNFR1 = (_PARAM(PARAM_GR_K_ON1) * tnf * _surfTNFR1 - (koff1+kdeg) * _surfBoundTNFR1 - _PARAM(PARAM_GR_K_INT1) * _surfBoundTNFR1) * dt;
@@ -485,11 +484,9 @@ void Mac::solveReceptorAndNFkBODEs(GrGrid& grid, double dt)
 	dGIkB = (_PARAM(PARAM_GR_q1)*_NFkBn*(2-_GIkB)-_PARAM(PARAM_GR_q2)*_IkBn*_GIkB) * dt;
 	dGR = (_PARAM(PARAM_GR_q1r)*_NFkBn*(2-_GR)-(_PARAM(PARAM_GR_q2rr)+_PARAM(PARAM_GR_q2r)*_IkBn)*_GR) * dt;
 	dchemt = (_c1rrChemTNF+_c1rChem*_GR-_PARAM(PARAM_GR_c3rChem)*_chemt) * dt;
-	//dchem = (_PARAM(PARAM_GR_c4Chem)*_chemt-_PARAM(PARAM_GR_c5Chem)*_chem-_PARAM(PARAM_GR_e3Chem)*_chem) * dt;
-	dchem = (_PARAM(PARAM_GR_c4Chem)*_chemt-_PARAM(PARAM_GR_c5Chem)*_chem-0.07484*_PARAM(PARAM_GR_c3rChem)*_chem) * dt;
+	dchem = (_PARAM(PARAM_GR_c4Chem)*_chemt-_PARAM(PARAM_GR_c5Chem)*_chem-_PARAM(PARAM_GR_e3Chem)*_chem) * dt;
 	dTNFt = (_c1rrChemTNF+_c1rTNF*_GR-_PARAM(PARAM_GR_c3rTNF)*_TNFt) * dt;
-	//dTNF = (_PARAM(PARAM_GR_c4TNF)*_TNFt-_PARAM(PARAM_GR_c5TNF)*_TNF-_PARAM(PARAM_GR_e3TNF)*_TNF) * dt;
-	dTNF = (_PARAM(PARAM_GR_c4TNF)*_TNFt-_PARAM(PARAM_GR_c5TNF)*_TNF-0.006475*_PARAM(PARAM_GR_c3rTNF)*_TNF) * dt;
+	dTNF = (_PARAM(PARAM_GR_c4TNF)*_TNFt-_PARAM(PARAM_GR_c5TNF)*_TNF-_PARAM(PARAM_GR_e3TNF)*_TNF) * dt;
 	dACTt = (_PARAM(PARAM_GR_c1rrACT)+_PARAM(PARAM_GR_c1r)*_GR-_PARAM(PARAM_GR_c3rACT)*_ACTt) * dt;
 	dACT = (_PARAM(PARAM_GR_c4ACT)*_ACTt-_PARAM(PARAM_GR_c5ACT)*_ACT) * dt;
 	dIAPt = (_PARAM(PARAM_GR_c1rrIAP)+_PARAM(PARAM_GR_c1r)*_GR-_PARAM(PARAM_GR_c3rIAP)*_IAPt) * dt;
@@ -509,12 +506,9 @@ void Mac::solveReceptorAndNFkBODEs(GrGrid& grid, double dt)
 	cell.setShedTNFR2(Nav * vol * shedtnfr2);
 	
 	// secrete chemokines
-	//cell.incCCL2(_PARAM(PARAM_GR_e3Chem) * _chem * dt);
-	//cell.incCCL5(_PARAM(PARAM_GR_e3Chem) * _chem * dt);
-	//cell.incCXCL9(2 * _PARAM(PARAM_GR_e3Chem) * _chem * dt);
-	cell.incCCL2(0.07484*_PARAM(PARAM_GR_c3rChem) * _chem * dt);
-	cell.incCCL5(0.07484*_PARAM(PARAM_GR_c3rChem) * _chem * dt);
-	cell.incCXCL9(2 * 0.07484*_PARAM(PARAM_GR_c3rChem) * _chem * dt);
+	cell.incCCL2(_PARAM(PARAM_GR_e3Chem) * _chem * dt);
+	cell.incCCL5(_PARAM(PARAM_GR_e3Chem) * _chem * dt);
+	cell.incCXCL9(2 * _PARAM(PARAM_GR_e3Chem) * _chem * dt);
 	
 	_IKKKa += dIKKKa;
 	_IKKn += dIKKn; 

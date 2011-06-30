@@ -18,6 +18,9 @@ private:
 	static const std::string _ClassName;
 
 protected:
+	/*
+	 * !!! If the data members change then the serialize and deserialize functions need to be updated !!!
+	 */
 	int _birthTime;
 	int _deathTime;
 	int _row;

@@ -18,14 +18,14 @@
  * states.
  *
  * A loaded simulation state can be used in the GUI version of
- * the code to display and save pictures for that state. The non-gui
+ * the code to display and save pictures for that state. The non-GUI
  * version can be run on a cluster (which generally don't have graphics
  * support - a lot of CPUs but no graphics cards) and set to save states
  * periodically. Once the all the cluster runs (typically in the hundreds
  * or thousands) have finished a script can be used to post process the
- * save states, using the GUI version to load each state for each run,
+ * saved states, using the GUI version to load each state for each run,
  * saving pictures for that state. This allows looking at both numerical
- * statistics and graphics for each run, avoiding the need  to make a decision
+ * statistics and graphics for each run, avoiding the need to make a decision
  * about which runs are interesting on the basis of statistics alone and
  * rerunning just those runs using the GUI version on a non-cluster environment
  * to generate graphics for just those runs.
@@ -83,10 +83,14 @@
  * that member will no longer compile.
  *
  * Changing a member's type, for members that are of a primitive type (int, float, etc.),
- * generally isn't a problem because the stream output and input operators are used (">>" and "<<").
+ * generally isn't a problem because the stream output and input operators are used (">>" and "<<"),
+ * which can handle any primitive type.
  * Changing a member's type from one class to another generally isn't a problem because we typically
  * call the class's serialize and deserialize functions. These function calls are (should be) the
- * same for all classes that we need to include in a saved state.
+ * same for all classes that we need to include in a saved state. That is, if class Flip to be serialized
+ * has a member of type Class Gorp which is changed to be of type Class Blap, both Gorp and Blap
+ * should have functions named "serialize" and "deserialize", so changing that member's type shouldn't
+ * require any changes to the Flip class serialize and deserialize functions.
  *
  * The support functions in this class that write a header and footer at the start and end of the data
  * written for a class help protect against a mismatch between what a class's serialization function
@@ -105,11 +109,15 @@
  * function then the number of items written will be smaller than the number that are read.
  * The deserialization function will read data after the footer for the class being read (for the next class
  * that was serialized). Since the footer is text, if the member that the footer is read into is not a string
- * then error will occur and be reported. If that doesn't happen then later what it reads as the footer won't
+ * then an error will occur and be reported. If that doesn't happen then later what it reads as the footer won't
  * match the actual footer for the class being read and be reported as an error. If the class being read is
  * the last class for a saved state it will attempt to read past end of file which does not seem to be detected
  * as an error. At least, 0 is assigned to numeric variables being read.
  *
+ * Also note that if a floating point value being serialized has a value of nan (not a number) what the output
+ * stream operator (">>") writes is the text "nan". This will typically not deserialize properly, causing
+ * a mismatched footer error. The solution is to find what caused a nan to be defined and written and to
+ * fix that problem.
  *
  */
 

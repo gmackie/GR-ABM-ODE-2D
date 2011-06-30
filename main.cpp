@@ -74,6 +74,7 @@ int main(int argc, char *argv[])
 {
 	QApplication a(argc, argv);
 
+	bool snapshotMode;
 	bool ode;
 	bool tnfrDynamics;
 	bool nfkbDynamics;
@@ -141,6 +142,7 @@ int main(int argc, char *argv[])
 				"Resolution of the OpenGL window")
 		("granuloma-visualization,g", po::value<std::string>(&granvizDataSetName), argHelp.c_str())
 		("load-state,l",  po::value<std::string>(&stateFileName), "File name of saved state to load")
+		("snapshot",  po::value<std::string>(&stateFileName), "Load a saved state, save a graphic snapshot and quit.\nArgument is the saved state to load.")
 		("ode", "Use integrated lymph node ODE for recruitment")
 		("tnfr-dynamics", "Use molecular level TNF/TNFR dynamics in the model")
 		("NFkB-dynamics", "Use molecular level intracellular NFkB dynamics in the model")
@@ -176,6 +178,7 @@ int main(int argc, char *argv[])
 		}
 		g_Rand.setSeed(seed);
 
+		snapshotMode = vm.count("snapshot");
 		scriptingMode = vm.count("script");
 		outputEnabled = vm.count("output");
 
@@ -313,11 +316,70 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-
+	// These are needed for snapshotMode, scriptingMode and regular execution.
 	ScalarAgentGrid agentGrid;
 	AgentsVisualization agentsVisualization(Simulation::_DIM, &agentGrid);
 	MainInterface itfc(&agentsVisualization, &agentGrid);
 	GLWindow glWindow(&itfc);
+
+	if (snapshotMode)
+	{
+		// Load a state, save the graphics to a png and quit.
+		// This avoids timing issues with the normal application run,
+		// which has separate simulation and UI threads.
+		// Often the graphics are not updated before the saved state is loaded
+		// and the program quits, resulting in a png file that is all black
+		// where the simulation graphics should be.
+		// Also, on 32 bit Ubuntu the granuloma boundary does not appear in the
+		// correct location if a picture is saved when running in scripting mode.
+
+		// Show the graphics window.
+		// On 32 bit Ubuntu the saved picture will not have a correct background color.
+		// It will be blue instead of black. Showing a message box, for reasons unknown,
+		// prevents this. The message box does not wait for user input.
+		glWindow.show();
+		QMessageBox qmb( QMessageBox::NoIcon, "Lung ABM", "wait");
+		qmb.show();
+
+		if(!outputEnabled)
+		{
+			std::cerr << "No output directory has been specified. Please specify one using the  -o option." << std::endl;
+			exit(1);
+		}
+
+		// Load the saved state.
+		std::ifstream in(stateFileName.c_str());
+		if (!in.good())
+		{
+			std::string errstr = "Failed to open file '" + stateFileName + "'.";
+			std::cerr << errstr << std::endl;
+			exit(1);
+		}
+
+		itfc.getSimulation().loadState(in);
+		in.close();
+
+		// Have the MainInterface object get the loaded simulation state from the Simulation object.
+		// This is the data that is used to update the graphics window.
+		itfc.doStep();
+
+		// Update the graphics window with the loaded model state.
+		glWindow.updateWindow();
+
+		// Take a snapshot.
+		QString dirName = QString(outputDir.c_str()) + QDir::separator();
+		Snapshot* pSnapshot = new Snapshot(dirName, QString());
+
+		int simTime = itfc.getSimulation().getTime();
+		pSnapshot->takePicture(simTime, glWindow.grabFrameBuffer());
+
+		exit(0);
+
+	}
+
+	// These are needed only for scriptingMode and regular execution.
+	// We specifically don't want the MainWindow running in snapshotMode, since we don't want it running the simulation
+	// updating the graphics window or taking snapshots.
 	ParamWindow paramWindow(&itfc);
 	MainWindow w(&itfc, &glWindow, &paramWindow, new StatWidget(), new AgentsWidget(&agentsVisualization));
 
@@ -403,9 +465,9 @@ int main(int argc, char *argv[])
 			const GrStat& stats = itfc.getSimulation().getStats();
 
 			if (pngInterval != 0){
-        glWindow.updateWindow();  //Update the graphics window before taking the picture
+				glWindow.updateWindow();  //Update the graphics window before taking the picture
 				pSnapshot->takePicture(time, glWindow.grabFrameBuffer());
-      }
+			}
 
 			if (csvInterval != 0)
 				pSnapshot->takeSnapshot(time, stats);

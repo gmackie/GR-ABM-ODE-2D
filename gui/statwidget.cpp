@@ -58,7 +58,7 @@ void StatWidget::updateLabels(const GrStat& stats)
 			arg(stats.getNrOfMacDeactDead());
 	_ui.labelMacDeact->setText(str);
 
-	str = QString("(%1,%2)").arg(stats.getNrApoptosisTNF()).arg(stats.getNrApoptosisFasFasL());
+	str = QString("(%1,%2)").arg(stats.getNrMacApoptosisTNF()).arg(stats.getNrApoptosisFasFasL());
 	_ui.labelApoptosis->setText(str);
 
 	str = QString("(%1,%2,%3,%4)").

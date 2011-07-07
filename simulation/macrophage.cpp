@@ -292,21 +292,57 @@ void Mac::computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tnf
 			 g_Rand.getReal() < 1 - pow(2.7183, -_PARAM(PARAM_GR_K_APOPTOSIS_MOLECULAR) * (_intBoundTNFR1 - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR))))
 	{
 		// TNF induced apoptosis
-		stats.incApoptosisTNF();
+		stats.incMacApoptosisTNF();
+		if (_state == MAC_RESTING)
+		{ 
+			stats.incRestingMacApoptosisTNF();
+		}
+		else if (_state == MAC_INFECTED || _state == MAC_CINFECTED)
+		{
+			stats.incInfAndCinfMacApoptosisTNF();
+		}
+		else if (_state == MAC_ACTIVE)
+		{
+			stats.incActivatedMacApoptosisTNF();
+		}
 		apoptosis(grid);
 	}
 	else if (nfkbDynamics && _intBoundTNFR1 > _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR) &&	
 			 g_Rand.getReal() < 1 - pow(2.7183, -nfkb_adjusted_k_apoptosis * (_intBoundTNFR1 - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR))))
 	{
 		// TNF induced apoptosis
-		stats.incApoptosisTNF();
+		stats.incMacApoptosisTNF();
+		if (_state == MAC_RESTING)
+		{ 
+			stats.incRestingMacApoptosisTNF();
+		}
+		else if (_state == MAC_INFECTED || _state == MAC_CINFECTED)
+		{
+			stats.incInfAndCinfMacApoptosisTNF();
+		}
+		else if (_state == MAC_ACTIVE)
+		{
+			stats.incActivatedMacApoptosisTNF();
+		}
 		apoptosis(grid);
 	}
 	else if (!tnfrDynamics && tnfBoundFraction > _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF) &&
 			 g_Rand.getReal() < 1 - pow(2.7183, -_PARAM(PARAM_GR_K_APOPTOSIS) * (tnfBoundFraction - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF))))
 	{
 		// TNF induced apoptosis
-		stats.incApoptosisTNF();
+		stats.incMacApoptosisTNF();
+		if (_state == MAC_RESTING)
+		{ 
+			stats.incRestingMacApoptosisTNF();
+		}
+		else if (_state == MAC_INFECTED || _state == MAC_CINFECTED)
+		{
+			stats.incInfAndCinfMacApoptosisTNF();
+		}
+		else if (_state == MAC_ACTIVE)
+		{
+			stats.incActivatedMacApoptosisTNF();
+		}
 		apoptosis(grid);
 	}
 	else
@@ -665,7 +701,7 @@ void Mac::solveNFkBODEsEquilibrium(double dt)
 	 */
 }
 
-void Mac::handleResting(const int time, GrGrid& grid, GrStat&, bool nfkbDynamics)
+void Mac::handleResting(const int time, GrGrid& grid, GrStat& stats, bool nfkbDynamics)
 {
 	GridCell& cell = grid(_row, _col);
 
@@ -719,6 +755,7 @@ void Mac::handleResting(const int time, GrGrid& grid, GrStat&, bool nfkbDynamics
 				_activationTime = time;
 				_deathTime = time + _PARAM(PARAM_MAC_A_AGE);
 				_nextState = MAC_ACTIVE;
+				stats.incRestingMacActivationTNF();
 			}
 		}
 	}
@@ -728,10 +765,11 @@ void Mac::handleResting(const int time, GrGrid& grid, GrStat&, bool nfkbDynamics
 		_activationTime = time;
 		_deathTime = time + _PARAM(PARAM_MAC_A_AGE);
 		_nextState = MAC_ACTIVE;
+		stats.incRestingMacActivationTNF();
 	}
 }
 
-void Mac::handleInfected(const int time, GrGrid& grid, GrStat&, bool nfkbDynamics)
+void Mac::handleInfected(const int time, GrGrid& grid, GrStat& stats, bool nfkbDynamics)
 {
 	GridCell& cell = grid(_row, _col);
 
@@ -779,6 +817,7 @@ void Mac::handleInfected(const int time, GrGrid& grid, GrStat&, bool nfkbDynamic
 					_activationTime = time;
 					_deathTime = time + _PARAM(PARAM_MAC_A_AGE);
 					_nextState = MAC_ACTIVE;
+					stats.incInfMacActivationTNF();
 				}
 				else 
 				{
@@ -794,6 +833,7 @@ void Mac::handleInfected(const int time, GrGrid& grid, GrStat&, bool nfkbDynamic
 				_activationTime = time;
 				_deathTime = time + _PARAM(PARAM_MAC_A_AGE);
 				_nextState = MAC_ACTIVE;
+				stats.incInfMacActivationTNF();
 			}
 			else
 			{

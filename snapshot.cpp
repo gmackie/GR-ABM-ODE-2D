@@ -108,6 +108,20 @@ Snapshot::Snapshot(const QString& dirName, const QString& fileName)
 		<< "\"NrCaseated\""
 		<< ","
 		<< "\"NonRepl Ext. Mtb.\""
+		<< ","
+		<< "\"MacApoptosisTNF\""
+		<< ","
+		<< "\"MrApoptTNF\""
+		<< ","
+		<< "\"Mi&MciApoptTNF\""
+		<< ","
+		<< "\"MaApoptTNF\""
+		<< ","
+		<< "\"TcellApoptTNF\""
+		<< ","
+		<< "\"MrActivationTNF\""
+		<< ","
+		<< "\"MiActivationTNF\""
 		<< "\n";
 }
 
@@ -275,7 +289,22 @@ void Snapshot::takeSnapshot(const int time, const GrStat& stats)
 		<< stats.getNrCaseated()
 		<< ','
 		<< stats.getTotNonRepExtMtb()
+		<< ','
+		<< stats.getNrMacApoptosisTNF()
+		<< ','
+		<< stats.getNrRestingMacApoptosisTNF()
+		<< ','
+		<< stats.getNrInfAndCinfMacApoptosisTNF()
+		<< ','
+		<< stats.getNrActivatedMacApoptosisTNF()
+		<< ','
+		<< stats.getNrTcellApoptosisTNF()
+		<< ','
+		<< stats.getNrRestingMacActivationTNF()
+		<< ','
+		<< stats.getNrInfMacActivationTNF()
 		;
+
 
 	_outFile << std::endl;
 

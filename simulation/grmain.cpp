@@ -52,7 +52,7 @@ void writeOutputOld(std::ofstream& outputFileStream, GrSimulation& sim, int csvI
 	","<<stats.getNrOfTgamDownRegulated()<<","<<stats.getNrOfTcyt()<<","<<stats.getNrOfTcytActive()<<","<<stats.getNrOfTcytDownRegulated()<<
 	","<<stats.getNrOfTregActive()<<","<<stats.getTotIntMtb()<<","<<stats.getTotExtMtb()<<
 	","<<stats.getTotTNF() / (NROWS*NCOLS)<<","<<stats.getTotCCL2() / (NROWS*NCOLS)<<","<<stats.getTotCCL5() / (NROWS*NCOLS)<<
-	","<<stats.getTotCXCL9() / (NROWS*NCOLS)<<","<<stats.getNrApoptosisTNF() <<
+	","<<stats.getTotCXCL9() / (NROWS*NCOLS)<<","<<stats.getNrMacApoptosisTNF() <<
 	","<<stats.getMDC()<< ","<< stats.getN4()<<","<< stats.getTH0()<<","<< stats.getTH1()<<
 	","<< stats.getN8()<< ","<< stats.getT80()<< ","<< stats.getT8()<< ","<< stats.getTC()<<
 	","<<stats.getTH0lung()<< ","<< stats.getTH1lung()<< ","<< stats.getT80lung()<<
@@ -155,6 +155,20 @@ void writeOutputHeader(std::ofstream& outputFileStream, std::string inputFileNam
 	<< "\"NrCaseated\""
 	<< ","
 	<< "\"NonRepl Ext. Mtb.\""
+	<< ","
+	<< "\"MacApoptosisTNF\""
+	<< ","
+	<< "\"MrApoptTNF\""
+	<< ","
+	<< "\"Mi&MciApoptTNF\""
+	<< ","
+	<< "\"MaApoptTNF\""
+	<< ","
+	<< "\"TcellApoptTNF\""
+	<< ","
+	<< "\"MrActivationTNF\""
+	<< ","
+	<< "\"MiActivationTNF\""
 	<< "\n";
 }
 
@@ -282,6 +296,20 @@ void writeOutput(std::ofstream& outputFileStream, GrSimulation& sim, int csvInte
 	<< stats.getNrCaseated()
 	<< ','
 	<< stats.getTotNonRepExtMtb()
+	<< ','
+	<< stats.getNrMacApoptosisTNF()
+	<< ','
+	<< stats.getNrRestingMacApoptosisTNF()
+	<< ','
+	<< stats.getNrInfAndCinfMacApoptosisTNF()
+	<< ','
+	<< stats.getNrActivatedMacApoptosisTNF()
+	<< ','
+	<< stats.getNrTcellApoptosisTNF()
+	<< ','
+	<< stats.getNrRestingMacActivationTNF()
+	<< ','
+	<< stats.getNrInfMacActivationTNF()
 	;
 	
 	outputFileStream << std::endl;

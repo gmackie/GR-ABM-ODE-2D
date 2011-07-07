@@ -92,12 +92,14 @@ void Tgam::computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tn
 			 g_Rand.getReal() < 1 - pow(2.7183, -_PARAM(PARAM_GR_K_APOPTOSIS_MOLECULAR) * (_intBoundTNFR1 - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR))))
 	{
 		// TNF induced apoptosis
+		stats.incTcellApoptosisTNF();
 		_nextState = TGAM_DEAD;
 	}
 	else if (!tnfrDynamics && tnfBoundFraction > _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF) &&
 			 g_Rand.getReal() < 1 - pow(2.7183, -_PARAM(PARAM_GR_K_APOPTOSIS) * (tnfBoundFraction - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF))))
 	{
 		// TNF induced apoptosis
+		stats.incTcellApoptosisTNF();
 		_nextState = TGAM_DEAD;
 	}
 	else

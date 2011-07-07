@@ -54,7 +54,14 @@ private:
 	double _totCXCL9;
 
 	int _nApoptosisFasFasL;
-	int _nApoptosisTNF;
+	int _nMacApoptosisTNF;
+	int _nRestingMacApoptosisTNF;
+	int _nInfAndCinfMacApoptosisTNF;
+	int _nActivatedMacApoptosisTNF;
+	int _nTcellApoptosisTNF;
+	
+	int _nRestingMacActivationTNF;
+	int _nInfMacActivationTNF;
 
 	int _nMacNFkB;
 	int _nMacNFkBResting;
@@ -177,9 +184,21 @@ public:
 	void incTotCCL5(double dCCL5);
 	void incTotCXCL9(double dCXCL9);
 	int getNrApoptosisFasFasL() const;
-	int getNrApoptosisTNF() const;
+	int getNrMacApoptosisTNF() const;
+	int getNrRestingMacApoptosisTNF() const;
+	int getNrInfAndCinfMacApoptosisTNF() const;
+	int getNrActivatedMacApoptosisTNF() const;
+	int getNrTcellApoptosisTNF() const;
+	int getNrRestingMacActivationTNF() const;
+	int getNrInfMacActivationTNF() const;
 	void incApoptosisFasFasL();
-	void incApoptosisTNF();
+	void incMacApoptosisTNF();
+	void incRestingMacApoptosisTNF();
+	void incInfAndCinfMacApoptosisTNF();
+	void incActivatedMacApoptosisTNF();
+	void incTcellApoptosisTNF();
+	void incRestingMacActivationTNF();
+	void incInfMacActivationTNF();
 	int getNrSourcesMac() const;
 	int getNrSourcesTgam() const;
 	int getNrSourcesTcyt() const;
@@ -575,9 +594,39 @@ inline int GrStat::getNrApoptosisFasFasL() const
 	return _nApoptosisFasFasL;
 }
 
-inline int GrStat::getNrApoptosisTNF() const
+inline int GrStat::getNrMacApoptosisTNF() const
 {
-	return _nApoptosisTNF;
+	return _nMacApoptosisTNF;
+}
+
+inline int GrStat::getNrRestingMacApoptosisTNF() const
+{
+	return _nRestingMacApoptosisTNF;
+}
+
+inline int GrStat::getNrInfAndCinfMacApoptosisTNF() const
+{
+	return _nInfAndCinfMacApoptosisTNF;
+}
+
+inline int GrStat::getNrActivatedMacApoptosisTNF() const
+{
+	return _nActivatedMacApoptosisTNF;
+}
+
+inline int GrStat::getNrTcellApoptosisTNF() const
+{
+	return _nTcellApoptosisTNF;
+}
+
+inline int GrStat::getNrRestingMacActivationTNF() const
+{
+	return _nRestingMacActivationTNF;
+}
+
+inline int GrStat::getNrInfMacActivationTNF() const
+{
+	return _nInfMacActivationTNF;
 }
 
 inline void GrStat::incApoptosisFasFasL()
@@ -585,9 +634,39 @@ inline void GrStat::incApoptosisFasFasL()
 	_nApoptosisFasFasL++;
 }
 
-inline void GrStat::incApoptosisTNF()
+inline void GrStat::incMacApoptosisTNF()
 {
-	_nApoptosisTNF++;
+	_nMacApoptosisTNF++;
+}
+
+inline void GrStat::incRestingMacApoptosisTNF()
+{
+	_nRestingMacApoptosisTNF++;
+}
+
+inline void GrStat::incInfAndCinfMacApoptosisTNF()
+{
+	_nInfAndCinfMacApoptosisTNF++;
+}
+
+inline void GrStat::incActivatedMacApoptosisTNF()
+{
+	_nActivatedMacApoptosisTNF++;
+}
+
+inline void GrStat::incTcellApoptosisTNF()
+{
+	_nTcellApoptosisTNF++;
+}
+
+inline void GrStat::incRestingMacActivationTNF()
+{
+	_nRestingMacActivationTNF++;
+}
+
+inline void GrStat::incInfMacActivationTNF()
+{
+	_nInfMacActivationTNF++;
 }
 
 inline void GrStat::incTotExtMtb(double dExtMtb)

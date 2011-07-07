@@ -37,7 +37,13 @@ GrStat::GrStat()
 	, _totCCL5(0)
 	, _totCXCL9(0)
 	, _nApoptosisFasFasL(0)
-	, _nApoptosisTNF(0)
+	, _nMacApoptosisTNF(0)
+	, _nRestingMacApoptosisTNF(0)
+	, _nInfAndCinfMacApoptosisTNF(0)
+	, _nActivatedMacApoptosisTNF(0)
+	, _nTcellApoptosisTNF(0)
+	, _nRestingMacActivationTNF(0)
+	, _nInfMacActivationTNF(0)
 	, _nMacNFkB(0)
 	, _nMacNFkBResting(0)
 	, _nMacNFkBInfected(0)
@@ -317,7 +323,14 @@ void GrStat::serialize(std::ostream& out) const
 	out << _totCXCL9 << std::endl;
 
 	out << _nApoptosisFasFasL << std::endl;
-	out << _nApoptosisTNF << std::endl;
+	out << _nMacApoptosisTNF << std::endl;
+	out << _nRestingMacApoptosisTNF << std::endl;
+	out << _nInfAndCinfMacApoptosisTNF << std::endl;
+	out << _nActivatedMacApoptosisTNF << std::endl;
+	out << _nTcellApoptosisTNF << std::endl;
+	
+	out << _nRestingMacActivationTNF << std::endl;
+	out << _nInfMacActivationTNF << std::endl;
 
 	out << _nMacNFkB << std::endl;
 	out << _nMacNFkBResting << std::endl;
@@ -424,7 +437,14 @@ void GrStat::deserialize(std::istream& in)
 	in >>_totCXCL9;
 
 	in >>_nApoptosisFasFasL;
-	in >>_nApoptosisTNF;
+	in >>_nMacApoptosisTNF;
+	in >> _nRestingMacApoptosisTNF;
+	in >> _nInfAndCinfMacApoptosisTNF;
+	in >> _nActivatedMacApoptosisTNF;
+	in >> _nTcellApoptosisTNF;
+	
+	in >> _nRestingMacActivationTNF;
+	in >> _nInfMacActivationTNF;
 
 	in >>_nMacNFkB;
 	in >>_nMacNFkBResting;

@@ -229,9 +229,9 @@ void GrSimulation::init()
 		
 		if (_nfkbDynamics)
 		{
-			// initialize NF-kB signaling from steady-state
-			for (int i = 0; i < 21600; ++i)
-				pMac->solveNFkBODEsEquilibrium(2);
+			// initialize NF-kB signaling from steady-state (12 hours equilibrium)
+			for (int i = 0; i < 7200*_PARAM(PARAM_GR_NF_KB_TIME_COEFF); ++i)
+				pMac->solveNFkBODEsEquilibrium(6.00/_PARAM(PARAM_GR_NF_KB_TIME_COEFF));
 		}
 
 		pMac->setIntMtb(1);
@@ -257,9 +257,9 @@ void GrSimulation::init()
 			Mac* newMac = createMac(row, col, g_Rand.getInt(-1, -maxMacAge), MAC_RESTING, false, false);
 			if (_nfkbDynamics)
 			{
-				// initialize NF-kB signaling from steady-state
-				for (int i = 0; i < 21600; ++i)
-					newMac->solveNFkBODEsEquilibrium(2);
+				// initialize NF-kB signaling from steady-state (12 hours equilibrium)
+				for (int i = 0; i < 7200*_PARAM(PARAM_GR_NF_KB_TIME_COEFF); ++i)
+					newMac->solveNFkBODEsEquilibrium(6.00/_PARAM(PARAM_GR_NF_KB_TIME_COEFF));
 			}
 			count--;
 		}
@@ -511,9 +511,9 @@ void GrSimulation::updateReceptorAndNFkBDynamics(double dt)
 {
 	for (MacList::iterator it = _macList.begin(); it != _macList.end(); it++)
 	{
-		for (int i = 0; i < dt; i++)
+		for (int i = 0; i < _PARAM(PARAM_GR_NF_KB_TIME_COEFF); i++)
 		{
-			it->solveReceptorAndNFkBODEs(_grid.getGrid(), 1.00);
+			it->solveReceptorAndNFkBODEs(_grid.getGrid(), dt/_PARAM(PARAM_GR_NF_KB_TIME_COEFF));
 		}
 	}
 	for (TgamList::iterator it = _tgamList.begin(); it != _tgamList.end(); it++)

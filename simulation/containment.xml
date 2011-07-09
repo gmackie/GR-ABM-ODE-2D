@@ -124,6 +124,7 @@
 	c4IAP = "0.5"
 	c5IAP = "0.0005"
 	kIAP = "38.5744"
+    NFkBTimeCoefficient = "10"
 	>
 	<Mac
 		initNumber = "105"

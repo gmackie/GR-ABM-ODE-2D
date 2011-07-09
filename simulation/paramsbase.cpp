@@ -236,6 +236,7 @@ const ParamDescription ParamsBase::_description[_PARAM_COUNT] =
 	/* INT */
 	{ "nrSources",							GR_NODE,	true,	false,	0.0,	0,	"",					"Number of vascular sources on the grid" },
 	{ "nrKillingsCaseation",				GR_NODE,	true,	false,	0.0,	0,	"",					"Number of killings for a compartment to become caseated" },
+	{ "NFkBTimeCoefficient",				GR_NODE,	true,	false,	0.0,	0,	"-",				"number of NF-kB time-steps within a single diffusion time-step" },
 	{ "maxAge",								MAC_NODE,	true,	false,	0.0,	0,	"#timesteps",		"Maximal macrophage age" },
 	{ "maxAgeAct",							MAC_NODE,	true,	false,	0.0,	0,	"#timesteps",		"Maximal activated macrophage age" },
 	{ "initNumber",							MAC_NODE,	true,	false,	0.0,	0,	"",					"Initial number of resting macrophages on the grid" },

@@ -1,51 +1,64 @@
-OS = $(shell uname)
+OS := $(shell grep -E 'Ubuntu|Red Hat' /etc/issue)
 
-SVNREV = $(shell svn info | grep "Last Changed Rev:" | cut -d" " -f4)
+SVNREV := $(shell svn info | grep "Last Changed Rev:" | cut -d" " -f4)
 CXX := g++
-CXXFLAGS += $(GPUFLAG) -DSVN_VERSION="\"\\\"$(SVNREV)\\\"\"" -msse -Wall
+CXXFLAGS += -DSVN_VERSION=\"$(SVNREV)\" -msse -Wall
 
 
-ifeq ($(OS), Linux)
-LDFLAGS += -lm -lboost_program_options-mt
-else
+ifeq ($(OS), )
 LDFLAGS += -lm -lboost_program_options
+else
+LDFLAGS += -lm -lboost_program_options-mt
 endif
 
 all: release
 
 .PHONY:	release debug profile
 
-debug:
-	@$(MAKE) CXXFLAGS="$(CXXFLAGS) $(PROFILE_FLAGS) -DDEBUG -DVERBOSE -O0 -g3" gr
-release:
-	@$(MAKE) CXXFLAGS="$(CXXFLAGS) -DNDEBUG -O3" gr
-	
-# PROFILE_FLAGS instead of using  CXXFLAGS="$(CXXFLAGS) -pg" avoids problems
-# with the quotes surrounding the version number getting stripped on the recursive
-# make invokation.
-profile:
-	@$(MAKE) PROFILE_FLAGS="-pg" debug
-	
-gr: paramsbase.o params.o rand.o agent.o gr.o grsimulationgrid.o grgrid.o gridcell.o macrophage.o grmain.o grstat.o grsimulation.o onlinestat.o grdiffusion.o grdiffusionftcs.o grdiffusionbtcs.o grdiffusionwrongbtcs.o grdiffusionftcsswap.o ttest.o areatest.o mtbtest.o tcell.o tcytotoxic.o tgamma.o tregulatory.o recruitmentbase.o recruitmentprob.o recruitmentlnode.o recruitmentlnodepure.o serialization.o tinyxml/tinystr.o tinyxml/tinyxml.o tinyxml/tinyxmlerror.o tinyxml/tinyxmlparser.o
+debug:	CXXFLAGS += -DDEBUG -DVERBOSE -O0 -g
+debug:	gr
+
+release:	CXXFLAGS += -DNDEBUG -O3
+release:	gr
+
+profile:	CXXFLAGS += -pg -g
+profile:	release
+
+# gcc compiler optimizations not included here...
+gpu:	CXXFLAGS += -DGPU -fPIC
+gpu:	LDFLAGS += -lcudart
+gpu:	SRCS += cudautil.cu grdiffusionftcsswapgpu.cu grsimulationgpu.cu
+gpu:	gr_gpu
+
+SRCS := paramsbase.cpp params.cpp rand.cpp agent.cpp gr.cpp grsimulationgrid.cpp grgrid.cpp gridcell.cpp macrophage.cpp  grstat.cpp grsimulation.cpp onlinestat.cpp grdiffusion.cpp grdiffusionftcs.cpp grdiffusionbtcs.cpp grdiffusionwrongbtcs.cpp grdiffusionftcsswap.cpp ttest.cpp areatest.cpp mtbtest.cpp tcell.cpp tcytotoxic.cpp tgamma.cpp tregulatory.cpp recruitmentbase.cpp recruitmentprob.cpp recruitmentlnode.cpp recruitmentlnodepure.cpp serialization.cpp tinyxml/tinystr.cpp tinyxml/tinyxml.cpp tinyxml/tinyxmlerror.cpp tinyxml/tinyxmlparser.cpp
+OBJS := ${SRCS:.cpp=.o}
+
+# If Makefile or gr.h changes, we need to recompile everything -- We can do this here because object files only depend on one file
+$(OBJS):	gr.h Makefile
+
+%.cu.o:	%.cu gr.h Makefile
+	nvcc -arch=sm_11 --compiler-options="$(CXXFLAGS)" -c -o $@ $<
+
+gr_gpu: $(OBJS) cudautil.cu grdiffusionftcsswapgpu.cu.o grsimulationgpu.cu.o grmain.o
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
-gr1: paramsbase.o params.o rand.o agent.o gr.o grsimulationgrid.o grgrid.o gridcell.o macrophage.o grmain.o grstat.o grsimulation.o onlinestat.o grdiffusion.o grdiffusionftcs.o grdiffusionbtcs.o grdiffusionwrongbtcs.o grdiffusionftcsswap.o ttest.o areatest.o mtbtest.o tcell.o tcytotoxic.o tgamma.o tregulatory.o recruitmentbase.o recruitmentprob.o recruitmentlnode.o recruitmentlnodepure.o serialization.o tinyxml/tinystr.o tinyxml/tinyxml.o tinyxml/tinyxmlerror.o tinyxml/tinyxmlparser.o
+gr: $(OBJS) grmain.o
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
-gr2: paramsbase.o params.o rand.o agent.o gr.o grsimulationgrid.o grgrid.o gridcell.o macrophage.o grmain.o grstat.o grsimulation.o onlinestat.o grdiffusion.o grdiffusionftcs.o grdiffusionbtcs.o grdiffusionwrongbtcs.o grdiffusionftcsswap.o ttest.o areatest.o mtbtest.o tcell.o tcytotoxic.o tgamma.o tregulatory.o recruitmentbase.o recruitmentprob.o recruitmentlnode.o recruitmentlnodepure.o serialization.o tinyxml/tinystr.o tinyxml/tinyxml.o tinyxml/tinyxmlerror.o tinyxml/tinyxmlparser.o
+gr1: $(OBJS) grmain.o
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
-gr3: paramsbase.o params.o rand.o agent.o gr.o grsimulationgrid.o grgrid.o gridcell.o macrophage.o grmain.o grstat.o grsimulation.o onlinestat.o grdiffusion.o grdiffusionftcs.o grdiffusionbtcs.o grdiffusionwrongbtcs.o grdiffusionftcsswap.o ttest.o areatest.o mtbtest.o tcell.o tcytotoxic.o tgamma.o tregulatory.o recruitmentbase.o recruitmentprob.o recruitmentlnode.o recruitmentlnodepure.o serialization.o tinyxml/tinystr.o tinyxml/tinyxml.o tinyxml/tinyxmlerror.o tinyxml/tinyxmlparser.o
+gr2: $(OBJS) grmain.o
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
-gr4: paramsbase.o params.o rand.o agent.o gr.o grsimulationgrid.o grgrid.o gridcell.o macrophage.o grmain.o grstat.o grsimulation.o onlinestat.o grdiffusion.o grdiffusionftcs.o grdiffusionbtcs.o grdiffusionwrongbtcs.o grdiffusionftcsswap.o ttest.o areatest.o mtbtest.o tcell.o tcytotoxic.o tgamma.o tregulatory.o recruitmentbase.o recruitmentprob.o recruitmentlnode.o recruitmentlnodepure.o serialization.o tinyxml/tinystr.o tinyxml/tinyxml.o tinyxml/tinyxmlerror.o tinyxml/tinyxmlparser.o
+gr3: $(OBJS) grmain.o
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
-lhs: gr.o paramsbase.o params.o tinyxml/tinystr.o tinyxml/tinyxml.o tinyxml/tinyxmlerror.o tinyxml/tinyxmlparser.o lhs.o rand.o serialization.o
+gr4: $(OBJS) grmain.o
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
-#Makefile.depend: *.h *.cpp Makefile
-#	$(CC) -M *.cpp > Makefile.depend
+lhs: $(OBJS) lhs.o
+	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
 clean:
 	rm -f *.o tinyxml/*.o gr gr1 gr2 gr3 gr4 lhs

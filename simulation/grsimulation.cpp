@@ -591,6 +591,7 @@ void GrSimulation::growExtMtb()
 				// Bacteria don't grow in caseated compartments
 				_stats.incNrCaseated();
 				_stats.incTotNonRepExtMtb(extMtb);
+				_stats.incTotExtMtb(extMtb);
 			}
 			else
 			{

@@ -43,7 +43,7 @@ private:
 	int _nTregActive;
 	int _nTregDead;
 
-	double _totExtMtb;			// Replicating bacteria: 	 not in caseated compartments.
+	double _totExtMtb;			// Replicating and non-replicating bacteria: all ExtMtb in all compartments
 	double _totNonRepExtMtb;	// Non-replicating bacteria: in caseated compartments.
 	double _totIntMtb;
 

@@ -31,6 +31,7 @@ signals:
 
 protected:
 	void paintGL();
+  void initializeGL();
 	void resizeGL(int width, int height);
 	void mouseMoveEvent(QMouseEvent* pEvent);
 	void mousePressEvent(QMouseEvent* pEvent);

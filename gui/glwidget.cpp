@@ -25,7 +25,15 @@ GLWidget::GLWidget(QWidget* parent)
 	, _allowMoveCamera(true)
 {
 	this->setFocusPolicy(Qt::ClickFocus);
+}
 
+GLWidget::~GLWidget()
+{
+
+}
+
+void GLWidget::initializeGL()
+{
 	glMatrixMode(GL_MODELVIEW);
 	glShadeModel(GL_SMOOTH);
 
@@ -46,16 +54,10 @@ GLWidget::GLWidget(QWidget* parent)
 	updateViewport(width(), height());
 	updateProjectionMatrix();
 	updateModelViewMatrix();
-
 }
-
-GLWidget::~GLWidget()
-{
-}
-
 void GLWidget::updateWindow()
 {
-	paintGL();
+	updateGL();
 }
 
 void GLWidget::updateProjectionMatrix()

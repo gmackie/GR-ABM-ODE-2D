@@ -285,7 +285,7 @@ QString GLWindow::getAgentStr(const Agent* pAgent)
 
 QImage GLWindow::grabFrameBuffer()
 {
-	return _ui.glWidget->grabFrameBuffer(true);
+	return _ui.glWidget->renderPixmap().toImage();
 }
 
 void GLWindow::updateColorMapLabels(float min, float max)

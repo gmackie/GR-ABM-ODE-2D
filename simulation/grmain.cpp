@@ -102,6 +102,10 @@ void writeOutputHeader(std::ofstream& outputFileStream, std::string inputFileNam
 	<< ','
 	<< "\"Ext. Mtb.\""
 	<< ','
+	<< "\"NonRepl Ext. Mtb.\""
+	<< ','
+	<< "\"Tot Mtb.\""
+	<< ','
 	<< "\"TNF\""
 	<< ','
 	<< "\"CCL2\""
@@ -153,21 +157,19 @@ void writeOutputHeader(std::ofstream& outputFileStream, std::string inputFileNam
 	<< "\"NrSourcesTreg\""
 	<< ','
 	<< "\"NrCaseated\""
-	<< ","
-	<< "\"NonRepl Ext. Mtb.\""
-	<< ","
+	<< ','
 	<< "\"MacApoptosisTNF\""
-	<< ","
+	<< ','
 	<< "\"MrApoptTNF\""
-	<< ","
+	<< ','
 	<< "\"Mi&MciApoptTNF\""
-	<< ","
+	<< ','
 	<< "\"MaApoptTNF\""
-	<< ","
+	<< ','
 	<< "\"TcellApoptTNF\""
-	<< ","
+	<< ','
 	<< "\"MrActivationTNF\""
-	<< ","
+	<< ','
 	<< "\"MiActivationTNF\""
 	<< "\n";
 }
@@ -214,6 +216,10 @@ void writeOutput(std::ofstream& outputFileStream, GrSimulation& sim, int csvInte
 	<< stats.getTotIntMtb()
 	<< ','
 	<< stats.getTotExtMtb()
+	<< ','
+	<< stats.getTotNonRepExtMtb()
+	<< ','
+	<< (stats.getTotIntMtb() + stats.getTotExtMtb())
 	<< ','
 	<< stats.getTotTNF()
 	<< ','
@@ -294,8 +300,6 @@ void writeOutput(std::ofstream& outputFileStream, GrSimulation& sim, int csvInte
 	<< stats.getNrSourcesTreg()
 	<< ','
 	<< stats.getNrCaseated()
-	<< ','
-	<< stats.getTotNonRepExtMtb()
 	<< ','
 	<< stats.getNrMacApoptosisTNF()
 	<< ','

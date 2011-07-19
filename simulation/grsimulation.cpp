@@ -576,7 +576,7 @@ void GrSimulation::moveTcells()
 void GrSimulation::growExtMtb()
 {
 	const double growthRate = _PARAM(PARAM_EXTMTB_GROWTH_RATE) - 1;
-	const double upperBound = _PARAM(PARAM_EXTMTB_UPPER_BOUND) * 1.1;
+	const double upperBound = _PARAM(PARAM_EXTMTB_UPPER_BOUND);
 
 	for (int row = 0; row < NROWS; row++)
 	{

@@ -55,6 +55,10 @@ Snapshot::Snapshot(const QString& dirName, const QString& fileName)
 		<< ','
 		<< "\"Ext. Mtb.\""
 		<< ','
+		<< "\"NonRepl Ext. Mtb.\""
+		<< ','
+		<< "\"Tot Mtb.\""
+		<< ','
 		<< "\"TNF\""
 		<< ','
 		<< "\"CCL2\""
@@ -104,23 +108,21 @@ Snapshot::Snapshot(const QString& dirName, const QString& fileName)
 		<< "\"NrSourcesTcyt\""
 		<< ','
 		<< "\"NrSourcesTreg\""
-		<< ","
+		<< ','
 		<< "\"NrCaseated\""
-		<< ","
-		<< "\"NonRepl Ext. Mtb.\""
-		<< ","
+		<< ','
 		<< "\"MacApoptosisTNF\""
-		<< ","
+		<< ','
 		<< "\"MrApoptTNF\""
-		<< ","
+		<< ','
 		<< "\"Mi&MciApoptTNF\""
-		<< ","
+		<< ','
 		<< "\"MaApoptTNF\""
-		<< ","
+		<< ','
 		<< "\"TcellApoptTNF\""
-		<< ","
+		<< ','
 		<< "\"MrActivationTNF\""
-		<< ","
+		<< ','
 		<< "\"MiActivationTNF\""
 		<< "\n";
 }
@@ -208,6 +210,10 @@ void Snapshot::takeSnapshot(const int time, const GrStat& stats)
 		<< ','
 		<< stats.getTotExtMtb()
 		<< ','
+		<< stats.getTotNonRepExtMtb()
+		<< ','
+		<< (stats.getTotIntMtb() + stats.getTotExtMtb())
+		<< ','
 		<< stats.getTotTNF()
 		<< ','
 		<< stats.getTotCCL2()
@@ -287,8 +293,6 @@ void Snapshot::takeSnapshot(const int time, const GrStat& stats)
 		<< stats.getNrSourcesTreg()
 		<< ','
 		<< stats.getNrCaseated()
-		<< ','
-		<< stats.getTotNonRepExtMtb()
 		<< ','
 		<< stats.getNrMacApoptosisTNF()
 		<< ','

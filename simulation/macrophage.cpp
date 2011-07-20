@@ -137,17 +137,10 @@ Mac::~Mac()
 
 void Mac::move(GrGrid& grid)
 {
-	int k = Agent::moveAgent(grid, true, true, false, true, _PARAM(PARAM_MAC_MOVEMENT_BONUSFACTOR));
+	Pos pos = Agent::moveAgent(grid, true, true, false, true, _PARAM(PARAM_MAC_MOVEMENT_BONUSFACTOR));
 
-	/**
-	 * 0 1 2
-	 * 3 4 5
-	 * 6 7 8
-	 */
-	int dRow = k / 3 - 1;
-	int dCol = k % 3 - 1;
-	int newRow = MOD_ROW(_row + dRow);
-	int newCol = MOD_COL(_col + dCol);
+	int newRow = pos.first;
+	int newCol = pos.second;
 
 	GridCell& cell = grid(_row, _col);
 	GridCell& newCell = grid(newRow, newCol);
@@ -256,12 +249,7 @@ void Mac::apoptosis(GrGrid& grid)
 	{
 		// disperse bacteria to the Moore neighborhood
 		// (half of the intracellular bacteria dies, the other half is dispersed)
-		const double dExtMtb = _intMtb / 18.0;
-
-		for (int i = -1; i <= 1; i++)
-			for (int j = -1; j <= 1; j++)
-				grid(MOD_ROW(_row + i), MOD_COL(_col + j)).incExtMtb(dExtMtb);
-
+		disperseMtb(grid, 0.5);
 		_intMtb = 0;
 	}
 }
@@ -853,12 +841,7 @@ void Mac::handleChronicallyInfected(const int, GrGrid& grid, GrStat&)
 	if (_intMtb >= _PARAM(PARAM_MAC_THRESHOLD_BURST_CI_INTMTB))
 	{
 		// burst, all intracellular bacteria disperse to the Moore neighborhood
-		const double dExtMtb = _intMtb / 9.0;
-
-		for (int i = -1; i <= 1; i++)
-			for (int j = -1; j <= 1; j++)
-				grid(MOD_ROW(_row + i), MOD_COL(_col + j)).incExtMtb(dExtMtb);
-
+		disperseMtb(grid, 1.0);
 		_intMtb = 0;
 
 		// increment number of killings
@@ -1092,7 +1075,7 @@ double Mac::getExtMtbInMoore(const GrGrid& grid) const
 {
 	double mtb = 0;
 
-	// count the number of Tgam cells in the Moore neighborhood
+	// count the number of extMtb cells in the Moore neighborhood
 	// that are in the specified state
 	for (int i = -1; i <= 1; i++)
 		for (int j = -1; j <= 1; j++)
@@ -1100,3 +1083,47 @@ double Mac::getExtMtbInMoore(const GrGrid& grid) const
 
 	return mtb;
 }
+
+// Disperse the bacteria in a discretized manner. If the macrophage has 1 or more bacteria,
+// then disperse to so that each compartment dispersed to receives at least 1 bacterium.
+// This means disperse to fewer than all the compartments in the Mooore neighborhood if
+// necessary, with the destination compartments chosen randomly. If the number of
+// compartments to dispsers to is less than all of the
+// For example, if 6.3 bacteria are to be dispersed then disperse to 1.05 bacteria to 6
+// randomly chosen neighbors. If 10.4 bacteria are to be dispersed then disperse to 1.16
+// bacteria to all compartments in the Moore neighborhood. If 0.8 If 10.4 bacteria are to
+// be dispersed then disperse them to 1 compartment.
+//
+void Mac::disperseMtb(GrGrid& grid, double fraction)
+{
+    assert(0 < fraction && fraction <= 1);
+
+    std::vector<int> permutation;
+    for (int i = 0; i < MOORE_COUNT; i++)
+    {
+    	permutation.push_back(i);
+    }
+
+    double mtb = fraction * _intMtb;
+
+    // Disperse to at least one compartment.
+    double minCompartments = std::max(floor(mtb), 1.0);
+    double dMtb = mtb / std::min(minCompartments, static_cast<double>(permutation.size()));
+
+    size_t n = std::min(static_cast<size_t>(minCompartments), permutation.size());
+    if (n < permutation.size())
+        std::random_shuffle(permutation.begin(), permutation.end(), g_Rand);
+
+    for (size_t i = 0; i < n; i++)
+    {
+    	Pos pos = compartmentOrdinalToCoordinates(permutation[i]);
+    	int row = pos.first;
+    	int col = pos.second;
+
+    	GridCell& cell = grid(row, col);
+    	cell.incExtMtb(dMtb);
+    }
+
+    _intMtb -= mtb;
+}
+

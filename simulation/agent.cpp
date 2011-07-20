@@ -36,7 +36,13 @@ Agent::~Agent()
 {
 }
 
-int Agent::moveAgent(GrGrid& grid, bool ccl2, bool ccl5, bool cxcl9, bool attractant, double bonusFactor)
+Pos Agent::moveAgent(GrGrid& grid, bool ccl2, bool ccl5, bool cxcl9, bool attractant, double bonusFactor)
+{
+	int DestinationOrdinal = getDestinationOrdinal(grid, ccl2, ccl5, cxcl9, attractant, bonusFactor);
+	return compartmentOrdinalToCoordinates(DestinationOrdinal);
+}
+
+int Agent::getDestinationOrdinal(GrGrid& grid, bool ccl2, bool ccl5, bool cxcl9, bool attractant, double bonusFactor)
 {
 	GridCell& cell = grid(_row, _col);
 
@@ -110,6 +116,25 @@ int Agent::moveAgent(GrGrid& grid, bool ccl2, bool ccl5, bool cxcl9, bool attrac
 	 * 6 7 8
 	 */
 	return k;
+}
+
+Pos Agent::compartmentOrdinalToCoordinates(int ordinal) const
+{
+
+	/**
+	 * The possible values for the ordinal are:
+	 *
+	 *  0  1  2
+	 *  3  4  5
+	 *  6  7  8
+	 */
+	int dRow = ((ordinal / 3) % 3) - 1;
+	int dCol = ordinal % 3 - 1;
+	int newRow = MOD_ROW(_row + dRow);
+	int newCol = MOD_COL(_col + dCol);
+
+	return Pos(newRow, newCol);
+
 }
 
 void Agent::serialize(std::ostream& out) const

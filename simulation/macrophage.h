@@ -116,6 +116,7 @@ public:
 	double getNormalizedACT() const;
 	void setC1rrChemTNF(double value);
 	AgentType getAgentType() const;
+	void disperseMtb(GrGrid& grid, double fraction);
 };
 
 inline AgentType Mac::getAgentType() const

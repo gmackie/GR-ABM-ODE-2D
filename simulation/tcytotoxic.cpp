@@ -160,11 +160,7 @@ void Tcyt::handleActive(const int, GrGrid& grid, GrStat&)
 				else
 				{
 					// kill, half the intracellular bacteria disperse to the Moore neighborhood
-					const double dExtMtb = pMac->getIntMtb() / 2.0 / 9.0;
-
-					for (int i = -1; i <= 1; i++)
-						for (int j = -1; j <= 1; j++)
-							grid(MOD_ROW(_row + i), MOD_COL(_col + j)).incExtMtb(dExtMtb);
+					pMac->disperseMtb(grid, 0.5);
 
 					pMac->setIntMtb(0);
 					pMac->kill();

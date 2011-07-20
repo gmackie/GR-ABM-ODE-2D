@@ -25,7 +25,9 @@ protected:
 	int _deathTime;
 	int _row;
 	int _col;
-	int moveAgent(GrGrid& grid, bool ccl2, bool ccl5, bool cxcl9, bool attractant, double bonusFactor);
+	Pos moveAgent(GrGrid& grid, bool ccl2, bool ccl5, bool cxcl9, bool attractant, double bonusFactor);
+	int getDestinationOrdinal(GrGrid& grid, bool ccl2, bool ccl5, bool cxcl9, bool attractant, double bonusFactor);
+	Pos compartmentOrdinalToCoordinates(int ordinal) const;
 
 public:
 	Agent();

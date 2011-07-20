@@ -6,7 +6,8 @@ CONFIG += debug_and_release
 QT += core \
     gui \
     opengl
-HEADERS += simulation/serialization.h \
+HEADERS += scalardatasets/scalartotmtbdataset.h \
+    simulation/serialization.h \
     simulation/params.h \
     simulation/paramsbase.h \
     simulation/grdiffusionftcsswap.h \
@@ -154,16 +155,16 @@ FORMS += gui/agentswidget.ui \
     gui/paramwindow.ui \
     gui/glwindow.ui \
     gui/mainwindow.ui
-unix {
-	LIBS += -lboost_program_options-mt
-	
+unix { 
+    LIBS += -lboost_program_options-mt
+    
     # Add SVN version number to include in code.
-    DEFINES += SVN_VERSION=\\\"$$quote($$system(svn info | awk \'/^Last Changed Rev:/ {print $4}\'))\\\"	
+    DEFINES += SVN_VERSION=\\\"$$quote($$system(svn info | awk \'/^Last Changed Rev:/ {print $4}\'))\\\"
 }
 macx { 
     LIBS -= -lboost_program_options-mt
     LIBS += -lboost_program_options
-
+    
     # Have qmake create make files that put the executable
     # in a file in the build directory, rather than in a Mac
     # application bundle. Ex. put the executable in grviz-lung
@@ -171,7 +172,7 @@ macx {
     CONFIG -= app_bundle
     
     # Add SVN version number to include in code.
-    DEFINES += SVN_VERSION=\\\"$$quote($$system(svn info | awk \'/^Last Changed Rev:/ {print $4}\'))\\\"    
+    DEFINES += SVN_VERSION=\\\"$$quote($$system(svn info | awk \'/^Last Changed Rev:/ {print $4}\'))\\\"
 }
 win32 { 
     CONFIG -= flat

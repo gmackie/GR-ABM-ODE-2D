@@ -29,6 +29,7 @@
 #include "scalardatasets/scalarcxcl9dataset.h"
 #include "scalardatasets/scalarextmtbdataset.h"
 #include "scalardatasets/scalarintmtbdataset.h"
+#include "scalardatasets/scalartotmtbdataset.h"
 #include "scalardatasets/scalartnfattrextmtb.h"
 #include "scalardatasets/scalarcelldensitydataset.h"
 #include "scalardatasets/scalardivergencedataset.h"
@@ -62,6 +63,7 @@ const QString MainWindow::_DATASET_TNF_ATTR_EXTMTB = "TNF Attr extMtb";
 const QString MainWindow::_DATASET_CELL_DENSITY = "Cell Density";
 const QString MainWindow::_DATASET_EXTMTB = "Ext. Mtb";
 const QString MainWindow::_DATASET_INTMTB = "Int. Mtb";
+const QString MainWindow::_DATASET_TOTMTB = "Tot. Mtb";
 
 const QString MainWindow::_SCALAR_DATASETS[] = {
 
@@ -71,6 +73,7 @@ const QString MainWindow::_SCALAR_DATASETS[] = {
 		_DATASET_CXCL9,
 		_DATASET_EXTMTB,
 		_DATASET_INTMTB,
+		_DATASET_TOTMTB,
 		_DATASET_ATTRACTANT,
 		_DATASET_TNF_ATTR_EXTMTB,
 		_DATASET_CELL_DENSITY
@@ -424,6 +427,7 @@ void MainWindow::initSmokeTab()
 	_ui.comboBoxSmokeDataset->addItem(_DATASET_CXCL9);
 	_ui.comboBoxSmokeDataset->addItem(_DATASET_EXTMTB);
 	_ui.comboBoxSmokeDataset->addItem(_DATASET_INTMTB);
+	_ui.comboBoxSmokeDataset->addItem(_DATASET_TOTMTB);
 	_ui.comboBoxSmokeDataset->addItem(_DATASET_ATTRACTANT);
 	_ui.comboBoxSmokeDataset->addItem(_DATASET_TNF_ATTR_EXTMTB);
 
@@ -1182,6 +1186,10 @@ ScalarDataset* MainWindow::getNewScalarDataset(const QString& value)
 	else if (value == _DATASET_INTMTB)
 	{
 		pScalarDataset = new ScalarIntMtbDataset();
+	}
+	else if (value == _DATASET_TOTMTB)
+	{
+		pScalarDataset = new ScalarTotMtbDataset();
 	}
 	else if (value == _DATASET_ATTRACTANT)
 	{

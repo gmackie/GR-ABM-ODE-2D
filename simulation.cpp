@@ -123,9 +123,9 @@ void Simulation::saveState(std::ostream& out) const
 	_modelMutex.unlock();
 }
 
-void Simulation::setTnfKnockout(bool tnfKnockout)
+void Simulation::setTnfDepletionTimeStep(int tnfDepletionTimeStep)
 {
 	lock();
-	_gr.setTnfKnockout(tnfKnockout);
+	_gr.setTnfDepletionTimeStep(tnfDepletionTimeStep);
 	unlock();
 }

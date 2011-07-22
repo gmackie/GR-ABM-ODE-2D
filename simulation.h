@@ -82,7 +82,7 @@ public:
 	
 	void setTnfrDynamics(bool tnfrDynamics);
 	void setNfkbDynamics(bool nfkbDynamics);
-	void setTnfKnockout(bool tnfKnockout);
+	void setTnfDepletionTimeStep(int tnfDepletionTimeStep);
 
 	static QString getTimeStr(int simTime, int time);
 

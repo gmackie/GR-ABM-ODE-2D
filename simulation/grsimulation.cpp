@@ -34,7 +34,7 @@ GrSimulation::GrSimulation()
 	, _pRecruitment(NULL)
 	, _tnfrDynamics(false)
 	, _nfkbDynamics(false)
-	, _tnfKnockout(false)
+	, _tnfDepletionTimeStep(-1)
 {
 	for (int i = 0; i < NOUTCOMES; i++)
 		_pTTest[i] = NULL;
@@ -69,7 +69,7 @@ void GrSimulation::serialize(std::ostream& out) const
 
 	out << _tnfrDynamics << std::endl;
 	out << _nfkbDynamics << std::endl;
-	out << _tnfKnockout << std::endl;
+	out << _tnfDepletionTimeStep << std::endl;
 
 	// serialize grid
 	_grid.serialize(out);
@@ -139,7 +139,7 @@ void GrSimulation::deserialize(std::istream& in)
 
 	in >> _tnfrDynamics;
 	in >> _nfkbDynamics;
-	in >> _tnfKnockout;
+	in >> _tnfDepletionTimeStep;
 
 	// deserialize grid
 	_grid.deserialize(in);
@@ -286,13 +286,21 @@ void GrSimulation::solve()
 	// reset statistics
 	_stats.reset();
 
+	bool tnfDepletion = false;
+
+	if (_tnfDepletionTimeStep >= 0 && _time >= _tnfDepletionTimeStep)
+	{
+		tnfDepletion = true;
+		_tnfrDynamics = false;
+	}
+
 	// calculate diffusion every 10 minutes
 	// dt = 6s, solve for 10 minutes = 100 * 6 seconds
 	double dt = 6;
 	for (int t = 0; t < 100; t++) 
 	{
-		secreteFromMacrophages();
-		secreteFromTcells();
+		secreteFromMacrophages(tnfDepletion);
+		secreteFromTcells(tnfDepletion);
 		secreteFromCaseations();
 		_pDiffusion->diffuse(_grid);
 		if (_nfkbDynamics)
@@ -448,23 +456,23 @@ void GrSimulation::computeNextStates()
 	} 
 }
 
-void GrSimulation::secreteFromMacrophages()
+void GrSimulation::secreteFromMacrophages(bool tnfDepletion)
 {
 	for (MacList::iterator it = _macList.begin(); it != _macList.end(); it++)
 	{
-		it->secrete(_grid.getGrid(), _tnfrDynamics, _nfkbDynamics, _tnfKnockout);
+		it->secrete(_grid.getGrid(), _tnfrDynamics, _nfkbDynamics, tnfDepletion);
 	}
 }
 
-void GrSimulation::secreteFromTcells()
+void GrSimulation::secreteFromTcells(bool tnfDepletion)
 {
 	for (TgamList::iterator it = _tgamList.begin(); it != _tgamList.end(); it++)
 	{
-		it->secrete(_grid.getGrid(), _tnfrDynamics, _nfkbDynamics, _tnfKnockout);
+		it->secrete(_grid.getGrid(), _tnfrDynamics, _nfkbDynamics, tnfDepletion);
 	}
 	for (TcytList::iterator it = _tcytList.begin(); it != _tcytList.end(); it++)
 	{
-		it->secrete(_grid.getGrid(), _tnfrDynamics, _nfkbDynamics, _tnfKnockout);
+		it->secrete(_grid.getGrid(), _tnfrDynamics, _nfkbDynamics, tnfDepletion);
 	}
 }
 

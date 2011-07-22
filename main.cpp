@@ -78,7 +78,7 @@ int main(int argc, char *argv[])
 	bool ode;
 	bool tnfrDynamics;
 	bool nfkbDynamics;
-	bool tnfKnockout;
+	int tnfDepletionTimeStep;
 	unsigned long seed;
 	bool seedSpecified;
 	int diffMethod;
@@ -146,7 +146,7 @@ int main(int argc, char *argv[])
 		("ode", "Use integrated lymph node ODE for recruitment")
 		("tnfr-dynamics", "Use molecular level TNF/TNFR dynamics in the model")
 		("NFkB-dynamics", "Use molecular level intracellular NFkB dynamics in the model")
-		("tnf-knockout", "Don't secrete tnf, if not using tnfr dynamics")
+		("tnf-depletion", po::value<int>(&tnfDepletionTimeStep)->default_value(-1), "The time step at which to stop secreting tnf, including by tnfr dynamics. -1: no depletion")
 		("ln-ode", po::value<std::string>(&lymphNodeODE), "Lymph node application")
 		("ln-ode-temp", po::value<std::string>(&lymphNodeTemp), "Lymph node temp file")
 		("version,v", "Version number");
@@ -185,19 +185,7 @@ int main(int argc, char *argv[])
 		ode = vm.count("ode");
 		tnfrDynamics = vm.count("tnfr-dynamics");
 		nfkbDynamics = vm.count("NFkB-dynamics");
-		tnfKnockout = vm.count("tnf-knockout");
 
-		if (tnfrDynamics && tnfKnockout)
-		{
-			std::cerr << "Both tnf dynamics and tnf knockout were specified. Only one is allowed."<< std::endl;
-			exit(1);
-		}
-		
-		if (nfkbDynamics && tnfKnockout)
-		{
-			std::cerr << "Both NFkB dynamics and tnf knockout were specified. Only one is allowed."<< std::endl;
-			exit(1);
-		}
 		if (!vm.count("input-file"))
 		{
 			QString fileName = QFileDialog::getOpenFileName(NULL, "Load parameters", "", "*.xml");
@@ -397,7 +385,7 @@ int main(int argc, char *argv[])
 	
 	itfc.getSimulation().setNfkbDynamics(nfkbDynamics);
 
-	itfc.getSimulation().setTnfKnockout(tnfKnockout);
+	itfc.getSimulation().setTnfDepletionTimeStep(tnfDepletionTimeStep);
 
 
 	glWindow.resizeGLWidget(resWidth, resHeight);

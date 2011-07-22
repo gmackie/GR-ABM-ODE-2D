@@ -34,7 +34,7 @@ public:
 	Agent(int birthtime, int deathtime, int row, int col);
 	virtual ~Agent();
 	virtual void move(GrGrid& grid) = 0;
-	virtual void secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfKnockout) = 0;
+	virtual void secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDepletion) = 0;
 	virtual void computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tnfrDynamics, bool nfkbDynamics) = 0;
 	virtual void updateState() = 0;
 	virtual void kill() = 0;

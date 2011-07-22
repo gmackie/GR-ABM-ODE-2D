@@ -43,15 +43,15 @@ private:
 	bool _nfkbDynamics;
 
 	// Inhibits tnf secretion if true and if not using tnfr dynamics.
-	bool _tnfKnockout;
+	int _tnfDepletionTimeStep;
 
 	void moveTcells();
 	void moveMacrophages();
 	void updateStates();
 	void updateT_Test();
 	void computeNextStates();
-	void secreteFromMacrophages();
-	void secreteFromTcells();
+	void secreteFromMacrophages(bool tnfDepletion);
+	void secreteFromTcells(bool tnfDepletion);
 	void secreteFromCaseations();
 	void updateReceptorDynamics(double dt);
 	void updateReceptorAndNFkBDynamics(double dt);
@@ -80,8 +80,8 @@ public:
 	void setTnfrDynamics(bool tnfrDynamics);
 	bool getNfkbDynamics() const;
 	void setNfkbDynamics(bool nfkbDynamics);
-	bool getTnfKnockout() const;
-	void setTnfKnockout(bool tnfKnockout);
+	int getTnfDepletionTimeStep() const;
+	void setTnfDepletionTimeStep(int tnfDepletionTimeStep);
 	double getAreaThreshold() const;
 	void setAreaThreshold(double areaThreshold);
 	double getAreaThresholdCellDensity() const;
@@ -187,14 +187,14 @@ inline void GrSimulation::setNfkbDynamics(bool nfkbDynamics)
 	_nfkbDynamics = nfkbDynamics;
 }
 
-inline bool GrSimulation::getTnfKnockout() const
+inline int GrSimulation::getTnfDepletionTimeStep() const
 {
-	return _tnfKnockout;
+	return _tnfDepletionTimeStep;
 }
 
-inline void GrSimulation::setTnfKnockout(bool tnfKnockout)
+inline void GrSimulation::setTnfDepletionTimeStep(int tnfDepletionTimeStep)
 {
-	_tnfKnockout = tnfKnockout;
+	_tnfDepletionTimeStep = tnfDepletionTimeStep;
 }
 
 inline const MacList& GrSimulation::getMacList() const

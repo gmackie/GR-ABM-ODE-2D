@@ -149,13 +149,14 @@ int main(int argc, char *argv[])
 		("tnf-depletion", po::value<int>(&tnfDepletionTimeStep)->default_value(-1), "The time step at which to stop secreting tnf, including by tnfr dynamics. -1: no depletion")
 		("ln-ode", po::value<std::string>(&lymphNodeODE), "Lymph node application")
 		("ln-ode-temp", po::value<std::string>(&lymphNodeTemp), "Lymph node temp file")
+		("quiet,q", "Don't show any visualization windows")
 		("version,v", "Version number");
 
+	po::variables_map vm;
 	try
 	{
 		po::positional_options_description p;
 		p.add("input-file", -1);
-		po::variables_map vm;
 		po::store(po::command_line_parser(argc, argv).options(desc).positional(p).run(), vm);
 		po::notify(vm);
 
@@ -309,65 +310,6 @@ int main(int argc, char *argv[])
 	AgentsVisualization agentsVisualization(Simulation::_DIM, &agentGrid);
 	MainInterface itfc(&agentsVisualization, &agentGrid);
 	GLWindow glWindow(&itfc);
-
-	if (snapshotMode)
-	{
-		// Load a state, save the graphics to a png and quit.
-		// This avoids timing issues with the normal application run,
-		// which has separate simulation and UI threads.
-		// Often the graphics are not updated before the saved state is loaded
-		// and the program quits, resulting in a png file that is all black
-		// where the simulation graphics should be.
-		// Also, on 32 bit Ubuntu the granuloma boundary does not appear in the
-		// correct location if a picture is saved when running in scripting mode.
-
-		// Show the graphics window.
-		// On 32 bit Ubuntu the saved picture will not have a correct background color.
-		// It will be blue instead of black. Showing a message box, for reasons unknown,
-		// prevents this. The message box does not wait for user input.
-		glWindow.show();
-		QMessageBox qmb( QMessageBox::NoIcon, "Lung ABM", "wait");
-		qmb.show();
-
-		if(!outputEnabled)
-		{
-			std::cerr << "No output directory has been specified. Please specify one using the  -o option." << std::endl;
-			exit(1);
-		}
-
-		// Load the saved state.
-		std::ifstream in(stateFileName.c_str());
-		if (!in.good())
-		{
-			std::string errstr = "Failed to open file '" + stateFileName + "'.";
-			std::cerr << errstr << std::endl;
-			exit(1);
-		}
-
-		itfc.getSimulation().loadState(in);
-		in.close();
-
-		// Have the MainInterface object get the loaded simulation state from the Simulation object.
-		// This is the data that is used to update the graphics window.
-		itfc.doStep();
-
-		// Update the graphics window with the loaded model state.
-		glWindow.updateWindow();
-
-		// Take a snapshot.
-		QString dirName = QString(outputDir.c_str()) + QDir::separator();
-		Snapshot* pSnapshot = new Snapshot(dirName, QString());
-
-		int simTime = itfc.getSimulation().getTime();
-		pSnapshot->takePicture(simTime, glWindow.grabFrameBuffer());
-
-		exit(0);
-
-	}
-
-	// These are needed only for scriptingMode and regular execution.
-	// We specifically don't want the MainWindow running in snapshotMode, since we don't want it running the simulation
-	// updating the graphics window or taking snapshots.
 	ParamWindow paramWindow(&itfc);
 	MainWindow w(&itfc, &glWindow, &paramWindow, new StatWidget(), new AgentsWidget(&agentsVisualization));
 
@@ -440,7 +382,7 @@ int main(int argc, char *argv[])
 	if (scriptingMode)
 	{
 		w.setScriptingMode(true);
-		glWindow.show();
+		if(!vm.count("quiet")) glWindow.show();
 
 		setupScriptingMode(w);
 
@@ -469,7 +411,7 @@ int main(int argc, char *argv[])
 	else
 	{
 		w.show();
-		glWindow.show();
+		if(!vm.count("quiet")) glWindow.show();
 		int err = a.exec();
 		return err;
 	}

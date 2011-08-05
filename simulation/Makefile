@@ -1,8 +1,9 @@
 OS := $(shell grep -E 'Ubuntu|Red Hat' /etc/issue)
+DIM := 100
 
 SVNREV := $(shell svn info | grep "Last Changed Rev:" | cut -d" " -f4)
 CXX := g++
-CXXFLAGS += -DSVN_VERSION=\"$(SVNREV)\" -msse -Wall
+CXXFLAGS += -DSVN_VERSION=\"$(SVNREV)\" -msse -Wall -D__DIM__=$(DIM)
 
 
 ifeq ($(OS), )
@@ -15,7 +16,7 @@ all: release
 
 .PHONY:	release debug profile
 
-debug:	CXXFLAGS += -DDEBUG -DVERBOSE -O0 -g
+debug:	CXXFLAGS += -DDEBUG -DVERBOSE -O0 -g -Wextra
 debug:	gr
 
 release:	CXXFLAGS += -DNDEBUG -O3

@@ -72,6 +72,7 @@ Snapshot* setupOutput(MainWindow& mainWindow, const std::string& outputDir, bool
 
 int main(int argc, char *argv[])
 {
+  std::cout << "GRID SIZE: NROWS: " << NROWS << " NCOLS: " << NCOLS << std::endl;
 	QApplication a(argc, argv);
 
 	bool snapshotMode;

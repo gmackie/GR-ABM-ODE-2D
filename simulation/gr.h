@@ -27,8 +27,12 @@
 #define GR_VERSION "r" SVN_VERSION
 #endif
 
-#define NROWS 100
-#define NCOLS 100
+#ifndef __DIM__
+  #define __DIM__ (100)
+#endif //__DIM__
+#define NROWS (__DIM__)
+#define NCOLS (__DIM__)
+
 #define MOD_ROW(val) ((((val) + NROWS)) % NROWS)
 #define MOD_COL(val) ((((val) + NCOLS)) % NCOLS)
 #define NOUTCOMES 2

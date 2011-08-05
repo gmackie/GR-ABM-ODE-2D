@@ -423,6 +423,7 @@ int run(unsigned long seed, const std::string& inputFileName, const std::string&
 
 int main(int argc, char** argv)
 {
+  std::cout << "GRID SIZE: NROWS: " << NROWS << " NCOLS: " << NCOLS << std::endl;
 	unsigned long seed;
 	std::string inputFileName;
 	std::string outputFileName;

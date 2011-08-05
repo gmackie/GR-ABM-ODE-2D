@@ -155,24 +155,35 @@ FORMS += gui/agentswidget.ui \
     gui/paramwindow.ui \
     gui/glwindow.ui \
     gui/mainwindow.ui
-unix { 
+
+QMAKE_CXXFLAGS_RELEASE -= -O2
+QMAKE_CXXFLAGS_RELEASE += -O3
+
+unix:system(grep -qE \"Ubuntu|Red Hat\" /etc/issue) {
     LIBS += -lboost_program_options-mt
-    
-    # Add SVN version number to include in code.
-    DEFINES += SVN_VERSION=\\\"$$quote($$system(svn info | awk \'/^Last Changed Rev:/ {print $4}\'))\\\"
-}
-macx { 
-    LIBS -= -lboost_program_options-mt
+} else:unix|macx {
     LIBS += -lboost_program_options
-    
+}
+
+exists( .git/ ) {
+      VERSION = $$quote($$system(git svn find-rev HEAD))
+} else : exists( .svn/ ) {
+      VERSION = $$quote($$system(svn info | awk \'/^Last Changed Rev:/ {print $4}\
+} else {
+      VERSION = "Unknown"
+}
+
+DEFINES += SVN_VERSION=\\\"$$VERSION\\\"
+
+!isEmpty(DIM) : DEFINES += __DIM__=$$DIM
+
+
+macx { 
     # Have qmake create make files that put the executable
     # in a file in the build directory, rather than in a Mac
     # application bundle. Ex. put the executable in grviz-lung
     # rather than in grviz-lung.app/Contents/MacOS/grviz-lung.
     CONFIG -= app_bundle
-    
-    # Add SVN version number to include in code.
-    DEFINES += SVN_VERSION=\\\"$$quote($$system(svn info | awk \'/^Last Changed Rev:/ {print $4}\'))\\\"
 }
 win32 { 
     CONFIG -= flat

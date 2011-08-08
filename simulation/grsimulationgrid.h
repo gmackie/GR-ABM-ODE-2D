@@ -40,8 +40,6 @@ public:
 
 
 private:
-	GrGrid _grid1;
-	GrGrid _grid2;
 	GrGrid *_pCurrentGrid;
 	GrGrid *_pNextGrid;
 };

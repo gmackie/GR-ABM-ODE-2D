@@ -16,7 +16,7 @@
 #include <stdio.h>
 
 MainInterface::MainInterface(Visualization* pAgentVisualization, ScalarAgentGridBase* pScalarAgentGrid)
-	: _simulation()
+	: _simulation(new Simulation())
 	, _scalarSmokeNormalizer(_MIN_CLAMP_VALUE, _MAX_CLAMP_VALUE)
 	, _scalarGlyphNormalizer(_MIN_CLAMP_VALUE, _MAX_CLAMP_VALUE)
 	, _scalarIsolinesNormalizer(_MIN_CLAMP_VALUE, _MAX_CLAMP_VALUE)
@@ -72,6 +72,7 @@ MainInterface::MainInterface(Visualization* pAgentVisualization, ScalarAgentGrid
 
 MainInterface::~MainInterface()
 {
+  delete _simulation;
 	delete _pScalarSmokeDataset;
 	delete _pScalarGlyphDataset;
 	delete _pVectorGlyphDataset;
@@ -113,7 +114,7 @@ void MainInterface::visualize()
 	}
 	else if (_drawHeightPlot)
 	{
-		_heightPlotVisualization.visualize(_blend, &_simulation, _pColorMapHeightPlot);
+		_heightPlotVisualization.visualize(_blend, _simulation, _pColorMapHeightPlot);
 	}
 	else
 	{
@@ -123,30 +124,30 @@ void MainInterface::visualize()
 
 void MainInterface::updateGrids()
 {
-	_simulation.lock();
+	_simulation->lock();
 
 	if (_drawAgents)
 	{
-		_pScalarAgentGrid->evaluate(&_simulation);
+		_pScalarAgentGrid->evaluate(_simulation);
 	}
 
-	_scalarGranulomaGrid.evaluate(&_simulation, _pScalarGranulomaDataset, true);
+	_scalarGranulomaGrid.evaluate(_simulation, _pScalarGranulomaDataset, true);
 
 	if (_drawSmoke || _drawIsolines)
 	{
-		_scalarSmokeGrid.evaluate(&_simulation, _pScalarSmokeDataset, _smokeGridNN);
+		_scalarSmokeGrid.evaluate(_simulation, _pScalarSmokeDataset, _smokeGridNN);
 	}
 
 	if (_drawGlyphs)
 	{
-		_scalarGlyphGrid.evaluate(&_simulation, _pScalarGlyphDataset, _glyphGridNN);
-		_vectorGlyphGrid.evaluate(&_simulation, _pVectorGlyphDataset, _glyphGridNN);
+		_scalarGlyphGrid.evaluate(_simulation, _pScalarGlyphDataset, _glyphGridNN);
+		_vectorGlyphGrid.evaluate(_simulation, _pVectorGlyphDataset, _glyphGridNN);
 	}
 
 	if (_drawHeightPlot)
 	{
-		_scalarHeightGrid.evaluate(&_simulation, _pScalarHeightDataset, _heightGridNN);
-		_scalarHeightColorGrid.evaluate(&_simulation, _pScalarHeightColorDataset, _heightGridNN);
+		_scalarHeightGrid.evaluate(_simulation, _pScalarHeightDataset, _heightGridNN);
+		_scalarHeightColorGrid.evaluate(_simulation, _pScalarHeightColorDataset, _heightGridNN);
 	}
 
 	if (!_scalarSmokeNormalizer.getClamping())
@@ -179,7 +180,7 @@ void MainInterface::updateGrids()
 		_scalarHeightColorNormalizer.setMax(_scalarHeightColorGrid.getMax());
 	}
 
-	_simulation.unlock();
+	_simulation->unlock();
 }
 
 void MainInterface::serializeGrids(std::ofstream& outFile)

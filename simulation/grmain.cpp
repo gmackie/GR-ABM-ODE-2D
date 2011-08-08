@@ -358,43 +358,43 @@ int run(unsigned long seed, const std::string& inputFileName, const std::string&
 		writeOutputHeader(outputFileStream, inputFileName);
 	}
 	
-	GrSimulation sim;     //Allocated on heap for larger grids, shouldn't effect runtimes
+	GrSimulation* sim = new GrSimulation();     //Allocated on heap for larger grids, shouldn't effect runtimes
 	
-	sim.setTnfrDynamics(tnfrDynamics || nfkbDynamics); // when NFkB is turned on, tnfr dynamics will be on autamatically.
-	sim.setNfkbDynamics(nfkbDynamics);
-	sim.setTnfDepletionTimeStep(tnfDepletionTimeStep);
-	sim.setRecruitment(pRecr);
+	sim->setTnfrDynamics(tnfrDynamics || nfkbDynamics); // when NFkB is turned on, tnfr dynamics will be on autamatically.
+	sim->setNfkbDynamics(nfkbDynamics);
+	sim->setTnfDepletionTimeStep(tnfDepletionTimeStep);
+	sim->setRecruitment(pRecr);
 	
-	const GrStat& stats = sim.getStats();
+	const GrStat& stats = sim->getStats();
 	
-	sim.setDiffusionMethod(diffMethod);
+	sim->setDiffusionMethod(diffMethod);
 	
 	//	Set area thresholds if specified on the command line.
 	if (areaTNFThreshold >= 0)
 	{
-		sim.setAreaThreshold(areaTNFThreshold);
+		sim->setAreaThreshold(areaTNFThreshold);
 	}
 	
 	if (areaCellDensityThreshold >= 0)
 	{
-		sim.setAreaThresholdCellDensity(areaCellDensityThreshold);
+		sim->setAreaThresholdCellDensity(areaCellDensityThreshold);
 	}
 	
-	sim.init();
+	sim->init();
 	
 	for (int time = 0; time <= timeToSimulate; time += 1)
 	{
 		
 		// Display and write output at the requested interval, and after the last time step.
         if (stateInterval > 0 && time % stateInterval == 0)
-            saveState(&sim, time, lhs ? outputFileName : ".");
+            saveState(sim, time, lhs ? outputFileName : ".");
 		if (csvInterval <= 0 || time % csvInterval == 0 || time == timeToSimulate)
 		{
 			if (screenDisplay)
 			{
 				//			printf("%d\t %d - (%d,%d,%d,%d,%d)\t%d - (%d,%d,%d)\t%d - (%d,%d,%d)\t%d - (%d,%d)\t(%f,%f)\t(%f,%f,%f,%f)\n",
 				printf("%d\t %d - (%d,%d,%d,%d,%d)\t%d - (%d,%d,%d)\t%d - (%d,%d,%d)\t%d - (%d,%d)\t(%f,%f)\t(%f,%f,%f,%f)\t(%d,%d,%d,%d)\t%d %f\n",
-					   sim.getTime(),
+					   sim->getTime(),
 					   stats.getNrOfMac(), stats.getNrOfMacResting(), stats.getNrOfMacInfected(),
 					   stats.getNrOfMacCInfected(), stats.getNrOfMacActive(), stats.getNrOfMacDead(),
 					   stats.getNrOfTgam(), stats.getNrOfTgamActive(),	stats.getNrOfTgamDownRegulated(),
@@ -411,11 +411,11 @@ int run(unsigned long seed, const std::string& inputFileName, const std::string&
 			
         	if (outputFileStream.good())
 			{
-				writeOutput(outputFileStream, sim, csvInterval);
+				writeOutput(outputFileStream, *sim, csvInterval);
 			}
 		}
         //Run the simulation one step
-		sim.solve();
+		sim->solve();
 	}
 	
 	return 0;

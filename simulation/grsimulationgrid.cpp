@@ -8,10 +8,8 @@
 #include "grsimulationgrid.h"
 
 GrSimulationGrid::GrSimulationGrid()
-	: _grid1()
-	, _grid2()
-	, _pCurrentGrid(&_grid1)
-	, _pNextGrid(&_grid2)
+	: _pCurrentGrid(new GrGrid())
+	, _pNextGrid(new GrGrid())
 {
 
 }

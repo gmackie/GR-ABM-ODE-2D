@@ -15,7 +15,7 @@ Simulation::Simulation()
 	: _mutex(QMutex::Recursive)
 	, _modelMutex(QMutex::Recursive)
 	, _time(0)
-	, _gr()
+	, _gr(new GrSimulation())
 	, _grid()
 	, _delay(0)
 	, _updated(false)
@@ -28,8 +28,8 @@ Simulation::Simulation()
 	, _timeStepsToSimulate(_TIMESTEPS_TO_SIMULATE) //_DAYS_TO_SIMULATE _TIMESTEPS_TO_SIMULATE
 	, _mtbClearance(true)
 {
-	_gr.init();
-	_gr.setAreaThreshold(_AREA_THRESHOLD);
+	_gr->init();
+	_gr->setAreaThreshold(_AREA_THRESHOLD);
 	update();
 }
 
@@ -41,13 +41,13 @@ void Simulation::update()
 {
 	_updated = true;
 	// get copies
-	_grid = _gr.getGrid();
-	_time = _gr.getTime();
-	_macList = _gr.getMacList();
-	_tgamList = _gr.getTgamList();
-	_tcytList = _gr.getTcytList();
-	_tregList = _gr.getTregList();
-	_stats = _gr.getStats();
+	_grid = _gr->getGrid();
+	_time = _gr->getTime();
+	_macList = _gr->getMacList();
+	_tgamList = _gr->getTgamList();
+	_tcytList = _gr->getTcytList();
+	_tregList = _gr->getTregList();
+	_stats = _gr->getStats();
 }
 
 bool Simulation::stopCondition()
@@ -66,7 +66,7 @@ void Simulation::run()
 	while (!stop)
 	{
 		_modelMutex.lock();
-		_gr.solve();
+		_gr->solve();
 		_modelMutex.unlock();
 
 		lock();
@@ -83,7 +83,7 @@ void Simulation::run()
 		// Perform one last t-test so any display of simulation results
 		// have current t-test results, not old ones (possibly very old ones
 		// if the testing period is long).
-		_gr.performT_Test();
+		_gr->performT_Test();
 		update(); // to get the latest t-test results from _gr
 		emit stopConditionMet();
 	}
@@ -111,7 +111,7 @@ void Simulation::loadState(std::istream& in)
 {
 	_modelMutex.lock();
 	_stopFlag = false;
-	_gr.deserialize(in);
+	_gr->deserialize(in);
 	update();
 	_modelMutex.unlock();
 }
@@ -119,13 +119,13 @@ void Simulation::loadState(std::istream& in)
 void Simulation::saveState(std::ostream& out) const
 {
 	_modelMutex.lock();
-	_gr.serialize(out);
+	_gr->serialize(out);
 	_modelMutex.unlock();
 }
 
 void Simulation::setTnfDepletionTimeStep(int tnfDepletionTimeStep)
 {
 	lock();
-	_gr.setTnfDepletionTimeStep(tnfDepletionTimeStep);
+	_gr->setTnfDepletionTimeStep(tnfDepletionTimeStep);
 	unlock();
 }

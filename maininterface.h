@@ -110,7 +110,7 @@ public:
     void setSimTime(int simTime);
 
 private:
-    Simulation _simulation;
+    Simulation* _simulation;
     ScalarNormalizer _scalarSmokeNormalizer;
     ScalarNormalizer _scalarGlyphNormalizer;
     ScalarNormalizer _scalarIsolinesNormalizer;
@@ -364,7 +364,7 @@ inline void MainInterface::setDrawGranuloma(bool drawGranuloma)
 
 inline Simulation& MainInterface::getSimulation()
 {
-	return _simulation;
+	return *_simulation;
 }
 
 inline ScalarAgentGridBase* MainInterface::getScalarAgentGrid()
@@ -494,7 +494,7 @@ inline void MainInterface::setHeightGridAlpha(float alpha)
 
 inline void MainInterface::setGranulomaThreshold(float refValue)
 {
-	_simulation.setAreaThreshold(refValue);
+	_simulation->setAreaThreshold(refValue);
 	_granulomaVisualization.setTargetValueVector(std::vector<float>(1, refValue));
 }
 

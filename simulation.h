@@ -20,7 +20,7 @@ private:
 	mutable QMutex _mutex;
 	mutable QMutex _modelMutex;
 	int _time;
-	GrSimulation _gr;
+	GrSimulation* _gr;
 	GrGrid _grid;
 	int _delay;
 	bool _updated;
@@ -94,7 +94,7 @@ inline void Simulation::setOutcomeMethod(int index,
 	OutcomeMethod method, double alpha, int testPeriod, int samplePeriod)
 {
 	lock();
-	_gr.setOutcomeMethod(index, method, alpha, testPeriod, samplePeriod);
+	_gr->setOutcomeMethod(index, method, alpha, testPeriod, samplePeriod);
 	unlock();
 }
 
@@ -102,7 +102,7 @@ inline void Simulation::getOutcomeParameters(int index,
 	int& samplePeriod, int& testPeriod, double& alpha) const
 {
 	lock();
-	_gr.getOutcomeParameters(index, samplePeriod, testPeriod, alpha);
+	_gr->getOutcomeParameters(index, samplePeriod, testPeriod, alpha);
 	unlock();
 }
 
@@ -120,7 +120,7 @@ inline double Simulation::getAreaThreshold() const
 inline void Simulation::setAreaThreshold(double areaThreshold)
 {
 	lock();
-	_gr.setAreaThreshold(areaThreshold);
+	_gr->setAreaThreshold(areaThreshold);
 	unlock();
 }
 
@@ -153,7 +153,7 @@ inline void Simulation::setMtbClearance(bool enable)
 inline void Simulation::setDiffusionMethod(DiffusionMethod method)
 {
 	lock();
-	_gr.setDiffusionMethod(method);
+	_gr->setDiffusionMethod(method);
 	unlock();
 }
 
@@ -202,7 +202,7 @@ inline DiffusionMethod Simulation::getDiffusionMethod() const
 	DiffusionMethod res;
 
 	lock();
-	res = _gr.getDiffusionMethod();
+	res = _gr->getDiffusionMethod();
 	unlock();
 
 	return res;
@@ -213,7 +213,7 @@ inline OutcomeMethod Simulation::getOutcomeMethod(int index) const
 	OutcomeMethod res;
 
 	lock();
-	res = _gr.getOutcomeMethod(index);
+	res = _gr->getOutcomeMethod(index);
 	unlock();
 
 	return res;
@@ -251,17 +251,17 @@ inline const GrGrid& Simulation::getGrGrid() const
 
 inline void Simulation::setRecruitment(RecruitmentBase* pRecruitment)
 {
-	_gr.setRecruitment(pRecruitment);
+	_gr->setRecruitment(pRecruitment);
 }
 
 inline void Simulation::setTnfrDynamics(bool tnfrDynamics)
 {
-	_gr.setTnfrDynamics(tnfrDynamics);
+	_gr->setTnfrDynamics(tnfrDynamics);
 }
 
 inline void Simulation::setNfkbDynamics(bool nfkbDynamics)
 {
-	_gr.setNfkbDynamics(nfkbDynamics);
+	_gr->setNfkbDynamics(nfkbDynamics);
 }
 
 inline QString Simulation::getTimeStr(int simTime, int time)

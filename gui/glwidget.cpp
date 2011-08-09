@@ -25,6 +25,7 @@ GLWidget::GLWidget(QWidget* parent)
 	, _allowMoveCamera(true)
 {
 	this->setFocusPolicy(Qt::ClickFocus);
+  this->setAutoBufferSwap(true);
 }
 
 GLWidget::~GLWidget()
@@ -106,8 +107,6 @@ void GLWidget::paintGL()
 	emit printText();
 
 	glFlush();
-
-	swapBuffers();
 }
 
 void GLWidget::resizeGL(int width, int height)
@@ -115,7 +114,7 @@ void GLWidget::resizeGL(int width, int height)
 	updateViewport(width, height);
 	updateProjectionMatrix();
 	updateModelViewMatrix();
-	paintGL();
+	updateGL();
 }
 
 void GLWidget::mousePressEvent(QMouseEvent* pEvent)
@@ -169,7 +168,7 @@ void GLWidget::wheelEvent(QWheelEvent* pEvent)
 	_radius += (0.5 * numSteps * 4);
 
 	updateModelViewMatrix();
-	paintGL();
+	updateGL();
 }
 
 void GLWidget::mouseMoveEvent(QMouseEvent* pEvent)
@@ -194,7 +193,7 @@ void GLWidget::mouseMoveEvent(QMouseEvent* pEvent)
 
 		updateModelViewMatrix();
 
-		paintGL();
+		updateGL();
 	}
 	else if ((pEvent->buttons() & Qt::RightButton) && _allowMoveCamera)
 	{
@@ -209,7 +208,7 @@ void GLWidget::mouseMoveEvent(QMouseEvent* pEvent)
 
 		updateModelViewMatrix();
 
-		paintGL();
+		updateGL();
 	}
 }
 
@@ -242,7 +241,7 @@ void GLWidget::set3DViewHeight()
 
 	updateModelViewMatrix();
 
-	paintGL();
+	updateGL();
 }
 
 void GLWidget::set2DView()
@@ -254,5 +253,5 @@ void GLWidget::set2DView()
 
 	updateModelViewMatrix();
 
-	paintGL();
+	updateGL();
 }

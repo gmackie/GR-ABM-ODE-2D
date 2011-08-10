@@ -183,6 +183,6 @@
 		growthExtMtbBound = "200"
 		/>
 	<Init>
-		<Mac row = "50" col = "50"/>
+		<Mac pos="center" />
 	</Init>
 </GR>

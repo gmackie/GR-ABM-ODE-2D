@@ -419,6 +419,26 @@ bool ParamsBase::readParam(const TiXmlElement* pElement, const std::string param
 
 	return true;
 }
+bool ParamsBase::readParam(const TiXmlElement* pElement, const std::string paramName, Pos& p) {
+  std::string val;
+  switch(pElement->QueryValueAttribute(paramName, &val))
+  {
+  case TIXML_NO_ATTRIBUTE: break;
+  case TIXML_WRONG_TYPE:
+		std::cerr << "Value of attribute '" << pElement->Value() << "/@"
+			<< paramName << "' must be a list of integers or 'center'";
+    break;
+  default:
+    if(val == std::string("center"))
+      p = Pos(NROWS/2, NCOLS/2);
+    else {
+      std::stringstream ss(val);
+      ss>>p; //throws parse error
+    }
+    return true;
+  }
+  return false;
+}
 
 // Read the "Init" element, which specifies the simulation initial conditions.
 // It is optional. If not specified hard coded initial conditions are used.
@@ -441,8 +461,19 @@ bool ParamsBase::readInitElement(const TiXmlElement* pRootElement)
 			Pos pos;
 			if (!strcmp(pInitChildElement->Value(), "Mac"))
 			{
-				res &= readParam(pInitChildElement, "row", &pos.first, true);
-				res &= readParam(pInitChildElement, "col", &pos.second, true);
+        res = readParam(pInitChildElement, "pos", pos);
+        if(res) {
+          Pos offset;
+          res |= readParam(pInitChildElement, "offset", offset);
+          if(res) {
+            pos.first += offset.first;
+            pos.second += offset.second;
+          }
+        }
+        else {
+  				res = readParam(pInitChildElement, "row", &pos.first, true);
+  				res &= readParam(pInitChildElement, "col", &pos.second, true);
+        }
 
 				if (!(0 <= pos.first && pos.first < NROWS) ||
 					!(0 <= pos.second && pos.second < NCOLS))
@@ -458,8 +489,19 @@ bool ParamsBase::readInitElement(const TiXmlElement* pRootElement)
 			}
 			else if (!strcmp(pInitChildElement->Value(), "ExtMtb"))
 			{
-				res &= readParam(pInitChildElement, "row", &pos.first, true);
-				res &= readParam(pInitChildElement, "col", &pos.second, true);
+        res = readParam(pInitChildElement, "pos", pos);
+        if(res) {
+          Pos offset;
+          res |= readParam(pInitChildElement, "offset", offset);
+          if(res) {
+            pos.first += offset.first;
+            pos.second += offset.second;
+          }
+        }
+        else {
+  				res = readParam(pInitChildElement, "row", &pos.first, true);
+  				res &= readParam(pInitChildElement, "col", &pos.second, true);
+        }
 
 				if (!(0 <= pos.first && pos.first < NROWS) ||
 					!(0 <= pos.second && pos.second < NCOLS))

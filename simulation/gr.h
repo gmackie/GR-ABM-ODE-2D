@@ -96,6 +96,18 @@ typedef enum {TGAM_DEAD, TGAM_ACTIVE, TGAM_DOWN_REGULATED} TgamState;
 typedef enum {TCYT_DEAD, TCYT_ACTIVE, TCYT_DOWN_REGULATED} TcytState;
 typedef enum {TREG_DEAD, TREG_ACTIVE} TregState;
 
+inline std::ostream& operator<<(std::ostream& s, const Pos& p) {
+  return s<<'('<<p.first<<','<<p.second<<')';
+}
+inline std::istream& operator>>(std::istream& s, Pos& p) {
+  char tmp;
+  s>>tmp; assert(tmp == '(');
+  s>>p.first;
+  s>>tmp; assert(tmp == ',');
+  s>>p.first;
+  s>>tmp; assert(tmp == ')');
+  return s;
+}
 
 // global variables
 extern Rand g_Rand;

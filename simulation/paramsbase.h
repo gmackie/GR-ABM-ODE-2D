@@ -8,6 +8,10 @@
 #ifndef PARAMS_H
 #define PARAMS_H
 
+#ifndef TIXML_USE_STL
+#define TIXML_USE_STL
+#endif //TIXML_USE_STL
+
 #include "tinyxml/tinyxml.h"
 #include "gr.h"
 
@@ -277,6 +281,7 @@ protected:
 	bool readParam(const TiXmlElement* pElement, const std::string paramName, double* pVar, double defaultVal, bool prob);
 	bool readParam(const TiXmlElement* pElement, const std::string paramName, int* pVar, bool pos);
 	bool readParam(const TiXmlElement* pElement, const std::string paramName, int* pVar, int defaultVal, bool pos);
+  bool readParam(const TiXmlElement*, std::string, Pos&);
 
 	bool readInitElement(const TiXmlElement* pRootElement);
 	void computeParams();

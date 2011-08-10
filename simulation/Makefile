@@ -37,6 +37,8 @@ OBJS := ${SRCS:.cpp=.o}
 # If Makefile or gr.h changes, we need to recompile everything -- We can do this here because object files only depend on one file
 $(OBJS):	gr.h Makefile
 
+tinyxml/%.o:	CXXFLAGS+= -DTIXML_USE_STL
+
 %.cu.o:	%.cu gr.h Makefile
 	nvcc -arch=sm_11 --compiler-options="$(CXXFLAGS)" -c -o $@ $<
 

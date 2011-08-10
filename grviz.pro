@@ -174,6 +174,7 @@ exists( .git/ ) {
 }
 
 DEFINES += SVN_VERSION=\\\"$$VERSION\\\"
+DEFINES += TIXML_USE_STL
 
 !isEmpty(DIM) : DEFINES += __DIM__=$$DIM
 

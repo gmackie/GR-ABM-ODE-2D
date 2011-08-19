@@ -105,6 +105,7 @@ void Treg::computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tn
 		case TREG_ACTIVE:
 			handleResting(time, grid, stats);
 			break;
+    default: throw std::runtime_error("Unknown Tcyt state");
 		}
 	}
 }
@@ -202,6 +203,7 @@ void Treg::print() const
 	case TREG_ACTIVE:
 		std::cout << "active" << std::endl;
 		break;
+  default: throw std::runtime_error("Unknown Tcyt state");
 	}
 }
 

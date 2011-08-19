@@ -243,7 +243,7 @@ inline Mac* GrSimulation::createMac(int row, int col, int birthtime, MacState st
 	Mac* pMac = &_macList.back();
 	
 	assert_res(_grid(row, col).addAgent(pMac));
-	_stats.updateMacStatistics(state);
+	_stats.updateAgentStatistics(pMac);
 
 	return pMac;
 }
@@ -254,7 +254,7 @@ inline Tgam* GrSimulation::createTgam(int row, int col, int birthtime, TgamState
 	Tgam* pTgam = &_tgamList.back();
 	
 	assert_res(_grid(row, col).addAgent(pTgam));
-	_stats.updateTgamStatistics(state);
+	_stats.updateAgentStatistics(pTgam);
 
 	return pTgam;
 }
@@ -265,7 +265,7 @@ inline Tcyt* GrSimulation::createTcyt(int row, int col, int birthtime, TcytState
 	Tcyt* pTcyt = &_tcytList.back();
 	
 	assert_res(_grid(row, col).addAgent(pTcyt));
-	_stats.updateTcytStatistics(state);
+	_stats.updateAgentStatistics(pTcyt);
 
 	return pTcyt;
 }
@@ -276,7 +276,7 @@ inline Treg* GrSimulation::createTreg(int row, int col, int birthtime, TregState
 	Treg* pTreg = &_tregList.back();
 	
 	assert_res(_grid(row, col).addAgent(pTreg));
-	_stats.updateTregStatistics(state);
+	_stats.updateAgentStatistics(pTreg);
 
 	return pTreg;
 }

@@ -115,6 +115,8 @@ void Tcyt::computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tn
 		case TCYT_DOWN_REGULATED:
 			handleDownRegulated(time, grid, stats);
 			break;
+    default:
+      throw std::runtime_error("Unknown Tcyt state");
 		}
 	}
 }
@@ -265,6 +267,7 @@ void Tcyt::print() const
 	case TCYT_DOWN_REGULATED:
 		std::cout << "down-regulated" << std::endl;
 		break;
+  default: throw std::runtime_error("Unknown Tcyt state");
 	}
 }
 

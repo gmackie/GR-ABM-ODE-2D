@@ -116,6 +116,7 @@ void Tgam::computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tn
 		case TGAM_DOWN_REGULATED:
 			handleDownRegulated(time, grid, stats);
 			break;
+    default: throw std::runtime_error("Unknown Tcyt state");
 		}
 	}
 }
@@ -244,6 +245,7 @@ void Tgam::print() const
 	case TGAM_ACTIVE:
 		std::cout << "active" << std::endl;
 		break;
+  default: throw std::runtime_error("Unknown Tcyt state");
 	}
 }
 

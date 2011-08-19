@@ -6,7 +6,12 @@
  */
 
 #include "grstat.h"
+#include "params.h"
 #include "serialization.h"
+#include "macrophage.h"
+#include "tgamma.h"
+#include "tcytotoxic.h"
+#include "tregulatory.h"
 
 const std::string GrStat::_ClassName = "GrStat";
 
@@ -93,17 +98,54 @@ GrStat::GrStat()
 	, _T80lung(0)
 	, _T8lung(0)
 	, _TClung(0)
+  , _intMtbFreq(new unsigned[int(_PARAM(PARAM_MAC_THRESHOLD_BURST_CI_INTMTB))])
+  , _macIntMtbStats(new Stat[NMAC_STATES])
 {
 	for (int i = 0; i < NOUTCOMES; i++)
 	{
 		_grStatus[i] = GR_NONE;
 	}
+  memset(_intMtbFreq, 0, sizeof(unsigned)*int(_PARAM(PARAM_MAC_THRESHOLD_BURST_CI_INTMTB)));
 }
 
 GrStat::~GrStat()
 {
+  if(_intMtbFreq)
+    delete[] _intMtbFreq;
+  if(_macIntMtbStats)
+    delete[] _macIntMtbStats;
 }
 
+void GrStat::updateAgentStatistics(Agent* a)
+{
+  assert(a!=NULL);
+  switch(a->getAgentType())
+  {
+    case MAC:
+    {
+      Mac* pMac = static_cast<Mac*>(a);
+      assert(pMac != NULL);
+      _macIntMtbStats[pMac->getState()](pMac->getIntMtb());
+      if(pMac->getState() == MAC_INFECTED || pMac->getState() == MAC_CINFECTED){
+        assert(pMac->getIntMtb() < _PARAM(PARAM_MAC_THRESHOLD_BURST_CI_INTMTB));
+        _intMtbFreq[int(pMac->getIntMtb())]++;
+      }
+      updateMacStatistics(static_cast<Mac*>(pMac)->getState());
+      break;
+    }
+    case TGAM:
+      updateTgamStatistics(static_cast<Tgam*>(a)->getState());
+      break;
+    case TCYT:
+      updateTcytStatistics(static_cast<Tcyt*>(a)->getState());
+      break;
+    case TREG:
+      updateTregStatistics(static_cast<Treg*>(a)->getState());
+      break;
+    default:
+      throw std::runtime_error("Unknown agent type");
+  }
+}
 void GrStat::updateMacStatistics(MacState state)
 {
 	switch (state)
@@ -123,6 +165,7 @@ void GrStat::updateMacStatistics(MacState state)
 	case MAC_DEAD:
 		_nMacDead++;
 		break;
+  default: throw std::runtime_error("Unknown Mac state"); break;
 	}
 
 	_nMac++;
@@ -147,6 +190,7 @@ void GrStat::updateMacNFkBStatistics(MacState state)
 	case MAC_DEAD:
 		_nMacNFkBDead++;
 		break;
+  default: throw std::runtime_error("Unknown Mac state"); break;
 	}
 
 	_nMacNFkB++;
@@ -171,6 +215,7 @@ void GrStat::updateMacStat1Statistics(MacState state)
 	case MAC_DEAD:
 		_nMacStat1Dead++;
 		break;
+  default: throw std::runtime_error("Unknown Mac state"); break;
 	}
 
 	_nMacStat1++;
@@ -195,6 +240,7 @@ void GrStat::updateMacDeactStatistics(MacState state)
 	case MAC_DEAD:
 		_nMacDeactDead++;
 		break;
+  default: throw std::runtime_error("Unknown Mac state"); break;
 	}
 
 	_nMacDeact++;
@@ -213,6 +259,7 @@ void GrStat::updateTgamStatistics(TgamState state)
 	case TGAM_DEAD:
 		_nTgamDead++;
 		break;
+  default: throw std::runtime_error("Unknown Tgam state"); break;
 	}
 
 	_nTgam++;
@@ -231,6 +278,7 @@ void GrStat::updateTcytStatistics(TcytState state)
 	case TCYT_DEAD:
 		_nTcytDead++;
 		break;
+  default: throw std::runtime_error("Unknown Tcyt state"); break;
 	}
 
 	_nTcyt++;
@@ -246,6 +294,7 @@ void GrStat::updateTregStatistics(TregState state)
 	case TREG_DEAD:
 		_nTregDead++;
 		break;
+  default: throw std::runtime_error("Unknown Treg state"); break;
 	}
 
 	_nTreg++;
@@ -253,6 +302,7 @@ void GrStat::updateTregStatistics(TregState state)
 
 void GrStat::resetAgentStats()
 {
+  namespace ba = boost::accumulators;
 	_nMac = _nMacResting = _nMacInfected = 
 		_nMacCInfected = _nMacDead = _nMacActive = 0;
 	
@@ -270,6 +320,10 @@ void GrStat::resetAgentStats()
 	_nTcyt = _nTcytDead = _nTcytDownRegulated = _nTcytActive = 0;
 	
 	_nTreg = _nTregDead = _nTregActive = 0;
+
+  memset(_intMtbFreq, 0, sizeof(unsigned)*_PARAM(PARAM_MAC_THRESHOLD_BURST_CI_INTMTB));
+  delete[] _macIntMtbStats;
+  _macIntMtbStats = new Stat[NMAC_STATES];  //Reset boost accumulators
 }
 
 void GrStat::reset()

@@ -90,11 +90,11 @@ typedef enum {DIFF_REC_EQ = 0, DIFF_SOR_CORRECT = 1, DIFF_SOR_WRONG = 2, DIFF_RE
 typedef enum {OUTCOME_AREA = 0, OUTCOME_MTB = 1, OUTCOME_NONE = 2} OutcomeMethod;
 //typedef enum {RECR_PROB = 0, RECR_LN_ODE = 1} RecruitmentMethod;
 
-typedef enum {MAC, TGAM, TCYT, TREG} AgentType;
-typedef enum {MAC_DEAD, MAC_RESTING, MAC_INFECTED, MAC_CINFECTED, MAC_ACTIVE} MacState;
-typedef enum {TGAM_DEAD, TGAM_ACTIVE, TGAM_DOWN_REGULATED} TgamState;
-typedef enum {TCYT_DEAD, TCYT_ACTIVE, TCYT_DOWN_REGULATED} TcytState;
-typedef enum {TREG_DEAD, TREG_ACTIVE} TregState;
+typedef enum {MAC, TGAM, TCYT, TREG, NAGENTS} AgentType;
+typedef enum {MAC_DEAD, MAC_RESTING, MAC_INFECTED, MAC_CINFECTED, MAC_ACTIVE, NMAC_STATES} MacState;
+typedef enum {TGAM_DEAD, TGAM_ACTIVE, TGAM_DOWN_REGULATED, NTGAM_STATES} TgamState;
+typedef enum {TCYT_DEAD, TCYT_ACTIVE, TCYT_DOWN_REGULATED, NTCYTSTATES} TcytState;
+typedef enum {TREG_DEAD, TREG_ACTIVE, NTREGSTATES} TregState;
 
 inline std::ostream& operator<<(std::ostream& s, const Pos& p) {
   return s<<'('<<p.first<<','<<p.second<<')';

@@ -9,10 +9,19 @@
 #define GRSTAT_H
 
 #include "gr.h"
+#include "params.h"
+#include <boost/accumulators/accumulators.hpp>
+#include <boost/accumulators/statistics/stats.hpp>
+#include <boost/accumulators/statistics/mean.hpp>
+#include <boost/accumulators/statistics/variance.hpp>
+#include <boost/accumulators/statistics/min.hpp>
+#include <boost/accumulators/statistics/max.hpp>
+#include <boost/accumulators/statistics/median.hpp>
 
 typedef enum {	GR_CONTAINMENT, GR_CONTAINMENT_INCONSISTENT, GR_CLEARANCE,
 				GR_DISSEMINATION, GR_DISSEMINATION_INCONSISTENT, GR_UNKNOWN, GR_NONE} GrStatus;
 
+namespace ba = boost::accumulators;
 class GrStat
 {
 private:
@@ -120,9 +129,17 @@ private:
 	double _T8lung;
 	double _TClung;
 
+  unsigned* _intMtbFreq;
+public:
+  typedef ba::accumulator_set<double, ba::stats< ba::features< ba::tag::variance, ba::tag::min, ba::tag::max, ba::tag::median > > > Stat;
+private:
+  Stat* _macIntMtbStats;
+
 public:
 	GrStat();
 	~GrStat();
+  const unsigned* getIntMtbFreq(size_t& s) const;
+  const Stat* getIntMtbStats(size_t &s) const;
 	int getNrOfMac() const;
 	int getNrOfTgam() const;
 	int getNrOfTcyt() const;
@@ -166,10 +183,13 @@ public:
 	double getTotCCL2() const;
 	double getTotCCL5() const;
 	double getTotCXCL9() const;
+	void updateAgentStatistics(Agent* a);
+protected:
 	void updateMacStatistics(MacState state);
 	void updateTgamStatistics(TgamState state);
 	void updateTcytStatistics(TcytState state);
 	void updateTregStatistics(TregState state);
+public:
 	void updateMacNFkBStatistics(MacState state);
 	void updateMacStat1Statistics(MacState state);
 	void updateMacDeactStatistics(MacState state);
@@ -267,6 +287,14 @@ public:
 	void setTClung(double val);
 };
 
+inline const unsigned* GrStat::getIntMtbFreq(size_t& s) const {
+  s = size_t(_PARAM(PARAM_MAC_THRESHOLD_BURST_CI_INTMTB));
+  return _intMtbFreq;
+}
+inline const GrStat::Stat* GrStat::getIntMtbStats(size_t &s) const {
+  s = size_t(NMAC_STATES);
+  return _macIntMtbStats;
+}
 inline void GrStat::setN4(double val)
 {
 	_N4 = val;

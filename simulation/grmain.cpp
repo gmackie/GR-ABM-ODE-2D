@@ -27,304 +27,174 @@ void printVersion()
 	std::cout << "Version: " << GR_VERSION << std::endl;
 }
 
-void printUsage(char* pArgv0, po::options_description& desc)
+void printUsage(const char* pArgv0, po::options_description& desc)
 {
-	std::cout << "Usage: " << pArgv0 << " [options]\n" << desc << std::endl;
+	std::cout << "Usage: " << pArgv0 << " [options] FILE\n" << desc << std::endl;
 }
 
-void writeOutputHeaderOld(std::ofstream& outputFileStream, std::string inputFileName)
-{
-	outputFileStream <<inputFileName<<","<<"Mac" <<","<<"Mr"<<","<<"Mi"<<","<<"Mci"<<","<<"Ma"<<","<<"Tgam"<<
-	","<<"Tgam a"<<","<<"Tgam reg"<<","<<"Tcyt"<<","<<"Tcyt a"<<","<<"Tcyt reg"<<","<<"Treg"<<
-	","<<"Int. Mtb."<<","<<"Ext. Mtb."<<","<<"TNF"<<","<<"CCL2"<<","<<"CCL5"<<
-	","<<"CXCL9"<<","<<"Mac Apop"<<","<< "MDC"<< ","<< "N4"<< ","
-	<< "TH0"<< ","<< "TH1"<< ","<< "N8"<< ","<< "T80"<< ","<< "T8"<< ","
-	<< "TC"<< "," << "TH0lung" << ","<< "TH1lung"<< ","<< "T80lung"<< ","
-	<< "T8lung" << "," << "TClung"<< std::endl;
+class oCSVStream {
+private:
+  std::ostream* f;
+public:
+  oCSVStream(std::ostream* s) : f(s) {}
+  virtual ~oCSVStream() { delete f; }
+  template<typename T> void operator<<(const T& data) { operator<<(std::string(data)); }
+
+  template<typename T>
+  void write(const T& data) { (*this)<<data; }
+  void endRow() { (*f)<<std::endl; }
+  virtual void saveRow(const GrSimulation& sim) = 0;
+};
+template<>
+void oCSVStream::operator<<(const unsigned& data) { (*f)<<data<<','; }
+template<>
+void oCSVStream::operator<<(const int& data) { (*f)<<data<<','; }
+template<>
+void oCSVStream::operator<<(const float& data) {
+  if(!isnan(data)) (*f)<<data<<',';
+  else (*f)<<"NaN,";
+}
+template<>
+void oCSVStream::operator<<(const double& data) {
+  if(!isnan(data)) (*f)<<data<<',';
+  else (*f)<<"NaN,";
+}
+template<>
+void oCSVStream::operator<<(const char& data) { (*f)<<data<<','; }
+//RFC 4180 Standard string handling
+template<>
+void oCSVStream::operator<<(const std::string& data) {
+  std::string c(data);
+  for(unsigned i=c.find('"'); i!=std::string::npos; i=c.find('"', i+1))
+    c.replace(i, 1, "\"\"");
+  (*f)<<'"'<<c<<"\",";
 }
 
-void writeOutputOld(std::ofstream& outputFileStream, GrSimulation& sim, int csvInterval)
-{
-	const GrStat& stats = sim.getStats();
-	
-	outputFileStream <<sim.getTime()/csvInterval <<","<<stats.getNrOfMac()<<","<<stats.getNrOfMacResting()<<","<<stats.getNrOfMacInfected()<<
-	","<<stats.getNrOfMacCInfected()<<","<<stats.getNrOfMacActive()<<","<<stats.getNrOfTgam()<<","<<stats.getNrOfTgamActive()<<
-	","<<stats.getNrOfTgamDownRegulated()<<","<<stats.getNrOfTcyt()<<","<<stats.getNrOfTcytActive()<<","<<stats.getNrOfTcytDownRegulated()<<
-	","<<stats.getNrOfTregActive()<<","<<stats.getTotIntMtb()<<","<<stats.getTotExtMtb()<<
-	","<<stats.getTotTNF() / (NROWS*NCOLS)<<","<<stats.getTotCCL2() / (NROWS*NCOLS)<<","<<stats.getTotCCL5() / (NROWS*NCOLS)<<
-	","<<stats.getTotCXCL9() / (NROWS*NCOLS)<<","<<stats.getNrMacApoptosisTNF() <<
-	","<<stats.getMDC()<< ","<< stats.getN4()<<","<< stats.getTH0()<<","<< stats.getTH1()<<
-	","<< stats.getN8()<< ","<< stats.getT80()<< ","<< stats.getT8()<< ","<< stats.getTC()<<
-	","<<stats.getTH0lung()<< ","<< stats.getTH1lung()<< ","<< stats.getT80lung()<<
-	","<< stats.getT8lung()<< ","<< stats.getTClung()<<std::endl;
-	
-}
+class IntMtbStats : public oCSVStream {
+public:
+  IntMtbStats(std::ostream* s, GrSimulation& sim) : oCSVStream(s) { outputHeader(sim); }
+  void outputHeader(const GrSimulation& sim) {
+    write("time");
+    size_t sz;
+    sim.getStats().getIntMtbFreq(sz);
+    for(unsigned i=0;i<sz;i++)
+      write(i);
+    write("Mi Max"); write("Mi Min"); write("Mi Mean"); write("Mi Median"); write("Mi StdDev");
+    write("Mci Max"); write("Mci Min"); write("Mci Mean"); write("Mci Median"); write("Mci StdDev");
+    endRow();
+  }
+  void saveRow(const GrSimulation& sim) {
+    const GrStat& stat = sim.getStats();
+    write(sim.getTime());
+    size_t sz;
+    {
+      const unsigned* v = stat.getIntMtbFreq(sz);
+      for(unsigned i=0;i<sz;i++) write(v[i]);
+    }
+    {
+      namespace ba = boost::accumulators;
+      const GrStat::Stat* v = stat.getIntMtbStats(sz);
+      if(ba::extract::count(v[MAC_INFECTED]) > 0){
+        write(ba::extract::max(v[MAC_INFECTED]));
+        write(ba::extract::min(v[MAC_INFECTED]));
+        write(ba::extract::mean(v[MAC_INFECTED]));
+        write(ba::extract::median(v[MAC_INFECTED]));
+        write(sqrt(ba::extract::variance(v[MAC_INFECTED])));
+      }
+      else { write(0.0/0.0); write(0.0/0.0); write(0.0/0.0); write(0.0/0.0); }
+      if(ba::extract::count(v[MAC_CINFECTED]) > 0) {
+        write(ba::extract::max(v[MAC_CINFECTED]));
+        write(ba::extract::min(v[MAC_CINFECTED]));
+        write(ba::extract::mean(v[MAC_CINFECTED]));
+        write(ba::extract::median(v[MAC_INFECTED]));
+        write(sqrt(ba::extract::variance(v[MAC_CINFECTED])));
+      }
+      else { write(0.0/0.0); write(0.0/0.0); write(0.0/0.0); write(0.0/0.0); }
+    }
+    endRow();
+  }
+};
 
-void writeOutputHeader(std::ofstream& outputFileStream, std::string inputFileName)
-{
-	outputFileStream << "\"time\""
-	<< ','
-	<< "\"Mac\""
-	<< ','
-	<< "\"Mr\""
-	<< ','
-	<< "\"Mi\""
-	<< ','
-	<< "\"Mci\""
-	<< ','
-	<< "\"Ma\""
-	<< ','
-	<< "\"Md\""
-	<< ','
-	<< "\"Tgam\""
-	<< ','
-	<< "\"Tgam a\""
-	<< ','
-	<< "\"Tgam reg\""
-	<< ','
-	<< "\"Tgam d\""
-	<< ','
-	<< "\"Tcyt\""
-	<< ','
-	<< "\"Tcyt a\""
-	<< ','
-	<< "\"Tcyt reg\""
-	<< ','
-	<< "\"Tcyt d\""
-	<< ','
-	<< "\"Treg\""
-	<< ','
-	<< "\"Treg r\""
-	<< ','
-	<< "\"Treg d\""
-	<< ','
-	<< "\"Int. Mtb.\""
-	<< ','
-	<< "\"Ext. Mtb.\""
-	<< ','
-	<< "\"NonRepl Ext. Mtb.\""
-	<< ','
-	<< "\"Tot Mtb.\""
-	<< ','
-	<< "\"TNF\""
-	<< ','
-	<< "\"CCL2\""
-	<< ','
-	<< "\"CCL5\""
-	<< ','
-	<< "\"CXCL9\""
-	<< ','
-	<< "\"AreaTNF\""
-	<< ','
-	<< "\"AreaCellDensity\""
-	<< ','
-	<< "\"MDC\""
-	<< ','
-	<< "\"N4\""
-	<< ','
-	<< "\"TH0\""
-	<< ','
-	<< "\"TH1\""
-	<< ','
-	<< "\"N8\""
-	<< ','
-	<< "\"T80\""
-	<< ','
-	<< "\"T8\""
-	<< ','
-	<< "\"TC\""
-	<< ','
-	<< "\"TH0lung\""
-	<< ','
-	<< "\"TH1lung\""
-	<< ','
-	<< "\"T80lung\""
-	<< ','
-	<< "\"T8lung\""
-	<< ','
-	<< "\"TClung\""
-	<< ','
-	<< "\"Outcome (1)\""
-	<< ','
-	<< "\"Outcome (2)\""
-	<< ','
-	<< "\"NrSourcesMac\""
-	<< ','
-	<< "\"NrSourcesTgam\""
-	<< ','
-	<< "\"NrSourcesTcyt\""
-	<< ','
-	<< "\"NrSourcesTreg\""
-	<< ','
-	<< "\"NrCaseated\""
-	<< ','
-	<< "\"MacApoptosisTNF\""
-	<< ','
-	<< "\"MrApoptTNF\""
-	<< ','
-	<< "\"Mi&MciApoptTNF\""
-	<< ','
-	<< "\"MaApoptTNF\""
-	<< ','
-	<< "\"TcellApoptTNF\""
-	<< ','
-	<< "\"MrActivationTNF\""
-	<< ','
-	<< "\"MiActivationTNF\""
-	<< "\n";
-}
+class GeneralStats : public oCSVStream {
+public:
+  GeneralStats(std::ostream* s) : oCSVStream(s) { outputHeader(); }
+  void outputHeader() {
+    write("time");
+    write("Mac"); write("Mr"); write("Mi"); write("Mci"); write("Ma"); write("Md");
+    write("Tgam"); write("Tgam a"); write("Tgam reg");  write("Tgam d");
+    write("Tcyt"); write("Tcyt a"); write("Tcyt reg"); write("Tcyt d");
+    write("Treg"); write("Treg r"); write("Treg d");
+    write("Int. Mtb."); write("Ext. Mtb."); write("NonRepl Ext. Mtb."); write("Tot Mtb.");
+    write("TNF"); write("CCL2"); write("CCL5"); write("CXCL9"); 
+    write("AreaTNF"); write("AreaCellDensity");
+    write("MDC"); write("N4"); write("TH0"); write("TH1"); write("N8");
+    write("T80"); write("T8"); write("TC"); write("TH0lung"); write("TH1lung");
+    write("T80lung"); write("T8lung"); write("TClung");
+    write("Outcome (1)"); write("Outcome (2)");
+    write("NrSourcesMac"); write("NrSourcesTgam"); write("NrSourcesTcyt"); write("NrSourcesTreg");
+    write("NrCaseated");
+    write("MacApoptosisTNF"); write("MrApoptTNF"); write("Mi&MciApoptTNF");  write("MaApoptTNF");
+    write("TcellApoptTNF");
+    write("MrActivationTNF");
+    write("MiActivationTNF");
+    endRow();
 
-void writeOutput(std::ofstream& outputFileStream, GrSimulation& sim, int csvInterval)
-{
-	const GrStat& stats = sim.getStats();
-	outputFileStream << sim.getTime()
-	<< ','
-	<< stats.getNrOfMac()
-	<< ','
-	<< stats.getNrOfMacResting()
-	<< ','
-	<< stats.getNrOfMacInfected()
-	<< ','
-	<< stats.getNrOfMacCInfected()
-	<< ','
-	<< stats.getNrOfMacActive()
-	<< ','
-	<< stats.getNrOfMacDead()
-	<< ','
-	<< stats.getNrOfTgam()
-	<< ','
-	<< stats.getNrOfTgamActive()
-	<< ','
-	<< stats.getNrOfTgamDownRegulated()
-	<< ','
-	<< stats.getNrOfTgamDead()
-	<< ','
-	<< stats.getNrOfTcyt()
-	<< ','
-	<< stats.getNrOfTcytActive()
-	<< ','
-	<< stats.getNrOfTcytDownRegulated()
-	<< ','
-	<< stats.getNrOfTcytDead()
-	<< ','
-	<< stats.getNrOfTreg()
-	<< ','
-	<< stats.getNrOfTregActive()
-	<< ','
-	<< stats.getNrOfTregDead()
-	<< ','
-	<< stats.getTotIntMtb()
-	<< ','
-	<< stats.getTotExtMtb()
-	<< ','
-	<< stats.getTotNonRepExtMtb()
-	<< ','
-	<< (stats.getTotIntMtb() + stats.getTotExtMtb())
-	<< ','
-	<< stats.getTotTNF()
-	<< ','
-	<< stats.getTotCCL2()
-	<< ','
-	<< stats.getTotCCL5()
-	<< ','
-	<< stats.getTotCXCL9()
-	<< ','
-	<< stats.getArea()
-	<< ','
-	<< stats.getAreaCellDensity()
-	<< ','
-	<< stats.getMDC()
-	<< ','
-	<< stats.getN4()
-	<< ','
-	<< stats.getTH0()
-	<< ','
-	<< stats.getTH1()
-	<< ','
-	<< stats.getN8()
-	<< ','
-	<< stats.getT80()
-	<< ','
-	<< stats.getT8()
-	<< ','
-	<< stats.getTC()
-	<< ','
-	<< stats.getTH0lung()
-	<< ','
-	<< stats.getTH1lung()
-	<< ','
-	<< stats.getT80lung()
-	<< ','
-	<< stats.getT8lung()
-	<< ','
-	<< stats.getTClung();
-	
-	for (int i = 0; i < NOUTCOMES; i++)
-	{
-		outputFileStream << ',';
-		
-		switch (stats.getGrStatus(i))
-		{
-			case GR_CLEARANCE:
-				outputFileStream << "\"Clearance\"";
-				break;
-			case GR_CONTAINMENT:
-				outputFileStream << "\"Containment\"";
-				break;
-			case GR_CONTAINMENT_INCONSISTENT:
-				outputFileStream << "\"Containment?\"";
-				break;
-			case GR_DISSEMINATION:
-				outputFileStream << "\"Dissemination\"";
-				break;
-			case GR_DISSEMINATION_INCONSISTENT:
-				outputFileStream << "\"Dissemination?\"";
-				break;
-			case GR_UNKNOWN:
-				outputFileStream << "\"Unknown\"";
-				break;
-			case GR_NONE:
-				outputFileStream << "\"None\"";
-				break;
-		}
-	}
-	
-	outputFileStream
-	<< ','
-	<< stats.getNrSourcesMac()
-	<< ','
-	<< stats.getNrSourcesTgam()
-	<< ','
-	<< stats.getNrSourcesTcyt()
-	<< ','
-	<< stats.getNrSourcesTreg()
-	<< ','
-	<< stats.getNrCaseated()
-	<< ','
-	<< stats.getNrMacApoptosisTNF()
-	<< ','
-	<< stats.getNrRestingMacApoptosisTNF()
-	<< ','
-	<< stats.getNrInfAndCinfMacApoptosisTNF()
-	<< ','
-	<< stats.getNrActivatedMacApoptosisTNF()
-	<< ','
-	<< stats.getNrTcellApoptosisTNF()
-	<< ','
-	<< stats.getNrRestingMacActivationTNF()
-	<< ','
-	<< stats.getNrInfMacActivationTNF()
-	;
-	
-	outputFileStream << std::endl;
-}
-void saveState(const GrSimulation* pSim, int time, std::string dir=std::string(".")){
+  }
+  void saveRow(const GrSimulation& sim) {
+    const GrStat& stats = sim.getStats();
+    write(sim.getTime());
+    write(stats.getNrOfMac()); write(stats.getNrOfMacResting()); write(stats.getNrOfMacInfected()); write(stats.getNrOfMacCInfected()); write(stats.getNrOfMacActive()); write(stats.getNrOfMacDead());
+    write(stats.getNrOfTgam()); write(stats.getNrOfTgamActive()); write(stats.getNrOfTgamDownRegulated()); write(stats.getNrOfTgamDead());
+    write(stats.getNrOfTcyt()); write(stats.getNrOfTcytActive()); write(stats.getNrOfTcytDownRegulated()); write(stats.getNrOfTcytDead());
+    write(stats.getNrOfTreg()); write(stats.getNrOfTregActive()); write(stats.getNrOfTregDead());
+    write(stats.getTotIntMtb()); write(stats.getTotExtMtb()); write(stats.getTotNonRepExtMtb()); write((stats.getTotIntMtb() + stats.getTotExtMtb()));
+    write(stats.getTotTNF()); write(stats.getTotCCL2()); write(stats.getTotCCL5());  write(stats.getTotCXCL9());
+    write(stats.getArea()); write(stats.getAreaCellDensity());
+    write(stats.getMDC()); write(stats.getN4()); write(stats.getTH0()); write(stats.getTH1()); write(stats.getN8()); write(stats.getT80()); write(stats.getT8()); write(stats.getTC());
+    write(stats.getTH0lung()); write(stats.getTH1lung()); write(stats.getT80lung()); write(stats.getT8lung()); write(stats.getTClung());
+
+    for (int i = 0; i < NOUTCOMES; i++)
+    {
+      switch (stats.getGrStatus(i))
+      {
+        case GR_CLEARANCE:
+          write("Clearance");
+          break;
+        case GR_CONTAINMENT:
+          write("Containment");
+          break;
+        case GR_CONTAINMENT_INCONSISTENT:
+          write("Containment?");
+          break;
+        case GR_DISSEMINATION:
+          write("Dissemination");
+          break;
+        case GR_DISSEMINATION_INCONSISTENT:
+          write("Dissemination?");
+          break;
+        case GR_UNKNOWN:
+          write("Unknown");
+          break;
+        case GR_NONE:
+          write("None");
+          break;
+      }
+    }
+    write(stats.getNrSourcesMac()); write(stats.getNrSourcesTgam());  write(stats.getNrSourcesTcyt()); write(stats.getNrSourcesTreg());
+    write(stats.getNrCaseated());
+    write(stats.getNrMacApoptosisTNF()); write(stats.getNrRestingMacApoptosisTNF()); write(stats.getNrInfAndCinfMacApoptosisTNF()); write(stats.getNrActivatedMacApoptosisTNF()); write(stats.getNrTcellApoptosisTNF());
+    write(stats.getNrRestingMacActivationTNF()); write(stats.getNrInfMacActivationTNF());
+    oCSVStream::endRow();
+  }
+};
+
+void saveState(const GrSimulation* pSim, int time, std::string dir=std::string("./")){
     int days, hours, minutes;
     char fname[17];
     assert(pSim);
     GrSimulation::convertSimTime(time, days, hours, minutes);
     sprintf(fname, "%03dd%02dh%02dm.state", days, hours, minutes);
-    std::ofstream out(((dir+'/')+std::string(fname)).c_str(), std::ios_base::trunc);
+    std::ofstream out((dir+std::string(fname)).c_str(), std::ios_base::trunc);
     if(!out.good())
         std::cerr<<"Unable to open output file: "<<fname<<endl;
     else pSim->serialize(out);
@@ -332,9 +202,61 @@ void saveState(const GrSimulation* pSim, int time, std::string dir=std::string("
 }
 
 
-int run(unsigned long seed, const std::string& inputFileName, const std::string& outputFileName,
+void run(GrSimulation* pSim, int stateInterval, int csvInterval, bool screenDisplay, int timeToSimulate, std::string outputDir, std::vector<oCSVStream*> csvStreams)
+{
+  GrStat& stats = pSim->getStats();
+  csvInterval = csvInterval < 1 ? 1 : csvInterval;
+  for (int time = 0; time <= timeToSimulate; time += 1)
+  {
+    fprintf(stderr, "Done: %3.2f%%\r", 100.0*(time / float(timeToSimulate)));
+    // Display and write output at the requested interval, and after the last time step.
+    if (stateInterval > 0 && time % stateInterval == 0)
+       saveState(pSim, time, outputDir);
+    if (time % csvInterval == 0 || time == timeToSimulate)  //Write out each csv file
+      for(unsigned i=0;i<csvStreams.size();i++)
+        csvStreams[i]->saveRow(*pSim);
+    if (screenDisplay)
+    {
+      printf("%d   %d - (%d,%d,%d,%d,%d)  %d - (%d,%d,%d)  %d - (%d,%d,%d)  %d - (%d,%d)  (%f,%f)  (%f,%f,%f,%f)  (%d,%d,%d,%d)  %d %f\n",
+         pSim->getTime(),
+         stats.getNrOfMac(), stats.getNrOfMacResting(), stats.getNrOfMacInfected(),
+         stats.getNrOfMacCInfected(), stats.getNrOfMacActive(), stats.getNrOfMacDead(),
+         stats.getNrOfTgam(), stats.getNrOfTgamActive(),	stats.getNrOfTgamDownRegulated(),
+         stats.getNrOfTgamDead(), stats.getNrOfTcyt(), stats.getNrOfTcytActive(),
+         stats.getNrOfTcytDownRegulated(), stats.getNrOfTcytDead(),
+         stats.getNrOfTreg(), stats.getNrOfTregActive(), stats.getNrOfTregDead(),
+         stats.getTotExtMtb(), stats.getTotIntMtb(),
+         stats.getTotTNF() / (NROWS*NCOLS), stats.getTotCCL2() / (NROWS*NCOLS),
+         stats.getTotCCL5() / (NROWS*NCOLS), stats.getTotCXCL9() / (NROWS*NCOLS),
+         stats.getNrSourcesMac(), stats.getNrSourcesTgam(), stats.getNrSourcesTcyt(), stats.getNrSourcesTreg(),
+         stats.getNrCaseated(), stats.getTotNonRepExtMtb()
+         );
+    }
+    //Run the pSimulation one step
+		if(time != timeToSimulate)
+      pSim->solve();
+  }
+}
+void buildSim(GrSimulation* pSim, DiffusionMethod diffMethod, RecruitmentBase* pRecr, bool tnfrDynamics,
+              bool nfkbDynamics, int tnfDepletionTimeStep, float areaTNFThreshold, float areaCellDensityThreshold) {
+  
+	pSim->setTnfrDynamics(tnfrDynamics || nfkbDynamics); // when NFkB is turned on, tnfr dynamics will be on autamatically.
+	pSim->setNfkbDynamics(nfkbDynamics);
+	pSim->setTnfDepletionTimeStep(tnfDepletionTimeStep);
+	pSim->setRecruitment(pRecr);
+	pSim->setDiffusionMethod(diffMethod);
+	
+	//	Set area thresholds if specified on the command line.
+	if (areaTNFThreshold >= 0)
+		pSim->setAreaThreshold(areaTNFThreshold);
+	
+	if (areaCellDensityThreshold >= 0)
+		pSim->setAreaThresholdCellDensity(areaCellDensityThreshold);
+}
+/*
+int run(unsigned long seed, const std::string& inputFileName, const std::string& outputFileName, 
 		int csvInterval, int stateInterval, bool screenDisplay, DiffusionMethod diffMethod, RecruitmentBase* pRecr, bool ode,
-		bool tnfrDynamics, bool nfkbDynamics, int tnfDepletionTimeStep, int timeToSimulate, bool lhs,
+		bool tnfrDynamics, bool nfkbDynamics, int tnfDepletionTimeStep, int timeToSimulate, bool lhs, bool intmtb,
 		float areaTNFThreshold, float areaCellDensityThreshold)
 {
 	printVersion();
@@ -348,12 +270,15 @@ int run(unsigned long seed, const std::string& inputFileName, const std::string&
 	// If an output file is requested, construct the complete output file name,
 	// open the output file and write a header line.
 	std::ofstream outputFileStream;
+  std::ofstream intMtbFileStream;
 	
 	if (outputFileName.size() > 0)
 	{
-    	std::ostringstream ofn;
-        ofn << outputFileName << (lhs ? "/seed" : "-") << seed << ".csv";
-        outputFileStream.open(ofn.str().c_str());
+   	std::ostringstream ofn;
+    ofn << outputFileName << (lhs ? "/seed" : "-") << seed;
+    outputFileStream.open((ofn.str()+std::string(".csv")).c_str());
+    if(intmtb)
+      intMtbFileStream.open((ofn.str()+std::string("-moi.csv")).c_str());
 		
 		writeOutputHeader(outputFileStream, inputFileName);
 	}
@@ -366,6 +291,8 @@ int run(unsigned long seed, const std::string& inputFileName, const std::string&
 	sim->setRecruitment(pRecr);
 	
 	const GrStat& stats = sim->getStats();
+  if(intMtbFileStream.good())
+    intMtbHeader(intMtbFileStream, stats);
 	
 	sim->setDiffusionMethod(diffMethod);
 	
@@ -409,9 +336,10 @@ int run(unsigned long seed, const std::string& inputFileName, const std::string&
 					   );
 			}
 			
-        	if (outputFileStream.good())
+      if (outputFileStream.good())
 			{
 				writeOutput(outputFileStream, *sim, csvInterval);
+        
 			}
 		}
         //Run the simulation one step
@@ -420,30 +348,13 @@ int run(unsigned long seed, const std::string& inputFileName, const std::string&
 	
 	return 0;
 }
-
+*/
 int main(int argc, char** argv)
 {
   std::cout << "GRID SIZE: NROWS: " << NROWS << " NCOLS: " << NCOLS << std::endl;
-	unsigned long seed;
-	std::string inputFileName;
-	std::string outputFileName;
-	int csvInterval; // In time steps
-	bool screenDisplay; // Whether or not to show statistics on the console.
-	
-	float areaTNFThreshold = -1;
-	float areaCellDensityThreshold = -1;
-	
-	std::string lymphNodeODE;
-	std::string lymphNodeTemp;
-	int diffMethod;
-    int stateInterval;
-	int nDays;
-    int timeToSimulate;
-	bool ode;
-	bool tnfrDynamics;
-	bool nfkbDynamics;
-	int tnfDepletionTimeStep;
-	bool lhs;
+  unsigned long seed;
+  std::string paramFile;
+  std::string outputDir;
 	
 	/*
 	 * Set seed to current time, in case not specified
@@ -458,152 +369,164 @@ int main(int argc, char** argv)
 	 *
 	 * */
 	struct timeval curTimeHiRes;
-	int hiResTimeResult = gettimeofday(&curTimeHiRes, NULL);
-	if (hiResTimeResult == -1)
-	{
-		cerr <<" Error getting current high resolution time."<< endl;
-		exit(1);
-	}
+  if (gettimeofday(&curTimeHiRes, NULL) != 0)
+		throw runtime_error("Error getting current high resolution time.");
 	
-	unsigned long seedadj;
-	
-	po::options_description desc("Allowed options");
-	desc.add_options()
+	po::options_description general("General");
+	general.add_options()
 	("help,h", "Help message")
-	("input-file,i", po::value<std::string>(&inputFileName), "Input file name")
-	("output-dir,o", po::value<std::string>(&outputFileName), "Output directory")
-	("csv-interval", po::value<int>(&csvInterval)->default_value(1),
-	 "CSV update interval (10 min timesteps)")
-	("state-interval", po::value<int>(&stateInterval)->default_value(-1),
-	 "State save interval (10 min timesteps)")
-	("no-screen-display", "Suppress printing statistics on the console.\n"
-	 "This option is implied by --lhs.")
-	("seed,s", po::value<unsigned long>(&seed), "Seed")
-	("seedadj", po::value<unsigned long>(&seedadj), "Seed adjustment for cluster runs")
-	("diffusion,d", po::value<int>(&diffMethod)->default_value(3),
+	("version,v", "Version number")
+	("quiet,q", "Suppress printing statistics on the console.\n"
+	            "This option is implied by --lhs.")
+	("output-dir,o", po::value<std::string>(&outputDir)->default_value("./"), "Output directory")
+	("input-file,i", po::value<std::string>(&paramFile), "Parameter file")
+	("seed,s", po::value<unsigned long>(&seed), "RNG seed, default is based on the current time");
+
+  po::options_description stats("Statistics");
+  stats.add_options()
+  ("moi", "Generate csv file of internal MTB statistics, saved in -moi.csv")
+  ("stats", "Generate csv file of general statistics, saved in .csv")
+	("csv-interval", po::value<unsigned>()->default_value(1), "CSV update interval (10 min timesteps)");
+
+  po::options_description sim_opts("Simulation");
+  sim_opts.add_options()
+  ("load,l", po::value<std::string>(), "Load from a saved state")
+	("timesteps,t", po::value<unsigned>(), "Number of time steps to simulate\n"
+                                    "Takes precedence over --days")
+	("days", po::value<unsigned>()->default_value(200), "Number of days to simulate")
+	("state-interval", po::value<unsigned>()->default_value(0), "State save interval (10 min timesteps)")
+	("diffusion,d", po::value<unsigned>()->default_value(3),
 	 "Diffusion method:\n0 - FTCS\n1 - BTCS (SOR, correct)\n2 - BTCS (SOR, wrong)\n3 - FTCS Grid Swap")
-	("timesteps,t", po::value<int>(&timeToSimulate), "Number of time steps to simulate\nTakes precedence over --days")
-	("days", po::value<int>(&nDays)->default_value(200), "Number of days to simulate")
-	("area-tnf-threshold", po::value<float>(&areaTNFThreshold)->default_value(0.5),"Threshold for granuloma area defined by TNF, in the range [0.0, 1.0]\n")
-	("area-cell-density-threshold", po::value<float>(&areaCellDensityThreshold)->default_value(0.5),"Threshold for granuloma area defined by cell density, in the range [0.0, 1.0]\n")
+	("area-tnf-threshold", po::value<float>()->default_value(0.5),"Threshold for granuloma area defined by TNF, in the range [0.0, 1.0]\n")
+	("area-cell-density-threshold", po::value<float>()->default_value(0.5),"Threshold for granuloma area defined by cell density, in the range [0.0, 1.0]");
+
+  po::options_description simdyn_opts("Simulation Dynamics");
+  simdyn_opts.add_options()
 	("ode", "Use integrated lymph node ODE for recruitment")
 	("tnfr-dynamics", "Use molecular level TNF/TNFR dynamics in the model")
 	("NFkB-dynamics", "Use molecular level intracellular NFkB dynamics in the model")
-	("tnf-depletion", po::value<int>(&tnfDepletionTimeStep)->default_value(-1), "The time step at which to stop secreting tnf, including by tnfr dynamics. -1: no depletion")
-	("ln-ode,l", po::value<std::string>(&lymphNodeODE), "Lymph node application")
-	("ln-ode-temp", po::value<std::string>(&lymphNodeTemp), "Lymph node temp file")
-	("lhs", "Running as part of an LHS run")
-	("version,v", "Version number");
+	("tnf-depletion", po::value<int>()->default_value(-1), "The time step at which to stop secreting tnf, including by tnfr dynamics. -1: no depletion");
 	
+  po::options_description lhs_opts("LHS");
+  lhs_opts.add_options()
+  ("lhs", "Running as part of an LHS run")
+	("seedadj", po::value<unsigned long>(), "Seed adjustment for cluster runs");
+
+  po::options_description desc("Allowed Options");
+  desc.add(general).add(stats).add(sim_opts).add(simdyn_opts).add(lhs_opts);
+	
+  po::variables_map vm;
 	try
 	{
 		po::positional_options_description p;
 		p.add("input-file", -1);
-		po::variables_map vm;
 		po::store(po::command_line_parser(argc, argv).options(desc).positional(p).run(), vm);
 		po::notify(vm);
-		
-		if (vm.count("version"))
-		{
-			printVersion();
-			return 0;
-		}
-		
-		if (vm.count("help"))
-		{
-			printUsage(argv[0], desc);
-			return 0;
-		}
-        if (!vm.count("timesteps"))
-            timeToSimulate = 144 * nDays;
-		
-		if (csvInterval < 0)
-		{
-			printUsage(argv[0], desc);
-			return 1;
-		}
-		
-		// If we just use time in seconds we will get duplicate seeds when doing a large number of runs,
-		// such as running a big LHS on a cluster.
-		// If we use just the micro-second part of the high resolution time we only get seeds that vary
-		// between 1 and 1,000,000.
-		// So we XOR the two times, which gives a larger range of seeds, with the lower order part varying
-		// with a higher resolution than we would get just by using seconds.
-		if (!vm.count("seed"))
-		{
-			seed = curTimeHiRes.tv_sec ^ curTimeHiRes.tv_usec;
-		}
-		
-		
-		// Adjust the seed if a seed adjustment was specified.
-		if (vm.count("seedadj"))
-		{
-			seed = seed ^ seedadj;
-		}
-		
-		ode = vm.count("ode");
-		tnfrDynamics = vm.count("tnfr-dynamics");
-		nfkbDynamics = vm.count("NFkB-dynamics");
-		
-		lhs = vm.count("lhs");
-		
-		if (lhs && (outputFileName.size() == 0))
-		{
-			std::cerr << "LHS run but no output name specified." << std::endl;
-			exit(1);
-		}
-		
-		RecruitmentProb recr;
-		RecruitmentLnODEPure pureOdeRecr;
-		RecruitmentBase* pRecr;
-		if (ode) pRecr = &pureOdeRecr; else pRecr = &recr;
-		
-		DiffusionMethod diffMethodEnum;
-		switch (diffMethod)
-		{
-			case 0:
-				diffMethodEnum = DIFF_REC_EQ;
-				break;
-			case 1:
-				diffMethodEnum = DIFF_SOR_CORRECT;
-				std::cerr << "The BTCS diffusion method is no longer supported." << std::endl;
-				exit(1);
-				break;
-			case 2:
-				diffMethodEnum = DIFF_SOR_WRONG;
-				std::cerr << "The BTCS Wrong diffusion method is no longer supported." << std::endl;
-				exit(1);
-				break;
-			case 3:
-				diffMethodEnum = DIFF_REC_EQ_SWAP;
-				break;
-			default:
-				printUsage(argv[0], desc);
-				return 1;
-		}
-		
-	    screenDisplay = !vm.count("no-screen-display");
-		
-		// Write the seed to a file, so runs can be repeated, except for lhs runs.
-		if (!lhs)
-		{
-			std::ofstream seedStream;
-			seedStream.open("seed");
-			seedStream << seed << std::endl;
-		}
-	    else {
-			// For lhs runs, we don't want to print to the screen unless explicitly told otherwise
-			screenDisplay = false;
-	    }
-		
-		return run(seed, inputFileName, outputFileName, csvInterval, stateInterval, screenDisplay, diffMethodEnum, pRecr, ode,
-				   tnfrDynamics, nfkbDynamics, tnfDepletionTimeStep, timeToSimulate, lhs, areaTNFThreshold, areaCellDensityThreshold );
 	}
 	catch (std::exception& e)
 	{
 		std::cerr << e.what() << std::endl;
 		return 1;
 	}
-	
-	return 0;
+  
+  if (vm.count("version"))
+  {
+    printVersion();
+    return 0;
+  }
+  
+  if (vm.count("help"))
+  {
+    printUsage(argv[0], desc);
+    return 0;
+  }
+  unsigned timeToSimulate;
+  if (!vm.count("timesteps"))
+    timeToSimulate = 144 * vm["days"].as<unsigned>();
+  else 
+    timeToSimulate = vm["timesteps"].as<unsigned>();
+  
+  // If we just use time in seconds we will get duplicate seeds when doing a large number of runs,
+  // such as running a big LHS on a cluster.
+  // If we use just the micro-second part of the high resolution time we only get seeds that vary
+  // between 1 and 1,000,000.
+  // So we XOR the two times, which gives a larger range of seeds, with the lower order part varying
+  // with a higher resolution than we would get just by using seconds.
+  if (!vm.count("seed"))
+    seed = curTimeHiRes.tv_sec ^ curTimeHiRes.tv_usec;
+  
+  // Adjust the seed if a seed adjustment was specified.
+  if (vm.count("seedadj"))
+    seed = seed ^ (vm["seedadj"].as<unsigned>());
+  
+  bool lhs = vm.count("lhs");
+
+  // Write the seed to a file, so runs can be repeated, except for lhs runs.
+  bool screenDisplay = !(vm.count("quiet") || vm.count("lhs"));
+  if (!lhs)
+  {
+    std::ofstream seedStream("seed");
+    seedStream << seed << std::endl;
+    seedStream.close();
+  }
+  
+  RecruitmentBase* pRecr = (vm.count("ode") ? (RecruitmentBase*)new RecruitmentLnODEPure() : (RecruitmentBase*)new RecruitmentProb());
+  
+  DiffusionMethod diffMethodEnum;
+  switch (vm["diffusion"].as<unsigned>())
+  {
+    case 0:
+      diffMethodEnum = DIFF_REC_EQ;
+      break;
+    case 3:
+      diffMethodEnum = DIFF_REC_EQ_SWAP;
+      break;
+    default:
+      std::cerr<<"Unsupported Diffusion method"<<std::endl;
+      printUsage(argv[0], desc);
+      exit(1);
+  }
+
+  if (!Params::getInstance(true)->fromXml(paramFile.c_str())) //Must be done before making GrSimulation
+    throw std::runtime_error("Unable to get parameters from file, cannot continue...");
+  GrSimulation* pSim = new GrSimulation();
+  assert(pSim != NULL);
+  if (vm.count("load")){
+    std::ifstream f(vm["load"].as<std::string>().c_str());
+    pSim->deserialize(f);
+    f.close();
+  }
+  buildSim(pSim, diffMethodEnum, pRecr, vm.count("tnfrDynamics"), vm.count("nfkbDynamics"),
+              vm["tnf-depletion"].as<int>(), vm["area-tnf-threshold"].as<float>(),
+              vm["area-cell-density-threshold"].as<float>());
+
+  if (!vm.count("load")){
+    g_Rand.setSeed(seed);
+    pSim->init();
+  }
+  if(outputDir[outputDir.size()-1] != '/')
+    outputDir += '/';
+
+  std::vector<oCSVStream*> csvStreams;
+  if(vm.count("moi")){
+    stringstream ss;
+    ss<<outputDir<<"moi"<<g_Rand.getSeed()<<".csv";
+    ofstream* f = new ofstream(ss.str().c_str());
+    csvStreams.push_back(new IntMtbStats(f, *pSim));
+  }
+  if(vm.count("stats")){
+    stringstream ss;
+    ss<<outputDir<<"seed"<<g_Rand.getSeed()<<".csv";
+    ofstream* f = new ofstream(ss.str().c_str());
+    csvStreams.push_back(new GeneralStats(f));
+  }
+
+  run(pSim, vm["state-interval"].as<unsigned>(), vm["csv-interval"].as<unsigned>(),
+      screenDisplay, timeToSimulate, vm["output-dir"].as<std::string>(), csvStreams);
+
+  for(unsigned i=0;i<csvStreams.size();i++)
+    delete csvStreams[i];
+  delete pSim;
+  delete pRecr;
+  return 0;
 }

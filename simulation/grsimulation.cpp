@@ -356,7 +356,7 @@ void GrSimulation::updateStates()
 	{
 		Mac& mac = *it;
 		mac.updateState();
-		_stats.updateMacStatistics(mac.getState());
+		_stats.updateAgentStatistics(&mac);
 
 		if (!mac.isDead())
 			_stats.incTotIntMtb(mac.getIntMtb());
@@ -386,7 +386,7 @@ void GrSimulation::updateStates()
 	{
 		Tgam& tgam = *it;
 		tgam.updateState();
-		_stats.updateTgamStatistics(tgam.getState());
+		_stats.updateAgentStatistics(&tgam);
 
 		if (tgam.isDead())
 		{
@@ -404,7 +404,7 @@ void GrSimulation::updateStates()
 	{
 		Tcyt& tcyt = *it;
 		tcyt.updateState();
-		_stats.updateTcytStatistics(tcyt.getState());
+		_stats.updateAgentStatistics(&tcyt);
 
 		if (tcyt.isDead())
 		{
@@ -422,7 +422,7 @@ void GrSimulation::updateStates()
 	{
 		Treg& treg = *it;
 		treg.updateState();
-		_stats.updateTregStatistics(treg.getState());
+		_stats.updateAgentStatistics(&treg);
 
 		if (it->isDead())
 		{

@@ -15,5 +15,6 @@ GrSimulationGrid::GrSimulationGrid()
 }
 
 GrSimulationGrid::~GrSimulationGrid() {
-
+  delete _pCurrentGrid;
+  delete _pNextGrid;
 }

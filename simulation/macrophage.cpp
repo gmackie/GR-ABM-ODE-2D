@@ -374,6 +374,8 @@ void Mac::computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tnf
 			case MAC_ACTIVE:
 				handleActivated(time, grid, stats);
 				break;
+      default:
+        throw std::runtime_error("Invalid Macrophage State");
 			}
 		}
 	}
@@ -903,6 +905,7 @@ void Mac::print() const
 	case MAC_ACTIVE:
 		std::cout << "active, ";
 		break;
+  default: break;
 	}
 
 	if (_NFkB)

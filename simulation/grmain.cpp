@@ -65,7 +65,7 @@ void oCSVStream::operator<<(const char& data) { (*f)<<data<<','; }
 template<>
 void oCSVStream::operator<<(const std::string& data) {
   std::string c(data);
-  for(unsigned i=c.find('"'); i!=std::string::npos; i=c.find('"', i+1))
+  for(unsigned i=c.find('"'); i<c.size(); i=c.find('"', i+1))
     c.replace(i, 1, "\"\"");
   (*f)<<'"'<<c<<"\",";
 }
@@ -77,8 +77,11 @@ public:
     write("time");
     size_t sz;
     sim.getStats().getIntMtbFreq(sz);
-    for(unsigned i=0;i<sz;i++)
-      write(i);
+    for(unsigned i=0;i<sz;i++){
+      stringstream ss;
+      ss<<(i+1);
+      write(ss.str());
+    }
     write("Mi Max"); write("Mi Min"); write("Mi Mean"); write("Mi Median"); write("Mi StdDev");
     write("Mci Max"); write("Mci Min"); write("Mci Mean"); write("Mci Median"); write("Mci StdDev");
     endRow();
@@ -101,7 +104,7 @@ public:
         write(ba::extract::median(v[MAC_INFECTED]));
         write(sqrt(ba::extract::variance(v[MAC_INFECTED])));
       }
-      else { write(0.0/0.0); write(0.0/0.0); write(0.0/0.0); write(0.0/0.0); }
+      else { write(0.0/0.0); write(0.0/0.0); write(0.0/0.0); write(0.0/0.0); write(0.0/0.0); }
       if(ba::extract::count(v[MAC_CINFECTED]) > 0) {
         write(ba::extract::max(v[MAC_CINFECTED]));
         write(ba::extract::min(v[MAC_CINFECTED]));
@@ -109,7 +112,7 @@ public:
         write(ba::extract::median(v[MAC_INFECTED]));
         write(sqrt(ba::extract::variance(v[MAC_CINFECTED])));
       }
-      else { write(0.0/0.0); write(0.0/0.0); write(0.0/0.0); write(0.0/0.0); }
+      else { write(0.0/0.0); write(0.0/0.0); write(0.0/0.0); write(0.0/0.0); write(0.0/0.0); }
     }
     endRow();
   }
@@ -201,10 +204,24 @@ void saveState(const GrSimulation* pSim, int time, std::string dir=std::string("
     out.close();    //Don't want to flush here, would slow things down a lot
 }
 
+void printStats(const GrSimulation* pSim) {
+  const GrStat& stats = pSim->getStats();
+  printf("%-7d ", pSim->getTime());
+  printf("%3d - (%d,%d,%d,%d,%d) ", stats.getNrOfMac(), stats.getNrOfMacResting(), stats.getNrOfMacInfected(), stats.getNrOfMacCInfected(), stats.getNrOfMacActive(), stats.getNrOfMacDead());
+  printf("%3d - (%d,%d,%d) ", stats.getNrOfTgam(), stats.getNrOfTgamActive(), stats.getNrOfTgamDownRegulated(), stats.getNrOfTgamDead());
+  printf("%3d - (%d,%d,%d) ", stats.getNrOfTcyt(), stats.getNrOfTcytActive(), stats.getNrOfTcytDownRegulated(), stats.getNrOfTcytDead());
+  printf("%3d - (%d,%d) ", stats.getNrOfTreg(), stats.getNrOfTregActive(), stats.getNrOfTregDead());
+  printf("(%.5f, %.5f) ", stats.getTotExtMtb(), stats.getTotIntMtb());
+  #define INV_SZ (1.0 / (NROWS*NCOLS))
+  printf("(%11.5f,%11.5f,%11.5f,%11.5f) ", stats.getTotTNF()*INV_SZ, stats.getTotCCL2()*INV_SZ, stats.getTotCCL5()*INV_SZ, stats.getTotCXCL9()*INV_SZ);
+  printf("(%d,%d,%d,%d) ", stats.getNrSourcesMac(), stats.getNrSourcesTgam(), stats.getNrSourcesTcyt(), stats.getNrSourcesTreg());
+  printf("(%d, %.5f)\n", stats.getNrCaseated(), stats.getTotNonRepExtMtb());
+}
 
 void run(GrSimulation* pSim, int stateInterval, int csvInterval, bool screenDisplay, int timeToSimulate, std::string outputDir, std::vector<oCSVStream*> csvStreams)
 {
-  GrStat& stats = pSim->getStats();
+  if(screenDisplay)
+  	cout << endl << "--seed " << g_Rand.getSeed() << endl;
   csvInterval = csvInterval < 1 ? 1 : csvInterval;
   for (int time = 0; time <= timeToSimulate; time += 1)
   {
@@ -216,22 +233,7 @@ void run(GrSimulation* pSim, int stateInterval, int csvInterval, bool screenDisp
       for(unsigned i=0;i<csvStreams.size();i++)
         csvStreams[i]->saveRow(*pSim);
     if (screenDisplay)
-    {
-      printf("%d   %d - (%d,%d,%d,%d,%d)  %d - (%d,%d,%d)  %d - (%d,%d,%d)  %d - (%d,%d)  (%f,%f)  (%f,%f,%f,%f)  (%d,%d,%d,%d)  %d %f\n",
-         pSim->getTime(),
-         stats.getNrOfMac(), stats.getNrOfMacResting(), stats.getNrOfMacInfected(),
-         stats.getNrOfMacCInfected(), stats.getNrOfMacActive(), stats.getNrOfMacDead(),
-         stats.getNrOfTgam(), stats.getNrOfTgamActive(),	stats.getNrOfTgamDownRegulated(),
-         stats.getNrOfTgamDead(), stats.getNrOfTcyt(), stats.getNrOfTcytActive(),
-         stats.getNrOfTcytDownRegulated(), stats.getNrOfTcytDead(),
-         stats.getNrOfTreg(), stats.getNrOfTregActive(), stats.getNrOfTregDead(),
-         stats.getTotExtMtb(), stats.getTotIntMtb(),
-         stats.getTotTNF() / (NROWS*NCOLS), stats.getTotCCL2() / (NROWS*NCOLS),
-         stats.getTotCCL5() / (NROWS*NCOLS), stats.getTotCXCL9() / (NROWS*NCOLS),
-         stats.getNrSourcesMac(), stats.getNrSourcesTgam(), stats.getNrSourcesTcyt(), stats.getNrSourcesTreg(),
-         stats.getNrCaseated(), stats.getTotNonRepExtMtb()
-         );
-    }
+      printStats(pSim);
     //Run the pSimulation one step
 		if(time != timeToSimulate)
       pSim->solve();
@@ -253,102 +255,7 @@ void buildSim(GrSimulation* pSim, DiffusionMethod diffMethod, RecruitmentBase* p
 	if (areaCellDensityThreshold >= 0)
 		pSim->setAreaThresholdCellDensity(areaCellDensityThreshold);
 }
-/*
-int run(unsigned long seed, const std::string& inputFileName, const std::string& outputFileName, 
-		int csvInterval, int stateInterval, bool screenDisplay, DiffusionMethod diffMethod, RecruitmentBase* pRecr, bool ode,
-		bool tnfrDynamics, bool nfkbDynamics, int tnfDepletionTimeStep, int timeToSimulate, bool lhs, bool intmtb,
-		float areaTNFThreshold, float areaCellDensityThreshold)
-{
-	printVersion();
-	std::cout << endl << "--seed " << seed << std::endl;
-	
-	if (!Params::getInstance(true)->fromXml(inputFileName.c_str()))
-		return 1;
-	
-	g_Rand.setSeed(seed);
-	
-	// If an output file is requested, construct the complete output file name,
-	// open the output file and write a header line.
-	std::ofstream outputFileStream;
-  std::ofstream intMtbFileStream;
-	
-	if (outputFileName.size() > 0)
-	{
-   	std::ostringstream ofn;
-    ofn << outputFileName << (lhs ? "/seed" : "-") << seed;
-    outputFileStream.open((ofn.str()+std::string(".csv")).c_str());
-    if(intmtb)
-      intMtbFileStream.open((ofn.str()+std::string("-moi.csv")).c_str());
-		
-		writeOutputHeader(outputFileStream, inputFileName);
-	}
-	
-	GrSimulation* sim = new GrSimulation();     //Allocated on heap for larger grids, shouldn't effect runtimes
-	
-	sim->setTnfrDynamics(tnfrDynamics || nfkbDynamics); // when NFkB is turned on, tnfr dynamics will be on autamatically.
-	sim->setNfkbDynamics(nfkbDynamics);
-	sim->setTnfDepletionTimeStep(tnfDepletionTimeStep);
-	sim->setRecruitment(pRecr);
-	
-	const GrStat& stats = sim->getStats();
-  if(intMtbFileStream.good())
-    intMtbHeader(intMtbFileStream, stats);
-	
-	sim->setDiffusionMethod(diffMethod);
-	
-	//	Set area thresholds if specified on the command line.
-	if (areaTNFThreshold >= 0)
-	{
-		sim->setAreaThreshold(areaTNFThreshold);
-	}
-	
-	if (areaCellDensityThreshold >= 0)
-	{
-		sim->setAreaThresholdCellDensity(areaCellDensityThreshold);
-	}
-	
-	sim->init();
-	
-	for (int time = 0; time <= timeToSimulate; time += 1)
-	{
-		
-		// Display and write output at the requested interval, and after the last time step.
-        if (stateInterval > 0 && time % stateInterval == 0)
-            saveState(sim, time, lhs ? outputFileName : ".");
-		if (csvInterval <= 0 || time % csvInterval == 0 || time == timeToSimulate)
-		{
-			if (screenDisplay)
-			{
-				//			printf("%d\t %d - (%d,%d,%d,%d,%d)\t%d - (%d,%d,%d)\t%d - (%d,%d,%d)\t%d - (%d,%d)\t(%f,%f)\t(%f,%f,%f,%f)\n",
-				printf("%d\t %d - (%d,%d,%d,%d,%d)\t%d - (%d,%d,%d)\t%d - (%d,%d,%d)\t%d - (%d,%d)\t(%f,%f)\t(%f,%f,%f,%f)\t(%d,%d,%d,%d)\t%d %f\n",
-					   sim->getTime(),
-					   stats.getNrOfMac(), stats.getNrOfMacResting(), stats.getNrOfMacInfected(),
-					   stats.getNrOfMacCInfected(), stats.getNrOfMacActive(), stats.getNrOfMacDead(),
-					   stats.getNrOfTgam(), stats.getNrOfTgamActive(),	stats.getNrOfTgamDownRegulated(),
-					   stats.getNrOfTgamDead(), stats.getNrOfTcyt(), stats.getNrOfTcytActive(),
-					   stats.getNrOfTcytDownRegulated(), stats.getNrOfTcytDead(),
-					   stats.getNrOfTreg(), stats.getNrOfTregActive(), stats.getNrOfTregDead(),
-					   stats.getTotExtMtb(), stats.getTotIntMtb(),
-					   stats.getTotTNF() / (NROWS*NCOLS), stats.getTotCCL2() / (NROWS*NCOLS),
-					   stats.getTotCCL5() / (NROWS*NCOLS), stats.getTotCXCL9() / (NROWS*NCOLS),
-					   stats.getNrSourcesMac(), stats.getNrSourcesTgam(), stats.getNrSourcesTcyt(), stats.getNrSourcesTreg(),
-					   stats.getNrCaseated(), stats.getTotNonRepExtMtb()
-					   );
-			}
-			
-      if (outputFileStream.good())
-			{
-				writeOutput(outputFileStream, *sim, csvInterval);
-        
-			}
-		}
-        //Run the simulation one step
-		sim->solve();
-	}
-	
-	return 0;
-}
-*/
+
 int main(int argc, char** argv)
 {
   std::cout << "GRID SIZE: NROWS: " << NROWS << " NCOLS: " << NCOLS << std::endl;
@@ -426,6 +333,7 @@ int main(int argc, char** argv)
 	catch (std::exception& e)
 	{
 		std::cerr << e.what() << std::endl;
+    printUsage(argv[0], desc);
 		return 1;
 	}
   
@@ -522,7 +430,7 @@ int main(int argc, char** argv)
   }
 
   run(pSim, vm["state-interval"].as<unsigned>(), vm["csv-interval"].as<unsigned>(),
-      screenDisplay, timeToSimulate, vm["output-dir"].as<std::string>(), csvStreams);
+      screenDisplay, timeToSimulate, outputDir, csvStreams);
 
   for(unsigned i=0;i<csvStreams.size();i++)
     delete csvStreams[i];

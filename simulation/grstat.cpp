@@ -99,7 +99,6 @@ GrStat::GrStat()
 	, _T8lung(0)
 	, _TClung(0)
   , _intMtbFreq(new unsigned[int(_PARAM(PARAM_MAC_THRESHOLD_BURST_CI_INTMTB))])
-  , _macIntMtbStats(new Stat[NMAC_STATES])
 {
 	for (int i = 0; i < NOUTCOMES; i++)
 	{
@@ -107,13 +106,28 @@ GrStat::GrStat()
 	}
   memset(_intMtbFreq, 0, sizeof(unsigned)*int(_PARAM(PARAM_MAC_THRESHOLD_BURST_CI_INTMTB)));
 }
+GrStat::GrStat(const GrStat& o)
+{
+  memcpy(this, &o, sizeof(GrStat)); //Copy the field values
+  _intMtbFreq = new unsigned[int(_PARAM(PARAM_MAC_THRESHOLD_BURST_CI_INTMTB))];
+  memcpy(_intMtbFreq, o._intMtbFreq, sizeof(unsigned)*int(_PARAM(PARAM_MAC_THRESHOLD_BURST_CI_INTMTB)));
+  for(int i=0;i<NMAC_STATES;i++)
+    _macIntMtbStats[i] = o._macIntMtbStats[i];
+}
+GrStat& GrStat::operator=(const GrStat& o)
+{
+  memcpy(this, &o, sizeof(GrStat)); //Copy the field values
+  _intMtbFreq = new unsigned[int(_PARAM(PARAM_MAC_THRESHOLD_BURST_CI_INTMTB))];
+  memcpy(_intMtbFreq, o._intMtbFreq, sizeof(unsigned)*int(_PARAM(PARAM_MAC_THRESHOLD_BURST_CI_INTMTB)));
+  for(int i=0;i<NMAC_STATES;i++)
+    _macIntMtbStats[i] = o._macIntMtbStats[i];
+  return *this;
+}
 
 GrStat::~GrStat()
 {
   if(_intMtbFreq)
     delete[] _intMtbFreq;
-  if(_macIntMtbStats)
-    delete[] _macIntMtbStats;
 }
 
 void GrStat::updateAgentStatistics(Agent* a)
@@ -322,8 +336,8 @@ void GrStat::resetAgentStats()
 	_nTreg = _nTregDead = _nTregActive = 0;
 
   memset(_intMtbFreq, 0, sizeof(unsigned)*_PARAM(PARAM_MAC_THRESHOLD_BURST_CI_INTMTB));
-  delete[] _macIntMtbStats;
-  _macIntMtbStats = new Stat[NMAC_STATES];  //Reset boost accumulators
+  for(int i=0;i<NMAC_STATES;i++)
+    _macIntMtbStats[i] = Stat();
 }
 
 void GrStat::reset()

@@ -133,10 +133,12 @@ private:
 public:
   typedef ba::accumulator_set<double, ba::stats< ba::features< ba::tag::variance, ba::tag::min, ba::tag::max, ba::tag::median > > > Stat;
 private:
-  Stat* _macIntMtbStats;
+  Stat _macIntMtbStats[NMAC_STATES];
 
 public:
 	GrStat();
+  GrStat(const GrStat&);
+  GrStat& operator=(const GrStat&);
 	~GrStat();
   const unsigned* getIntMtbFreq(size_t& s) const;
   const Stat* getIntMtbStats(size_t &s) const;

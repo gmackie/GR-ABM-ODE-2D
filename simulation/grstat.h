@@ -52,21 +52,18 @@ private:
 	int _nTregActive;
 	int _nTregDead;
 
-	double _totExtMtb;			// Replicating and non-replicating bacteria: all ExtMtb in all compartments
-	double _totNonRepExtMtb;	// Non-replicating bacteria: in caseated compartments.
-	double _totIntMtb;
+	FLOAT_TYPE _totExtMtb;			// Replicating and non-replicating bacteria: all ExtMtb in all compartments
+	FLOAT_TYPE _totNonRepExtMtb;	// Non-replicating bacteria: in caseated compartments.
+	FLOAT_TYPE _totIntMtb;
 
-	double _totMacAttractant;
-	double _totTNF;
-	double _totCCL2;
-	double _totCCL5;
-	double _totCXCL9;
+	FLOAT_TYPE _totMacAttractant;
+	FLOAT_TYPE _totTNF;
+	FLOAT_TYPE _totCCL2;
+	FLOAT_TYPE _totCCL5;
+	FLOAT_TYPE _totCXCL9;
 
 	int _nApoptosisFasFasL;
-	int _nMacApoptosisTNF;
-	int _nRestingMacApoptosisTNF;
-	int _nInfAndCinfMacApoptosisTNF;
-	int _nActivatedMacApoptosisTNF;
+	int _nMacApoptosisTNF[NMAC_STATES];
 	int _nTcellApoptosisTNF;
 	
 	int _nRestingMacActivationTNF;
@@ -99,7 +96,7 @@ private:
 	int _nMacDeactDead;
 
 	int _nBactAct;
-	int _area;
+	int _areaTNF;
 	int _areaCellDensity;
 	int _nCaseated;
 
@@ -108,30 +105,30 @@ private:
 	int _queueTgam;
 	int _queueTcyt;
 	int _queueTreg;
-	double _fluxTgam;
-	double _fluxTcyt;
-	double _fluxTreg;
+	FLOAT_TYPE _fluxTgam;
+	FLOAT_TYPE _fluxTcyt;
+	FLOAT_TYPE _fluxTreg;
 	int _nSourceMacActive;
 	int _nSourceTgamActive;
 	int _nSourceTcytActive;
 	int _nSourceTregActive;
-	double _MDC;
-	double _N4;
-	double _TH0;
-	double _TH1;
-	double _N8;
-	double _T80;
-	double _T8;
-	double _TC;
-	double _TH0lung;
-	double _TH1lung;
-	double _T80lung;
-	double _T8lung;
-	double _TClung;
+	FLOAT_TYPE _MDC;
+	FLOAT_TYPE _N4;
+	FLOAT_TYPE _TH0;
+	FLOAT_TYPE _TH1;
+	FLOAT_TYPE _N8;
+	FLOAT_TYPE _T80;
+	FLOAT_TYPE _T8;
+	FLOAT_TYPE _TC;
+	FLOAT_TYPE _TH0lung;
+	FLOAT_TYPE _TH1lung;
+	FLOAT_TYPE _T80lung;
+	FLOAT_TYPE _T8lung;
+	FLOAT_TYPE _TClung;
 
   unsigned* _intMtbFreq;
 public:
-  typedef ba::accumulator_set<double, ba::stats< ba::features< ba::tag::variance, ba::tag::min, ba::tag::max, ba::tag::median > > > Stat;
+  typedef ba::accumulator_set<FLOAT_TYPE, ba::stats< ba::features< ba::tag::variance, ba::tag::min, ba::tag::max, ba::tag::median > > > Stat;
 private:
   Stat _macIntMtbStats[NMAC_STATES];
 
@@ -177,14 +174,14 @@ public:
 	int getNrOfTcytDownRegulated() const;
 	int getNrOfTregActive() const;
 	int getNrOfTregDead() const;
-	double getTotExtMtb() const;
-	double getTotNonRepExtMtb() const;
-	double getTotIntMtb() const;
-	double getTotMacAttractant() const;
-	double getTotTNF() const;
-	double getTotCCL2() const;
-	double getTotCCL5() const;
-	double getTotCXCL9() const;
+	FLOAT_TYPE getTotExtMtb() const;
+	FLOAT_TYPE getTotNonRepExtMtb() const;
+	FLOAT_TYPE getTotIntMtb() const;
+	FLOAT_TYPE getTotMacAttractant() const;
+	FLOAT_TYPE getTotTNF() const;
+	FLOAT_TYPE getTotCCL2() const;
+	FLOAT_TYPE getTotCCL5() const;
+	FLOAT_TYPE getTotCXCL9() const;
 	void updateAgentStatistics(Agent* a);
 protected:
 	void updateMacStatistics(MacState state);
@@ -197,27 +194,22 @@ public:
 	void updateMacDeactStatistics(MacState state);
 	void resetAgentStats();
 	void reset();
-	void incTotExtMtb(double dExtMtb);
-	void incTotNonRepExtMtb(double dNonRepExtMtb);
-	void incTotIntMtb(double dIntMtb);
-	void incTotMacAttractant(double dMacAttractant);
-	void incTotTNF(double dTNF);
-	void incTotCCL2(double dCCL2);
-	void incTotCCL5(double dCCL5);
-	void incTotCXCL9(double dCXCL9);
+	void incTotExtMtb(FLOAT_TYPE dExtMtb);
+	void incTotNonRepExtMtb(FLOAT_TYPE dNonRepExtMtb);
+	void incTotIntMtb(FLOAT_TYPE dIntMtb);
+	void incTotMacAttractant(FLOAT_TYPE dMacAttractant);
+	void incTotTNF(FLOAT_TYPE dTNF);
+	void incTotCCL2(FLOAT_TYPE dCCL2);
+	void incTotCCL5(FLOAT_TYPE dCCL5);
+	void incTotCXCL9(FLOAT_TYPE dCXCL9);
 	int getNrApoptosisFasFasL() const;
 	int getNrMacApoptosisTNF() const;
-	int getNrRestingMacApoptosisTNF() const;
-	int getNrInfAndCinfMacApoptosisTNF() const;
-	int getNrActivatedMacApoptosisTNF() const;
+  int getNrMacApoptosisTNF(MacState s) const;
 	int getNrTcellApoptosisTNF() const;
 	int getNrRestingMacActivationTNF() const;
 	int getNrInfMacActivationTNF() const;
 	void incApoptosisFasFasL();
-	void incMacApoptosisTNF();
-	void incRestingMacApoptosisTNF();
-	void incInfAndCinfMacApoptosisTNF();
-	void incActivatedMacApoptosisTNF();
+	void incMacApoptosisTNF(MacState s);
 	void incTcellApoptosisTNF();
 	void incRestingMacActivationTNF();
 	void incInfMacActivationTNF();
@@ -239,8 +231,8 @@ public:
 	void incNrSourcesActiveTreg();
 	int getNrBactAct() const;
 	void incNrBactAct();
-	int getArea() const;
-	void incArea();
+	int getAreaTNF() const;
+	void incAreaTNF();
 	int getAreaCellDensity() const;
 	void incAreaCellDensity();
 	int getNrCaseated() const;
@@ -255,38 +247,38 @@ public:
 	void setNrTcytQueued(int count);
 	int getNrTregQueued() const;
 	void setNrTregQueued(int count);
-	double getFluxTgam() const;
-	void setFluxTgam(double flux);
-	double getFluxTcyt() const;
-	void setFluxTcyt(double flux);
-	double getFluxTreg() const;
-	void setFluxTreg(double flux);
-	double getMDC() const;
-	void setMDC(double MDC);
-	double getN4() const;
-	double getTH0() const;
-	double getTH1() const;
-	double getN8() const;
-	double getT80() const;
-	double getT8() const;
-	double getTC() const;
-	double getTH0lung() const;
-	double getTH1lung() const;
-	double getT80lung() const;
-	double getT8lung() const;
-	double getTClung() const;
-	void setN4(double val);
-	void setTH0(double val);
-	void setTH1(double val);
-	void setN8(double val);
-	void setT80(double val);
-	void setT8(double val);
-	void setTC(double val);
-	void setTH0lung(double val);
-	void setTH1lung(double val);
-	void setT80lung(double val);
-	void setT8lung(double val);
-	void setTClung(double val);
+	FLOAT_TYPE getFluxTgam() const;
+	void setFluxTgam(FLOAT_TYPE flux);
+	FLOAT_TYPE getFluxTcyt() const;
+	void setFluxTcyt(FLOAT_TYPE flux);
+	FLOAT_TYPE getFluxTreg() const;
+	void setFluxTreg(FLOAT_TYPE flux);
+	FLOAT_TYPE getMDC() const;
+	void setMDC(FLOAT_TYPE MDC);
+	FLOAT_TYPE getN4() const;
+	FLOAT_TYPE getTH0() const;
+	FLOAT_TYPE getTH1() const;
+	FLOAT_TYPE getN8() const;
+	FLOAT_TYPE getT80() const;
+	FLOAT_TYPE getT8() const;
+	FLOAT_TYPE getTC() const;
+	FLOAT_TYPE getTH0lung() const;
+	FLOAT_TYPE getTH1lung() const;
+	FLOAT_TYPE getT80lung() const;
+	FLOAT_TYPE getT8lung() const;
+	FLOAT_TYPE getTClung() const;
+	void setN4(FLOAT_TYPE val);
+	void setTH0(FLOAT_TYPE val);
+	void setTH1(FLOAT_TYPE val);
+	void setN8(FLOAT_TYPE val);
+	void setT80(FLOAT_TYPE val);
+	void setT8(FLOAT_TYPE val);
+	void setTC(FLOAT_TYPE val);
+	void setTH0lung(FLOAT_TYPE val);
+	void setTH1lung(FLOAT_TYPE val);
+	void setT80lung(FLOAT_TYPE val);
+	void setT8lung(FLOAT_TYPE val);
+	void setTClung(FLOAT_TYPE val);
 };
 
 inline const unsigned* GrStat::getIntMtbFreq(size_t& s) const {
@@ -297,132 +289,132 @@ inline const GrStat::Stat* GrStat::getIntMtbStats(size_t &s) const {
   s = size_t(NMAC_STATES);
   return _macIntMtbStats;
 }
-inline void GrStat::setN4(double val)
+inline void GrStat::setN4(FLOAT_TYPE val)
 {
 	_N4 = val;
 }
 
-inline void GrStat::setTH0(double val)
+inline void GrStat::setTH0(FLOAT_TYPE val)
 {
 	_TH0 = val;
 }
 
-inline void GrStat::setTH1(double val)
+inline void GrStat::setTH1(FLOAT_TYPE val)
 {
 	_TH1 = val;
 }
 
-inline void GrStat::setN8(double val)
+inline void GrStat::setN8(FLOAT_TYPE val)
 {
 	_N8 = val;
 }
 
-inline void GrStat::setT80(double val)
+inline void GrStat::setT80(FLOAT_TYPE val)
 {
 	_T80 = val;
 }
 
-inline void GrStat::setT8(double val)
+inline void GrStat::setT8(FLOAT_TYPE val)
 {
 	_T8 = val;
 }
 
-inline void GrStat::setTC(double val)
+inline void GrStat::setTC(FLOAT_TYPE val)
 {
 	_TC = val;
 }
 
-inline void GrStat::setTH0lung(double val)
+inline void GrStat::setTH0lung(FLOAT_TYPE val)
 {
 	_TH0lung = val;
 }
 
-inline void GrStat::setTH1lung(double val)
+inline void GrStat::setTH1lung(FLOAT_TYPE val)
 {
 	_TH1lung = val;
 }
 
-inline void GrStat::setT80lung(double val)
+inline void GrStat::setT80lung(FLOAT_TYPE val)
 {
 	_T80lung = val;
 }
 
-inline void GrStat::setT8lung(double val)
+inline void GrStat::setT8lung(FLOAT_TYPE val)
 {
 	_T8lung = val;
 }
 
-inline void GrStat::setTClung(double val)
+inline void GrStat::setTClung(FLOAT_TYPE val)
 {
 	_TClung = val;
 }
 
-inline double GrStat::getN4() const
+inline FLOAT_TYPE GrStat::getN4() const
 {
 	return _N4;
 }
 
-inline double GrStat::getTH0() const
+inline FLOAT_TYPE GrStat::getTH0() const
 {
 	return _TH0;
 }
 
-inline double GrStat::getTH1() const
+inline FLOAT_TYPE GrStat::getTH1() const
 {
 	return _TH1;
 }
 
-inline double GrStat::getN8() const
+inline FLOAT_TYPE GrStat::getN8() const
 {
 	return _N8;
 }
 
-inline double GrStat::getT80() const
+inline FLOAT_TYPE GrStat::getT80() const
 {
 	return _T80;
 }
 
-inline double GrStat::getT8() const
+inline FLOAT_TYPE GrStat::getT8() const
 {
 	return _T8;
 }
 
-inline double GrStat::getTC() const
+inline FLOAT_TYPE GrStat::getTC() const
 {
 	return _TC;
 }
 
-inline double GrStat::getTH0lung() const
+inline FLOAT_TYPE GrStat::getTH0lung() const
 {
 	return _TH0lung;
 }
 
-inline double GrStat::getTH1lung() const
+inline FLOAT_TYPE GrStat::getTH1lung() const
 {
 	return _TH1lung;
 }
 
-inline double GrStat::getT80lung() const
+inline FLOAT_TYPE GrStat::getT80lung() const
 {
 	return _T80lung;
 }
 
-inline double GrStat::getT8lung() const
+inline FLOAT_TYPE GrStat::getT8lung() const
 {
 	return _T8lung;
 }
 
-inline double GrStat::getTClung() const
+inline FLOAT_TYPE GrStat::getTClung() const
 {
 	return _TClung;
 }
 
-inline double GrStat::getMDC() const
+inline FLOAT_TYPE GrStat::getMDC() const
 {
 	return _MDC;
 }
 
-inline void GrStat::setMDC(double MDC)
+inline void GrStat::setMDC(FLOAT_TYPE MDC)
 {
 	_MDC = MDC;
 }
@@ -437,12 +429,12 @@ inline void GrStat::setNrTgamQueued(int count)
 	_queueTgam = count;
 }
 
-inline double GrStat::getFluxTgam() const
+inline FLOAT_TYPE GrStat::getFluxTgam() const
 {
 	return _fluxTgam;
 }
 
-inline void GrStat::setFluxTgam(double flux)
+inline void GrStat::setFluxTgam(FLOAT_TYPE flux)
 {
 	_fluxTgam = flux;
 }
@@ -457,12 +449,12 @@ inline void GrStat::setNrTcytQueued(int count)
 	_queueTcyt = count;
 }
 
-inline double GrStat::getFluxTcyt() const
+inline FLOAT_TYPE GrStat::getFluxTcyt() const
 {
 	return _fluxTcyt;
 }
 
-inline void GrStat::setFluxTcyt(double flux)
+inline void GrStat::setFluxTcyt(FLOAT_TYPE flux)
 {
 	_fluxTcyt = flux;
 }
@@ -477,12 +469,12 @@ inline void GrStat::setNrTregQueued(int count)
 	_queueTreg = count;
 }
 
-inline double GrStat::getFluxTreg() const
+inline FLOAT_TYPE GrStat::getFluxTreg() const
 {
 	return _fluxTreg;
 }
 
-inline void GrStat::setFluxTreg(double flux)
+inline void GrStat::setFluxTreg(FLOAT_TYPE flux)
 {
 	_fluxTreg = flux;
 }
@@ -509,14 +501,14 @@ inline void GrStat::setGrStatus(int index, GrStatus status)
 	_grStatus[index] = status;
 }
 
-inline int GrStat::getArea() const
+inline int GrStat::getAreaTNF() const
 {
-	return _area;
+	return _areaTNF;
 }
 
-inline void GrStat::incArea()
+inline void GrStat::incAreaTNF()
 {
-	_area++;
+	_areaTNF++;
 }
 
 inline int GrStat::getAreaCellDensity() const
@@ -626,22 +618,11 @@ inline int GrStat::getNrApoptosisFasFasL() const
 
 inline int GrStat::getNrMacApoptosisTNF() const
 {
-	return _nMacApoptosisTNF;
+  return std::accumulate(_nMacApoptosisTNF, _nMacApoptosisTNF+NMAC_STATES, 0);
 }
-
-inline int GrStat::getNrRestingMacApoptosisTNF() const
+inline int GrStat::getNrMacApoptosisTNF(MacState s) const
 {
-	return _nRestingMacApoptosisTNF;
-}
-
-inline int GrStat::getNrInfAndCinfMacApoptosisTNF() const
-{
-	return _nInfAndCinfMacApoptosisTNF;
-}
-
-inline int GrStat::getNrActivatedMacApoptosisTNF() const
-{
-	return _nActivatedMacApoptosisTNF;
+  return _nMacApoptosisTNF[s];
 }
 
 inline int GrStat::getNrTcellApoptosisTNF() const
@@ -664,24 +645,9 @@ inline void GrStat::incApoptosisFasFasL()
 	_nApoptosisFasFasL++;
 }
 
-inline void GrStat::incMacApoptosisTNF()
+inline void GrStat::incMacApoptosisTNF(MacState s)
 {
-	_nMacApoptosisTNF++;
-}
-
-inline void GrStat::incRestingMacApoptosisTNF()
-{
-	_nRestingMacApoptosisTNF++;
-}
-
-inline void GrStat::incInfAndCinfMacApoptosisTNF()
-{
-	_nInfAndCinfMacApoptosisTNF++;
-}
-
-inline void GrStat::incActivatedMacApoptosisTNF()
-{
-	_nActivatedMacApoptosisTNF++;
+	_nMacApoptosisTNF[s]++;
 }
 
 inline void GrStat::incTcellApoptosisTNF()
@@ -699,82 +665,82 @@ inline void GrStat::incInfMacActivationTNF()
 	_nInfMacActivationTNF++;
 }
 
-inline void GrStat::incTotExtMtb(double dExtMtb)
+inline void GrStat::incTotExtMtb(FLOAT_TYPE dExtMtb)
 {
 	_totExtMtb += dExtMtb;
 }
 
-inline void GrStat::incTotNonRepExtMtb(double dNonRepExtMtb)
+inline void GrStat::incTotNonRepExtMtb(FLOAT_TYPE dNonRepExtMtb)
 {
 	_totNonRepExtMtb += dNonRepExtMtb;
 }
 
-inline void GrStat::incTotIntMtb(double dIntMtb)
+inline void GrStat::incTotIntMtb(FLOAT_TYPE dIntMtb)
 {
 	_totIntMtb += dIntMtb;
 }
 
-inline void GrStat::incTotMacAttractant(double dMacAttractant)
+inline void GrStat::incTotMacAttractant(FLOAT_TYPE dMacAttractant)
 {
 	_totMacAttractant += dMacAttractant;
 }
 
-inline void GrStat::incTotTNF(double dTNF)
+inline void GrStat::incTotTNF(FLOAT_TYPE dTNF)
 {
 	_totTNF += dTNF;
 }
 
-inline void GrStat::incTotCCL2(double dCCL2)
+inline void GrStat::incTotCCL2(FLOAT_TYPE dCCL2)
 {
 	_totCCL2 += dCCL2;
 }
 
-inline void GrStat::incTotCCL5(double dCCL5)
+inline void GrStat::incTotCCL5(FLOAT_TYPE dCCL5)
 {
 	_totCCL5 += dCCL5;
 }
 
-inline void GrStat::incTotCXCL9(double dCXCL9)
+inline void GrStat::incTotCXCL9(FLOAT_TYPE dCXCL9)
 {
 	_totCXCL9 += dCXCL9;
 }
 
-inline double GrStat::getTotMacAttractant() const
+inline FLOAT_TYPE GrStat::getTotMacAttractant() const
 {
 	return _totMacAttractant;
 }
 
-inline double GrStat::getTotTNF() const
+inline FLOAT_TYPE GrStat::getTotTNF() const
 {
 	return _totTNF;
 }
 
-inline double GrStat::getTotCCL2() const
+inline FLOAT_TYPE GrStat::getTotCCL2() const
 {
 	return _totCCL2;
 }
 
-inline double GrStat::getTotCCL5() const
+inline FLOAT_TYPE GrStat::getTotCCL5() const
 {
 	return _totCCL5;
 }
 
-inline double GrStat::getTotCXCL9() const
+inline FLOAT_TYPE GrStat::getTotCXCL9() const
 {
 	return _totCXCL9;
 }
 
-inline double GrStat::getTotExtMtb() const
+inline FLOAT_TYPE GrStat::getTotExtMtb() const
 {
 	return _totExtMtb;
 }
 
-inline double GrStat::getTotNonRepExtMtb() const
+inline FLOAT_TYPE GrStat::getTotNonRepExtMtb() const
 {
 	return _totNonRepExtMtb;
 }
 
-inline double GrStat::getTotIntMtb() const
+inline FLOAT_TYPE GrStat::getTotIntMtb() const
 {
 	return _totIntMtb;
 }

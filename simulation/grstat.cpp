@@ -42,10 +42,7 @@ GrStat::GrStat()
 	, _totCCL5(0)
 	, _totCXCL9(0)
 	, _nApoptosisFasFasL(0)
-	, _nMacApoptosisTNF(0)
-	, _nRestingMacApoptosisTNF(0)
-	, _nInfAndCinfMacApoptosisTNF(0)
-	, _nActivatedMacApoptosisTNF(0)
+	, _nMacApoptosisTNF()
 	, _nTcellApoptosisTNF(0)
 	, _nRestingMacActivationTNF(0)
 	, _nInfMacActivationTNF(0)
@@ -72,7 +69,7 @@ GrStat::GrStat()
 	, _nMacDeactActive(0)
 	, _nMacDeactDead(0)
 	, _nBactAct(0)
-	, _area(0)
+	, _areaTNF(0)
 	, _areaCellDensity(0)
 	, _nCaseated(0)
 	, _queueTgam(0)
@@ -316,7 +313,6 @@ void GrStat::updateTregStatistics(TregState state)
 
 void GrStat::resetAgentStats()
 {
-  namespace ba = boost::accumulators;
 	_nMac = _nMacResting = _nMacInfected = 
 		_nMacCInfected = _nMacDead = _nMacActive = 0;
 	
@@ -335,6 +331,7 @@ void GrStat::resetAgentStats()
 	
 	_nTreg = _nTregDead = _nTregActive = 0;
 
+  memset(_nMacApoptosisTNF, 0 , sizeof(int)*NMAC_STATES);
   memset(_intMtbFreq, 0, sizeof(unsigned)*_PARAM(PARAM_MAC_THRESHOLD_BURST_CI_INTMTB));
   for(int i=0;i<NMAC_STATES;i++)
     _macIntMtbStats[i] = Stat();
@@ -350,7 +347,7 @@ void GrStat::reset()
 
 	_nCaseated = 0;
 
-	_area = _areaCellDensity = 0;
+	_areaTNF = _areaCellDensity = 0;
 }
 
 void GrStat::serialize(std::ostream& out) const
@@ -391,10 +388,9 @@ void GrStat::serialize(std::ostream& out) const
 	out << _totCXCL9 << std::endl;
 
 	out << _nApoptosisFasFasL << std::endl;
-	out << _nMacApoptosisTNF << std::endl;
-	out << _nRestingMacApoptosisTNF << std::endl;
-	out << _nInfAndCinfMacApoptosisTNF << std::endl;
-	out << _nActivatedMacApoptosisTNF << std::endl;
+  for(unsigned i=0;i<NMAC_STATES;i++)
+  	out << _nMacApoptosisTNF[i] << std::endl;
+
 	out << _nTcellApoptosisTNF << std::endl;
 	
 	out << _nRestingMacActivationTNF << std::endl;
@@ -427,7 +423,7 @@ void GrStat::serialize(std::ostream& out) const
 	out << _nMacDeactDead << std::endl;
 
 	out << _nBactAct << std::endl;
-	out << _area << std::endl;
+	out << _areaTNF << std::endl;
 	out << _areaCellDensity << std::endl;
 	out << _nCaseated << std::endl;
 
@@ -505,11 +501,10 @@ void GrStat::deserialize(std::istream& in)
 	in >>_totCXCL9;
 
 	in >>_nApoptosisFasFasL;
-	in >>_nMacApoptosisTNF;
-	in >> _nRestingMacApoptosisTNF;
-	in >> _nInfAndCinfMacApoptosisTNF;
-	in >> _nActivatedMacApoptosisTNF;
-	in >> _nTcellApoptosisTNF;
+  for(unsigned i=0;i<NMAC_STATES;i++)
+  	in >>_nMacApoptosisTNF[i];
+	
+  in >> _nTcellApoptosisTNF;
 	
 	in >> _nRestingMacActivationTNF;
 	in >> _nInfMacActivationTNF;
@@ -541,7 +536,7 @@ void GrStat::deserialize(std::istream& in)
 	in >>_nMacDeactDead;
 
 	in >>_nBactAct;
-	in >>_area;
+	in >>_areaTNF;
 	in >>_areaCellDensity;
 	in >>_nCaseated;
 

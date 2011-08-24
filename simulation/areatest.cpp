@@ -18,7 +18,7 @@ AreaTest::~AreaTest()
 
 void AreaTest::update(const int time, const int index, GrStat& stats)
 {
-	TTest::update(time, index, stats, stats.getArea());
+	TTest::update(time, index, stats, stats.getAreaTNF());
 }
 
 void AreaTest::evaluate(const int index, GrStat& stats, double degressOfFreedom)

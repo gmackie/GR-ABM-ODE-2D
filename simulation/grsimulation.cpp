@@ -615,7 +615,7 @@ void GrSimulation::growExtMtb()
 			_stats.incTotCXCL9(cell.getCXCL9());
 
 			if (cell.getTNF() >= _areaThreshold)
-				_stats.incArea();
+				_stats.incAreaTNF();
 
 			if (cell.getCellDensity(_grid.getGrid()) >= _areaThresholdCellDensity)
 			{

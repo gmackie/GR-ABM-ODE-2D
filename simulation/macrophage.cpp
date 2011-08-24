@@ -280,57 +280,21 @@ void Mac::computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tnf
 			 g_Rand.getReal() < 1 - pow(2.7183, -_PARAM(PARAM_GR_K_APOPTOSIS_MOLECULAR) * (_intBoundTNFR1 - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR))))
 	{
 		// TNF induced apoptosis
-		stats.incMacApoptosisTNF();
-		if (_state == MAC_RESTING)
-		{ 
-			stats.incRestingMacApoptosisTNF();
-		}
-		else if (_state == MAC_INFECTED || _state == MAC_CINFECTED)
-		{
-			stats.incInfAndCinfMacApoptosisTNF();
-		}
-		else if (_state == MAC_ACTIVE)
-		{
-			stats.incActivatedMacApoptosisTNF();
-		}
+		stats.incMacApoptosisTNF(_state);
 		apoptosis(grid);
 	}
 	else if (nfkbDynamics && _intBoundTNFR1 > _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR) &&	
 			 g_Rand.getReal() < 1 - pow(2.7183, -nfkb_adjusted_k_apoptosis * (_intBoundTNFR1 - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR))))
 	{
 		// TNF induced apoptosis
-		stats.incMacApoptosisTNF();
-		if (_state == MAC_RESTING)
-		{ 
-			stats.incRestingMacApoptosisTNF();
-		}
-		else if (_state == MAC_INFECTED || _state == MAC_CINFECTED)
-		{
-			stats.incInfAndCinfMacApoptosisTNF();
-		}
-		else if (_state == MAC_ACTIVE)
-		{
-			stats.incActivatedMacApoptosisTNF();
-		}
+		stats.incMacApoptosisTNF(_state);
 		apoptosis(grid);
 	}
 	else if (!tnfrDynamics && tnfBoundFraction > _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF) &&
 			 g_Rand.getReal() < 1 - pow(2.7183, -_PARAM(PARAM_GR_K_APOPTOSIS) * (tnfBoundFraction - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF))))
 	{
 		// TNF induced apoptosis
-		stats.incMacApoptosisTNF();
-		if (_state == MAC_RESTING)
-		{ 
-			stats.incRestingMacApoptosisTNF();
-		}
-		else if (_state == MAC_INFECTED || _state == MAC_CINFECTED)
-		{
-			stats.incInfAndCinfMacApoptosisTNF();
-		}
-		else if (_state == MAC_ACTIVE)
-		{
-			stats.incActivatedMacApoptosisTNF();
-		}
+		stats.incMacApoptosisTNF(_state);
 		apoptosis(grid);
 	}
 	else

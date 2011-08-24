@@ -27,6 +27,14 @@
 #define GR_VERSION "r" SVN_VERSION
 #endif
 
+#if defined(USE_FLOAT)
+typedef float FLOAT_TYPE;
+#define FLOAT_TYPE_PRECISION (FLT_DIG+2)
+#else
+typedef double FLOAT_TYPE;
+#define FLOAT_TYPE_PRECISION (DBL_DIG+2)
+#endif
+
 #ifndef __DIM__
   #define __DIM__ (100)
 #endif //__DIM__
@@ -95,6 +103,7 @@ typedef enum {MAC_DEAD, MAC_RESTING, MAC_INFECTED, MAC_CINFECTED, MAC_ACTIVE, NM
 typedef enum {TGAM_DEAD, TGAM_ACTIVE, TGAM_DOWN_REGULATED, NTGAM_STATES} TgamState;
 typedef enum {TCYT_DEAD, TCYT_ACTIVE, TCYT_DOWN_REGULATED, NTCYT_STATES} TcytState;
 typedef enum {TREG_DEAD, TREG_ACTIVE, NTREG_STATES} TregState;
+typedef int State;
 
 inline std::ostream& operator<<(std::ostream& s, const Pos& p) {
   return s<<'('<<p.first<<','<<p.second<<')';

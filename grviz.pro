@@ -168,7 +168,7 @@ unix:system(grep -qE \"Ubuntu|Red Hat\" /etc/issue) {
 exists( .git/ ) {
       VERSION = $$quote($$system(git svn find-rev HEAD))
 } else : exists( .svn/ ) {
-      VERSION = $$quote($$system(svn info | awk \'/^Last Changed Rev:/ {print $4}\
+      VERSION = $$quote($$system(svn info | awk \'/^Last Changed Rev:/ {print $4}\'
 } else {
       VERSION = "Unknown"
 }

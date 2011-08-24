@@ -222,7 +222,7 @@ void Snapshot::takeSnapshot(const int time, const GrStat& stats)
 		<< ','
 		<< stats.getTotCXCL9()
 		<< ','
-		<< stats.getArea()
+		<< stats.getAreaTNF()
 		<< ','
 		<< stats.getAreaCellDensity()
 		<< ','
@@ -282,6 +282,13 @@ void Snapshot::takeSnapshot(const int time, const GrStat& stats)
 		}
 	}
 
+  static int totMacApoptosisTNF[NMAC_STATES] = {0}; //Just temporary for Mohammed Fallahi
+  int sumMacApoptosisTNF = 0;
+  for(int i=0;i<NMAC_STATES;i++){    //Keep a running sum of deaths
+    totMacApoptosisTNF[i]+=(stats.getNrMacApoptosisTNF((MacState)i));
+    sumMacApoptosisTNF+=totMacApoptosisTNF[i]; 
+  }
+
 	_outFile
 		<< ','
 		<< stats.getNrSourcesMac()
@@ -294,15 +301,13 @@ void Snapshot::takeSnapshot(const int time, const GrStat& stats)
 		<< ','
 		<< stats.getNrCaseated()
 		<< ','
-		<< stats.getNrMacApoptosisTNF()
-		<< ','
-		<< stats.getNrRestingMacApoptosisTNF()
-		<< ','
-		<< stats.getNrInfAndCinfMacApoptosisTNF()
-		<< ','
-		<< stats.getNrActivatedMacApoptosisTNF()
-		<< ','
-		<< stats.getNrTcellApoptosisTNF()
+    << sumMacApoptosisTNF 
+    << ',';
+
+    for(int i=0;i<NMAC_STATES;i++)    //Keep a running sum of deaths
+      _outFile<<totMacApoptosisTNF[i]<<',';
+    
+		_outFile << stats.getNrTcellApoptosisTNF()
 		<< ','
 		<< stats.getNrRestingMacActivationTNF()
 		<< ','

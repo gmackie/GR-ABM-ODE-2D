@@ -91,7 +91,7 @@ void StatWidget::updateLabels(const GrStat& stats)
 	_ui.labelCXCL9->setText(str);
 
 	// update granuloma area
-	str = QString("%1").arg(stats.getArea());
+	str = QString("%1").arg(stats.getAreaTNF());
 	_ui.labelGranulomaAreaVal->setText(str);
 
 	// update ODE stats

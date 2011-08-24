@@ -14,6 +14,7 @@
 #include "tregulatory.h"
 #include <functional>
 #include <algorithm>
+#include <numeric>
 
 const std::string GrStat::_ClassName = "GrStat";
 

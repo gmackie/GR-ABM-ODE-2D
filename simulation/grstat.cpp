@@ -12,6 +12,8 @@
 #include "tgamma.h"
 #include "tcytotoxic.h"
 #include "tregulatory.h"
+#include <functional>
+#include <algorithm>
 
 const std::string GrStat::_ClassName = "GrStat";
 

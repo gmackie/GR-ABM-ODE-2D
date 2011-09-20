@@ -228,14 +228,14 @@ void printStats(const GrSimulation* pSim) {
   printf("(%d, %.5f)\n", stats.getNrCaseated(), stats.getTotNonRepExtMtb());
 }
 
-void run(GrSimulation* pSim, int stateInterval, int csvInterval, bool screenDisplay, int timeToSimulate, std::string outputDir, std::vector<oCSVStream*> csvStreams)
+void run(GrSimulation* pSim, int stateInterval, int csvInterval, bool screenDisplay, int timeToSimulate, std::string outputDir, std::vector<oCSVStream*> csvStreams, bool lhs)
 {
   if(screenDisplay)
   	cout << endl << "--seed " << g_Rand.getSeed() << endl;
   csvInterval = csvInterval < 1 ? 1 : csvInterval;
   for (int time = 0; time <= timeToSimulate; time += 1)
   {
-    fprintf(stderr, "Done: %3.2f%%\r", 100.0*(time / float(timeToSimulate)));
+    if (!lhs) fprintf(stderr, "Done: %3.2f%%\r", 100.0*(time / float(timeToSimulate)));
     // Display and write output at the requested interval, and after the last time step.
     if (stateInterval > 0 && time % stateInterval == 0)
        saveState(pSim, time, outputDir);
@@ -360,7 +360,7 @@ int main(int argc, char** argv)
   }
   unsigned timeToSimulate;
   if (!vm.count("timesteps"))
-    timeToSimulate = 144 * vm["days"].as<unsigned>();
+    timeToSimulate = TIME_STEPS_PER_DAY * vm["days"].as<unsigned>();
   else 
     timeToSimulate = vm["timesteps"].as<unsigned>();
   
@@ -375,7 +375,7 @@ int main(int argc, char** argv)
   
   // Adjust the seed if a seed adjustment was specified.
   if (vm.count("seedadj"))
-    seed = seed ^ (vm["seedadj"].as<unsigned>());
+    seed = seed ^ (vm["seedadj"].as<unsigned long>());
   
   bool lhs = vm.count("lhs");
 
@@ -440,7 +440,7 @@ int main(int argc, char** argv)
   }
 
   run(pSim, vm["state-interval"].as<unsigned>(), vm["csv-interval"].as<unsigned>(),
-      screenDisplay, timeToSimulate, outputDir, csvStreams);
+      screenDisplay, timeToSimulate, outputDir, csvStreams, lhs);
 
   for(unsigned i=0;i<csvStreams.size();i++)
     delete csvStreams[i];

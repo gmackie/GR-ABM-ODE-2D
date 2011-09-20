@@ -152,9 +152,9 @@ inline void GrSimulation::setAreaThresholdCellDensity(double areaThreshold)
 
 inline void GrSimulation::convertSimTime(const int time, int& rDays, int& rHours, int& rMinutes)
 {
-	rDays = time / 144;
-	rHours = (time % 144) / 6;
-	rMinutes = ((time % 144) % 6) * 10;
+	rDays = time / TIME_STEPS_PER_DAY;
+	rHours = (time % TIME_STEPS_PER_DAY) / 6;
+	rMinutes = ((time % TIME_STEPS_PER_DAY) % 6) * 10;
 }
 
 inline int GrSimulation::getTime() const

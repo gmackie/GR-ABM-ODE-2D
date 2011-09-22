@@ -95,13 +95,14 @@ GrStat::GrStat()
 	, _T80lung(0)
 	, _T8lung(0)
 	, _TClung(0)
-  , _intMtbFreq(new unsigned[int(_PARAM(PARAM_MAC_THRESHOLD_BURST_CI_INTMTB))])
+	, _intMtbFreq(new unsigned[int(_PARAM(PARAM_MAC_THRESHOLD_BURST_CI_INTMTB))])
 {
 	for (int i = 0; i < NOUTCOMES; i++)
 	{
 		_grStatus[i] = GR_NONE;
 	}
-  memset(_intMtbFreq, 0, sizeof(unsigned)*int(_PARAM(PARAM_MAC_THRESHOLD_BURST_CI_INTMTB)));
+
+	memset(_intMtbFreq, 0, sizeof(unsigned)*int(_PARAM(PARAM_MAC_THRESHOLD_BURST_CI_INTMTB)));
 }
 GrStat::GrStat(const GrStat& o)
 {
@@ -332,7 +333,7 @@ void GrStat::resetAgentStats()
 	_nTreg = _nTregDead = _nTregActive = 0;
 
   memset(_nMacApoptosisTNF, 0 , sizeof(int)*NMAC_STATES);
-  memset(_intMtbFreq, 0, sizeof(unsigned)*_PARAM(PARAM_MAC_THRESHOLD_BURST_CI_INTMTB));
+  memset(_intMtbFreq, 0, sizeof(unsigned)*int(_PARAM(PARAM_MAC_THRESHOLD_BURST_CI_INTMTB)));
   for(int i=0;i<NMAC_STATES;i++)
     _macIntMtbStats[i] = Stat();
 }

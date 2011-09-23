@@ -248,6 +248,14 @@ void GrSimulation::init()
 	// Add a fixed number (PARAM_MAC_INIT_NUMBER) of resting
 	// macrophages to the grid
 	int count = _PARAM(PARAM_MAC_INIT_NUMBER);
+
+	int nrGridCompartments = (NROWS*NCOLS);
+	if (count > nrGridCompartments)
+	{
+		std::cerr << "The number of initial resting macrophages to place on the grid, " << count << ", is > the number of grid compartments, " << nrGridCompartments << "." << std::endl;
+		exit(1);
+	}
+
 	while (count > 0)
 	{
 		int row = g_Rand.getInt(NROWS);

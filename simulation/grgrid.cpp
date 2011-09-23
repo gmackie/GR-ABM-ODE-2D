@@ -41,6 +41,15 @@ void GrGrid::initSources()
 	int dRow = NROWS / n;
 	int dCol = NCOLS / n;
 
+	// This can happen if the number of sources is large relative to the grid dimensions,
+	// for example if using a small grid for testing and debugging.
+	if (dRow <= 0 || dCol <= 0)
+	{
+		std::cerr << "One or more of dRow: " << dRow << " or dCol: " << dCol << " is <= 0 in GrGrid::initSources." << std::endl;
+		std::cerr << "Check that the grid size is not too small relative to the number of sources."<< std::endl;
+		exit(1);
+	}
+
 	for (int i = 0; i < n; i++)
 	{
 		for (int j = 0; j < n; j++)

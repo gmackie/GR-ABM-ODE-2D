@@ -410,7 +410,15 @@ int main(int argc, char** argv)
   GrSimulation* pSim = new GrSimulation();
   assert(pSim != NULL);
   if (vm.count("load")){
-    std::ifstream f(vm["load"].as<std::string>().c_str());
+	std::string s = vm["load"].as<std::string>();
+    std::ifstream f(s.c_str());
+
+    if(!f)
+    {
+    	std::cerr << "Saved state " << s << " does not exist." << std::endl;
+    	exit(1);
+    }
+
     pSim->deserialize(f);
     f.close();
   }

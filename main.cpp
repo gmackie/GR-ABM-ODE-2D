@@ -75,7 +75,6 @@ int main(int argc, char *argv[])
   std::cout << "GRID SIZE: NROWS: " << NROWS << " NCOLS: " << NCOLS << std::endl;
 	QApplication a(argc, argv);
 
-	bool snapshotMode;
 	bool ode;
 	bool tnfrDynamics;
 	bool nfkbDynamics;
@@ -180,7 +179,6 @@ int main(int argc, char *argv[])
 		}
 		g_Rand.setSeed(seed);
 
-		snapshotMode = vm.count("snapshot");
 		scriptingMode = vm.count("script");
 		outputEnabled = vm.count("output");
 
@@ -306,7 +304,6 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-	// These are needed for snapshotMode, scriptingMode and regular execution.
 	ScalarAgentGrid agentGrid;
 	AgentsVisualization agentsVisualization(Simulation::_DIM, &agentGrid);
 	MainInterface itfc(&agentsVisualization, &agentGrid);
@@ -363,6 +360,13 @@ int main(int argc, char *argv[])
 	// for example when setting up output for saving statistics.
 	if (stateFileName.size() > 0)
 	{
+		QString qStateFileName = stateFileName.c_str();
+	    if (!QFile::exists(qStateFileName))
+	    {
+	    	std::cerr << "Saved state " << stateFileName << " does not exist." << std::endl;
+	    	exit(1);
+	    }
+
 		if (seedSpecified)
 		{
 			std::cerr << "Loading a saved state, seed " << seed << " ignored."<< std::endl;

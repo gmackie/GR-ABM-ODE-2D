@@ -130,7 +130,8 @@ private:
 	FLOAT_TYPE _T8lung;
 	FLOAT_TYPE _TClung;
 
-  unsigned* _intMtbFreq;
+	size_t _intMtbFreqSize;
+	unsigned* _intMtbFreq;
 public:
   typedef ba::accumulator_set<FLOAT_TYPE, ba::stats< ba::features< ba::tag::variance, ba::tag::min, ba::tag::max, ba::tag::median > > > Stat;
 private:
@@ -141,8 +142,9 @@ public:
   GrStat(const GrStat&);
   GrStat& operator=(const GrStat&);
 	~GrStat();
-  const unsigned* getIntMtbFreq(size_t& s) const;
-  const Stat* getIntMtbStats(size_t &s) const;
+	size_t getIntMtbFreqSize() const;
+	const unsigned* getIntMtbFreq(size_t& s) const;
+	const Stat* getIntMtbStats(size_t &s) const;
 	int getNrOfMac() const;
 	int getNrOfTgam() const;
 	int getNrOfTcyt() const;
@@ -284,6 +286,11 @@ public:
 	void setT8lung(FLOAT_TYPE val);
 	void setTClung(FLOAT_TYPE val);
 };
+
+inline size_t GrStat::getIntMtbFreqSize() const
+{
+	return _intMtbFreqSize;
+}
 
 inline const unsigned* GrStat::getIntMtbFreq(size_t& s) const {
   s = size_t(_PARAM(PARAM_MAC_THRESHOLD_BURST_CI_INTMTB));

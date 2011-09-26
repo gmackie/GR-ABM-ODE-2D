@@ -95,28 +95,36 @@ GrStat::GrStat()
 	, _T80lung(0)
 	, _T8lung(0)
 	, _TClung(0)
-	, _intMtbFreq(new unsigned[int(_PARAM(PARAM_MAC_THRESHOLD_BURST_CI_INTMTB))])
+
+		// + 1 because burst threshold might not be an integer value, and if not,
+		// when a macrophage's intMtb count is truncated to the floor(burst threshold)
+		// and then used as an index into _intMtbFreq an array over reference will occur.
+		// Ex. PARAM_MAC_THRESHOLD_BURST_CI_INTMTB 22.4
+		// If a mac's intMtb grows to 22.1, when it's intMtb value, as the integer 22, is used as an index
+		// into _intMtbFreq, so _intMtbFreq must be dimensioned to 23 or an array over reference will occur.
+	, _intMtbFreqSize(int(_PARAM(PARAM_MAC_THRESHOLD_BURST_CI_INTMTB)) + 1)
+	, _intMtbFreq(new unsigned[_intMtbFreqSize])
 {
 	for (int i = 0; i < NOUTCOMES; i++)
 	{
 		_grStatus[i] = GR_NONE;
 	}
 
-	memset(_intMtbFreq, 0, sizeof(unsigned)*int(_PARAM(PARAM_MAC_THRESHOLD_BURST_CI_INTMTB)));
+	memset(_intMtbFreq, 0, sizeof(unsigned)*_intMtbFreqSize);
 }
 GrStat::GrStat(const GrStat& o)
 {
   memcpy(this, &o, sizeof(GrStat)); //Copy the field values
-  _intMtbFreq = new unsigned[int(_PARAM(PARAM_MAC_THRESHOLD_BURST_CI_INTMTB))];
-  memcpy(_intMtbFreq, o._intMtbFreq, sizeof(unsigned)*int(_PARAM(PARAM_MAC_THRESHOLD_BURST_CI_INTMTB)));
+  _intMtbFreq = new unsigned[_intMtbFreqSize];
+  memcpy(_intMtbFreq, o._intMtbFreq, sizeof(unsigned)*_intMtbFreqSize);
   for(int i=0;i<NMAC_STATES;i++)
     _macIntMtbStats[i] = o._macIntMtbStats[i];
 }
 GrStat& GrStat::operator=(const GrStat& o)
 {
   memcpy(this, &o, sizeof(GrStat)); //Copy the field values
-  _intMtbFreq = new unsigned[int(_PARAM(PARAM_MAC_THRESHOLD_BURST_CI_INTMTB))];
-  memcpy(_intMtbFreq, o._intMtbFreq, sizeof(unsigned)*int(_PARAM(PARAM_MAC_THRESHOLD_BURST_CI_INTMTB)));
+  _intMtbFreq = new unsigned[_intMtbFreqSize];
+  memcpy(_intMtbFreq, o._intMtbFreq, sizeof(unsigned)*_intMtbFreqSize);
   for(int i=0;i<NMAC_STATES;i++)
     _macIntMtbStats[i] = o._macIntMtbStats[i];
   return *this;
@@ -140,6 +148,8 @@ void GrStat::updateAgentStatistics(Agent* a)
       _macIntMtbStats[pMac->getState()](pMac->getIntMtb());
       if(pMac->getState() == MAC_INFECTED || pMac->getState() == MAC_CINFECTED){
         assert(pMac->getIntMtb() < _PARAM(PARAM_MAC_THRESHOLD_BURST_CI_INTMTB));
+        assert((int) pMac->getIntMtb() < _intMtbFreqSize);
+
         _intMtbFreq[int(pMac->getIntMtb())]++;
       }
       updateMacStatistics(static_cast<Mac*>(pMac)->getState());
@@ -333,7 +343,7 @@ void GrStat::resetAgentStats()
 	_nTreg = _nTregDead = _nTregActive = 0;
 
   memset(_nMacApoptosisTNF, 0 , sizeof(int)*NMAC_STATES);
-  memset(_intMtbFreq, 0, sizeof(unsigned)*int(_PARAM(PARAM_MAC_THRESHOLD_BURST_CI_INTMTB)));
+  memset(_intMtbFreq, 0, sizeof(unsigned)*_intMtbFreqSize);
   for(int i=0;i<NMAC_STATES;i++)
     _macIntMtbStats[i] = Stat();
 }

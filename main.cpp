@@ -49,7 +49,6 @@ void setupScriptingMode(MainWindow& mainWindow)
 	ui.checkBoxDrawSmoke->setChecked(false);
 	ui.groupBoxOutput->setEnabled(false);
 	ui.groupBoxStoppingCriteria->setEnabled(false);
-	ui.checkBoxDrawGranulomaBorder->setChecked(true);
 	ui.horizontalSliderGranulomaBorderThreshold->setEnabled(false);
 
 	mainWindow.hide();

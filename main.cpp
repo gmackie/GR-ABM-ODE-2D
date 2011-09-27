@@ -141,6 +141,7 @@ int main(int argc, char *argv[])
 		("res,r", po::value<std::string>(&resolution)->default_value("512x512"),
 				"Resolution of the OpenGL window")
 		("granuloma-visualization,g", po::value<std::string>(&granvizDataSetName), argHelp.c_str())
+		("border", "Draw granuloma border")
 		("load-state,l",  po::value<std::string>(&stateFileName), "File name of saved state to load")
 		("snapshot",  po::value<std::string>(&stateFileName), "Load a saved state, save a graphic snapshot and quit.\nArgument is the saved state to load.")
 		("ode", "Use integrated lymph node ODE for recruitment")
@@ -349,6 +350,8 @@ int main(int argc, char *argv[])
 		ui.checkBoxDrawGranulomaBorder->setChecked(granvizEnabled);
 		ui.comboBoxGranulomaDataset->setCurrentIndex(granvizDatasetIndex);
 	}
+
+	ui.checkBoxDrawGranulomaBorder->setChecked(vm.count("border"));
 
 	itfc.getSimulation().setOutcomeMethod(0, outcomeMethod[0],
 		_OUTCOME_ALPHA, testPeriod[0], samplePeriod[0]);

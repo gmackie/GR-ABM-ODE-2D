@@ -145,12 +145,6 @@ public:
   }
   void saveRow(const GrSimulation& sim) {
     const GrStat& stats = sim.getStats();
-    static int totMacApoptosisTNF[NMAC_STATES] = {0}; //Just temporary for Mohammed Fallahi
-    int sumMacApoptosisTNF = 0;
-    for(int i=0;i<NMAC_STATES;i++){    //Keep a running sum of deaths
-      totMacApoptosisTNF[i]+=(stats.getNrMacApoptosisTNF((MacState)i));
-      sumMacApoptosisTNF+=totMacApoptosisTNF[i]; 
-    }
 
     write(sim.getTime());
     write(stats.getNrOfMac()); write(stats.getNrOfMacResting()); write(stats.getNrOfMacInfected()); write(stats.getNrOfMacCInfected()); write(stats.getNrOfMacActive()); write(stats.getNrOfMacDead());
@@ -160,8 +154,9 @@ public:
     write(stats.getTotIntMtb()); write(stats.getTotExtMtb()); write(stats.getTotNonRepExtMtb()); write((stats.getTotIntMtb() + stats.getTotExtMtb()));
     write(stats.getTotTNF()); write(stats.getTotCCL2()); write(stats.getTotCCL5());  write(stats.getTotCXCL9());
     write(stats.getAreaTNF()); write(stats.getAreaCellDensity());
-    write(stats.getMDC()); write(stats.getN4()); write(stats.getTH0()); write(stats.getTH1()); write(stats.getN8()); write(stats.getT80()); write(stats.getT8()); write(stats.getTC());
-    write(stats.getTH0lung()); write(stats.getTH1lung()); write(stats.getT80lung()); write(stats.getT8lung()); write(stats.getTClung());
+    write(stats.getMDC()); write(stats.getN4()); write(stats.getTH0()); write(stats.getTH1()); write(stats.getN8());
+    write(stats.getT80()); write(stats.getT8()); write(stats.getTC());  write(stats.getTH0lung()); write(stats.getTH1lung());
+    write(stats.getT80lung()); write(stats.getT8lung()); write(stats.getTClung());
 
     for (int i = 0; i < NOUTCOMES; i++)
     {
@@ -192,11 +187,24 @@ public:
     }
     write(stats.getNrSourcesMac()); write(stats.getNrSourcesTgam());  write(stats.getNrSourcesTcyt()); write(stats.getNrSourcesTreg());
     write(stats.getNrCaseated());
+
+    int startState = 1; // Skip the dead state: apoptosis doesn't occur for an already dead mac.
+    static int totMacApoptosisTNF[NMAC_STATES] = {0}; //Just temporary for Mohammed Fallahi
+    int sumMacApoptosisTNF = 0;
+
+    //
+    for(int i=startState;i<NMAC_STATES;i++){    //Keep a running sum of deaths
+      totMacApoptosisTNF[i]+=(stats.getNrMacApoptosisTNF((MacState)i));
+      sumMacApoptosisTNF+=totMacApoptosisTNF[i];
+    }
+
     write(sumMacApoptosisTNF);
-    for(int i=0;i<NMAC_STATES;i++)
+    for(int i=startState;i<NMAC_STATES;i++)
       write(totMacApoptosisTNF[i]);
+
     write(stats.getNrTcellApoptosisTNF());
-    write(stats.getNrRestingMacActivationTNF()); write(stats.getNrInfMacActivationTNF());
+    write(stats.getNrRestingMacActivationTNF());
+    write(stats.getNrInfMacActivationTNF());
     oCSVStream::endRow();
   }
 };

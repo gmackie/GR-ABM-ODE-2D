@@ -115,7 +115,9 @@ Snapshot::Snapshot(const QString& dirName, const QString& fileName)
 		<< ','
 		<< "\"MrApoptTNF\""
 		<< ','
-		<< "\"Mi&MciApoptTNF\""
+		<< "\"MiApoptTNF\""
+		<< ','
+		<< "\"MciApoptTNF\""
 		<< ','
 		<< "\"MaApoptTNF\""
 		<< ','
@@ -282,12 +284,13 @@ void Snapshot::takeSnapshot(const int time, const GrStat& stats)
 		}
 	}
 
-  static int totMacApoptosisTNF[NMAC_STATES] = {0}; //Just temporary for Mohammed Fallahi
-  int sumMacApoptosisTNF = 0;
-  for(int i=0;i<NMAC_STATES;i++){    //Keep a running sum of deaths
-    totMacApoptosisTNF[i]+=(stats.getNrMacApoptosisTNF((MacState)i));
-    sumMacApoptosisTNF+=totMacApoptosisTNF[i]; 
-  }
+	int startState = 1; // Skip the dead state: apoptosis doesn't occur for an already dead mac.
+	static int totMacApoptosisTNF[NMAC_STATES] = {0}; //Just temporary for Mohammed Fallahi
+	int sumMacApoptosisTNF = 0;
+	for(int i=startState;i<NMAC_STATES;i++){    //Keep a running sum of deaths
+	totMacApoptosisTNF[i]+=(stats.getNrMacApoptosisTNF((MacState)i));
+	sumMacApoptosisTNF+=totMacApoptosisTNF[i];
+	}
 
 	_outFile
 		<< ','
@@ -304,8 +307,10 @@ void Snapshot::takeSnapshot(const int time, const GrStat& stats)
     << sumMacApoptosisTNF 
     << ',';
 
-    for(int i=0;i<NMAC_STATES;i++)    //Keep a running sum of deaths
+    for(int i=startState;i<NMAC_STATES;i++)    //Keep a running sum of deaths
+    {
       _outFile<<totMacApoptosisTNF[i]<<',';
+    }
     
 		_outFile << stats.getNrTcellApoptosisTNF()
 		<< ','

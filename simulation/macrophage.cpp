@@ -728,7 +728,7 @@ void Mac::handleInfected(const int time, GrGrid& grid, GrStat& stats, bool nfkbD
 	GridCell& cell = grid(_row, _col);
 
 	// intracellular bacteria reproduce
-	_intMtb *= _PARAM(PARAM_INTMTB_GROWTH_RATE);
+	_intMtb *= getIntMtbGrowthRate(time);
 
 	// uptake extracellular bacteria
 	// The probability to uptake decreases linearly as the number of intra-cellular bacteria increases to the threshold
@@ -797,12 +797,12 @@ void Mac::handleInfected(const int time, GrGrid& grid, GrStat& stats, bool nfkbD
 	}
 }
 
-void Mac::handleChronicallyInfected(const int, GrGrid& grid, GrStat&)
+void Mac::handleChronicallyInfected(const int time, GrGrid& grid, GrStat&)
 {
 	GridCell& cell = grid(_row, _col);
 
 	// intracellular bacteria reproduce
-	_intMtb *= _PARAM(PARAM_INTMTB_GROWTH_RATE);
+	_intMtb *= getIntMtbGrowthRate(time);
 
 	if (_intMtb >= _PARAM(PARAM_MAC_THRESHOLD_BURST_CI_INTMTB))
 	{

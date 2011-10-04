@@ -200,6 +200,7 @@ const ParamDescription ParamsBase::_description[_PARAM_COUNT] =
 	{ "thresholdRec",						TREG_NODE,	false,	false,	0.0,	0,	"",					"TNF/chemokine threshold for Treg recruitment" },
 	{ "probRec",							TREG_NODE,	true,	false,	0.0,	0,	"",					"Probability of recruiting a Treg cell" },
 	{ "growthRateIntMtb",					MTB_NODE,	false,	false,	0.0,	0,	"",					"Growth rate of intracellular bacteria" },
+	{ "growthRateFactorPostAdaptiveIntMtb",	MTB_NODE,	false,	true,	1.0,	1,	"",					"Factor applied to growth rate of intracellular bacteria (parameter growthRateIntMtb) after adaptive immunity begins" },
 	{ "growthRateExtMtb",					MTB_NODE,	false,	false,	0.0,	0,	"",					"Growth rate of extracellular bacteria" },
 	{ "growthExtMtbBound",					MTB_NODE,	false,	false,	0.0,	0,	"#bacteria",		"Upper bound on the number of extracellular bacteria used in growth function" },
 	{ "muMDC_LN",							GR_NODE,	false,	false,	0.0,	0,	"",					"ODE stuff" },

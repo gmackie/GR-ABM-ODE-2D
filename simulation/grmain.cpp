@@ -243,7 +243,7 @@ void run(GrSimulation* pSim, int stateInterval, int csvInterval, bool screenDisp
   csvInterval = csvInterval < 1 ? 1 : csvInterval;
   for (int time = 0; time <= timeToSimulate; time += 1)
   {
-    if (!lhs) fprintf(stderr, "Done: %3.2f%%\r", 100.0*(time / float(timeToSimulate)));
+    //if (!lhs) fprintf(stderr, "Done: %3.2f%%\r", 100.0*(time / float(timeToSimulate)));
     // Display and write output at the requested interval, and after the last time step.
     if (stateInterval > 0 && time % stateInterval == 0)
        saveState(pSim, time, outputDir);

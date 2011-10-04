@@ -80,6 +80,8 @@ private:
 	double getExtMtbInMoore(const GrGrid& grid) const;
 
 public:
+	static double getIntMtbGrowthRate(const int time);
+
 	Mac();
 	Mac(int birthtime, int row, int col, MacState state, double intMtb, bool NFkB, bool stat1);
 	~Mac();
@@ -227,5 +229,15 @@ inline void Mac::setC1rrChemTNF(double value)
 	_c1rrChemTNF = value;
 }
 
+inline double Mac::getIntMtbGrowthRate(const int time)
+{
+	double intMtbGrowthRate =  _PARAM(PARAM_INTMTB_GROWTH_RATE);
+	if (time >= _PARAM(PARAM_TCELL_TIME_RECRUITMENT_ENABLED))
+	{
+		intMtbGrowthRate *= _PARAM(PARAM_INTMTB_GROWTH_RATE_FACTOR_POST_ADAPTIVE);
+	}
+
+	return intMtbGrowthRate;
+}
 
 #endif /* MACROPHAGE_H */

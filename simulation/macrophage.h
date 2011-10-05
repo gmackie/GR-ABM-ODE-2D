@@ -232,7 +232,7 @@ inline void Mac::setC1rrChemTNF(double value)
 inline double Mac::getIntMtbGrowthRate(const int time)
 {
 	double intMtbGrowthRate =  _PARAM(PARAM_INTMTB_GROWTH_RATE);
-	if (time >= _PARAM(PARAM_TCELL_TIME_RECRUITMENT_ENABLED))
+	if (time >= (_PARAM(PARAM_TCELL_TIME_RECRUITMENT_ENABLED) + _PARAM(PARAM_INTMTB_GROWTH_RATE_FACTOR_DELAY)))
 	{
 		intMtbGrowthRate *= _PARAM(PARAM_INTMTB_GROWTH_RATE_FACTOR_POST_ADAPTIVE);
 	}

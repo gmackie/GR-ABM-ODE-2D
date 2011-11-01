@@ -8,8 +8,7 @@
 #ifndef LHS_H
 #define LHS_H
 
-#include "tinyxml/tinyxml.h"
-#include "params.h"
+#include "paramsbase.h"
 #include <vector>
 
 struct LhsDoubleParam

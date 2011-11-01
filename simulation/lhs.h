@@ -13,12 +13,14 @@
 
 struct LhsDoubleParam
 {
+	bool _isRange; // True if min < max, false if min == max.
 	double _min;
 	double _max;
 };
 
 struct LhsIntParam
 {
+	bool _isRange; // True if min < max, false if min == max.
 	int _min;
 	int _max;
 };

@@ -153,6 +153,15 @@ bool Lhs::readParam(const TiXmlElement* pElement, const TiXmlAttribute* pAttrib,
 		}
 	}
 
+	if (range._min == range._max)
+	{
+		range._isRange = false;
+	}
+	else
+	{
+		range._isRange = true;
+	}
+
 	if (range._min > range._max)
 	{
 		std::cerr << "Values '" << str << "' of attribute '" << pElement->Value() << "/@"
@@ -195,6 +204,15 @@ bool Lhs::readParam(const TiXmlElement* pElement, const TiXmlAttribute* pAttrib,
 		}
 	}
 
+	if (range._min == range._max)
+	{
+		range._isRange = false;
+	}
+	else
+	{
+		range._isRange = true;
+	}
+
 	if (range._min > range._max)
 	{
 		std::cerr << "Values '" << str << "' of attribute '" << pElement->Value() << "/@"
@@ -214,6 +232,18 @@ bool Lhs::readParam(const TiXmlElement* pElement, const TiXmlAttribute* pAttrib,
 
 bool Lhs::init(const char* filename)
 {
+	// Need to initialize _isRange here for parameters that don't appear in the LHS parameter file.
+	// They will have a single value defined, from the default value in paramsbase.cpp.
+	for (int i = 0; i < PARAM_DOUBLE_COUNT; ++i)
+	{
+		_lhsDoubleParam[i]._isRange = false;
+	}
+
+	for (int i = 0; i < PARAM_INT_COUNT; ++i)
+	{
+		_lhsIntParam[i]._isRange = false;
+	}
+
 	if (!fromXml(filename))
 	{
 		return false;
@@ -353,6 +383,12 @@ void Lhs::performLhs()
 
 		for (int j = 0; j < _nSamples; j++)
 		{
+			if (!_lhsIntParam[i]._isRange)
+			{
+				bins[paramindex][j] = _lhsIntParam[i]._min;
+				continue;
+			}
+
 			int count = _nSamples / (_lhsIntParam[i]._max - _lhsIntParam[i]._min + 1);
 			if (count == 0)
 			{
@@ -397,16 +433,25 @@ void Lhs::performLhs()
 
 			if (j < PARAM_DOUBLE_COUNT)
 			{
-				// A non-integer variable. Pick a random value between the min and max for the sub-range
-				// for the selected bin.
-				double a = _lhsDoubleParam[j]._min +
-					k * (_lhsDoubleParam[j]._max - _lhsDoubleParam[j]._min) / _nSamples;
-
-				double b = _lhsDoubleParam[j]._min +
-					(k + 1) * (_lhsDoubleParam[j]._max - _lhsDoubleParam[j]._min) / _nSamples;
-
 				ParamDoubleType param = (ParamDoubleType) j;
-				updateParamDouble(param, g_Rand.getReal(a, b));
+
+				if (_lhsDoubleParam[j]._isRange)
+				{
+					// A non-integer variable. Pick a random value between the min and max for the sub-range
+					// for the selected bin.
+					double a = _lhsDoubleParam[j]._min +
+						k * (_lhsDoubleParam[j]._max - _lhsDoubleParam[j]._min) / _nSamples;
+
+					double b = _lhsDoubleParam[j]._min +
+						(k + 1) * (_lhsDoubleParam[j]._max - _lhsDoubleParam[j]._min) / _nSamples;
+
+					updateParamDouble(param, g_Rand.getReal(a, b));
+				}
+				else
+				{
+					// This isn't a range, i.e. min == max, so just use the single value for this parameter.
+					updateParamDouble(param, _lhsDoubleParam[j]._min);
+				}
 			}
 			else
 			{

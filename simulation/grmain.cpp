@@ -276,6 +276,7 @@ void buildSim(GrSimulation* pSim, DiffusionMethod diffMethod, RecruitmentBase* p
 
 int main(int argc, char** argv)
 {
+  printVersion();
   std::cout << "GRID SIZE: NROWS: " << NROWS << " NCOLS: " << NCOLS << std::endl;
   unsigned long seed;
   std::string paramFile;

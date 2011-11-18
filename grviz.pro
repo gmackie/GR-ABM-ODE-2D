@@ -168,7 +168,7 @@ unix:system(grep -qE \"Ubuntu|Red Hat\" /etc/issue) {
 exists( .git/ ) {
       VERSION = $$quote($$system(git svn find-rev HEAD))
 } else : exists( .svn/ ) {
-      VERSION = $$quote($$system(svn info | awk \'/^Last Changed Rev:/ {print $4}\'
+      VERSION = $$quote($$system(svn info | awk \'/^Last Changed Rev:/ {print $4}\'))
 } else {
       VERSION = "Unknown"
 }
@@ -176,8 +176,7 @@ exists( .git/ ) {
 DEFINES += SVN_VERSION=\\\"$$VERSION\\\"
 DEFINES += TIXML_USE_STL
 
-!isEmpty(DIM) : DEFINES += __DIM__=$$DIM
-
+DEFINES += __DIM__="$(if $(DIM),$(DIM),100)"
 
 macx { 
     # Have qmake create make files that put the executable

@@ -14,7 +14,7 @@ endif
 
 all: release
 
-.PHONY:	release debug profile
+.PHONY:	release debug profile valgrindO0 valgrindO1 valgrindO3
 
 debug:	CXXFLAGS += -DDEBUG -DVERBOSE -O0 -g -Wextra
 debug:	gr
@@ -24,6 +24,15 @@ release:	gr
 
 profile:	CXXFLAGS += -pg -g
 profile:	release
+
+valgrindO0:	CXXFLAGS += -g -DNDEBUG -O0
+valgrindO0:	gr
+
+valgrindO1:	CXXFLAGS += -g -DNDEBUG -O1
+valgrindO1:	gr
+
+valgrindO3:	CXXFLAGS += -g -DNDEBUG -O3
+valgrindO3:	gr
 
 # gcc compiler optimizations not included here...
 gpu:	CXXFLAGS += -DGPU -fPIC

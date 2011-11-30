@@ -1,15 +1,17 @@
 OS := $(shell grep -E 'Ubuntu|Red Hat' /etc/issue)
 DIM := 100
+BOOST_PREFIX := /usr
 
 SVNREV := $(shell svn info | grep "Last Changed Rev:" | cut -d" " -f4)
 CXX := g++
-CXXFLAGS += -DSVN_VERSION=\"$(SVNREV)\" -msse -Wall -D__DIM__=$(DIM)
 
+override CXXFLAGS += -DSVN_VERSION=\"$(SVNREV)\" -D__DIM__=$(DIM) -Wall -I$(BOOST_PREFIX)/include -Wno-strict-aliasing
+override LDFLAGS += -L$(BOOST_PREFIX)/lib -lm -lboost_program_options -lboost_iostreams -lboost_serialization
 
 ifeq ($(OS), )
 LDFLAGS += -lm -lboost_program_options
 else
-LDFLAGS += -lm -lboost_program_options-mt
+LDFLAGS += -lm -lboost_program_options
 endif
 
 all: release

@@ -148,7 +148,7 @@ void GrStat::updateAgentStatistics(Agent* a)
       _macIntMtbStats[pMac->getState()](pMac->getIntMtb());
       if(pMac->getState() == MAC_INFECTED || pMac->getState() == MAC_CINFECTED){
         assert(pMac->getIntMtb() < _PARAM(PARAM_MAC_THRESHOLD_BURST_CI_INTMTB));
-        assert((int) pMac->getIntMtb() < _intMtbFreqSize);
+        assert(pMac->getIntMtb() < _intMtbFreqSize);
 
         _intMtbFreq[int(pMac->getIntMtb())]++;
       }

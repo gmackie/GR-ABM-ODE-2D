@@ -32,23 +32,18 @@ void GrGrid::initSources()
 	// Useful for testing and debugging.
 	// Prevents recruitment and can just watch initial macs without the sources cluttering the screen.
 	if (nSources == 0)
-	{
 		return;
-	}
+  if (nSources > NROWS*NCOLS)
+  {
+    std::cerr <<"Cannot place "<<nSources<<" on grid "<<NROWS<<'x'<<NCOLS<<std::endl;
+    exit(1);
+  }
 
-	int n = (int)floor(sqrtf((float) nSources));
+	const int n = (int)floor(sqrt((float) nSources));
 
-	int dRow = NROWS / n;
-	int dCol = NCOLS / n;
-
-	// This can happen if the number of sources is large relative to the grid dimensions,
-	// for example if using a small grid for testing and debugging.
-	if (dRow <= 0 || dCol <= 0)
-	{
-		std::cerr << "One or more of dRow: " << dRow << " or dCol: " << dCol << " is <= 0 in GrGrid::initSources." << std::endl;
-		std::cerr << "Check that the grid size is not too small relative to the number of sources."<< std::endl;
-		exit(1);
-	}
+	const int dRow = NROWS / n;
+	const int dCol = NCOLS / n;
+  const int leftover = NROWS - n*dRow;  //Assumes square grid
 
 	for (int i = 0; i < n; i++)
 	{
@@ -57,7 +52,7 @@ void GrGrid::initSources()
 			int row = g_Rand.getInt(dRow);
 			int col = g_Rand.getInt(dCol);
 
-			GridCell* pGridCell = &_grid[dRow * i + row][dCol * j + col];
+			GridCell* pGridCell = &_grid[dRow * i + row+std::min(i,leftover)][dCol * j + col+std::min(j,leftover)];
 
 			assert(!pGridCell->isSource());
 

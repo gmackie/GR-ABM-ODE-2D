@@ -12,6 +12,9 @@
 #include "rand.h"
 #include <sys/time.h>
 #include <boost/program_options.hpp>
+#include <boost/iostreams/device/file.hpp>
+#include <boost/iostreams/filtering_stream.hpp>
+#include <boost/iostreams/filter/gzip.hpp>
 #include "recruitmentlnode.h"
 #include "recruitmentlnodepure.h"
 #include "recruitmentprob.h"
@@ -211,15 +214,18 @@ public:
 
 void saveState(const GrSimulation* pSim, int time, std::string dir=std::string("./")){
     int days, hours, minutes;
-    char fname[17];
+    char fname[20];
     assert(pSim);
     GrSimulation::convertSimTime(time, days, hours, minutes);
-    sprintf(fname, "%03dd%02dh%02dm.state", days, hours, minutes);
-    std::ofstream out((dir+std::string(fname)).c_str(), std::ios_base::trunc);
+    sprintf(fname, "%03dd%02dh%02dm.state.gz", days, hours, minutes);
+    //std::ofstream out((dir+std::string(fname)).c_str(), std::ios_base::trunc);
+    namespace bio = boost::iostreams;
+    bio::filtering_ostream out;
+    out.push(bio::gzip_compressor());
+    out.push(bio::file_sink((dir+std::string(fname)).c_str()));
     if(!out.good())
         std::cerr<<"Unable to open output file: "<<fname<<endl;
     else pSim->serialize(out);
-    out.close();    //Don't want to flush here, would slow things down a lot
 }
 
 void printStats(const GrSimulation* pSim) {

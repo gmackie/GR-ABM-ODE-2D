@@ -218,7 +218,7 @@ void saveState(const GrSimulation* pSim, int time, std::string dir=std::string("
     assert(pSim);
     GrSimulation::convertSimTime(time, days, hours, minutes);
     sprintf(fname, "%03dd%02dh%02dm.state.gz", days, hours, minutes);
-    //std::ofstream out((dir+std::string(fname)).c_str(), std::ios_base::trunc);
+ 
     namespace bio = boost::iostreams;
     bio::filtering_ostream out;
     out.push(bio::gzip_compressor());

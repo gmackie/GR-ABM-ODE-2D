@@ -8,12 +8,6 @@ CXX := g++
 override CXXFLAGS += -DSVN_VERSION=\"$(SVNREV)\" -D__DIM__=$(DIM) -Wall -I$(BOOST_PREFIX)/include -Wno-strict-aliasing
 override LDFLAGS += -L$(BOOST_PREFIX)/lib -lm -lboost_program_options -lboost_iostreams -lboost_serialization
 
-ifeq ($(OS), )
-LDFLAGS += -lm -lboost_program_options
-else
-LDFLAGS += -lm -lboost_program_options
-endif
-
 all: release
 
 .PHONY:	release debug profile valgrindO0 valgrindO1 valgrindO3

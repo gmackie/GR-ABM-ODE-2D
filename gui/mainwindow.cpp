@@ -38,6 +38,10 @@
 #include "gui/glwidget.h"
 #include "gui/paramwindow.h"
 
+#include <boost/iostreams/device/file.hpp>
+#include <boost/iostreams/filtering_stream.hpp>
+#include <boost/iostreams/filter/gzip.hpp>
+
 // static members
 MainWindow* MainWindow::_pMainWindow = NULL;
 const QString MainWindow::_COLORMAP_GRAYSCALE = "Grayscale";
@@ -1514,8 +1518,16 @@ void MainWindow::loadState(std::string fileName)
 	}
 	else
 	{
+	    boost::iostreams::filtering_istream in;
+
+	    QString qFileName = fileName.c_str();
+
+	    if(QFileInfo(qFileName).suffix() == "gz") {
+	      in.push(boost::iostreams::gzip_decompressor());
+	    }
+	    in.push(boost::iostreams::file_source(qFileName.toStdString()));
+
 		sim.loadState(in);
-		in.close();
 
 		// update diffusion and seed in the user interface
 		_ui.spinBoxSeed->setValue((int) g_Rand.getSeed());

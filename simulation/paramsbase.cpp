@@ -796,19 +796,17 @@ void ParamsBase::writeParameter(std::ostream& out, int parameterIndex, int inden
 
 void ParamsBase::writeInitNode(std::ostream& out, int indent) const
 {
-
 	doIdentation(out, indent);
+  const TiXmlElement* pInitNode = _xmlDoc.RootElement()->FirstChildElement("Init");
 	out << "<Init>" << std::endl;
-	for (PosVector::const_iterator it = _initialMacs.begin(); it != _initialMacs.end(); it++)
-	{
-		doIdentation(out, indent+1);
-		out << "<Mac row = \"" << it->first << "\" col = \"" << it->second << "\"/>" << std::endl;
-	}
-	for (PosVector::const_iterator it = _initialExtMtb.begin(); it != _initialExtMtb.end(); it++)
-	{
-		doIdentation(out, indent+1);
-		out << "<ExtMtb row = \"" << it->first << "\" col = \"" << it->second << "\"/>" << std::endl;
-	}
+  for(const TiXmlElement* pElem = pInitNode->FirstChildElement(); pElem; pElem = pElem->NextSiblingElement()) {
+    doIdentation(out, indent+1);
+    out << '<' << pElem->Value();
+    for(const TiXmlAttribute* pAtt = pElem->FirstAttribute(); pAtt; pAtt = pAtt->Next()) {
+      out<< ' ' << pAtt->Name() << "=\"" << pAtt->Value() << "\" ";
+    }
+    out<<"/>"<<std::endl;
+  }
 	doIdentation(out, indent);
 	out << "</Init>" << std::endl;
 }

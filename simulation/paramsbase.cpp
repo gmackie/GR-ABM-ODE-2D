@@ -235,13 +235,15 @@ const ParamDescription ParamsBase::_description[_PARAM_COUNT] =
 	{ "scalingLN",							GR_NODE,	false,	true,	1.0,	1,	"",					"ODE stuff - scaling factor for T cell fluxes to account for GR size" },
 	{ "initN4",								GR_NODE,	false,	false,	0.0,	0,	"",					"ODE stuff - N4(0)" },
 	{ "initN8",								GR_NODE,	false,	false,	0.0,	0,	"",					"ODE stuff - N8(0)" },
+  { "sourceDensity",      GR_NODE, false, true, 0.2, 0, "", "Density of vascular sources on the grid"},
 	/* INT */
-	{ "nrSources",							GR_NODE,	true,	false,	0.0,	0,	"",					"Number of vascular sources on the grid" },
+	{ "nrSources",							GR_NODE,	true,	true,	0.0,	0,	"",					"Number of vascular sources on the grid" },
 	{ "nrKillingsCaseation",				GR_NODE,	true,	false,	0.0,	0,	"",					"Number of killings for a compartment to become caseated" },
 	{ "NFkBTimeCoefficient",				GR_NODE,	true,	false,	0.0,	0,	"-",				"number of NF-kB time-steps within a single diffusion time-step" },
 	{ "maxAge",								MAC_NODE,	true,	false,	0.0,	0,	"#timesteps",		"Maximal macrophage age" },
 	{ "maxAgeAct",							MAC_NODE,	true,	false,	0.0,	0,	"#timesteps",		"Maximal activated macrophage age" },
-	{ "initNumber",							MAC_NODE,	true,	false,	0.0,	0,	"",					"Initial number of resting macrophages on the grid" },
+	{ "initDensity",							MAC_NODE,	true,	true,	0.0,	0,	"",					"Initial density of resting macrophages on the grid" },
+	{ "initNumber",							MAC_NODE,	true, true,	0.0,	0,	"",					"Initial number of resting macrophages on the grid" },
 	{ "maxAge",								TCELL_NODE,	true,	false,	0.0,	0,	"#timesteps",		"Maximal T cell age" },
 	{ "timeRecEnabled",						TCELL_NODE,	true,	false,	0.0,	0,	"#timesteps",		"Time after which T cell recruitment is enabled" },
 	{ "maxTimeReg",							TGAM_NODE,	true,	false,	0.0,	0,	"#timesteps",		"Time span during which a Tgam cell remains down-regulated" },
@@ -630,6 +632,20 @@ bool ParamsBase::readElement(const TiXmlElement* pElement, bool paramsRead[])
 // Define any computed parameters including any that are computed based on other parameters.
 void ParamsBase::computeParams()
 {
+  if(_paramsRead[PARAM_MAC_INIT_DENSITY])
+    setParam(PARAM_MAC_INIT_NUMBER, getParam(PARAM_MAC_INIT_DENSITY) / FLOAT_TYPE(NROWS*NCOLS));
+  else if(_paramsRead[PARAM_MAC_INIT_NUMBER])
+    setParam(PARAM_MAC_INIT_DENSITY, getParam(PARAM_MAC_INIT_NUMBER) * FLOAT_TYPE(NROWS*NCOLS));
+  else
+    throw std::runtime_error("Initial resting macs not specified in parameter file");
+
+  if(_paramsRead[PARAM_SOURCE_DENSITY])
+    setParam(PARAM_GR_NR_SOURCES, getParam(PARAM_MAC_INIT_DENSITY) / FLOAT_TYPE(NROWS*NCOLS));
+  else if(_paramsRead[PARAM_GR_NR_SOURCES])
+    setParam(PARAM_SOURCE_DENSITY, getParam(PARAM_MAC_INIT_NUMBER) * FLOAT_TYPE(NROWS*NCOLS));
+  else
+    throw std::runtime_error("Sources not specified in parameter file");
+
 	defineRecruitmentWeight(PARAM_GR_WEIGHT_CCL2_RECRUITMENT, PARAM_MAC_SEC_RATE_CCL2);
 	defineRecruitmentWeight(PARAM_GR_WEIGHT_CCL5_RECRUITMENT, PARAM_MAC_SEC_RATE_CCL5);
 	defineRecruitmentWeight(PARAM_GR_WEIGHT_CXCL9_RECRUITMENT, PARAM_MAC_SEC_RATE_CXCL9);

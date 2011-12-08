@@ -11,6 +11,8 @@
 #include "gr.h"
 #include "agent.h"
 
+using namespace std;
+
 class Mac : public Agent
 {
 private:
@@ -232,9 +234,15 @@ inline void Mac::setC1rrChemTNF(double value)
 inline double Mac::getIntMtbGrowthRate(const int time)
 {
 	double intMtbGrowthRate =  _PARAM(PARAM_INTMTB_GROWTH_RATE);
+
 	if (time >= (_PARAM(PARAM_TCELL_TIME_RECRUITMENT_ENABLED) + _PARAM(PARAM_INTMTB_GROWTH_RATE_FACTOR_DELAY)))
 	{
-		intMtbGrowthRate *= _PARAM(PARAM_INTMTB_GROWTH_RATE_FACTOR_POST_ADAPTIVE);
+		// intMtb slows its growth rate as the immune system becomes activated. This is a proxy for more detailed intMtb growth rate response
+		// to immune activation base on iNos and arginase.
+		// The rate adjustment is applied to the fraction of the base growth rate, ex. for 1.025 it applies to the .025.
+		// This ensures that the overall growth rate is positive. If applied to the entire base growth rate the effective
+		// base growth rate can easily become < 1, i.e. negative growth.
+		intMtbGrowthRate = 1 + (intMtbGrowthRate - 1) *_PARAM(PARAM_INTMTB_GROWTH_RATE_FACTOR_POST_ADAPTIVE);
 	}
 
 	return intMtbGrowthRate;

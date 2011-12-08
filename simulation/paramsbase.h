@@ -208,7 +208,7 @@ typedef enum {
 	PARAM_scaling_LN,
 	PARAM_initN4,
 	PARAM_initN8,
-  PARAM_SOURCE_DENSITY,
+	PARAM_SOURCE_DENSITY,
 	PARAM_DOUBLE_COUNT // dummy for the count
 } ParamDoubleType;
 

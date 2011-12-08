@@ -422,6 +422,7 @@ int main(int argc, char** argv)
 
   if (!Params::getInstance(true)->fromXml(paramFile.c_str())) //Must be done before making GrSimulation
     throw std::runtime_error("Unable to get parameters from file, cannot continue...");
+
   GrSimulation* pSim = new GrSimulation();
   assert(pSim != NULL);
   if (vm.count("load")){

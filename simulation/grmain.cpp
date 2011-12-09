@@ -242,6 +242,26 @@ void printStats(const GrSimulation* pSim) {
   printf("(%d, %.5f)\n", stats.getNrCaseated(), stats.getTotNonRepExtMtb());
 }
 
+// Stopping criteria.
+// Used to stop a simulation early when doing an lhs.
+// Don't stop if the stopping time steps are 0, which should be the default,
+// so old parameter files without these parameters will work without stopping prematurely.
+bool shouldStop(int time, GrSimulation* pSim)
+{
+	bool res = false;
+	const GrStat& stats = pSim->getStats();
+	FLOAT_TYPE totMtb = stats.getTotExtMtb() + stats.getTotIntMtb();
+	int areaCellDensity = stats.getAreaCellDensity();
+
+	if ( (_PARAM(PARAM_MTB_STOPPING_TIME_STEP) > 0 && time == _PARAM(PARAM_MTB_STOPPING_TIME_STEP) && totMtb < _PARAM(PARAM_MTB_STOPPING_THRESHOLD) ) ||
+		 (_PARAM(PARAM_AREA_CELL_DENSITY_STOPPING_TIME_STEP) && time == _PARAM(PARAM_AREA_CELL_DENSITY_STOPPING_TIME_STEP) && areaCellDensity < _PARAM(PARAM_AREA_CELL_DENSITY_STOPPING_THRESHOLD)) )
+	{
+		res = true;
+	}
+
+	return res;
+}
+
 void run(GrSimulation* pSim, int stateInterval, int csvInterval, bool screenDisplay, int timeToSimulate, std::string outputDir, std::vector<oCSVStream*> csvStreams, bool lhs)
 {
   if(screenDisplay)
@@ -259,8 +279,14 @@ void run(GrSimulation* pSim, int stateInterval, int csvInterval, bool screenDisp
     if (screenDisplay)
       printStats(pSim);
     //Run the pSimulation one step
-		if(time != timeToSimulate)
+    if(time != timeToSimulate)
       pSim->solve();
+
+    //Check stopping criteria.
+    if (lhs && shouldStop(time, pSim))
+    {
+    	return;
+    }
   }
 }
 void buildSim(GrSimulation* pSim, DiffusionMethod diffMethod, RecruitmentBase* pRecr, bool tnfrDynamics,

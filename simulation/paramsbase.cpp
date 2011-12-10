@@ -638,16 +638,16 @@ bool ParamsBase::readElement(const TiXmlElement* pElement, bool paramsRead[])
 void ParamsBase::computeParams()
 {
   if(_paramsRead[PARAM_MAC_INIT_DENSITY])
-    setParam(PARAM_MAC_INIT_NUMBER, getParam(PARAM_MAC_INIT_DENSITY) / FLOAT_TYPE(NROWS*NCOLS));
+    setParam(PARAM_MAC_INIT_NUMBER, getParam(PARAM_MAC_INIT_DENSITY) * FLOAT_TYPE(NROWS*NCOLS));
   else if(_paramsRead[PARAM_MAC_INIT_NUMBER])
-    setParam(PARAM_MAC_INIT_DENSITY, getParam(PARAM_MAC_INIT_NUMBER) * FLOAT_TYPE(NROWS*NCOLS));
+    setParam(PARAM_MAC_INIT_DENSITY, getParam(PARAM_MAC_INIT_NUMBER) / FLOAT_TYPE(NROWS*NCOLS));
   else
     throw std::runtime_error("Initial resting macs not specified in parameter file");
 
   if(_paramsRead[PARAM_SOURCE_DENSITY])
-    setParam(PARAM_GR_NR_SOURCES, getParam(PARAM_MAC_INIT_DENSITY) / FLOAT_TYPE(NROWS*NCOLS));
+    setParam(PARAM_GR_NR_SOURCES, getParam(PARAM_MAC_INIT_DENSITY) * FLOAT_TYPE(NROWS*NCOLS));
   else if(_paramsRead[PARAM_GR_NR_SOURCES])
-    setParam(PARAM_SOURCE_DENSITY, getParam(PARAM_MAC_INIT_NUMBER) * FLOAT_TYPE(NROWS*NCOLS));
+    setParam(PARAM_SOURCE_DENSITY, getParam(PARAM_MAC_INIT_NUMBER) / FLOAT_TYPE(NROWS*NCOLS));
   else
     throw std::runtime_error("Sources not specified in parameter file");
 

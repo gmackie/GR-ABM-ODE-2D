@@ -68,7 +68,9 @@ const ParamDescription ParamsBase::_description[_PARAM_COUNT] =
 	{ "diffusivityTNF",						GR_NODE,	false,	false,	0.0,	0,	"cm^2/s",			"TNF diffusivity" },
 	{ "diffusivityShedTNFR2",				GR_NODE,	false,	false,	0.0,	0,	"cm^2/s",			"Shed sTNF/TNFR2 comples diffusivity" },
 	{ "diffusivityChemokines",				GR_NODE,	false,	false,	0.0,	0,	"cm^2/s",			"Chemokine diffusivity" },
-	{ "degRateTNF",							GR_NODE,	false,	false,	0.0,	0,	"",					"TNF degradation rate (per 6s)" },
+	{ "diffusivityIL10",					GR_NODE,	false,	false,	0.0,	0,	"cm^2/s",			"IL10 diffusivity" },	
+    { "degRateTNF",							GR_NODE,	false,	false,	0.0,	0,	"",					"TNF degradation rate (per 6s)" },
+    { "degRateIL10",					    GR_NODE,	false,	false,	0.0,	0,	"",					"IL10 degradation rate (per 6s)" },
 	{ "degRateChemokines",					GR_NODE,	false,	false,	0.0,	0,	"",					"Chemokine degradation rate (per 6s)" },
 	{ "minChemotaxis",						GR_NODE,	false,	false,	0.0,	0,	"#molecules",		"Chemotaxis sensivity range (lower bound)" },
 	{ "maxChemotaxis",						GR_NODE,	false,	false,	0.0,	0,	"#molecules",		"Chemotaxis sensivity range (upper bound)" },
@@ -76,10 +78,10 @@ const ParamDescription ParamsBase::_description[_PARAM_COUNT] =
 	{ "dTNF_Tcyt",							GR_NODE,	false,	false,	0.0,	0,	"#molecules/6s",	"Secretion rate of TNF by Tgam" },
 
 	// molecular TNF-associated parameters
-	{ "kSynthMac",							GR_NODE,	false,	false,	0.0,	0,	"#/cell.sec",		"Rate of mTNF synthesis by a macrophage" },
-	{ "kSynthTcell",						GR_NODE,	false,	false,	0.0,	0,	"#/cell.sec",		"Rate of mTNF synthesis by a T cell" },
-	{ "kTaceMac",							GR_NODE,	false,	false,	0.0,	0,	"1/sec",			"Rate of mTNF release from a macrophage" },
-	{ "kTaceTcell",							GR_NODE,	false,	false,	0.0,	0,	"1/sec",			"Rate of mTNF release from a T cell" },
+	{ "kSynthMac",							GR_NODE,	false,	false,	0.0,	0,	"#/cell.sec",		"Basal rate of mTNF synthesis by a macrophage" },
+	{ "kSynthTcell",						GR_NODE,	false,	false,	0.0,	0,	"#/cell.sec",		"Basal rate of mTNF synthesis by a T cell" },
+	{ "kTaceMac",							GR_NODE,	false,	false,	0.0,	0,	"1/sec",			"Basal rate of mTNF release from a macrophage" },
+	{ "kTaceTcell",							GR_NODE,	false,	false,	0.0,	0,	"1/sec",			"Basal rate of mTNF release from a T cell" },
 	{ "KD1",								GR_NODE,	false,	false,	0.0,	0,	"M",				"sTNF/TNFR1 dissociation equilibrium constant" },
 	{ "KD2",								GR_NODE,	false,	false,	0.0,	0,	"M",				"sTNF/TNFR2 dissociation equilibrium constant" },
 	{ "kOn1",								GR_NODE,	false,	false,	0.0,	0,	"1/M.s",			"sTNF/TNFR1 association rate constant" },
@@ -103,6 +105,25 @@ const ParamDescription ParamsBase::_description[_PARAM_COUNT] =
 	{ "stdTNFR2Tcell",						GR_NODE,	false,	false,	0.0,	0,	"#/cell",			"Standard deviation of density of TNFR2 on T cells" },
 	// end of molecular TNF-associated parameters
 
+    // molecular IL10 associated parameters
+    { "IkD",                                GR_NODE,	false,	false,	0.0,	0,	"M",		        "sIL10/IL10R association rate constant" },	
+    { "IkOn",							    GR_NODE,	false,	false,	0.0,	0,	"1/M.s",		    "sIL10/IL10R association rate constant" },
+	{ "IkOff",							    GR_NODE,	false,	false,	0.0,	0,	"1/s",		        "sIL10/IL10R dissociation rate constant" },
+	{ "IkT",                                GR_NODE,	false,	false,	0.0,	0,	"1/s",		        "sIL10/IL10R association rate constant" },
+	{ "IkInt",                              GR_NODE,	false,	false,	0.0,	0,	"1/s",		        "sIL10/IL10R association rate constant" },
+	{ "meanIL10RMac",                       GR_NODE,	false,	false,	0.0,	0,	"#/cell",		    "Mean density of IL10R on macrophages" },
+	{ "stdIL10RMac",                        GR_NODE,	false,	false,	0.0,	0,	"#/cell",		    "Standard deviation of mean density of IL10R on macrophages" },
+	{ "meanIL10RTcell",                     GR_NODE,	false,	false,	0.0,	0,	"#/cell",		    "Mean density of IL10R on T cells" },
+	{ "stdIL10RTcell",                      GR_NODE,	false,	false,	0.0,	0,	"#/cell",		    "Standard deviation of mean density of IL10R on T cells" },
+    // end of molecular IL10 associated parameters
+
+    // TNF and IL10 linking parameters
+	{ "LinkTaceMM1",                        GR_NODE,	false,	false,	0.0,	0,	"",		            "TACE inhibition Michaelis-Menton Parameter 1" },
+	{ "LinkTaceMM2",                        GR_NODE,	false,	false,	0.0,	0,	"#/cell",		    "TACE inhibition Michaelis-Menton Parameter 2" },
+	{ "LinkSynthMM1",                       GR_NODE,	false,	false,	0.0,	0,	"",		            "SYNTH inhibition Michaelis-Menton Parameter 1" },
+	{ "LinkSynthMM2",                       GR_NODE,	false,	false,	0.0,	0,	"#/cell",		    "SYNTH inhibition Michaelis-Menton Parameter 2" },
+    // end of TNF and IL10 linking parameters
+    
 	// intracellular NFkB signaling pathway parameters
 	{ "KN",									GR_NODE,	false,	true,	0.0,	0,	"#/cell",			"number of IKKK molecules" },
 	{ "KNN",								GR_NODE,	false,	true,	0.0,	0,	"#/cell",			"number of IKK molecules" },

@@ -40,7 +40,9 @@ typedef enum {
 	PARAM_GR_D_TNF,
 	PARAM_GR_D_SHED_TNFR2,
 	PARAM_GR_D_CHEMOKINES,
+    PARAM_GR_D_IL10,
 	PARAM_GR_DEG_TNF,
+    PARAM_GR_DEG_IL10,
 	PARAM_GR_DEG_CHEMOKINES,
 	PARAM_GR_MIN_CHEMOTAXIS,
 	PARAM_GR_MAX_CHEMOTAXIS,
@@ -74,6 +76,25 @@ typedef enum {
 	PARAM_GR_MEAN_TNFR2_TCELL,
 	PARAM_GR_STD_TNFR2_TCELL,
 	// end of molecular TNF-associated parameters
+    
+    // molecular IL10 associated parameters
+    PARAM_GR_I_KD,
+    PARAM_GR_I_K_ON,
+    PARAM_GR_I_K_OFF,
+    PARAM_GR_I_K_T,
+    PARAM_GR_I_K_INT,
+    PARAM_GR_I_IL10R_MAC,
+    PARAM_GR_STD_IL10R_MAC,
+    PARAM_GR_I_IL10R_TCELL,
+    PARAM_GR_STD_IL10R_TCELL,
+    // end of molecular IL10 associated parameters
+    
+    // TNF and IL10 linking parameters
+    PARAM_GR_LINK_TACE_MM1,
+    PARAM_GR_LINK_TACE_MM2,
+    PARAM_GR_LINK_SYNTH_MM1,
+    PARAM_GR_LINK_SYNTH_MM2,
+    // end of TNF and IL10 linking parameters
 
 	// intracellular NFkB signaling pathway parameters
 	PARAM_GR_KN,

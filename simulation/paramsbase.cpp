@@ -227,6 +227,7 @@ const ParamDescription ParamsBase::_description[_PARAM_COUNT] =
 	{ "growthRateExtMtb",					MTB_NODE,	false,	false,	0.0,	0,	"",					"Growth rate of extracellular bacteria" },
 	{ "growthExtMtbBound",					MTB_NODE,	false,	false,	0.0,	0,	"#bacteria",		"Upper bound on the number of extracellular bacteria used in growth function" },
 	{ "mtbStoppingThreshold",				GR_NODE,	false,	true,	0.0,	0,	"#bacteria", 		"Stop simulation if mtb count above this threshold and simulation is at the time step specified by mtbStopppingTimeStep"},
+	{ "mtbStoppingThreshold2",				GR_NODE,	false,	true,	0.0,	0,	"#bacteria", 		"Stop simulation if mtb count above this threshold and simulation is at the time step specified by mtbStopppingTimeStep"},
 	{ "muMDC_LN",							GR_NODE,	false,	false,	0.0,	0,	"",					"ODE stuff" },
 	{ "muN4",								GR_NODE,	false,	false,	0.0,	0,	"",					"ODE stuff" },
 	{ "k13",								GR_NODE,	false,	false,	0.0,	0,	"",					"ODE stuff" },
@@ -276,8 +277,11 @@ const ParamDescription ParamsBase::_description[_PARAM_COUNT] =
 	{ "movementAct",						MAC_NODE,	true,	false,	0.0,	0,	"#timesteps",		"Time required for an active macrophage to move one micro-compartment" },
 	{ "maxTimeReg",							MAC_NODE,	true,	false,	0.0,	0,	"#timesteps",		"Time span during which a macrophage remains down-regulated" },
 	{ "mtbStopppingTimeStep",				GR_NODE,	true,	true,	0.0,	0,	"",					"Time step at which to check mtbStoppingThreshold" },
+	{ "mtbStopppingTimeStep2",				GR_NODE,	true,	true,	0.0,	0,	"",					"Time step at which to check mtbStoppingThreshold" },
 	{ "areaCellDensityStoppingThreshold",	GR_NODE,	false,	true,	0.0,	0,	"um^2",				"Stop simulation if area by cell density above this threshold and simulation is at the time step specified by areaCellDensityStopppingTimeStep"},
+	{ "areaCellDensityStoppingThreshold2",	GR_NODE,	false,	true,	0.0,	0,	"um^2",				"Stop simulation if area by cell density above this threshold and simulation is at the time step specified by areaCellDensityStopppingTimeStep"},
 	{ "areaCellDensityStopppingTimeStep",	GR_NODE,	true,	true,	0.0,	0,	"",					"Time step at which to check areaCellDensityStoppingThreshold" },
+	{ "areaCellDensityStopppingTimeStep2",	GR_NODE,	true,	true,	0.0,	0,	"",					"Time step at which to check areaCellDensityStoppingThreshold" },
 };
 
 ParamsBase::ParamsBase(bool ode)

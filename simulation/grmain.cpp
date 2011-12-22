@@ -248,18 +248,18 @@ void printStats(const GrSimulation* pSim) {
 // so old parameter files without these parameters will work without stopping prematurely.
 bool shouldStop(int time, GrSimulation* pSim)
 {
-	bool res = false;
 	const GrStat& stats = pSim->getStats();
 	FLOAT_TYPE totMtb = stats.getTotExtMtb() + stats.getTotIntMtb();
 	int areaCellDensity = stats.getAreaCellDensity();
 
 	if ( (_PARAM(PARAM_MTB_STOPPING_TIME_STEP) > 0 && time == _PARAM(PARAM_MTB_STOPPING_TIME_STEP) && totMtb < _PARAM(PARAM_MTB_STOPPING_THRESHOLD) ) ||
 		 (_PARAM(PARAM_AREA_CELL_DENSITY_STOPPING_TIME_STEP) && time == _PARAM(PARAM_AREA_CELL_DENSITY_STOPPING_TIME_STEP) && areaCellDensity < _PARAM(PARAM_AREA_CELL_DENSITY_STOPPING_THRESHOLD)) )
-	{
-		res = true;
-	}
+    return true;
+	if ( (_PARAM(PARAM_MTB_STOPPING_TIME_STEP2) > 0 && time == _PARAM(PARAM_MTB_STOPPING_TIME_STEP2) && totMtb < _PARAM(PARAM_MTB_STOPPING_THRESHOLD2) ) ||
+		 (_PARAM(PARAM_AREA_CELL_DENSITY_STOPPING_TIME_STEP2) && time == _PARAM(PARAM_AREA_CELL_DENSITY_STOPPING_TIME_STEP2) && areaCellDensity < _PARAM(PARAM_AREA_CELL_DENSITY_STOPPING_THRESHOLD2)) )
+    return true;
 
-	return res;
+	return false;
 }
 
 void run(GrSimulation* pSim, int stateInterval, int csvInterval, bool screenDisplay, int timeToSimulate, std::string outputDir, std::vector<oCSVStream*> csvStreams, bool lhs)

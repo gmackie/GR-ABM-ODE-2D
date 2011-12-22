@@ -43,16 +43,11 @@ bool Params::reinit(const char* filename)
 
 bool Params::fromXml(const char* filename)
 {
-	bool res = ParamsBase::fromXml(filename);
+	if(!ParamsBase::fromXml(filename)) return false;  //Failed to read from file
 
 	computeParams();
 
-	if (res)
-	{
-		res &= checkParams();
-	}
-
-	return res;
+  return checkParams(); //Failed? to validate
 }
 
 bool Params::readParam(const TiXmlElement* pElement, const TiXmlAttribute* pAttrib,  ParamDoubleType param)

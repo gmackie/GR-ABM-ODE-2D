@@ -40,6 +40,7 @@ private:
 	double _cxcl9;
 	double _shedtnfr2;
 	double _extMtb;
+    double _il10;
 	Agent* _agent[MAX_AGENTS_PER_CELL];
 
 public:
@@ -54,6 +55,9 @@ public:
 	double getTNF() const;
 	void setTNF(double tnf);
 	void incTNF(double dTNF);
+    double getIL10() const;
+    void setIL10(double il10);
+    void incIL10(double dIL10);
 	double getCCL2() const;
 	void setCCL2(double ccl2);
 	void incCCL2(double dCCL2);
@@ -146,6 +150,21 @@ inline void GridCell::setTNF(double tnf)
 inline void GridCell::incTNF(double dTNF)
 {
 	_tnf += dTNF;
+}
+
+inline double GridCell::getIL10() const
+{
+    return _il10;
+}
+
+inline void GridCell::setIL10(double il10)
+{
+    _il10 = il10;
+}
+
+inline void GridCell::incIL10(double dIL10)
+{
+    _il10 += dIL10;
 }
 
 inline double GridCell::getCCL2() const

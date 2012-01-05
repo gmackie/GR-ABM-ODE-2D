@@ -75,7 +75,7 @@ const ParamDescription ParamsBase::_description[_PARAM_COUNT] =
 	{ "minChemotaxis",						GR_NODE,	false,	false,	0.0,	0,	"#molecules",		"Chemotaxis sensivity range (lower bound)" },
 	{ "maxChemotaxis",						GR_NODE,	false,	false,	0.0,	0,	"#molecules",		"Chemotaxis sensivity range (upper bound)" },
 	{ "dTNF_Tgam",							GR_NODE,	false,	false,	0.0,	0,	"#molecules/6s",	"Secretion rate of TNF by Tgam" },
-	{ "dTNF_Tcyt",							GR_NODE,	false,	false,	0.0,	0,	"#molecules/6s",	"Secretion rate of TNF by Tgam" },
+	{ "dTNF_Tcyt",							GR_NODE,	false,	false,	0.0,	0,	"#molecules/6s",	"Secretion rate of TNF by Tcyt" },
 
 	// molecular TNF-associated parameters
 	{ "kSynthMac",							GR_NODE,	false,	false,	0.0,	0,	"#/cell.sec",		"Basal rate of mTNF synthesis by a macrophage" },
@@ -106,7 +106,10 @@ const ParamDescription ParamsBase::_description[_PARAM_COUNT] =
 	// end of molecular TNF-associated parameters
 
     // molecular IL10 associated parameters
-    { "IkD",                                GR_NODE,	false,	false,	0.0,	0,	"M",		        "sIL10/IL10R association rate constant" },	
+    { "IkSynthMacInf",                      GR_NODE,	false,	false,	0.0,	0,	"#/cell.s",		    "sIL10 synthesis rate for infected Macs" },	
+    { "IkSynthMacAct",                      GR_NODE,	false,	false,	0.0,	0,	"#/cell.s",		    "sIL10 synthesis rate for activated Macs" },	
+    { "IkSynthTcell",                       GR_NODE,	false,	false,	0.0,	0,	"#/cell.s",		    "sIL10 synthesis rate for T cells" },	
+    { "IkD",                                GR_NODE,	false,	false,	0.0,	0,	"M",		        "sIL10/IL10R equilibrium dissociation rate constant" },	
     { "IkOn",							    GR_NODE,	false,	false,	0.0,	0,	"1/M.s",		    "sIL10/IL10R association rate constant" },
 	{ "IkOff",							    GR_NODE,	false,	false,	0.0,	0,	"1/s",		        "sIL10/IL10R dissociation rate constant" },
 	{ "IkT",                                GR_NODE,	false,	false,	0.0,	0,	"1/s",		        "sIL10/IL10R association rate constant" },
@@ -118,10 +121,14 @@ const ParamDescription ParamsBase::_description[_PARAM_COUNT] =
     // end of molecular IL10 associated parameters
 
     // TNF and IL10 linking parameters
-	{ "LinkTaceMM1",                        GR_NODE,	false,	false,	0.0,	0,	"",		            "TACE inhibition Michaelis-Menton Parameter 1" },
-	{ "LinkTaceMM2",                        GR_NODE,	false,	false,	0.0,	0,	"#/cell",		    "TACE inhibition Michaelis-Menton Parameter 2" },
-	{ "LinkSynthMM1",                       GR_NODE,	false,	false,	0.0,	0,	"",		            "SYNTH inhibition Michaelis-Menton Parameter 1" },
-	{ "LinkSynthMM2",                       GR_NODE,	false,	false,	0.0,	0,	"#/cell",		    "SYNTH inhibition Michaelis-Menton Parameter 2" },
+	{ "LinkTaceMM1",                        GR_NODE,	false,	false,	0.0,	0,	"",		            "IL10 on - TACE inhibition Michaelis-Menton Parameter 1" },
+	{ "LinkTaceMM2",                        GR_NODE,	false,	false,	0.0,	0,	"#/cell",		    "IL10 on - TACE inhibition Michaelis-Menton Parameter 2" },
+	{ "LinkSynthMM1",                       GR_NODE,	false,	false,	0.0,	0,	"",		            "IL10 on - SYNTH inhibition Michaelis-Menton Parameter 1" },
+	{ "LinkSynthMM2",                       GR_NODE,	false,	false,	0.0,	0,	"#/cell",		    "IL10 on - SYNTH inhibition Michaelis-Menton Parameter 2" },
+	{ "EqLinkTaceMM1",                      GR_NODE,	false,	false,	0.0,	0,	"",		            "IL10 off - TACE inhibition Michaelis-Menton Parameter 1" },
+	{ "EqLinkTaceMM2",                      GR_NODE,	false,	false,	0.0,	0,	"#/cell",		    "IL10 off - TACE inhibition Michaelis-Menton Parameter 2" },
+	{ "EqLinkSynthMM1",                     GR_NODE,	false,	false,	0.0,	0,	"",		            "IL10 off - SYNTH inhibition Michaelis-Menton Parameter 1" },
+	{ "EqLinkSynthMM2",                     GR_NODE,	false,	false,	0.0,	0,	"#/cell",		    "IL10 off - SYNTH inhibition Michaelis-Menton Parameter 2" },
     // end of TNF and IL10 linking parameters
     
 	// intracellular NFkB signaling pathway parameters

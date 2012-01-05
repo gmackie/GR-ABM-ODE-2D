@@ -34,7 +34,9 @@ GrSimulation::GrSimulation()
 	, _pRecruitment(NULL)
 	, _tnfrDynamics(false)
 	, _nfkbDynamics(false)
+    , _il10dynamics(false)
 	, _tnfDepletionTimeStep(-1)
+    , _il10DepletionTimeStep(-1)
 {
 	for (int i = 0; i < NOUTCOMES; i++)
 		_pTTest[i] = NULL;
@@ -69,7 +71,9 @@ void GrSimulation::serialize(std::ostream& out) const
 
 	out << _tnfrDynamics << std::endl;
 	out << _nfkbDynamics << std::endl;
+    out << _il10dynamics << std::endl;
 	out << _tnfDepletionTimeStep << std::endl;
+    out << _il10DepletionTimeStep << std::endl;
 
 	// serialize grid
 	_grid.serialize(out);
@@ -139,7 +143,9 @@ void GrSimulation::deserialize(std::istream& in)
 
 	in >> _tnfrDynamics;
 	in >> _nfkbDynamics;
+    in >> _il10dynamics;
 	in >> _tnfDepletionTimeStep;
+    in >> _il10DepletionTimeStep;
 
 	// deserialize grid
 	_grid.deserialize(in);

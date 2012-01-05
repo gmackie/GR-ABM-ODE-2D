@@ -291,12 +291,43 @@ void run(GrSimulation* pSim, int stateInterval, int csvInterval, bool screenDisp
     }
   }
 }
-void buildSim(GrSimulation* pSim, DiffusionMethod diffMethod, RecruitmentBase* pRecr, bool tnfrDynamics,
-              bool nfkbDynamics, int tnfDepletionTimeStep, float areaTNFThreshold, float areaCellDensityThreshold) {
+void buildSim(GrSimulation* pSim, DiffusionMethod diffMethod, RecruitmentBase* pRecr, bool tnfrDynamics, bool il10Dynamics,
+              bool nfkbDynamics, int tnfDepletionTimeStep, int il10DepletionTimeStep, float areaTNFThreshold, float areaCellDensityThreshold) {
   
 	pSim->setTnfrDynamics(tnfrDynamics || nfkbDynamics); // when NFkB is turned on, tnfr dynamics will be on autamatically.
-	pSim->setNfkbDynamics(nfkbDynamics);
+    
+    if (tnfrDynamics == 1 || nfkbDynamics == 1) {
+        cout << "TNF Dynamics - On" << std::endl;
+    }
+    
+    else
+    {
+        cout << "TNF Dynamics - Off" << std::endl;
+    }
+    pSim->setIl10Dynamics(il10Dynamics);
+    
+    if (il10Dynamics == 1) {
+        cout << "IL10 Dynamics - On" << std::endl;
+    }
+    
+    else
+    {
+        cout << "IL10 Dynamics - Off" << std::endl;
+    }
+    
+    pSim->setNfkbDynamics(nfkbDynamics);
+    
+    if (nfkbDynamics == 1) {
+        cout << "NFkB Dynamics - On" << std::endl;
+    }
+    
+    else
+    {
+        cout << "NFkB Dynamics - Off" << std::endl;
+    }
+    
 	pSim->setTnfDepletionTimeStep(tnfDepletionTimeStep);
+    pSim->setIl10DepletionTimeStep(il10DepletionTimeStep);
 	pSim->setRecruitment(pRecr);
 	pSim->setDiffusionMethod(diffMethod);
 	
@@ -364,8 +395,10 @@ int main(int argc, char** argv)
   simdyn_opts.add_options()
 	("ode", "Use integrated lymph node ODE for recruitment")
 	("tnfr-dynamics", "Use molecular level TNF/TNFR dynamics in the model")
+    ("il10r-dynamics", "Use molecular level IL10/IL10R dynamics in the model")
 	("NFkB-dynamics", "Use molecular level intracellular NFkB dynamics in the model")
-	("tnf-depletion", po::value<int>()->default_value(-1), "The time step at which to stop secreting tnf, including by tnfr dynamics. -1: no depletion");
+	("tnf-depletion", po::value<int>()->default_value(-1), "The time step at which to stop secreting tnf, including by tnfr dynamics. -1: no depletion")
+    ("il10-depletion", po::value<int>()->default_value(-1), "The time step at which to stop secreting il10, including by il10r dynamics. -1: no depletion");
 	
   po::options_description lhs_opts("LHS");
   lhs_opts.add_options()
@@ -466,10 +499,11 @@ int main(int argc, char** argv)
     pSim->deserialize(f);
     f.close();
   }
-  buildSim(pSim, diffMethodEnum, pRecr, vm.count("tnfrDynamics"), vm.count("nfkbDynamics"),
-              vm["tnf-depletion"].as<int>(), vm["area-tnf-threshold"].as<float>(),
-              vm["area-cell-density-threshold"].as<float>());
 
+  buildSim(pSim, diffMethodEnum, pRecr, vm.count("tnfr-dynamics"), vm.count("il10r-dynamics"), vm.count("NFkB-dynamics"),
+           vm["tnf-depletion"].as<int>(), vm["il10-depletion"].as<int>(), vm["area-tnf-threshold"].as<float>(),
+              vm["area-cell-density-threshold"].as<float>());
+    
   if (!vm.count("load")){
     g_Rand.setSeed(seed);
     pSim->init();

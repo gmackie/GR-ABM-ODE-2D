@@ -41,9 +41,11 @@ private:
 	RecruitmentBase* _pRecruitment;
 	bool _tnfrDynamics;
 	bool _nfkbDynamics;
+    bool _il10dynamics;
 
 	// Inhibits tnf secretion if true and if not using tnfr dynamics.
 	int _tnfDepletionTimeStep;
+    int _il10DepletionTimeStep;
 
 	void moveTcells();
 	void moveMacrophages();
@@ -82,6 +84,10 @@ public:
 	void setNfkbDynamics(bool nfkbDynamics);
 	int getTnfDepletionTimeStep() const;
 	void setTnfDepletionTimeStep(int tnfDepletionTimeStep);
+    bool getIl10Dynamics() const;
+    void setIl10Dynamics(bool il10dynamics);
+    int getIl10DepletionTimeStep() const;
+    void setIl10DepletionTimeStep (int il10DepletionTimeStep);
 	double getAreaThreshold() const;
 	void setAreaThreshold(double areaThreshold);
 	double getAreaThresholdCellDensity() const;
@@ -195,6 +201,26 @@ inline int GrSimulation::getTnfDepletionTimeStep() const
 inline void GrSimulation::setTnfDepletionTimeStep(int tnfDepletionTimeStep)
 {
 	_tnfDepletionTimeStep = tnfDepletionTimeStep;
+}
+
+inline bool GrSimulation::getIl10Dynamics() const
+{
+    return _il10dynamics;
+}
+
+inline void GrSimulation::setIl10Dynamics(bool il10dynamics)
+{
+    _il10dynamics = il10dynamics;
+}
+
+inline int GrSimulation::getIl10DepletionTimeStep() const
+{
+    return _il10DepletionTimeStep;
+}
+
+inline void GrSimulation::setIl10DepletionTimeStep(int il10DepletionTimeStep)
+{
+    _il10DepletionTimeStep = il10DepletionTimeStep;
 }
 
 inline const MacList& GrSimulation::getMacList() const

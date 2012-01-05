@@ -40,7 +40,13 @@ private:
 	double _vTNFR2;
 	double _kSynth; // Rate of mTNF synthesis by cell
 	double _kTACE; // Rate of mTNF release from cell by TACE activity
-	
+    
+    // IL10 associated atributes
+    double _surfIL10R; // No. of cell surface IL10R
+    double _vIL10R; // Rate of IL10R synthesis
+    double _surfBoundIL10R; // No. of bound cell surface IL10R
+    double _kISynth;
+    
 	// NF-kB signaling pathway components
 	double _IKKKa; // (IKKK in active state)
 	double _IKKn; // (IKK in neutral state)
@@ -93,6 +99,9 @@ public:
 	void solveODEs (GrGrid& grid, double dt);
 	void solveReceptorAndNFkBODEs (GrGrid& grid, double dt);
 	void solveNFkBODEsEquilibrium (double dt);
+    void solveTNFandIL10 (GrGrid& grid, double dt);
+    void solveTNFandIL10andNFKB (GrGrid& grid, double dt);
+    void solveIL10Dynamics (GrGrid& grid, double dt);
 	void updateState();
 	int getActivationTime() const;
 	void setNFkB(bool value);

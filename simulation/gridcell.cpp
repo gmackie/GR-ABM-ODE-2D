@@ -25,6 +25,7 @@ GridCell::GridCell()
 	, _cxcl9(0)
 	, _shedtnfr2(0)
 	, _extMtb(0)
+    , _il10(0)
 {
 	_agent[0] = _agent[1] = NULL;
 }
@@ -85,6 +86,7 @@ void GridCell::serialize(std::ostream& out) const
 	out << _cxcl9 << std::endl;
 	out << _shedtnfr2 << std::endl;
 	out << _extMtb << std::endl;
+    out << _il10 << std::endl;
 
 	Serialization::writeFooter(out, GridCell::_ClassName);
 }
@@ -111,6 +113,7 @@ void GridCell::deserialize(std::istream& in)
 	in >> _cxcl9;
 	in >> _shedtnfr2;
 	in >> _extMtb;
+    in >> _il10;
 
 	if (!Serialization::readFooter(in, GridCell::_ClassName))
 	{

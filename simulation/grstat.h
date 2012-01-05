@@ -62,6 +62,7 @@ private:
 
 	FLOAT_TYPE _totMacAttractant;
 	FLOAT_TYPE _totTNF;
+    FLOAT_TYPE _totIL10;
 	FLOAT_TYPE _totCCL2;
 	FLOAT_TYPE _totCCL5;
 	FLOAT_TYPE _totCXCL9;
@@ -185,6 +186,7 @@ public:
 	FLOAT_TYPE getTotIntMtb() const;
 	FLOAT_TYPE getTotMacAttractant() const;
 	FLOAT_TYPE getTotTNF() const;
+    FLOAT_TYPE getTotIL10() const;
 	FLOAT_TYPE getTotCCL2() const;
 	FLOAT_TYPE getTotCCL5() const;
 	FLOAT_TYPE getTotCXCL9() const;
@@ -205,6 +207,7 @@ public:
 	void incTotIntMtb(FLOAT_TYPE dIntMtb);
 	void incTotMacAttractant(FLOAT_TYPE dMacAttractant);
 	void incTotTNF(FLOAT_TYPE dTNF);
+    void incTotIL10(FLOAT_TYPE dIL10);
 	void incTotCCL2(FLOAT_TYPE dCCL2);
 	void incTotCCL5(FLOAT_TYPE dCCL5);
 	void incTotCXCL9(FLOAT_TYPE dCXCL9);
@@ -701,6 +704,11 @@ inline void GrStat::incTotTNF(FLOAT_TYPE dTNF)
 	_totTNF += dTNF;
 }
 
+inline void GrStat::incTotIL10(FLOAT_TYPE dIL10)
+{
+    _totIL10 =+ dIL10;
+}
+
 inline void GrStat::incTotCCL2(FLOAT_TYPE dCCL2)
 {
 	_totCCL2 += dCCL2;
@@ -724,6 +732,11 @@ inline FLOAT_TYPE GrStat::getTotMacAttractant() const
 inline FLOAT_TYPE GrStat::getTotTNF() const
 {
 	return _totTNF;
+}
+
+inline FLOAT_TYPE GrStat::getTotIL10() const
+{
+    return _totIL10;
 }
 
 inline FLOAT_TYPE GrStat::getTotCCL2() const

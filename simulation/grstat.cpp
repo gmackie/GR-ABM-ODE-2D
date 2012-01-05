@@ -38,6 +38,7 @@ GrStat::GrStat()
 	, _totIntMtb(0)
 	, _totMacAttractant(0)
 	, _totTNF(0)
+    , _totIL10(0)
 	, _totCCL2(0)
 	, _totCCL5(0)
 	, _totCXCL9(0)
@@ -350,7 +351,7 @@ void GrStat::resetAgentStats()
 
 void GrStat::reset()
 {
-	_totIntMtb = _totExtMtb = _totNonRepExtMtb = _totMacAttractant = _totTNF = _totCCL2 = _totCCL5 = _totCXCL9 = 0;
+	_totIntMtb = _totExtMtb = _totNonRepExtMtb = _totMacAttractant = _totTNF = _totCCL2 = _totCCL5 = _totCXCL9 = _totIL10 = 0;
 	
 	_nSourceMac = _nSourceTcyt = _nSourceTgam = _nSourceTreg = 0;
 	
@@ -394,6 +395,7 @@ void GrStat::serialize(std::ostream& out) const
 
 	out << _totMacAttractant << std::endl;
 	out << _totTNF << std::endl;
+    out << _totIL10 << std::endl;
 	out << _totCCL2 << std::endl;
 	out << _totCCL5 << std::endl;
 	out << _totCXCL9 << std::endl;
@@ -507,6 +509,7 @@ void GrStat::deserialize(std::istream& in)
 
 	in >>_totMacAttractant;
 	in >>_totTNF;
+    in >> _totIL10;
 	in >>_totCCL2;
 	in >>_totCCL5;
 	in >>_totCXCL9;

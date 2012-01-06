@@ -58,6 +58,7 @@ private:
 	void updateReceptorDynamics(double dt);
 	void updateReceptorAndNFkBDynamics(double dt);
 	void adjustTNFDegradation(double dt);
+    void adjustFauxDegradation(double dt);
 	void growExtMtb();
 	void shuffleCells();
 

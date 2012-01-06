@@ -34,7 +34,7 @@ GrSimulation::GrSimulation()
 	, _pRecruitment(NULL)
 	, _tnfrDynamics(false)
 	, _nfkbDynamics(false)
-    , _il10dynamics(false)
+    , _il10rDynamics(false)
 	, _tnfDepletionTimeStep(-1)
     , _il10DepletionTimeStep(-1)
 {
@@ -71,7 +71,7 @@ void GrSimulation::serialize(std::ostream& out) const
 
 	out << _tnfrDynamics << std::endl;
 	out << _nfkbDynamics << std::endl;
-    out << _il10dynamics << std::endl;
+    out << _il10rDynamics << std::endl;
 	out << _tnfDepletionTimeStep << std::endl;
     out << _il10DepletionTimeStep << std::endl;
 
@@ -143,7 +143,7 @@ void GrSimulation::deserialize(std::istream& in)
 
 	in >> _tnfrDynamics;
 	in >> _nfkbDynamics;
-    in >> _il10dynamics;
+    in >> _il10rDynamics;
 	in >> _tnfDepletionTimeStep;
     in >> _il10DepletionTimeStep;
 
@@ -301,6 +301,7 @@ void GrSimulation::solve()
 	_stats.reset();
 
 	bool tnfDepletion = false;
+    bool il10Depletion = false;
 
 	if (_tnfDepletionTimeStep >= 0 && _time >= _tnfDepletionTimeStep)
 	{
@@ -308,13 +309,19 @@ void GrSimulation::solve()
 		_tnfrDynamics = false;
 	}
 
+    if (_il10DepletionTimeStep >= 0 && _time >= _il10DepletionTimeStep)
+	{
+		il10Depletion = true;
+		_il10rDynamics = false;
+	}
+    
 	// calculate diffusion every 10 minutes
 	// dt = 6s, solve for 10 minutes = 100 * 6 seconds
 	double dt = 6;
 	for (int t = 0; t < 100; t++) 
 	{
-		secreteFromMacrophages(tnfDepletion);
-		secreteFromTcells(tnfDepletion);
+		secreteFromMacrophages(tnfDepletion, il10Depletion);
+		secreteFromTcells(tnfDepletion, il10Depletion);
 		secreteFromCaseations();
 		_pDiffusion->diffuse(_grid);
 		if (_nfkbDynamics)
@@ -454,39 +461,39 @@ void GrSimulation::computeNextStates()
 {
 	for (MacList::iterator it = _macList.begin(); it != _macList.end(); it++)
 	{
-		it->computeNextState(_time, _grid.getGrid(), _stats, _tnfrDynamics, _nfkbDynamics);
+		it->computeNextState(_time, _grid.getGrid(), _stats, _tnfrDynamics, _nfkbDynamics, _il10rDynamics);
 	}
 	for (TgamList::iterator it = _tgamList.begin(); it != _tgamList.end(); it++)
 	{
-		it->computeNextState(_time, _grid.getGrid(), _stats, _tnfrDynamics, _nfkbDynamics);
+		it->computeNextState(_time, _grid.getGrid(), _stats, _tnfrDynamics, _nfkbDynamics, _il10rDynamics);
 	}
 	for (TcytList::iterator it = _tcytList.begin(); it != _tcytList.end(); it++)
 	{
-		it->computeNextState(_time, _grid.getGrid(), _stats, _tnfrDynamics, _nfkbDynamics);
+		it->computeNextState(_time, _grid.getGrid(), _stats, _tnfrDynamics, _nfkbDynamics, _il10rDynamics);
 	}
 	for (TregList::iterator it = _tregList.begin(); it != _tregList.end(); it++)
 	{
-		it->computeNextState(_time, _grid.getGrid(), _stats, _tnfrDynamics, _nfkbDynamics);
+		it->computeNextState(_time, _grid.getGrid(), _stats, _tnfrDynamics, _nfkbDynamics, _il10rDynamics);
 	} 
 }
 
-void GrSimulation::secreteFromMacrophages(bool tnfDepletion)
+void GrSimulation::secreteFromMacrophages(bool tnfDepletion, bool il10Depletion)
 {
 	for (MacList::iterator it = _macList.begin(); it != _macList.end(); it++)
 	{
-		it->secrete(_grid.getGrid(), _tnfrDynamics, _nfkbDynamics, tnfDepletion);
+		it->secrete(_grid.getGrid(), _tnfrDynamics, _nfkbDynamics, tnfDepletion, _il10rDynamics, il10Depletion);
 	}
 }
 
-void GrSimulation::secreteFromTcells(bool tnfDepletion)
+void GrSimulation::secreteFromTcells(bool tnfDepletion, bool il10Depletion)
 {
 	for (TgamList::iterator it = _tgamList.begin(); it != _tgamList.end(); it++)
 	{
-		it->secrete(_grid.getGrid(), _tnfrDynamics, _nfkbDynamics, tnfDepletion);
+		it->secrete(_grid.getGrid(), _tnfrDynamics, _nfkbDynamics, tnfDepletion, _il10rDynamics, il10Depletion);
 	}
 	for (TcytList::iterator it = _tcytList.begin(); it != _tcytList.end(); it++)
 	{
-		it->secrete(_grid.getGrid(), _tnfrDynamics, _nfkbDynamics, tnfDepletion);
+		it->secrete(_grid.getGrid(), _tnfrDynamics, _nfkbDynamics, tnfDepletion, _il10rDynamics, il10Depletion);
 	}
 }
 
@@ -624,6 +631,7 @@ void GrSimulation::growExtMtb()
 
 			_stats.incTotMacAttractant(cell.getMacAttractant());
 			_stats.incTotTNF(cell.getTNF());
+            _stats.incTotIL10(cell.getIL10());
 			_stats.incTotCCL2(cell.getCCL2());
 			_stats.incTotCCL5(cell.getCCL5());
 			_stats.incTotCXCL9(cell.getCXCL9());

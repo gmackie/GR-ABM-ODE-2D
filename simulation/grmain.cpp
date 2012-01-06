@@ -296,36 +296,32 @@ void buildSim(GrSimulation* pSim, DiffusionMethod diffMethod, RecruitmentBase* p
   
 	pSim->setTnfrDynamics(tnfrDynamics || nfkbDynamics); // when NFkB is turned on, tnfr dynamics will be on autamatically.
     
-    if (tnfrDynamics == 1 || nfkbDynamics == 1) {
-        cout << "TNF Dynamics - On" << std::endl;
-    }
+    cout << "Tunable Resolution" << std::endl;
+    cout << "------------------" << std::endl;
     
+    if (tnfrDynamics == 1 || nfkbDynamics == 1) {
+        cout << "TNF  Dynamics  -  On" << std::endl;
+    }
     else
     {
-        cout << "TNF Dynamics - Off" << std::endl;
+        cout << "TNF  Dynamics  -  Off" << std::endl;
     }
     pSim->setIl10Dynamics(il10Dynamics);
-    
     if (il10Dynamics == 1) {
-        cout << "IL10 Dynamics - On" << std::endl;
+        cout << "IL10 Dynamics  -  On" << std::endl;
     }
-    
     else
     {
-        cout << "IL10 Dynamics - Off" << std::endl;
+        cout << "IL10 Dynamics  -  Off" << std::endl;
     }
-    
     pSim->setNfkbDynamics(nfkbDynamics);
-    
     if (nfkbDynamics == 1) {
-        cout << "NFkB Dynamics - On" << std::endl;
+        cout << "NFkB Dynamics  -  On" << std::endl;
     }
-    
     else
     {
-        cout << "NFkB Dynamics - Off" << std::endl;
+        cout << "NFkB Dynamics  -  Off" << std::endl;
     }
-    
 	pSim->setTnfDepletionTimeStep(tnfDepletionTimeStep);
     pSim->setIl10DepletionTimeStep(il10DepletionTimeStep);
 	pSim->setRecruitment(pRecr);

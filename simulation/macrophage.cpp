@@ -166,7 +166,7 @@ void Mac::move(GrGrid& grid)
 	}
 }
 
-void Mac::secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDepletion)
+void Mac::secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDepletion, bool il10rDynamics, bool il10Depletion)
 {
 	if (_deactivationTime != -1)
 	{
@@ -299,7 +299,7 @@ void Mac::apoptosis(GrGrid& grid)
 	}
 }
 
-void Mac::computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tnfrDynamics, bool nfkbDynamics)
+void Mac::computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tnfrDynamics, bool nfkbDynamics, bool il10rDynamics)
 {
 	GridCell& cell = grid(_row, _col);
 	double tnfBoundFraction = cell.getTNF() / (cell.getTNF() + _PARAM(PARAM_GR_KD1) * 48.16e11);

@@ -41,7 +41,7 @@ private:
 	RecruitmentBase* _pRecruitment;
 	bool _tnfrDynamics;
 	bool _nfkbDynamics;
-    bool _il10dynamics;
+    bool _il10rDynamics;
 
 	// Inhibits tnf secretion if true and if not using tnfr dynamics.
 	int _tnfDepletionTimeStep;
@@ -52,8 +52,8 @@ private:
 	void updateStates();
 	void updateT_Test();
 	void computeNextStates();
-	void secreteFromMacrophages(bool tnfDepletion);
-	void secreteFromTcells(bool tnfDepletion);
+	void secreteFromMacrophages(bool tnfDepletion, bool il10Depletion);
+	void secreteFromTcells(bool tnfDepletion, bool il10Depletion);
 	void secreteFromCaseations();
 	void updateReceptorDynamics(double dt);
 	void updateReceptorAndNFkBDynamics(double dt);
@@ -205,12 +205,12 @@ inline void GrSimulation::setTnfDepletionTimeStep(int tnfDepletionTimeStep)
 
 inline bool GrSimulation::getIl10Dynamics() const
 {
-    return _il10dynamics;
+    return _il10rDynamics;
 }
 
-inline void GrSimulation::setIl10Dynamics(bool il10dynamics)
+inline void GrSimulation::setIl10Dynamics(bool il10rDynamics)
 {
-    _il10dynamics = il10dynamics;
+    _il10rDynamics = il10rDynamics;
 }
 
 inline int GrSimulation::getIl10DepletionTimeStep() const

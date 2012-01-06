@@ -43,8 +43,8 @@ public:
 	Tcyt(int birthtime, int row, int col, TcytState state);
 	~Tcyt();
 	void move(GrGrid& grid);
-	void secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDepletion);
-	void computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tnfrDynamics, bool nfkbDynamics);
+	void secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDepletion, bool il10rDynamics, bool il10Depletion);
+	void computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tnfrDynamics, bool nfkbDynamics, bool il10rDynamics);
 	void updateState();
 	void solveODEs (GrGrid& grid, double dt);
 	TcytState getState() const;

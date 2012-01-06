@@ -24,8 +24,10 @@ void GrDiffusionFTCS_Swap::diffuse(GrSimulationGrid& grSim) const
 	const double muTNF = _PARAM(PARAM_GR_D_TNF) * 6 / (4e-6);
 	const double muShedTNFR2 = _PARAM(PARAM_GR_D_SHED_TNFR2) * 6 / (4e-6);
 	const double muChemokines = _PARAM(PARAM_GR_D_CHEMOKINES) * 6 / (4e-6);
+    const double muIL10 = _PARAM(PARAM_GR_D_IL10) * 6 / (4e-6);
 	const double degTNF = _PARAM(PARAM_GR_DEG_TNF);
 	const double degChemokines = _PARAM(PARAM_GR_DEG_CHEMOKINES);
+    const double degIL10 = _PARAM(PARAM_GR_DEG_IL10);
 	const double ratioCCL5toCCL2 = _PARAM(PARAM_MAC_SEC_RATE_CCL5) / _PARAM(PARAM_MAC_SEC_RATE_CCL2);
 	const double ratioCXCL9toCCL2 = _PARAM(PARAM_MAC_SEC_RATE_CXCL9) / _PARAM(PARAM_MAC_SEC_RATE_CCL2);
 
@@ -83,6 +85,24 @@ void GrDiffusionFTCS_Swap::diffuse(GrSimulationGrid& grSim) const
 				double temp = newCell.getTNF();
 				newCell.setTNF(temp + _PARAM(PARAM_GR_KD2) * _PARAM(PARAM_GR_K_ON2) * res * dt);
 
+                
+                double il10_i_j_old = cell.getIL10();
+                double il10_i_min_1_j = cell_i_min_1_j.getIL10();
+                double il10_i_plus_1_j = cell_i_plus_1_j.getIL10();
+                double il10_i_j_min_1 = cell_i_j_min_1.getIL10();
+                double il10_i_j_plus_1 = cell_i_j_plus_1.getIL10();
+                
+                
+                res = il10_i_j_old + muIL10 * (il10_i_min_1_j + il10_i_plus_1_j + il10_i_j_min_1 + il10_i_j_plus_1 - 4 * il10_i_j_old);
+                
+                if (res <= _cutOffValue) {
+                    res = 0;
+                }
+                
+                res *= degIL10;
+                newCell.setIL10(res);
+                
+                
 				double ccl2_i_j_old = cell.getCCL2();
 				double ccl2_i_min_1_j = cell_i_min_1_j.getCCL2();
 				double ccl2_i_plus_1_j = cell_i_plus_1_j.getCCL2();

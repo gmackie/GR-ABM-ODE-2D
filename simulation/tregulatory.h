@@ -41,8 +41,8 @@ public:
 	Treg(int birthtime, int row, int col, TregState state);
 	~Treg();
 	void move(GrGrid& grid);
-	void secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDepletion);
-	void computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tnfrDynamics, bool nfkbDynamics);
+	void secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDepletion, bool il10rDynamics, bool il10Depletion);
+	void computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tnfrDynamics, bool nfkbDynamics, bool il10Depletion);
 	void updateState();
 	void solveODEs (GrGrid& grid, double dt);
 	TregState getState() const;

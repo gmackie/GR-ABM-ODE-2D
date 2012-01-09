@@ -130,9 +130,9 @@ public:
     write("Tgam"); write("Tgam a"); write("Tgam reg");  write("Tgam d");
     write("Tcyt"); write("Tcyt a"); write("Tcyt reg"); write("Tcyt d");
     write("Treg"); write("Treg r"); write("Treg d");
-    write("Int. Mtb."); write("Ext. Mtb."); write("NonRepl Ext. Mtb."); write("Tot Mtb.");
+    write("Int. Mtb."); write("Ext. Mtb."); write("repExtMtb"); write("NonRepl Ext. Mtb."); write("Tot Mtb.");
     write("TNF"); write("CCL2"); write("CCL5"); write("CXCL9"); 
-    write("AreaTNF"); write("AreaCellDensity");
+    write("AreaTNF"); write("AreaCellDensity"); write("LesionSize");
     write("MDC"); write("N4"); write("TH0"); write("TH1"); write("N8");
     write("T80"); write("T8"); write("TC"); write("TH0lung"); write("TH1lung");
     write("T80lung"); write("T8lung"); write("TClung");
@@ -154,9 +154,15 @@ public:
     write(stats.getNrOfTgam()); write(stats.getNrOfTgamActive()); write(stats.getNrOfTgamDownRegulated()); write(stats.getNrOfTgamDead());
     write(stats.getNrOfTcyt()); write(stats.getNrOfTcytActive()); write(stats.getNrOfTcytDownRegulated()); write(stats.getNrOfTcytDead());
     write(stats.getNrOfTreg()); write(stats.getNrOfTregActive()); write(stats.getNrOfTregDead());
-    write(stats.getTotIntMtb()); write(stats.getTotExtMtb()); write(stats.getTotNonRepExtMtb()); write((stats.getTotIntMtb() + stats.getTotExtMtb()));
+
+    FLOAT_TYPE repExtMtb = stats.getTotExtMtb() - stats.getTotNonRepExtMtb();
+    write(stats.getTotIntMtb()); write(stats.getTotExtMtb()); write(repExtMtb); write(stats.getTotNonRepExtMtb()); write((stats.getTotIntMtb() + stats.getTotExtMtb()));
+
     write(stats.getTotTNF()); write(stats.getTotCCL2()); write(stats.getTotCCL5());  write(stats.getTotCXCL9());
-    write(stats.getAreaTNF()); write(stats.getAreaCellDensity());
+
+    FLOAT_TYPE lesionSize = 2 * sqrt((0.0004 * stats.getAreaCellDensity()) / PI);
+    write(stats.getAreaTNF()); write(stats.getAreaCellDensity()); write(lesionSize);
+
     write(stats.getMDC()); write(stats.getN4()); write(stats.getTH0()); write(stats.getTH1()); write(stats.getN8());
     write(stats.getT80()); write(stats.getT8()); write(stats.getTC());  write(stats.getTH0lung()); write(stats.getTH1lung());
     write(stats.getT80lung()); write(stats.getT8lung()); write(stats.getTClung());
@@ -294,7 +300,7 @@ void run(GrSimulation* pSim, int stateInterval, int csvInterval, bool screenDisp
 void buildSim(GrSimulation* pSim, DiffusionMethod diffMethod, RecruitmentBase* pRecr, bool tnfrDynamics, bool il10rDynamics,
               bool nfkbDynamics, int tnfDepletionTimeStep, int il10DepletionTimeStep, float areaTNFThreshold, float areaCellDensityThreshold) {
   
-	pSim->setTnfrDynamics(tnfrDynamics || nfkbDynamics); // when NFkB is turned on, tnfr dynamics will be on autamatically.
+	pSim->setTnfrDynamics(tnfrDynamics || nfkbDynamics); // when NFkB is turned on, tnfr dynamics will be on automatically.
     
     cout << "Tunable Resolution" << std::endl;
     cout << "------------------" << std::endl;

@@ -62,7 +62,7 @@ void Treg::move(GrGrid& grid)
 	Tcell::moveTcell(grid, false, true, false);
 }
 
-void Treg::secrete(GrGrid&, bool, bool, bool, bool il10rDynamics, bool il10Depletion)
+void Treg::secrete(GrGrid&, bool, bool, bool, bool, bool)
 {
 }
 
@@ -70,7 +70,7 @@ void Treg::deactivate(const int)
 {
 }
 
-void Treg::computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tnfrDynamics, bool nfkbDynamics, bool il10rDynamics)
+void Treg::computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tnfrDynamics, bool, bool)
 {
 	GridCell& cell = grid(_row, _col);
 	double tnfBoundFraction = cell.getTNF() / (cell.getTNF() + _PARAM(PARAM_GR_KD1) * 48.16e11);

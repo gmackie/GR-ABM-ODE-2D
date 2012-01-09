@@ -50,6 +50,8 @@ typedef double FLOAT_TYPE;
 #define MOORE_COUNT 9
 #define MOORE_COUNT_DBL 9.0
 
+#define PI 3.141592653
+
 #ifdef _DEBUG
 #define assert_res(a) (assert(a))
 #else

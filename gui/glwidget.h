@@ -5,8 +5,6 @@
 #include "maininterface.h"
 #include "vectordatasets/vector.h"
 
-#define PI 3.141592653
-
 class GLWidget : public QGLWidget
 {
     Q_OBJECT

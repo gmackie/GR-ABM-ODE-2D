@@ -90,6 +90,7 @@ typedef enum {
     PARAM_GR_STD_IL10R_MAC,
     PARAM_GR_I_IL10R_TCELL,
     PARAM_GR_STD_IL10R_TCELL,
+    PARAM_GR_I_MOD,
     // end of molecular IL10 associated parameters
     
     // TNF and IL10 linking parameters

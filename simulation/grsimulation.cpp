@@ -334,7 +334,7 @@ void GrSimulation::solve()
 		}
 		else
 		{
-			adjustFauxDegradation(dt);
+			adjustFauxDegradation(dt, _tnfrDynamics, _il10rDynamics);
             //adjustTNFDegradation(dt);
 		}
 	}
@@ -679,52 +679,25 @@ void GrSimulation::adjustTNFDegradation(double dt)
 	}
 }
 
-void GrSimulation::adjustFauxDegradation(double dt)
+void GrSimulation::adjustFauxDegradation(double dt, bool tnfrDynamics, bool il10rDynamics)
 {
-    // this function exists for when both tnf and il10 are turned off as it prevents the whole grid from being scanned twice
-    // by having two different functions
     
-    for (int row = 0; row < NROWS; row++)
+    for (MacList::iterator it = _macList.begin(); it != _macList.end(); it++)
+    {
+        it->solveDegradation(_grid.getGrid(), dt, _tnfrDynamics, _il10rDynamics);
+    }
+    for (TgamList::iterator it = _tgamList.begin(); it != _tgamList.end(); it++)
 	{
-		for (int col = 0; col < NCOLS; col++)
-		{
-			GridCell& cell = _grid(row, col);
-			
-            double Nav = 6.02e23; // Avagadros #
-            double vol = 8.0e-12; // volume of a cell in L
-
-            if (!_tnfrDynamics) {
-                
-                // simulate the effect of TNF internalization by cells in the form of degradation. only for TNF
-                double dtnf;
-                double tnf = cell.getTNF();
-                if (cell.hasMac())
-                {
-                    dtnf = -_PARAM(PARAM_GR_K_INT1) * (tnf / (tnf + _PARAM(PARAM_GR_KD1) * Nav * vol)) * _PARAM(PARAM_GR_MEAN_TNFR1_MAC) * dt * 0.4;
-                    tnf += dtnf;
-                }
-                
-                if (cell.hasTcell())
-                {
-                    dtnf = -_PARAM(PARAM_GR_K_INT1) * (tnf / (tnf + _PARAM(PARAM_GR_KD1) * Nav * vol)) * _PARAM(PARAM_GR_MEAN_TNFR1_TCELL) * dt * 0.4;
-                    tnf += dtnf;  
-                }
-                
-                // dtnf = -_PARAM(PARAM_GR_K_INT1) * (tnf / (tnf + _PARAM(PARAM_GR_KD1) * 48.16e11)) * 800 * (cell.hasTcell()) * dt * 0.4;
-                // tnf += dtnf;
-                
-                cell.setTNF(tnf);
-            }
-            
-            
-            if (!_il10rDynamics) {
-                // Stuff must go here
-            }
-            
-		}
+		it->solveDegradation(_grid.getGrid(), dt, _tnfrDynamics, _il10rDynamics);
 	}
-    
-    
+	for (TcytList::iterator it = _tcytList.begin(); it != _tcytList.end(); it++)
+	{
+		it->solveDegradation(_grid.getGrid(), dt, _tnfrDynamics, _il10rDynamics);
+	}
+	for (TregList::iterator it = _tregList.begin(); it != _tregList.end(); it++)
+	{
+		it->solveDegradation(_grid.getGrid(), dt, _tnfrDynamics, _il10rDynamics);
+	}
 }
 
 void GrSimulation::updateT_Test()

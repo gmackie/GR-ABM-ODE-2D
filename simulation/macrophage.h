@@ -102,6 +102,7 @@ public:
     void solveTNFandIL10 (GrGrid& grid, double dt);
     void solveTNFandIL10andNFKB (GrGrid& grid, double dt);
     void solveIL10Dynamics (GrGrid& grid, double dt);
+    void solveDegradation (GrGrid& grid, double dt, bool tnfrDynamics, bool il10rDynamics);
 	void updateState();
 	int getActivationTime() const;
 	void setNFkB(bool value);

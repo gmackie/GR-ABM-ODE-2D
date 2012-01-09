@@ -118,6 +118,7 @@ const ParamDescription ParamsBase::_description[_PARAM_COUNT] =
 	{ "stdIL10RMac",                        GR_NODE,	false,	false,	0.0,	0,	"#/cell",		    "Standard deviation of mean density of IL10R on macrophages" },
 	{ "meanIL10RTcell",                     GR_NODE,	false,	false,	0.0,	0,	"#/cell",		    "Mean density of IL10R on T cells" },
 	{ "stdIL10RTcell",                      GR_NODE,	false,	false,	0.0,	0,	"#/cell",		    "Standard deviation of mean density of IL10R on T cells" },
+    { "Imod",                               GR_NODE,    false,  false,  0.0,    0,  "",                 "Scaling factor for coarse grained IL10 dynamics" },
     // end of molecular IL10 associated parameters
 
     // TNF and IL10 linking parameters

@@ -247,6 +247,40 @@ void Tcyt::solveODEs(GrGrid& grid, double dt)
 }
 
 
+void Tcyt::solveDegradation(GrGrid& grid, double dt, bool tnfrDynamics, bool il10rDynamics)
+{
+    GridCell& cell = grid(_row, _col);
+    
+    double Nav = 6.02e23; // Avagadros #
+    double vol = 8.0e-12; // volume of a cell in L
+    
+    if (!tnfrDynamics) {
+        
+        // simulate the effect of TNF internalization by cells in the form of degradation. Only for TNF
+        double dtnf;
+        double tnf = cell.getTNF();
+            dtnf = -_PARAM(PARAM_GR_K_INT1) * (tnf / (tnf + _PARAM(PARAM_GR_KD1) * Nav * vol)) * _PARAM(PARAM_GR_MEAN_TNFR1_TCELL) * dt * 0.4;
+            tnf += dtnf;  
+        
+        cell.setTNF(tnf);
+    }
+    
+    if (!il10rDynamics) {
+        
+        double dil10;
+        double il10 = cell.getIL10();
+        
+        // simulate the effect of IL10 internalization in the form of degradation. Only for IL10
+        dil10 = -_PARAM(PARAM_GR_I_K_INT) * (il10 / (il10 + _PARAM(PARAM_GR_I_KD) * Nav * vol)) * _PARAM(PARAM_GR_I_IL10R_TCELL) * dt * _PARAM(PARAM_GR_I_MOD);
+        il10 += dil10;  
+
+        cell.setIL10(il10);
+        
+    }
+    
+}
+
+
 void Tcyt::kill()
 {
 	_nextState = _state = TCYT_DEAD;

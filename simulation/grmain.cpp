@@ -291,7 +291,7 @@ void run(GrSimulation* pSim, int stateInterval, int csvInterval, bool screenDisp
     }
   }
 }
-void buildSim(GrSimulation* pSim, DiffusionMethod diffMethod, RecruitmentBase* pRecr, bool tnfrDynamics, bool il10Dynamics,
+void buildSim(GrSimulation* pSim, DiffusionMethod diffMethod, RecruitmentBase* pRecr, bool tnfrDynamics, bool il10rDynamics,
               bool nfkbDynamics, int tnfDepletionTimeStep, int il10DepletionTimeStep, float areaTNFThreshold, float areaCellDensityThreshold) {
   
 	pSim->setTnfrDynamics(tnfrDynamics || nfkbDynamics); // when NFkB is turned on, tnfr dynamics will be on autamatically.
@@ -306,8 +306,8 @@ void buildSim(GrSimulation* pSim, DiffusionMethod diffMethod, RecruitmentBase* p
     {
         cout << "TNF  Dynamics  -  Off" << std::endl;
     }
-    pSim->setIl10Dynamics(il10Dynamics);
-    if (il10Dynamics == 1) {
+    pSim->setIl10rDynamics(il10rDynamics);
+    if (il10rDynamics == 1) {
         cout << "IL10 Dynamics  -  On" << std::endl;
     }
     else

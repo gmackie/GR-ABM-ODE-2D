@@ -47,6 +47,7 @@ public:
 	void computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tnfrDynamics, bool nfkbDynamics, bool il10rDynamics);
 	void updateState();
 	void solveODEs (GrGrid& grid, double dt);
+    void solveDegradation (GrGrid& grid, double dt, bool tnfrDynamics, bool il10rDynamics);
 	TcytState getState() const;
 	TcytState getNextState() const;
 	void deactivate(const int time);

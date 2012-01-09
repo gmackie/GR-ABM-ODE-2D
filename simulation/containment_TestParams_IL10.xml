@@ -134,6 +134,7 @@
     stdIL10RMac = "87"
     meanIL10RTcell = "307"
     stdIL10RTcell = "30"
+    Imod = "0.4"
     LinkTaceMM1 = "0.0"
     LinkTaceMM2 = "0.0"
     LinkSynthMM1 = "0.0"

@@ -45,6 +45,7 @@ public:
 	void computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tnfrDynamics, bool nfkbDynamics, bool il10Depletion);
 	void updateState();
 	void solveODEs (GrGrid& grid, double dt);
+    void solveDegradation (GrGrid& grid, double dt, bool tnfrDynamics, bool il10rDynamics);
 	TregState getState() const;
 	TregState getNextState() const;
 	void kill();

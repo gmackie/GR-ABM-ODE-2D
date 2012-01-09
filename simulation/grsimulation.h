@@ -58,7 +58,7 @@ private:
 	void updateReceptorDynamics(double dt);
 	void updateReceptorAndNFkBDynamics(double dt);
 	void adjustTNFDegradation(double dt);
-    void adjustFauxDegradation(double dt);
+    void adjustFauxDegradation(double dt, bool tnfrDynamics, bool il10rDynamics);
 	void growExtMtb();
 	void shuffleCells();
 
@@ -85,8 +85,8 @@ public:
 	void setNfkbDynamics(bool nfkbDynamics);
 	int getTnfDepletionTimeStep() const;
 	void setTnfDepletionTimeStep(int tnfDepletionTimeStep);
-    bool getIl10Dynamics() const;
-    void setIl10Dynamics(bool il10dynamics);
+    bool getIl10rDynamics() const;
+    void setIl10rDynamics(bool il10rdynamics);
     int getIl10DepletionTimeStep() const;
     void setIl10DepletionTimeStep (int il10DepletionTimeStep);
 	double getAreaThreshold() const;
@@ -204,12 +204,12 @@ inline void GrSimulation::setTnfDepletionTimeStep(int tnfDepletionTimeStep)
 	_tnfDepletionTimeStep = tnfDepletionTimeStep;
 }
 
-inline bool GrSimulation::getIl10Dynamics() const
+inline bool GrSimulation::getIl10rDynamics() const
 {
     return _il10rDynamics;
 }
 
-inline void GrSimulation::setIl10Dynamics(bool il10rDynamics)
+inline void GrSimulation::setIl10rDynamics(bool il10rDynamics)
 {
     _il10rDynamics = il10rDynamics;
 }

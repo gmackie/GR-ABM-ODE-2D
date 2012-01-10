@@ -76,6 +76,10 @@ const ParamDescription ParamsBase::_description[_PARAM_COUNT] =
 	{ "maxChemotaxis",						GR_NODE,	false,	false,	0.0,	0,	"#molecules",		"Chemotaxis sensivity range (upper bound)" },
 	{ "dTNF_Tgam",							GR_NODE,	false,	false,	0.0,	0,	"#molecules/6s",	"Secretion rate of TNF by Tgam" },
 	{ "dTNF_Tcyt",							GR_NODE,	false,	false,	0.0,	0,	"#molecules/6s",	"Secretion rate of TNF by Tcyt" },
+    { "dIL10_Tgam",							GR_NODE,	false,	false,	0.0,	0,	"#molecules/6s",	"Secretion rate of IL10 by Tgam" },
+    { "dIL10_Tcyt",							GR_NODE,	false,	false,	0.0,	0,	"#molecules/6s",	"Secretion rate of IL10 by Tcyt" },
+    { "dIL10_Treg",							GR_NODE,	false,	false,	0.0,	0,	"#molecules/6s",	"Secretion rate of IL10 by reg" },
+    
 
 	// molecular TNF-associated parameters
 	{ "kSynthMac",							GR_NODE,	false,	false,	0.0,	0,	"#/cell.sec",		"Basal rate of mTNF synthesis by a macrophage" },
@@ -201,6 +205,7 @@ const ParamDescription ParamsBase::_description[_PARAM_COUNT] =
 	{ "dCCL5",								MAC_NODE,	false,	false,	0.0,	0,	"#molecules/6s",	"Secretion rate of CCL5" },
 	{ "dCXCL9",								MAC_NODE,	false,	false,	0.0,	0,	"#molecules/6s",	"Secretion rate of CXCL9" },
 	{ "dTNF",								MAC_NODE,	false,	false,	0.0,	0,	"#molecules/6s",	"Secretion rate of TNF" },
+    { "dIL10",								MAC_NODE,	false,	false,	0.0,	0,	"#molecules/6s",	"Secretion rate of IL10" },
 	{ "thresholdNFkBTNF",					MAC_NODE,	false,	false,	0.0,	0,	"fraction",			"TNF threshold for NFkB activation" },
 	{ "kNFkB",								MAC_NODE,	false,	false,	0.0,	0,	"1/s",				"Rate of NFkB activation" },
 	{ "thresholdNFkBTNF_Molecular",			MAC_NODE,	false,	false,	0.0,	0,	"#molecules",		"TNF threshold for NFkB activation" },

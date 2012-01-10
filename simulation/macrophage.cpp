@@ -166,7 +166,7 @@ void Mac::move(GrGrid& grid)
 	}
 }
 
-void Mac::secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDepletion, bool, bool)
+void Mac::secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDepletion, bool il10rDynamics, bool il10Depletion)
 {
 	if (_deactivationTime != -1)
 	{
@@ -195,6 +195,11 @@ void Mac::secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDe
 			_c1rrChemTNF = _PARAM(PARAM_GR_epsilon1) * _PARAM(PARAM_GR_c1r);
 			cell.incNrSecretions();
             _kISynth = _PARAM(PARAM_GR_I_K_SYNTH_MAC_INF);
+            
+            if (!il10rDynamics && !il10Depletion) {
+                cell.incIL10(_PARAM(PARAM_MAC_SEC_RATE_IL10));
+            }
+            
 		}
 		else if (_state == MAC_ACTIVE)
 		{
@@ -203,6 +208,11 @@ void Mac::secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDe
 			_c1rrChemTNF = _PARAM(PARAM_GR_c1r);
 			cell.incNrSecretions();
             _kISynth = _PARAM(PARAM_GR_I_K_SYNTH_MAC_ACT);
+            
+            if (!il10rDynamics && !il10Depletion) {
+                cell.incIL10(0.5 * _PARAM(PARAM_MAC_SEC_RATE_IL10));
+            }
+            
 		}
         else if (_state == MAC_CINFECTED)
         {
@@ -211,67 +221,201 @@ void Mac::secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDe
 			_c1rrChemTNF = _PARAM(PARAM_GR_c1r);
 			cell.incNrSecretions();
             _kISynth = 2.0 * _PARAM(PARAM_GR_I_K_SYNTH_MAC_INF);
+            
+            if (!il10rDynamics && !il10Depletion) {
+                cell.incIL10(2.0 * _PARAM(PARAM_MAC_SEC_RATE_IL10));
+            }
         }
 	}
+    
 	else
-	// TNF and chemokines are secreted independent of NFkB dynamics
+	// TNF, IL10, and chemokines are secreted independent of NFkB dynamics
+    // IL10 dynamics are independent of the state of _NFkB
 	{
-		if (_NFkB)
-		{
-			// if NFkB is turned on, secrete TNF and chemokines
-			if (_state != MAC_RESTING)
-			{
-				cell.incCCL2(_PARAM(PARAM_MAC_SEC_RATE_CCL2));
-				cell.incCCL5(_PARAM(PARAM_MAC_SEC_RATE_CCL5));
-				cell.incCXCL9(_PARAM(PARAM_MAC_SEC_RATE_CXCL9));
-				_kSynth = _PARAM(PARAM_GR_K_SYNTH_MAC);
-                
-                if (_state == MAC_ACTIVE)
-                {
-                    _kISynth = _PARAM(PARAM_GR_I_K_SYNTH_MAC_ACT);
-                }
-                if (_state == MAC_INFECTED)
-                {
-                    _kISynth = _PARAM(PARAM_GR_I_K_SYNTH_MAC_INF);
-                }
-                if (_state == MAC_CINFECTED)
-                {
-                _kISynth = _kISynth = 2.0 * _PARAM(PARAM_GR_I_K_SYNTH_MAC_INF);
-                }
-                                      
-				if (!tnfrDynamics && !tnfDepletion)
-					cell.incTNF(_PARAM(PARAM_MAC_SEC_RATE_TNF));
-			}
-			else
-			{
-				cell.incCCL2(0.5 * _PARAM(PARAM_MAC_SEC_RATE_CCL2));
+		if (_state == MAC_RESTING) {
+            
+            if (_NFkB) {
+                cell.incCCL2(0.5 * _PARAM(PARAM_MAC_SEC_RATE_CCL2));
 				cell.incCCL5(0.5 * _PARAM(PARAM_MAC_SEC_RATE_CCL5));
 				cell.incCXCL9(0.5 * _PARAM(PARAM_MAC_SEC_RATE_CXCL9));
 				_kSynth = 0.5 * _PARAM(PARAM_GR_K_SYNTH_MAC);
                 _kISynth = 0.0;
-				if (!tnfrDynamics && !tnfDepletion)
+                
+                if (!tnfrDynamics && !tnfDepletion)
 					cell.incTNF(0.5 * _PARAM(PARAM_MAC_SEC_RATE_TNF));
-			}
-		
-			cell.incNrSecretions();
-		}
-		else if (_state == MAC_RESTING)
-        {
-			_kSynth = 0.0;
-            _kISynth = 0.0;
+                
+                cell.incNrSecretions();
+            }
+            else
+            {
+                _kSynth = 0.0;
+                _kISynth = 0.0;
+            }
         }
-		else if (_state == MAC_INFECTED)
-		{
-			cell.incCCL2(0.5 * _PARAM(PARAM_MAC_SEC_RATE_CCL2));
-			cell.incCCL5(0.5 * _PARAM(PARAM_MAC_SEC_RATE_CCL5));
-			cell.incCXCL9(0.5 * _PARAM(PARAM_MAC_SEC_RATE_CXCL9));
-			_kSynth = 0.5 * _PARAM(PARAM_GR_K_SYNTH_MAC);
-            _kISynth = _PARAM(PARAM_GR_I_K_SYNTH_MAC_INF);
-			if (!tnfrDynamics && !tnfDepletion)
-				cell.incTNF(0.5 * _PARAM(PARAM_MAC_SEC_RATE_TNF));
-		
-			cell.incNrSecretions();
-		}
+        else if (_state == MAC_INFECTED) {
+            
+            if (_NFkB) {
+                cell.incCCL2(_PARAM(PARAM_MAC_SEC_RATE_CCL2));
+				cell.incCCL5(_PARAM(PARAM_MAC_SEC_RATE_CCL5));
+				cell.incCXCL9(_PARAM(PARAM_MAC_SEC_RATE_CXCL9));
+				_kSynth = _PARAM(PARAM_GR_K_SYNTH_MAC);
+                _kISynth = _PARAM(PARAM_GR_I_K_SYNTH_MAC_INF);
+                
+                if (!tnfrDynamics && !tnfDepletion)
+					cell.incTNF(_PARAM(PARAM_MAC_SEC_RATE_TNF));
+                
+                if (!il10rDynamics && !il10Depletion) {
+                    cell.incIL10(_PARAM(PARAM_MAC_SEC_RATE_IL10));
+                }
+                
+                cell.incNrSecretions();
+            }
+            
+            else
+            {
+                cell.incCCL2(0.5 * _PARAM(PARAM_MAC_SEC_RATE_CCL2));
+                cell.incCCL5(0.5 * _PARAM(PARAM_MAC_SEC_RATE_CCL5));
+                cell.incCXCL9(0.5 * _PARAM(PARAM_MAC_SEC_RATE_CXCL9));
+                _kSynth = 0.5 * _PARAM(PARAM_GR_K_SYNTH_MAC);
+                _kISynth = _PARAM(PARAM_GR_I_K_SYNTH_MAC_INF);
+                
+                if (!tnfrDynamics && !tnfDepletion)
+					cell.incTNF(_PARAM(PARAM_MAC_SEC_RATE_TNF));
+                
+                if (!il10rDynamics && !il10Depletion) {
+                    cell.incIL10(_PARAM(PARAM_MAC_SEC_RATE_IL10));
+                }
+                
+                cell.incNrSecretions();
+            }
+        }
+        else if (_state == MAC_CINFECTED) {
+            
+            if (_NFkB) {
+                cell.incCCL2(_PARAM(PARAM_MAC_SEC_RATE_CCL2));
+				cell.incCCL5(_PARAM(PARAM_MAC_SEC_RATE_CCL5));
+				cell.incCXCL9(_PARAM(PARAM_MAC_SEC_RATE_CXCL9));
+				_kSynth = _PARAM(PARAM_GR_K_SYNTH_MAC);
+                _kISynth = _kISynth = 2.0 * _PARAM(PARAM_GR_I_K_SYNTH_MAC_INF);
+                
+                if (!tnfrDynamics && !tnfDepletion)
+					cell.incTNF(_PARAM(PARAM_MAC_SEC_RATE_TNF));
+                
+                if (!il10rDynamics && !il10Depletion) {
+                    cell.incIL10(2.0 * _PARAM(PARAM_MAC_SEC_RATE_IL10));
+                }
+                
+                cell.incNrSecretions();
+            }
+            
+            else
+            {
+                _kISynth = _kISynth = 2.0 * _PARAM(PARAM_GR_I_K_SYNTH_MAC_INF);
+                
+                if (!il10rDynamics && !il10Depletion) {
+                    cell.incIL10(2.0 * _PARAM(PARAM_MAC_SEC_RATE_IL10));
+                    cell.incNrSecretions();
+                }
+            }
+        }
+        else if (_state == MAC_ACTIVE) {
+            
+            if (_NFkB) {
+                cell.incCCL2(_PARAM(PARAM_MAC_SEC_RATE_CCL2));
+				cell.incCCL5(_PARAM(PARAM_MAC_SEC_RATE_CCL5));
+				cell.incCXCL9(_PARAM(PARAM_MAC_SEC_RATE_CXCL9));
+				_kSynth = _PARAM(PARAM_GR_K_SYNTH_MAC);
+                _kISynth = _PARAM(PARAM_GR_I_K_SYNTH_MAC_ACT);
+                
+                if (!tnfrDynamics && !tnfDepletion)
+					cell.incTNF(_PARAM(PARAM_MAC_SEC_RATE_TNF));
+                
+                if (!il10rDynamics && !il10Depletion) {
+                    cell.incIL10(0.5 * _PARAM(PARAM_MAC_SEC_RATE_IL10));
+                }
+                
+                cell.incNrSecretions();
+            }
+            
+            else
+            {
+                _kISynth = _PARAM(PARAM_GR_I_K_SYNTH_MAC_ACT);
+                
+                if (!il10rDynamics && !il10Depletion) {
+                    cell.incIL10(0.5 * _PARAM(PARAM_MAC_SEC_RATE_IL10));
+                    cell.incNrSecretions();
+                }
+            }
+        }
+        
+        
+//        if (_NFkB)
+//		{
+//			// if NFkB is turned on, secrete TNF and chemokines
+//			if (_state != MAC_RESTING)
+//			{
+//				cell.incCCL2(_PARAM(PARAM_MAC_SEC_RATE_CCL2));
+//				cell.incCCL5(_PARAM(PARAM_MAC_SEC_RATE_CCL5));
+//				cell.incCXCL9(_PARAM(PARAM_MAC_SEC_RATE_CXCL9));
+//				_kSynth = _PARAM(PARAM_GR_K_SYNTH_MAC);
+//                
+//                if (_state == MAC_ACTIVE)
+//                {
+//                    _kISynth = _PARAM(PARAM_GR_I_K_SYNTH_MAC_ACT);
+//                }
+//                if (_state == MAC_INFECTED)
+//                {
+//                    _kISynth = _PARAM(PARAM_GR_I_K_SYNTH_MAC_INF);
+//                }
+//                if (_state == MAC_CINFECTED)
+//                {
+//                _kISynth = _kISynth = 2.0 * _PARAM(PARAM_GR_I_K_SYNTH_MAC_INF);
+//                }
+//                                      
+//				if (!tnfrDynamics && !tnfDepletion)
+//					cell.incTNF(_PARAM(PARAM_MAC_SEC_RATE_TNF));
+//                
+//			}
+//			else
+//			{
+//				cell.incCCL2(0.5 * _PARAM(PARAM_MAC_SEC_RATE_CCL2));
+//				cell.incCCL5(0.5 * _PARAM(PARAM_MAC_SEC_RATE_CCL5));
+//				cell.incCXCL9(0.5 * _PARAM(PARAM_MAC_SEC_RATE_CXCL9));
+//				_kSynth = 0.5 * _PARAM(PARAM_GR_K_SYNTH_MAC);
+//                _kISynth = 0.0;
+//				if (!tnfrDynamics && !tnfDepletion)
+//					cell.incTNF(0.5 * _PARAM(PARAM_MAC_SEC_RATE_TNF));
+//			}
+//		
+//			cell.incNrSecretions();
+//		}
+//		else if (_state == MAC_RESTING)
+//        {
+//			_kSynth = 0.0;
+//            _kISynth = 0.0;
+//        }
+//		else if (_state == MAC_INFECTED)
+//		{
+//			cell.incCCL2(0.5 * _PARAM(PARAM_MAC_SEC_RATE_CCL2));
+//			cell.incCCL5(0.5 * _PARAM(PARAM_MAC_SEC_RATE_CCL5));
+//			cell.incCXCL9(0.5 * _PARAM(PARAM_MAC_SEC_RATE_CXCL9));
+//			_kSynth = 0.5 * _PARAM(PARAM_GR_K_SYNTH_MAC);
+//            _kISynth = _PARAM(PARAM_GR_I_K_SYNTH_MAC_INF);
+//			if (!tnfrDynamics && !tnfDepletion)
+//				cell.incTNF(0.5 * _PARAM(PARAM_MAC_SEC_RATE_TNF));
+//		
+//			cell.incNrSecretions();
+//		}
+//        else if (_state == MAC_CINFECTED)
+//        {
+//            _kISynth = _kISynth = 2.0 * _PARAM(PARAM_GR_I_K_SYNTH_MAC_INF);
+//        }
+//        
+//        else if (_state == MAC_ACTIVE)
+//        {
+//            _kISynth = _PARAM(PARAM_GR_I_K_SYNTH_MAC_ACT);
+//        }
+        
 	}
 }
 

@@ -148,6 +148,9 @@
     IkSynthMacInf = "0.160"
     IkSynthMacAct = "0.080"
     IkSynthTcell = "0.0"
+    dIL10_Tgam = "0.0"
+    dIL10_Tcyt = "0.0"
+    dIL10_Treg = "0.0"
     >
 	<Mac
 		initNumber = "105"
@@ -161,6 +164,7 @@
 		dCCL2 = "24.85"
 		dCCL5 = "24.85"
 		dCXCL9 = "49.7"
+        dIL10 = "0.72"
 		thresholdNFkBTNF = "0.05"
 		kNFkB = "0.016231"
 		thresholdNFkBTNF_Molecular = "26.4083"

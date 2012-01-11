@@ -30,6 +30,13 @@ Treg::Treg()
 	, _vTNFR2(-1.0 * _PARAM(PARAM_GR_K_T2))
 	, _kSynth(-1.0)
 	, _kTACE(-1.0)
+    // IL10 components
+    
+    , _surfIL10R(-1.0)
+    , _vIL10R(-1.0)
+    , _surfBoundIL10R(-1.0)
+    , _kISynth(-1.0)
+
 {
 }
 
@@ -50,6 +57,13 @@ Treg::Treg(int birthtime, int row, int col, TregState state)
 	, _vTNFR2(_surfTNFR2 * _PARAM(PARAM_GR_K_T2))
 	, _kSynth(0.0)
 	, _kTACE(_PARAM(PARAM_GR_K_TACE_TCELL))
+    // IL10 components
+    
+    , _surfIL10R(g_Rand.getReal(_PARAM(PARAM_GR_I_IL10R_TCELL) - _PARAM(PARAM_GR_STD_IL10R_TCELL), _PARAM(PARAM_GR_I_IL10R_TCELL) + _PARAM(PARAM_GR_STD_IL10R_TCELL)))
+    , _vIL10R(_surfIL10R * _PARAM(PARAM_GR_I_K_T))
+    , _surfBoundIL10R(0.0)
+    , _kISynth(0.0)
+
 {
 }
 
@@ -62,8 +76,15 @@ void Treg::move(GrGrid& grid)
 	Tcell::moveTcell(grid, false, true, false);
 }
 
-void Treg::secrete(GrGrid&, bool, bool, bool, bool, bool)
+void Treg::secrete(GrGrid& grid, bool, bool, bool, bool il10rDynamics, bool il10Depletion)
 {
+    
+    GridCell& cell = grid(_row, _col);
+    
+    if (!il10rDynamics && !il10Depletion) {
+        cell.incIL10(_PARAM(PARAM_TREG_SEC_RATE_IL10));
+    }
+    
 }
 
 void Treg::deactivate(const int)
@@ -149,6 +170,7 @@ void Treg::solveODEs(GrGrid& grid, double dt)
 	
 	double tnf = cell.getTNF() / (Nav * vol);
 	double shedtnfr2 = cell.getShedTNFR2() / (Nav * vol);
+    double il10 = cell.getIL10() /(Nav * vol);
 	
 	double dmTNF;
 	double dsurfTNFR1;
@@ -160,7 +182,17 @@ void Treg::solveODEs(GrGrid& grid, double dt)
 	double dsTNF;
 	double dshedTNFR2;
 	
-	dmTNF = (_kSynth - _kTACE * _mTNF) * dt;
+    double eqsurfBoundIL10R;
+    double Iksynth;
+    double IkTACE;
+    
+    // modulate TNF parameters based on equilibrium IL10 receptor equations since the il10 molecular equations are not active
+    eqsurfBoundIL10R = (il10 * _surfIL10R) / (_PARAM(PARAM_GR_I_KD) + il10);
+    Iksynth = _kSynth * (1.0 - ((_PARAM(PARAM_GR_LINK_SYNTH_MM1) * eqsurfBoundIL10R) / (_PARAM(PARAM_GR_LINK_SYNTH_MM2) + eqsurfBoundIL10R)));
+    IkTACE = _kTACE * (1.0 - ((_PARAM(PARAM_GR_LINK_TACE_MM1) * eqsurfBoundIL10R) / (_PARAM(PARAM_GR_LINK_TACE_MM2) + eqsurfBoundIL10R)));
+    // end of equilibrium calculations
+    
+	dmTNF = (Iksynth - IkTACE * _mTNF) * dt;
 	dsurfTNFR1 = (_vTNFR1 - _PARAM(PARAM_GR_K_ON1) * tnf * _surfTNFR1 + koff1 * _surfBoundTNFR1 - _PARAM(PARAM_GR_K_T1) * _surfTNFR1 + _PARAM(PARAM_GR_K_REC1) * _intBoundTNFR1) * dt;
 	dsurfTNFR2 = (_vTNFR2 - _PARAM(PARAM_GR_K_ON2) * tnf * _surfTNFR2 + koff2 * _surfBoundTNFR2 - _PARAM(PARAM_GR_K_T2) * _surfTNFR2 + _PARAM(PARAM_GR_K_REC2) * _intBoundTNFR2) * dt;
 	dsurfBoundTNFR1 = (_PARAM(PARAM_GR_K_ON1) * tnf * _surfTNFR1 - koff1 * _surfBoundTNFR1 - _PARAM(PARAM_GR_K_INT1) * _surfBoundTNFR1) * dt;
@@ -184,6 +216,121 @@ void Treg::solveODEs(GrGrid& grid, double dt)
 	cell.setShedTNFR2(Nav * vol * shedtnfr2);
 	if (_mTNF < 0 || _surfTNFR1 < 0 || _surfBoundTNFR1 < 0 || _surfTNFR2 < 0 || _surfBoundTNFR2 < 0)
 		std::cout << "Error: Negative Value of Species in TNF/TNFR dynamics" << std::endl;
+}
+
+
+void Treg::solveTNFandIL10(GrGrid& grid, double dt)
+{
+    GridCell& cell = grid(_row, _col);
+	
+	double koff1 = _PARAM(PARAM_GR_K_ON1) * _PARAM(PARAM_GR_KD1);
+	double koff2 = _PARAM(PARAM_GR_K_ON2) * _PARAM(PARAM_GR_KD2);
+	double density = 1.25e11; // used for conversion of conc. unit (M -> #/cell) based on cell and microcompartment volumes 
+	double Nav = 6.02e23; // Avogadro Number
+	double vol = 8.0e-12; // volume of a cell in liter
+	
+	double tnf = cell.getTNF() / (Nav * vol);
+	double shedtnfr2 = cell.getShedTNFR2() / (Nav * vol);
+    double il10 = cell.getIL10() / (Nav * vol);
+	
+	double dmTNF;
+	double dsurfTNFR1;
+	double dsurfTNFR2;
+	double dsurfBoundTNFR1;
+	double dsurfBoundTNFR2;
+	double dintBoundTNFR1;
+	double dintBoundTNFR2;
+	double dsTNF;
+	double dshedTNFR2;
+    
+    double dsIL10;
+	double dsurfIL10R;
+	double dsurfBoundIL10R;
+    
+    double Iksynth;
+    double IkTACE;
+    
+    
+    // solving for TNF parameters that depend on IL10
+    Iksynth = _kSynth * (1.0 - ((_PARAM(PARAM_GR_LINK_SYNTH_MM1) * _surfBoundIL10R) / (_PARAM(PARAM_GR_LINK_SYNTH_MM2) + _surfBoundIL10R)));
+    IkTACE = _kTACE * (1.0 - ((_PARAM(PARAM_GR_LINK_TACE_MM1) * _surfBoundIL10R) / (_PARAM(PARAM_GR_LINK_TACE_MM2) + _surfBoundIL10R)));
+    // end of TNF and IL10 linking
+    
+	// TNF differential equations
+	dmTNF = (Iksynth - IkTACE * _mTNF) * dt;
+	dsurfTNFR1 = (_vTNFR1 - _PARAM(PARAM_GR_K_ON1) * tnf * _surfTNFR1 + koff1 * _surfBoundTNFR1 - _PARAM(PARAM_GR_K_T1) * _surfTNFR1 + _PARAM(PARAM_GR_K_REC1) * _intBoundTNFR1) * dt;
+	dsurfTNFR2 = (_vTNFR2 - _PARAM(PARAM_GR_K_ON2) * tnf * _surfTNFR2 + koff2 * _surfBoundTNFR2 - _PARAM(PARAM_GR_K_T2) * _surfTNFR2 + _PARAM(PARAM_GR_K_REC2) * _intBoundTNFR2) * dt;
+	dsurfBoundTNFR1 = (_PARAM(PARAM_GR_K_ON1) * tnf * _surfTNFR1 - koff1 * _surfBoundTNFR1 - _PARAM(PARAM_GR_K_INT1) * _surfBoundTNFR1) * dt;
+	dsurfBoundTNFR2 = (_PARAM(PARAM_GR_K_ON2) * tnf * _surfTNFR2 - koff2 * _surfBoundTNFR2 - _PARAM(PARAM_GR_K_INT2) * _surfBoundTNFR2 - _PARAM(PARAM_GR_K_SHED) * _surfBoundTNFR2) * dt;
+	dintBoundTNFR1 = (_PARAM(PARAM_GR_K_INT1) * _surfBoundTNFR1 - _PARAM(PARAM_GR_K_DEG1) * _intBoundTNFR1 - _PARAM(PARAM_GR_K_REC1) * _intBoundTNFR1) * dt;
+	dintBoundTNFR2 = (_PARAM(PARAM_GR_K_INT2) * _surfBoundTNFR2 - _PARAM(PARAM_GR_K_DEG2) * _intBoundTNFR2 - _PARAM(PARAM_GR_K_REC2) * _intBoundTNFR2) * dt;
+	dsTNF = ((density/Nav) * (_kTACE * _mTNF - _PARAM(PARAM_GR_K_ON1) * tnf * _surfTNFR1 + koff1 * _surfBoundTNFR1 - _PARAM(PARAM_GR_K_ON2) * tnf * _surfTNFR2 + koff2 * _surfBoundTNFR2)) * dt; 
+	dshedTNFR2 = ((density/Nav) * _PARAM(PARAM_GR_K_SHED) * _surfBoundTNFR2) * dt;
+	// end of TNF differential equations
+    
+    // IL10 differential equations
+    dsIL10 = (density/Nav) * _kISynth + ((density/Nav) * (_PARAM(PARAM_GR_I_K_OFF) * _surfBoundIL10R - _PARAM(PARAM_GR_I_K_ON) * _surfIL10R * il10)) * dt;
+	dsurfIL10R = (_vIL10R - _PARAM(PARAM_GR_I_K_ON) * _surfIL10R * il10 + _PARAM(PARAM_GR_I_K_OFF) * _surfBoundIL10R - _PARAM(PARAM_GR_I_K_T) * _surfIL10R) * dt;
+	dsurfBoundIL10R = (_PARAM(PARAM_GR_I_K_ON) * _surfIL10R * il10 - _PARAM(PARAM_GR_I_K_OFF) * _surfBoundIL10R - _PARAM(PARAM_GR_I_K_INT) * _surfBoundIL10R) * dt;
+    // end of IL10 differential equations
+    
+    // update tnf variables
+	_mTNF += dmTNF;
+	_surfTNFR1 += dsurfTNFR1;
+	_surfTNFR2 += dsurfTNFR2;
+	_surfBoundTNFR1 += dsurfBoundTNFR1;
+	_surfBoundTNFR2 += dsurfBoundTNFR2;
+	_intBoundTNFR1 += dintBoundTNFR1;
+	_intBoundTNFR2 += dintBoundTNFR2;
+	tnf += dsTNF;
+	shedtnfr2 += dshedTNFR2;
+    
+    // update il10 variables
+    _surfIL10R += dsurfIL10R;
+    _surfBoundIL10R += dsurfBoundIL10R;
+    il10 += dsIL10;
+	
+	cell.setTNF(Nav * vol * tnf);
+	cell.setShedTNFR2(Nav * vol * shedtnfr2);
+    cell.setIL10(Nav * vol * il10);
+	if (_mTNF < 0 || _surfTNFR1 < 0 || _surfBoundTNFR1 < 0 || _surfTNFR2 < 0 || _surfBoundTNFR2 < 0)
+		std::cout << "Error: Negative Value of species in TNF/TNFR dynamics" << std::endl;
+    
+    if (_surfIL10R < 0 || _surfBoundIL10R < 0)
+        std::cout << "Error: Negative value of species in IL10/IL10R dynamics" << std::endl;
+    
+}
+
+void Treg::solveIL10Dynamics(GrGrid& grid, double dt)
+{
+    GridCell& cell = grid(_row, _col);
+    
+    double density = 1.25e11; // used for conversion of conc. unit (M -> #/cell) based on cell and microcompartment volumes 
+	double Nav = 6.02e23; // Avogadro Number
+	double vol = 8.0e-12; // volume of a cell in liter
+    
+    double il10 = cell.getIL10() / (Nav * vol);
+    
+    double dsIL10;
+	double dsurfIL10R;
+	double dsurfBoundIL10R;
+    
+    // IL10 differential equations
+    dsIL10 = (density/Nav) * _kISynth + ((density/Nav) * (_PARAM(PARAM_GR_I_K_OFF) * _surfBoundIL10R - _PARAM(PARAM_GR_I_K_ON) * _surfIL10R * il10)) * dt;
+	dsurfIL10R = (_vIL10R - _PARAM(PARAM_GR_I_K_ON) * _surfIL10R * il10 + _PARAM(PARAM_GR_I_K_OFF) * _surfBoundIL10R - _PARAM(PARAM_GR_I_K_T) * _surfIL10R) * dt;
+	dsurfBoundIL10R = (_PARAM(PARAM_GR_I_K_ON) * _surfIL10R * il10 - _PARAM(PARAM_GR_I_K_OFF) * _surfBoundIL10R - _PARAM(PARAM_GR_I_K_INT) * _surfBoundIL10R) * dt;
+    // end of IL10 differential equations
+    
+    // update il10 variables
+    _surfIL10R += dsurfIL10R;
+    _surfBoundIL10R += dsurfBoundIL10R;
+    il10 += dsIL10;
+    
+    cell.setIL10(Nav * vol * il10);
+    
+    if (_surfIL10R < 0 || _surfBoundIL10R < 0)
+        std::cout << "Error: Negative value of species in IL10/IL10R dynamics" << std::endl;
+    
 }
 
 void Treg::solveDegradation(GrGrid& grid, double dt, bool tnfrDynamics, bool il10rDynamics)

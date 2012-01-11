@@ -34,6 +34,13 @@ private:
 	double _vTNFR2;
 	double _kSynth; // Rate of mTNF synthesis by cell
 	double _kTACE; // Rate of mTNF release from cell by TACE activity
+    
+    // IL10 associated atributes
+    double _surfIL10R; // No. of cell surface IL10R
+    double _vIL10R; // Rate of IL10R synthesis
+    double _surfBoundIL10R; // No. of bound cell surface IL10R
+    double _kISynth;
+    
 	
 	void handleActive(const int time, GrGrid& grid, GrStat& stats);
 	void handleDownRegulated(const int time, GrGrid& grid, GrStat& stats);
@@ -47,6 +54,8 @@ public:
 	void computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tnfrDynamics, bool nfkbDynamics, bool il10rDynamics);
 	void updateState();
 	void solveODEs (GrGrid& grid, double dt);
+    void solveTNFandIL10 (GrGrid& grid, double dt);
+    void solveIL10Dynamics (GrGrid& grid, double dt);
     void solveDegradation (GrGrid& grid, double dt, bool tnfrDynamics, bool il10rDynamics);
 	TcytState getState() const;
 	TcytState getNextState() const;

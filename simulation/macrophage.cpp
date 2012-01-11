@@ -314,7 +314,6 @@ void Mac::secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDe
                 
                 if (!il10rDynamics && !il10Depletion) {
                     cell.incIL10(2.0 * _PARAM(PARAM_MAC_SEC_RATE_IL10));
-                    cell.incNrSecretions();
                 }
             }
         }
@@ -343,7 +342,6 @@ void Mac::secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDe
                 
                 if (!il10rDynamics && !il10Depletion) {
                     cell.incIL10(0.5 * _PARAM(PARAM_MAC_SEC_RATE_IL10));
-                    cell.incNrSecretions();
                 }
             }
         }

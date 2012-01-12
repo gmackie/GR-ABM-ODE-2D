@@ -232,6 +232,10 @@ void Mac::secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDe
 	// TNF, IL10, and chemokines are secreted independent of NFkB dynamics
     // IL10 dynamics are independent of the state of _NFkB
 	{
+        double Nav = 6.02e23; // Avogadro Number
+        double vol = 8.0e-12; // volume of a cell in liter
+        double MW_IL10 = 18600; // molecular weight of IL10 in g/mol
+        
 		if (_state == MAC_RESTING) {
             
             if (_NFkB) {
@@ -242,7 +246,12 @@ void Mac::secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDe
                 _kISynth = 0.0;
                 
                 if (!tnfrDynamics && !tnfDepletion)
-					cell.incTNF(0.5 * _PARAM(PARAM_MAC_SEC_RATE_TNF));
+                {
+                    
+                    double il10 = log(((cell.getIL10() * MW_IL10 * 1e6)/(Nav * vol))); // converting il10 concentration to log(ng/mL) for use in dose dependence
+                    double tnfMOD = (1.0/(1.0 + exp((il10 + _PARAM(PARAM_GR_LINK_LOG_ALPHA))/_PARAM(PARAM_GR_LINK_LOG_BETA)))); // calculate the fraction of inhibition
+					cell.incTNF(tnfMOD * 0.5 * _PARAM(PARAM_MAC_SEC_RATE_TNF));
+                }
                 
                 cell.incNrSecretions();
             }
@@ -262,8 +271,11 @@ void Mac::secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDe
                 _kISynth = _PARAM(PARAM_GR_I_K_SYNTH_MAC_INF);
                 
                 if (!tnfrDynamics && !tnfDepletion)
-					cell.incTNF(_PARAM(PARAM_MAC_SEC_RATE_TNF));
-                
+                {    
+                    double il10 = log(((cell.getIL10() * MW_IL10 * 1e6)/(Nav * vol))); // converting il10 concentration to log(ng/mL) for use in dose dependence
+                    double tnfMOD = (1.0/(1.0 + exp((il10 + _PARAM(PARAM_GR_LINK_LOG_ALPHA))/_PARAM(PARAM_GR_LINK_LOG_BETA)))); // calculate the fraction of inhibition
+					cell.incTNF(tnfMOD * _PARAM(PARAM_MAC_SEC_RATE_TNF));
+                }
                 if (!il10rDynamics && !il10Depletion) {
                     cell.incIL10(_PARAM(PARAM_MAC_SEC_RATE_IL10));
                 }
@@ -280,8 +292,11 @@ void Mac::secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDe
                 _kISynth = _PARAM(PARAM_GR_I_K_SYNTH_MAC_INF);
                 
                 if (!tnfrDynamics && !tnfDepletion)
-					cell.incTNF(_PARAM(PARAM_MAC_SEC_RATE_TNF));
-                
+                {    
+                    double il10 = log(((cell.getIL10() * MW_IL10 * 1e6)/(Nav * vol))); // converting il10 concentration to log(ng/mL) for use in dose dependence
+                    double tnfMOD = (1.0/(1.0 + exp((il10 + _PARAM(PARAM_GR_LINK_LOG_ALPHA))/_PARAM(PARAM_GR_LINK_LOG_BETA)))); // calculate the fraction of inhibition
+					cell.incTNF(tnfMOD * _PARAM(PARAM_MAC_SEC_RATE_TNF));
+                }
                 if (!il10rDynamics && !il10Depletion) {
                     cell.incIL10(_PARAM(PARAM_MAC_SEC_RATE_IL10));
                 }
@@ -299,8 +314,11 @@ void Mac::secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDe
                 _kISynth = _kISynth = 2.0 * _PARAM(PARAM_GR_I_K_SYNTH_MAC_INF);
                 
                 if (!tnfrDynamics && !tnfDepletion)
-					cell.incTNF(_PARAM(PARAM_MAC_SEC_RATE_TNF));
-                
+                {    
+                    double il10 = log(((cell.getIL10() * MW_IL10 * 1e6)/(Nav * vol))); // converting il10 concentration to log(ng/mL) for use in dose dependence
+                    double tnfMOD = (1.0/(1.0 + exp((il10 + _PARAM(PARAM_GR_LINK_LOG_ALPHA))/_PARAM(PARAM_GR_LINK_LOG_BETA)))); // calculate the fraction of inhibition
+					cell.incTNF(tnfMOD * _PARAM(PARAM_MAC_SEC_RATE_TNF));
+                }
                 if (!il10rDynamics && !il10Depletion) {
                     cell.incIL10(2.0 * _PARAM(PARAM_MAC_SEC_RATE_IL10));
                 }
@@ -327,8 +345,11 @@ void Mac::secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDe
                 _kISynth = _PARAM(PARAM_GR_I_K_SYNTH_MAC_ACT);
                 
                 if (!tnfrDynamics && !tnfDepletion)
-					cell.incTNF(_PARAM(PARAM_MAC_SEC_RATE_TNF));
-                
+                {    
+                    double il10 = log(((cell.getIL10() * MW_IL10 * 1e6)/(Nav * vol))); // converting il10 concentration to log(ng/mL) for use in dose dependence
+                    double tnfMOD = (1.0/(1.0 + exp((il10 + _PARAM(PARAM_GR_LINK_LOG_ALPHA))/_PARAM(PARAM_GR_LINK_LOG_BETA)))); // calculate the fraction of inhibition
+					cell.incTNF(tnfMOD * _PARAM(PARAM_MAC_SEC_RATE_TNF));
+                }
                 if (!il10rDynamics && !il10Depletion) {
                     cell.incIL10(0.5 * _PARAM(PARAM_MAC_SEC_RATE_IL10));
                 }
@@ -535,7 +556,7 @@ void Mac::computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tnf
 void Mac::solveODEs(GrGrid& grid, double dt)
 {
 	GridCell& cell = grid(_row, _col);
-	
+     
 	double koff1 = _PARAM(PARAM_GR_K_ON1) * _PARAM(PARAM_GR_KD1);
 	double koff2 = _PARAM(PARAM_GR_K_ON2) * _PARAM(PARAM_GR_KD2);
 	double density = 1.25e11; // used for conversion of conc. unit (M -> #/cell) based on cell and microcompartment volumes 

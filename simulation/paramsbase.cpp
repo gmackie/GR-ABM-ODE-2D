@@ -130,10 +130,8 @@ const ParamDescription ParamsBase::_description[_PARAM_COUNT] =
 	{ "LinkTaceMM2",                        GR_NODE,	false,	false,	0.0,	0,	"#/cell",		    "IL10 on - TACE inhibition Michaelis-Menton Parameter 2" },
 	{ "LinkSynthMM1",                       GR_NODE,	false,	false,	0.0,	0,	"",		            "IL10 on - SYNTH inhibition Michaelis-Menton Parameter 1" },
 	{ "LinkSynthMM2",                       GR_NODE,	false,	false,	0.0,	0,	"#/cell",		    "IL10 on - SYNTH inhibition Michaelis-Menton Parameter 2" },
-	{ "EqLinkTaceMM1",                      GR_NODE,	false,	false,	0.0,	0,	"",		            "IL10 off - TACE inhibition Michaelis-Menton Parameter 1" },
-	{ "EqLinkTaceMM2",                      GR_NODE,	false,	false,	0.0,	0,	"#/cell",		    "IL10 off - TACE inhibition Michaelis-Menton Parameter 2" },
-	{ "EqLinkSynthMM1",                     GR_NODE,	false,	false,	0.0,	0,	"",		            "IL10 off - SYNTH inhibition Michaelis-Menton Parameter 1" },
-	{ "EqLinkSynthMM2",                     GR_NODE,	false,	false,	0.0,	0,	"#/cell",		    "IL10 off - SYNTH inhibition Michaelis-Menton Parameter 2" },
+    { "LinkLogAlpha",                       GR_NODE,	false,	false,	0.0,	0,	"log10(ng/mL)",		"Coarse grained TNF/IL10 dose dependence parameter alpha" },
+    { "LinkLogBeta",                        GR_NODE,	false,	false,	0.0,	0,	"log10(ng/mL)",     "Coarse grained TNF/IL10 dose dependence parameter beta" },
     // end of TNF and IL10 linking parameters
     
 	// intracellular NFkB signaling pathway parameters

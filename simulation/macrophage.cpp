@@ -553,7 +553,7 @@ void Mac::computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tnf
 	}
 }
 
-void Mac::solveODEs(GrGrid& grid, double dt)
+void Mac::solveTNF(GrGrid& grid, double dt)
 {
 	GridCell& cell = grid(_row, _col);
      
@@ -613,7 +613,7 @@ void Mac::solveODEs(GrGrid& grid, double dt)
 		std::cout << "Error: Negative Value of Species in TNF/TNFR dynamics" << std::endl;	
 }
 
-void Mac::solveReceptorAndNFkBODEs(GrGrid& grid, double dt)
+void Mac::solveNFkBandTNF(GrGrid& grid, double dt)
 {
 	GridCell& cell = grid(_row, _col);
 	
@@ -805,9 +805,35 @@ void Mac::solveTNFandIL10(GrGrid& grid, double dt)
     double IkTACE;
     
     
+    
+    
     // solving for TNF parameters that depend on IL10
+    
+    // debug
+    
+    //cout << _kSynth << "    " << _kTACE << std::endl;
+    
+    //double temp1 = ((_PARAM(PARAM_GR_LINK_SYNTH_MM1) * _surfBoundIL10R) / (_PARAM(PARAM_GR_LINK_SYNTH_MM2) + _surfBoundIL10R));
+    //double temp2 = ((_PARAM(PARAM_GR_LINK_TACE_MM1) * _surfBoundIL10R) / (_PARAM(PARAM_GR_LINK_TACE_MM2) + _surfBoundIL10R));
+    
+    //double temp3 = (_PARAM(PARAM_GR_LINK_SYNTH_MM1) * _surfBoundIL10R);
+    //double temp4 = (_PARAM(PARAM_GR_LINK_SYNTH_MM2) + _surfBoundIL10R);
+
+    //cout << temp3 << "    " << temp4 << std::endl;
+    //cout << temp1 << "    " << temp2 << std::endl;
+    
+
+   
+    
+
     Iksynth = _kSynth * (1.0 - ((_PARAM(PARAM_GR_LINK_SYNTH_MM1) * _surfBoundIL10R) / (_PARAM(PARAM_GR_LINK_SYNTH_MM2) + _surfBoundIL10R)));
     IkTACE = _kTACE * (1.0 - ((_PARAM(PARAM_GR_LINK_TACE_MM1) * _surfBoundIL10R) / (_PARAM(PARAM_GR_LINK_TACE_MM2) + _surfBoundIL10R)));
+    
+    //cout << Iksynth << "    " << IkTACE << std::endl;
+    
+    //std::cin.ignore();
+    // debug
+    
     // end of TNF and IL10 linking
     
 	// TNF differential equations
@@ -856,7 +882,7 @@ void Mac::solveTNFandIL10(GrGrid& grid, double dt)
 }
 
 
-void Mac::solveTNFandIL10andNFKB(GrGrid& grid, double dt)
+void Mac::solveTNFandIL10andNFkB(GrGrid& grid, double dt)
 {
    	GridCell& cell = grid(_row, _col);
 	
@@ -1030,7 +1056,7 @@ void Mac::solveTNFandIL10andNFKB(GrGrid& grid, double dt)
 }
 
 
-void Mac::solveIL10Dynamics(GrGrid& grid, double dt)
+void Mac::solveIL10(GrGrid& grid, double dt)
 {
     GridCell& cell = grid(_row, _col);
     

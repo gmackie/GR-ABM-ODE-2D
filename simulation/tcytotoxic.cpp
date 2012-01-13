@@ -228,7 +228,7 @@ void Tcyt::updateState()
 	_state = _nextState;
 }
 
-void Tcyt::solveODEs(GrGrid& grid, double dt)
+void Tcyt::solveTNF(GrGrid& grid, double dt)
 {
 	GridCell& cell = grid(_row, _col);
 	
@@ -371,7 +371,7 @@ void Tcyt::solveTNFandIL10(GrGrid& grid, double dt)
     
 }
 
-void Tcyt::solveIL10Dynamics(GrGrid& grid, double dt)
+void Tcyt::solveIL10(GrGrid& grid, double dt)
 {
     GridCell& cell = grid(_row, _col);
     

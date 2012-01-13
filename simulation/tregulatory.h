@@ -50,9 +50,9 @@ public:
 	void secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDepletion, bool il10rDynamics, bool il10Depletion);
 	void computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tnfrDynamics, bool nfkbDynamics, bool il10Depletion);
 	void updateState();
-	void solveODEs (GrGrid& grid, double dt);
+	void solveTNF (GrGrid& grid, double dt);
     void solveTNFandIL10 (GrGrid& grid, double dt);
-    void solveIL10Dynamics (GrGrid& grid, double dt);
+    void solveIL10 (GrGrid& grid, double dt);
     void solveDegradation (GrGrid& grid, double dt, bool tnfrDynamics, bool il10rDynamics);
 	TregState getState() const;
 	TregState getNextState() const;

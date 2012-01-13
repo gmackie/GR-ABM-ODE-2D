@@ -199,7 +199,7 @@ void Tgam::updateState()
 	_state = _nextState;
 }
 
-void Tgam::solveODEs(GrGrid& grid, double dt)
+void Tgam::solveTNF(GrGrid& grid, double dt)
 {
 	GridCell& cell = grid(_row, _col);
 	
@@ -341,7 +341,7 @@ void Tgam::solveTNFandIL10(GrGrid& grid, double dt)
     
 }
 
-void Tgam::solveIL10Dynamics(GrGrid& grid, double dt)
+void Tgam::solveIL10(GrGrid& grid, double dt)
 {
     GridCell& cell = grid(_row, _col);
     

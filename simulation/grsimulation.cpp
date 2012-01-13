@@ -324,15 +324,33 @@ void GrSimulation::solve()
 		secreteFromTcells(tnfDepletion, il10Depletion);
 		secreteFromCaseations();
 		_pDiffusion->diffuse(_grid);
-		if (_nfkbDynamics)
+		
+        
+        
+        
+        if (_nfkbDynamics)
 		{
-			updateReceptorAndNFkBDynamics(dt);
+			if (_il10rDynamics) {
+                updateNFkBandTNFandIL10Dynamics(dt);
+            }
+            updateNFkBandTNFDynamics(dt);
 		}
-		else if (_tnfrDynamics)
+		else if (_tnfrDynamics && _il10rDynamics)
+        {
+            updateTNFandIL10Dynamics(dt);
+        }
+        
+        else if (_tnfrDynamics && !_il10rDynamics)
 		{
-			updateReceptorDynamics(dt);
+			updateTNFDynamics(dt);
 		}
-		else
+		
+        else if (_il10rDynamics && !_tnfrDynamics)
+        {
+            updateIL10Dynamics(dt);
+        }
+        
+        else
 		{
 			adjustFauxDegradation(dt, _tnfrDynamics, _il10rDynamics);
             //adjustTNFDegradation(dt);
@@ -496,6 +514,10 @@ void GrSimulation::secreteFromTcells(bool tnfDepletion, bool il10Depletion)
 	{
 		it->secrete(_grid.getGrid(), _tnfrDynamics, _nfkbDynamics, tnfDepletion, _il10rDynamics, il10Depletion);
 	}
+    for (TregList::iterator it = _tregList.begin(); it != _tregList.end(); it++)
+	{
+		it->secrete(_grid.getGrid(), _tnfrDynamics, _nfkbDynamics, tnfDepletion, _il10rDynamics, il10Depletion);
+	}
 }
 
 void GrSimulation::secreteFromCaseations()
@@ -517,48 +539,118 @@ void GrSimulation::secreteFromCaseations()
 	}
 }
 
-void GrSimulation::updateReceptorDynamics(double dt)
+void GrSimulation::updateTNFDynamics(double dt)
 {
 	for (MacList::iterator it = _macList.begin(); it != _macList.end(); it++)
 	{
-		it->solveODEs(_grid.getGrid(), dt);
+		it->solveTNF(_grid.getGrid(), dt);
 	}
 	for (TgamList::iterator it = _tgamList.begin(); it != _tgamList.end(); it++)
 	{
-		it->solveODEs(_grid.getGrid(), dt);
+		it->solveTNF(_grid.getGrid(), dt);
 	}
 	for (TcytList::iterator it = _tcytList.begin(); it != _tcytList.end(); it++)
 	{
-		it->solveODEs(_grid.getGrid(), dt);
+		it->solveTNF(_grid.getGrid(), dt);
 	}
 	for (TregList::iterator it = _tregList.begin(); it != _tregList.end(); it++)
 	{
-		it->solveODEs(_grid.getGrid(), dt);
+		it->solveTNF(_grid.getGrid(), dt);
 	}
 }
 
-void GrSimulation::updateReceptorAndNFkBDynamics(double dt)
+
+void GrSimulation::updateIL10Dynamics(double dt)
+{
+	for (MacList::iterator it = _macList.begin(); it != _macList.end(); it++)
+	{
+		it->solveIL10(_grid.getGrid(), dt);
+	}
+	for (TgamList::iterator it = _tgamList.begin(); it != _tgamList.end(); it++)
+	{
+		it->solveIL10(_grid.getGrid(), dt);
+	}
+	for (TcytList::iterator it = _tcytList.begin(); it != _tcytList.end(); it++)
+	{
+		it->solveIL10(_grid.getGrid(), dt);
+	}
+	for (TregList::iterator it = _tregList.begin(); it != _tregList.end(); it++)
+	{
+		it->solveIL10(_grid.getGrid(), dt);
+	}
+}
+
+
+
+void GrSimulation::updateTNFandIL10Dynamics(double dt)
+{
+	for (MacList::iterator it = _macList.begin(); it != _macList.end(); it++)
+	{
+		it->solveTNFandIL10(_grid.getGrid(), dt);
+	}
+	for (TgamList::iterator it = _tgamList.begin(); it != _tgamList.end(); it++)
+	{
+		it->solveTNFandIL10(_grid.getGrid(), dt);
+	}
+	for (TcytList::iterator it = _tcytList.begin(); it != _tcytList.end(); it++)
+	{
+		it->solveTNFandIL10(_grid.getGrid(), dt);
+	}
+	for (TregList::iterator it = _tregList.begin(); it != _tregList.end(); it++)
+	{
+		it->solveTNFandIL10(_grid.getGrid(), dt);
+	}
+}
+
+
+void GrSimulation::updateNFkBandTNFDynamics(double dt)
 {
 	for (MacList::iterator it = _macList.begin(); it != _macList.end(); it++)
 	{
 		for (int i = 0; i < _PARAM(PARAM_GR_NF_KB_TIME_COEFF); i++)
 		{
-			it->solveReceptorAndNFkBODEs(_grid.getGrid(), dt/_PARAM(PARAM_GR_NF_KB_TIME_COEFF));
+			it->solveNFkBandTNF(_grid.getGrid(), dt/_PARAM(PARAM_GR_NF_KB_TIME_COEFF));
 		}
 	}
 	for (TgamList::iterator it = _tgamList.begin(); it != _tgamList.end(); it++)
 	{
-		it->solveODEs(_grid.getGrid(), dt);
+		it->solveTNF(_grid.getGrid(), dt);
 	}
 	for (TcytList::iterator it = _tcytList.begin(); it != _tcytList.end(); it++)
 	{
-		it->solveODEs(_grid.getGrid(), dt);
+		it->solveTNF(_grid.getGrid(), dt);
 	}
 	for (TregList::iterator it = _tregList.begin(); it != _tregList.end(); it++)
 	{
-		it->solveODEs(_grid.getGrid(), dt);
+		it->solveTNF(_grid.getGrid(), dt);
 	}
 }
+
+
+void GrSimulation::updateNFkBandTNFandIL10Dynamics(double dt)
+{
+	for (MacList::iterator it = _macList.begin(); it != _macList.end(); it++)
+	{
+		for (int i = 0; i < _PARAM(PARAM_GR_NF_KB_TIME_COEFF); i++)
+		{
+			it->solveTNFandIL10andNFkB(_grid.getGrid(), dt/_PARAM(PARAM_GR_NF_KB_TIME_COEFF));
+		}
+	}
+	for (TgamList::iterator it = _tgamList.begin(); it != _tgamList.end(); it++)
+	{
+		it->solveTNFandIL10(_grid.getGrid(), dt);
+	}
+	for (TcytList::iterator it = _tcytList.begin(); it != _tcytList.end(); it++)
+	{
+		it->solveTNFandIL10(_grid.getGrid(), dt);
+	}
+	for (TregList::iterator it = _tregList.begin(); it != _tregList.end(); it++)
+	{
+		it->solveTNFandIL10(_grid.getGrid(), dt);
+	}
+}
+
+
 
 void GrSimulation::moveMacrophages()
 {

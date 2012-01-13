@@ -55,8 +55,11 @@ private:
 	void secreteFromMacrophages(bool tnfDepletion, bool il10Depletion);
 	void secreteFromTcells(bool tnfDepletion, bool il10Depletion);
 	void secreteFromCaseations();
-	void updateReceptorDynamics(double dt);
-	void updateReceptorAndNFkBDynamics(double dt);
+    void updateTNFDynamics(double dt);
+    void updateIL10Dynamics(double dt);
+    void updateTNFandIL10Dynamics(double dt);
+    void updateNFkBandTNFandIL10Dynamics(double dt);
+    void updateNFkBandTNFDynamics(double dt);
 	void adjustTNFDegradation(double dt);
     void adjustFauxDegradation(double dt, bool tnfrDynamics, bool il10rDynamics);
 	void growExtMtb();

@@ -158,7 +158,7 @@ void Treg::updateState()
 	_state = _nextState;
 }
 
-void Treg::solveODEs(GrGrid& grid, double dt)
+void Treg::solveTNF(GrGrid& grid, double dt)
 {
 	GridCell& cell = grid(_row, _col);
 	
@@ -301,7 +301,7 @@ void Treg::solveTNFandIL10(GrGrid& grid, double dt)
     
 }
 
-void Treg::solveIL10Dynamics(GrGrid& grid, double dt)
+void Treg::solveIL10(GrGrid& grid, double dt)
 {
     GridCell& cell = grid(_row, _col);
     

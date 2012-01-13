@@ -96,12 +96,12 @@ public:
 	void move(GrGrid& grid);
 	void secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDepletion, bool il10rDynamics, bool il10Depletion);
 	void computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tnfrDynamics, bool nfkbDynamics, bool il10rDynamics);
-	void solveODEs (GrGrid& grid, double dt);
-	void solveReceptorAndNFkBODEs (GrGrid& grid, double dt);
+	void solveTNF (GrGrid& grid, double dt);
+	void solveNFkBandTNF (GrGrid& grid, double dt);
 	void solveNFkBODEsEquilibrium (double dt);
     void solveTNFandIL10 (GrGrid& grid, double dt);
-    void solveTNFandIL10andNFKB (GrGrid& grid, double dt);
-    void solveIL10Dynamics (GrGrid& grid, double dt);
+    void solveTNFandIL10andNFkB (GrGrid& grid, double dt);
+    void solveIL10 (GrGrid& grid, double dt);
     void solveDegradation (GrGrid& grid, double dt, bool tnfrDynamics, bool il10rDynamics);
 	void updateState();
 	int getActivationTime() const;

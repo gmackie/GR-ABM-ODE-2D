@@ -706,7 +706,7 @@ inline void GrStat::incTotTNF(FLOAT_TYPE dTNF)
 
 inline void GrStat::incTotIL10(FLOAT_TYPE dIL10)
 {
-    _totIL10 =+ dIL10;
+    _totIL10 += dIL10;
 }
 
 inline void GrStat::incTotCCL2(FLOAT_TYPE dCCL2)

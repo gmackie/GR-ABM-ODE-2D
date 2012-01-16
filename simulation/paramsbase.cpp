@@ -78,7 +78,7 @@ const ParamDescription ParamsBase::_description[_PARAM_COUNT] =
 	{ "dTNF_Tcyt",							GR_NODE,	false,	false,	0.0,	0,	"#molecules/6s",	"Secretion rate of TNF by Tcyt" },
     { "dIL10_Tgam",							GR_NODE,	false,	false,	0.0,	0,	"#molecules/6s",	"Secretion rate of IL10 by Tgam" },
     { "dIL10_Tcyt",							GR_NODE,	false,	false,	0.0,	0,	"#molecules/6s",	"Secretion rate of IL10 by Tcyt" },
-    { "dIL10_Treg",							GR_NODE,	false,	false,	0.0,	0,	"#molecules/6s",	"Secretion rate of IL10 by reg" },
+    { "dIL10_Treg",							GR_NODE,	false,	false,	0.0,	0,	"#molecules/6s",	"Secretion rate of IL10 by Treg" },
     
 
 	// molecular TNF-associated parameters

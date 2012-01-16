@@ -509,7 +509,7 @@ void GrStat::deserialize(std::istream& in)
 
 	in >>_totMacAttractant;
 	in >>_totTNF;
-    in >> _totIL10;
+    in >>_totIL10;
 	in >>_totCCL2;
 	in >>_totCCL5;
 	in >>_totCXCL9;

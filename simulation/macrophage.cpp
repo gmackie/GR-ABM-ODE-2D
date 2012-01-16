@@ -275,9 +275,11 @@ void Mac::secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDe
                     double il10 = log(((cell.getIL10() * MW_IL10 * 1e6)/(Nav * vol))); // converting il10 concentration to log(ng/mL) for use in dose dependence
                     double tnfMOD = (1.0/(1.0 + exp((il10 + _PARAM(PARAM_GR_LINK_LOG_ALPHA))/_PARAM(PARAM_GR_LINK_LOG_BETA)))); // calculate the fraction of inhibition
 					cell.incTNF(tnfMOD * _PARAM(PARAM_MAC_SEC_RATE_TNF));
+                    //cout << "Debug: IL10 inhibition from MAC_INFECTED" << std::endl;
                 }
                 if (!il10rDynamics && !il10Depletion) {
                     cell.incIL10(_PARAM(PARAM_MAC_SEC_RATE_IL10));
+                    //cout << "Debug: Secrete from MAC_INFECTED" << std::endl;
                 }
                 
                 cell.incNrSecretions();
@@ -296,9 +298,11 @@ void Mac::secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDe
                     double il10 = log(((cell.getIL10() * MW_IL10 * 1e6)/(Nav * vol))); // converting il10 concentration to log(ng/mL) for use in dose dependence
                     double tnfMOD = (1.0/(1.0 + exp((il10 + _PARAM(PARAM_GR_LINK_LOG_ALPHA))/_PARAM(PARAM_GR_LINK_LOG_BETA)))); // calculate the fraction of inhibition
 					cell.incTNF(tnfMOD * _PARAM(PARAM_MAC_SEC_RATE_TNF));
+                    //cout << "Debug: IL10 inhibition from MAC_INFECTED" << std::endl;
                 }
                 if (!il10rDynamics && !il10Depletion) {
                     cell.incIL10(_PARAM(PARAM_MAC_SEC_RATE_IL10));
+                    //cout << "Debug: Secrete from MAC_INFECTED" << std::endl;
                 }
                 
                 cell.incNrSecretions();
@@ -610,7 +614,9 @@ void Mac::solveTNF(GrGrid& grid, double dt)
 	cell.setTNF(Nav * vol * tnf);
 	cell.setShedTNFR2(Nav * vol * shedtnfr2);
 	if (_mTNF < 0 || _surfTNFR1 < 0 || _surfBoundTNFR1 < 0 || _surfTNFR2 < 0 || _surfBoundTNFR2 < 0)
-		std::cout << "Error: Negative Value of Species in TNF/TNFR dynamics" << std::endl;	
+		std::cout << "Error: Negative Value of Species in TNF/TNFR dynamics" << std::endl;
+    
+    //cout << "Debug: Running TNF dynamics" << std::endl;
 }
 
 void Mac::solveNFkBandTNF(GrGrid& grid, double dt)
@@ -769,6 +775,8 @@ void Mac::solveNFkBandTNF(GrGrid& grid, double dt)
 		_NFkB_IkB < 0 || _NFkB_IkBn < 0 || _GA20 < 0 || _GIkB < 0 || _GR < 0 || _chemt < 0 || _chem < 0 ||
 		_TNFt < 0 || _TNF < 0 || _ACTt < 0 || _ACT < 0 || _IAPt < 0 || _IAP < 0)
 		std::cout << "Error: Negative Value of Species in NFkB dynamics" << std::endl;
+    
+    //cout << "Debug: Running TNF and NFkB dynamics" << std::endl;
 }
 
 
@@ -878,6 +886,8 @@ void Mac::solveTNFandIL10(GrGrid& grid, double dt)
     
     if (_surfIL10R < 0 || _surfBoundIL10R < 0)
         std::cout << "Error: Negative value of species in IL10/IL10R dynamics" << std::endl;
+    
+    //cout << "Debug: Running TNF and IL10 dynamics" << std::endl;
     
 }
 
@@ -1053,6 +1063,8 @@ void Mac::solveTNFandIL10andNFkB(GrGrid& grid, double dt)
 		_NFkB_IkB < 0 || _NFkB_IkBn < 0 || _GA20 < 0 || _GIkB < 0 || _GR < 0 || _chemt < 0 || _chem < 0 ||
 		_TNFt < 0 || _TNF < 0 || _ACTt < 0 || _ACT < 0 || _IAPt < 0 || _IAP < 0)
 		std::cout << "Error: Negative Value of Species in NFkB dynamics" << std::endl;
+    
+     //cout << "Debug: Running TNF and IL10 and NFkB dynamics" << std::endl;
 }
 
 
@@ -1085,6 +1097,8 @@ void Mac::solveIL10(GrGrid& grid, double dt)
     
     if (_surfIL10R < 0 || _surfBoundIL10R < 0)
         std::cout << "Error: Negative value of species in IL10/IL10R dynamics" << std::endl;
+    
+     //cout << "Debug: Running IL10 dynamics" << std::endl;
     
 }
 

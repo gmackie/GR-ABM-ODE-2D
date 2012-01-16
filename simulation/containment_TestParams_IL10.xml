@@ -148,7 +148,7 @@
     IkSynthTcell = "0.0"
     dIL10_Tgam = "0.0"
     dIL10_Tcyt = "0.0"
-    dIL10_Treg = "0.0"
+    dIL10_Treg = "7.2"
     >
 	<Mac
 		initNumber = "105"

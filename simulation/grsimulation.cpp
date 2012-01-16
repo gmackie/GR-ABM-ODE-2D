@@ -324,10 +324,7 @@ void GrSimulation::solve()
 		secreteFromTcells(tnfDepletion, il10Depletion);
 		secreteFromCaseations();
 		_pDiffusion->diffuse(_grid);
-		
-        
-        
-        
+
         if (_nfkbDynamics)
 		{
 			if (_il10rDynamics) {
@@ -350,7 +347,7 @@ void GrSimulation::solve()
             updateIL10Dynamics(dt);
         }
         
-        else
+        else if (!_il10rDynamics || !_tnfrDynamics)
 		{
 			adjustFauxDegradation(dt, _tnfrDynamics, _il10rDynamics);
             //adjustTNFDegradation(dt);

@@ -55,6 +55,9 @@ typedef enum {
 	// molecular TNF-associated parameters
 	PARAM_GR_K_SYNTH_MAC,
 	PARAM_GR_K_SYNTH_TCELL,
+    PARAM_GR_K_TRANS,
+    PARAM_GR_K_RNA_MAC,
+    PARAM_GR_K_RNA_TCELL,
 	PARAM_GR_K_TACE_MAC,
 	PARAM_GR_K_TACE_TCELL,
 	PARAM_GR_KD1,
@@ -97,10 +100,10 @@ typedef enum {
     // end of molecular IL10 associated parameters
     
     // TNF and IL10 linking parameters
-    PARAM_GR_LINK_TACE_MM1,
-    PARAM_GR_LINK_TACE_MM2,
-    PARAM_GR_LINK_SYNTH_MM1,
-    PARAM_GR_LINK_SYNTH_MM2,
+    PARAM_GR_LINK_RNA_DELTA,
+    PARAM_GR_LINK_RNA_GAMMA,
+    PARAM_GR_LINK_RNA_TAU,
+    PARAM_GR_LINK_RNA_MOD,
     PARAM_GR_LINK_LOG_ALPHA,
     PARAM_GR_LINK_LOG_BETA,
     

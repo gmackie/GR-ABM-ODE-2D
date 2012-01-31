@@ -31,10 +31,12 @@ Mac::Mac()
 	, _surfBoundTNFR2(-1.0)
 	, _intBoundTNFR1(-1.0)
 	, _intBoundTNFR2(-1.0)
+    , _mTNFRNA(-1.0)
 	, _vTNFR1(-1.0)
 	, _vTNFR2(-1.0)
 	, _kSynth(-1.0)
 	, _kTACE(-1.0)
+    , _kmRNA(-1.0)
 
     // IL10 components
 
@@ -97,10 +99,12 @@ Mac::Mac(int birthtime, int row, int col, MacState state, double intMtb, bool NF
 	, _surfBoundTNFR2(0.0)
 	, _intBoundTNFR1(0.0)
 	, _intBoundTNFR2(0.0)
+    , _mTNFRNA(0.0)
 	, _vTNFR1(_surfTNFR1 * _PARAM(PARAM_GR_K_T1))
 	, _vTNFR2(_surfTNFR2 * _PARAM(PARAM_GR_K_T2))
 	, _kSynth(0.0)
 	, _kTACE(_PARAM(PARAM_GR_K_TACE_MAC))
+    , _kmRNA(0.0)
 
     // IL10 components
 
@@ -171,6 +175,7 @@ void Mac::secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDe
 	if (_deactivationTime != -1)
 	{
 		_kSynth = 0;
+        _kmRNA = 0;
 		_c1rChem = 0;
 		_c1rTNF = 0;
 		_c1rrChemTNF = 0;
@@ -243,13 +248,16 @@ void Mac::secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDe
 				cell.incCCL5(0.5 * _PARAM(PARAM_MAC_SEC_RATE_CCL5));
 				cell.incCXCL9(0.5 * _PARAM(PARAM_MAC_SEC_RATE_CXCL9));
 				_kSynth = 0.5 * _PARAM(PARAM_GR_K_SYNTH_MAC);
+                _kmRNA = 0.5 * _PARAM(PARAM_GR_K_RNA_MAC);
                 _kISynth = 0.0;
                 
                 if (!tnfrDynamics && !tnfDepletion)
                 {
                     
                     double il10 = log(((cell.getIL10() * MW_IL10 * 1e6)/(Nav * vol))); // converting il10 concentration to log(ng/mL) for use in dose dependence
+                    //std::cout << "LOG OF IL10: " << il10 << std::endl;
                     double tnfMOD = (1.0/(1.0 + exp((il10 + _PARAM(PARAM_GR_LINK_LOG_ALPHA))/_PARAM(PARAM_GR_LINK_LOG_BETA)))); // calculate the fraction of inhibition
+                    //std::cout << "tnfMOD: " << tnfMOD << std::endl;
 					cell.incTNF(tnfMOD * 0.5 * _PARAM(PARAM_MAC_SEC_RATE_TNF));
                 }
                 
@@ -258,6 +266,7 @@ void Mac::secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDe
             else
             {
                 _kSynth = 0.0;
+                _kmRNA = 0.0;
                 _kISynth = 0.0;
             }
         }
@@ -268,11 +277,13 @@ void Mac::secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDe
 				cell.incCCL5(_PARAM(PARAM_MAC_SEC_RATE_CCL5));
 				cell.incCXCL9(_PARAM(PARAM_MAC_SEC_RATE_CXCL9));
 				_kSynth = _PARAM(PARAM_GR_K_SYNTH_MAC);
+                _kmRNA = _PARAM(PARAM_GR_K_RNA_MAC);
                 _kISynth = _PARAM(PARAM_GR_I_K_SYNTH_MAC_INF);
                 
                 if (!tnfrDynamics && !tnfDepletion)
                 {    
                     double il10 = log(((cell.getIL10() * MW_IL10 * 1e6)/(Nav * vol))); // converting il10 concentration to log(ng/mL) for use in dose dependence
+                    //std::cout << "LOG OF IL10: " << il10 << std::endl;
                     double tnfMOD = (1.0/(1.0 + exp((il10 + _PARAM(PARAM_GR_LINK_LOG_ALPHA))/_PARAM(PARAM_GR_LINK_LOG_BETA)))); // calculate the fraction of inhibition
 					cell.incTNF(tnfMOD * _PARAM(PARAM_MAC_SEC_RATE_TNF));
                     //cout << "Debug: IL10 inhibition from MAC_INFECTED" << std::endl;
@@ -291,14 +302,17 @@ void Mac::secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDe
                 cell.incCCL5(0.5 * _PARAM(PARAM_MAC_SEC_RATE_CCL5));
                 cell.incCXCL9(0.5 * _PARAM(PARAM_MAC_SEC_RATE_CXCL9));
                 _kSynth = 0.5 * _PARAM(PARAM_GR_K_SYNTH_MAC);
+                _kmRNA = 0.5 * _PARAM(PARAM_GR_K_RNA_MAC);
                 _kISynth = _PARAM(PARAM_GR_I_K_SYNTH_MAC_INF);
                 
                 if (!tnfrDynamics && !tnfDepletion)
                 {    
                     double il10 = log(((cell.getIL10() * MW_IL10 * 1e6)/(Nav * vol))); // converting il10 concentration to log(ng/mL) for use in dose dependence
+                    //std::cout << "LOG OF IL10: " << il10 << std::endl;
                     double tnfMOD = (1.0/(1.0 + exp((il10 + _PARAM(PARAM_GR_LINK_LOG_ALPHA))/_PARAM(PARAM_GR_LINK_LOG_BETA)))); // calculate the fraction of inhibition
 					cell.incTNF(tnfMOD * _PARAM(PARAM_MAC_SEC_RATE_TNF));
                     //cout << "Debug: IL10 inhibition from MAC_INFECTED" << std::endl;
+                    //std::cout << "tnfMOD: " << tnfMOD << std::endl;
                 }
                 if (!il10rDynamics && !il10Depletion) {
                     cell.incIL10(_PARAM(PARAM_MAC_SEC_RATE_IL10));
@@ -315,6 +329,7 @@ void Mac::secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDe
 				cell.incCCL5(_PARAM(PARAM_MAC_SEC_RATE_CCL5));
 				cell.incCXCL9(_PARAM(PARAM_MAC_SEC_RATE_CXCL9));
 				_kSynth = _PARAM(PARAM_GR_K_SYNTH_MAC);
+                _kmRNA = _PARAM(PARAM_GR_K_RNA_MAC);
                 _kISynth = _kISynth = 2.0 * _PARAM(PARAM_GR_I_K_SYNTH_MAC_INF);
                 
                 if (!tnfrDynamics && !tnfDepletion)
@@ -346,6 +361,7 @@ void Mac::secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDe
 				cell.incCCL5(_PARAM(PARAM_MAC_SEC_RATE_CCL5));
 				cell.incCXCL9(_PARAM(PARAM_MAC_SEC_RATE_CXCL9));
 				_kSynth = _PARAM(PARAM_GR_K_SYNTH_MAC);
+                _kmRNA = _PARAM(PARAM_GR_K_RNA_MAC);
                 _kISynth = _PARAM(PARAM_GR_I_K_SYNTH_MAC_ACT);
                 
                 if (!tnfrDynamics && !tnfDepletion)
@@ -571,6 +587,7 @@ void Mac::solveTNF(GrGrid& grid, double dt)
 	double shedtnfr2 = cell.getShedTNFR2() / (Nav * vol);
     double il10 = cell.getIL10() /(Nav * vol);
 	
+    double dmTNFRNA;
 	double dmTNF;
 	double dsurfTNFR1;
 	double dsurfTNFR2;
@@ -582,25 +599,25 @@ void Mac::solveTNF(GrGrid& grid, double dt)
 	double dshedTNFR2;
 	
     double eqsurfBoundIL10R;
-    double Iksynth;
-    double IkTACE;
+    double IkmRNA;
     
     // modulate TNF parameters based on equilibrium IL10 receptor equations since the il10 molecular equations are not active
     eqsurfBoundIL10R = (il10 * _surfIL10R) / (_PARAM(PARAM_GR_I_KD) + il10);
-    Iksynth = _kSynth * (1.0 - ((_PARAM(PARAM_GR_LINK_SYNTH_MM1) * eqsurfBoundIL10R) / (_PARAM(PARAM_GR_LINK_SYNTH_MM2) + eqsurfBoundIL10R)));
-    IkTACE = _kTACE * (1.0 - ((_PARAM(PARAM_GR_LINK_TACE_MM1) * eqsurfBoundIL10R) / (_PARAM(PARAM_GR_LINK_TACE_MM2) + eqsurfBoundIL10R)));
+    IkmRNA = _kmRNA * (_PARAM(PARAM_GR_LINK_RNA_TAU) + ((1.0 - _PARAM(PARAM_GR_LINK_RNA_TAU))/(1.0 + pow(2.7183, ((eqsurfBoundIL10R - _PARAM(PARAM_GR_LINK_RNA_GAMMA))/_PARAM(PARAM_GR_LINK_RNA_DELTA))))));
     // end of equilibrium calculations
-    
-	dmTNF = (Iksynth - IkTACE * _mTNF) * dt;
+                                               
+    dmTNFRNA = (IkmRNA - _PARAM(PARAM_GR_K_TRANS) * _mTNFRNA) * dt;
+	dmTNF = (_PARAM(PARAM_GR_K_TRANS) * _mTNFRNA - _kTACE * _mTNF) * dt;
 	dsurfTNFR1 = (_vTNFR1 - _PARAM(PARAM_GR_K_ON1) * tnf * _surfTNFR1 + koff1 * _surfBoundTNFR1 - _PARAM(PARAM_GR_K_T1) * _surfTNFR1 + _PARAM(PARAM_GR_K_REC1) * _intBoundTNFR1) * dt;
 	dsurfTNFR2 = (_vTNFR2 - _PARAM(PARAM_GR_K_ON2) * tnf * _surfTNFR2 + koff2 * _surfBoundTNFR2 - _PARAM(PARAM_GR_K_T2) * _surfTNFR2 + _PARAM(PARAM_GR_K_REC2) * _intBoundTNFR2) * dt;
 	dsurfBoundTNFR1 = (_PARAM(PARAM_GR_K_ON1) * tnf * _surfTNFR1 - koff1 * _surfBoundTNFR1 - _PARAM(PARAM_GR_K_INT1) * _surfBoundTNFR1) * dt;
 	dsurfBoundTNFR2 = (_PARAM(PARAM_GR_K_ON2) * tnf * _surfTNFR2 - koff2 * _surfBoundTNFR2 - _PARAM(PARAM_GR_K_INT2) * _surfBoundTNFR2 - _PARAM(PARAM_GR_K_SHED) * _surfBoundTNFR2) * dt;
 	dintBoundTNFR1 = (_PARAM(PARAM_GR_K_INT1) * _surfBoundTNFR1 - _PARAM(PARAM_GR_K_DEG1) * _intBoundTNFR1 - _PARAM(PARAM_GR_K_REC1) * _intBoundTNFR1) * dt;
 	dintBoundTNFR2 = (_PARAM(PARAM_GR_K_INT2) * _surfBoundTNFR2 - _PARAM(PARAM_GR_K_DEG2) * _intBoundTNFR2 - _PARAM(PARAM_GR_K_REC2) * _intBoundTNFR2) * dt;
-	dsTNF = ((density/Nav) * (IkTACE * _mTNF - _PARAM(PARAM_GR_K_ON1) * tnf * _surfTNFR1 + koff1 * _surfBoundTNFR1 - _PARAM(PARAM_GR_K_ON2) * tnf * _surfTNFR2 + koff2 * _surfBoundTNFR2)) * dt; 
+	dsTNF = ((density/Nav) * (_kTACE * _mTNF - _PARAM(PARAM_GR_K_ON1) * tnf * _surfTNFR1 + koff1 * _surfBoundTNFR1 - _PARAM(PARAM_GR_K_ON2) * tnf * _surfTNFR2 + koff2 * _surfBoundTNFR2)) * dt; 
 	dshedTNFR2 = ((density/Nav) * _PARAM(PARAM_GR_K_SHED) * _surfBoundTNFR2) * dt;
-	
+ 
+    _mTNFRNA += dmTNFRNA;
 	_mTNF += dmTNF;
 	_surfTNFR1 += dsurfTNFR1;
 	_surfTNFR2 += dsurfTNFR2;
@@ -613,7 +630,7 @@ void Mac::solveTNF(GrGrid& grid, double dt)
 	
 	cell.setTNF(Nav * vol * tnf);
 	cell.setShedTNFR2(Nav * vol * shedtnfr2);
-	if (_mTNF < 0 || _surfTNFR1 < 0 || _surfBoundTNFR1 < 0 || _surfTNFR2 < 0 || _surfBoundTNFR2 < 0)
+	if (_mTNF < 0 || _surfTNFR1 < 0 || _surfBoundTNFR1 < 0 || _surfTNFR2 < 0 || _surfBoundTNFR2 < 0 || _mTNFRNA < 0)
 		std::cout << "Error: Negative Value of Species in TNF/TNFR dynamics" << std::endl;
     
     //cout << "Debug: Running TNF dynamics" << std::endl;
@@ -674,23 +691,26 @@ void Mac::solveNFkBandTNF(GrGrid& grid, double dt)
     
     
     double eqsurfBoundIL10R;
-    double Ie3TNF;
-    double IkTACE;
+    double IkmRNA;
+
     
     // modulate TNF parameters based on equilibrium IL10 receptor equations since the il10 molecular equations are not active
     eqsurfBoundIL10R = (il10 * _surfIL10R) / (_PARAM(PARAM_GR_I_KD) + il10);
-    Ie3TNF = _PARAM(PARAM_GR_e3TNF) * (1.0 - ((_PARAM(PARAM_GR_LINK_SYNTH_MM1) * eqsurfBoundIL10R) / (_PARAM(PARAM_GR_LINK_SYNTH_MM2) + eqsurfBoundIL10R)));
-    IkTACE = _kTACE * (1.0 - ((_PARAM(PARAM_GR_LINK_TACE_MM1) * eqsurfBoundIL10R) / (_PARAM(PARAM_GR_LINK_TACE_MM2) + eqsurfBoundIL10R)));
+    IkmRNA = _kmRNA * (_PARAM(PARAM_GR_LINK_RNA_TAU) + ((1.0 - _PARAM(PARAM_GR_LINK_RNA_TAU))/(1.0 + pow(2.7183, ((eqsurfBoundIL10R - _PARAM(PARAM_GR_LINK_RNA_GAMMA))/_PARAM(PARAM_GR_LINK_RNA_DELTA))))));
     // end of equilibrium calculations
     
-	dmTNF = ( Ie3TNF*_TNF - IkTACE * _mTNF) * dt;
+    
+    // CURRENTLY NOT LINKED WITH IL10 SINCE NFKB DYNAMICS HAVE NOT BEEN LOOKED AT
+    
+    // tnf dynamics model equations
+	dmTNF = (_PARAM(PARAM_GR_e3TNF)*_TNF - _kTACE * _mTNF) * dt;
 	dsurfTNFR1 = (_vTNFR1 - _PARAM(PARAM_GR_K_ON1) * tnf * _surfTNFR1 + (koff1+kdeg) * _surfBoundTNFR1 - _PARAM(PARAM_GR_K_T1) * _surfTNFR1 + _PARAM(PARAM_GR_K_REC1) * _intBoundTNFR1) * dt;
 	dsurfTNFR2 = (_vTNFR2 - _PARAM(PARAM_GR_K_ON2) * tnf * _surfTNFR2 + (koff2+kdeg) * _surfBoundTNFR2 - _PARAM(PARAM_GR_K_T2) * _surfTNFR2 + _PARAM(PARAM_GR_K_REC2) * _intBoundTNFR2) * dt;
 	dsurfBoundTNFR1 = (_PARAM(PARAM_GR_K_ON1) * tnf * _surfTNFR1 - (koff1+kdeg) * _surfBoundTNFR1 - _PARAM(PARAM_GR_K_INT1) * _surfBoundTNFR1) * dt;
 	dsurfBoundTNFR2 = (_PARAM(PARAM_GR_K_ON2) * tnf * _surfTNFR2 - (koff2+kdeg) * _surfBoundTNFR2 - _PARAM(PARAM_GR_K_INT2) * _surfBoundTNFR2 - _PARAM(PARAM_GR_K_SHED) * _surfBoundTNFR2) * dt;
 	dintBoundTNFR1 = (_PARAM(PARAM_GR_K_INT1) * _surfBoundTNFR1 - _PARAM(PARAM_GR_K_DEG1) * _intBoundTNFR1 - _PARAM(PARAM_GR_K_REC1) * _intBoundTNFR1) * dt;
 	dintBoundTNFR2 = (_PARAM(PARAM_GR_K_INT2) * _surfBoundTNFR2 - _PARAM(PARAM_GR_K_DEG2) * _intBoundTNFR2 - _PARAM(PARAM_GR_K_REC2) * _intBoundTNFR2) * dt;
-	dsTNF = ((density/Nav) * (IkTACE * _mTNF - _PARAM(PARAM_GR_K_ON1) * tnf * _surfTNFR1 + koff1 * _surfBoundTNFR1 - _PARAM(PARAM_GR_K_ON2) * tnf * _surfTNFR2 + koff2 * _surfBoundTNFR2)) * dt; 
+	dsTNF = ((density/Nav) * (_kTACE * _mTNF - _PARAM(PARAM_GR_K_ON1) * tnf * _surfTNFR1 + koff1 * _surfBoundTNFR1 - _PARAM(PARAM_GR_K_ON2) * tnf * _surfTNFR2 + koff2 * _surfBoundTNFR2)) * dt; 
 	dshedTNFR2 = ((density/Nav) * _PARAM(PARAM_GR_K_SHED) * _surfBoundTNFR2) * dt;
 	
 	// NF-kB dynamics model equations
@@ -795,6 +815,7 @@ void Mac::solveTNFandIL10(GrGrid& grid, double dt)
 	double shedtnfr2 = cell.getShedTNFR2() / (Nav * vol);
     double il10 = cell.getIL10() / (Nav * vol);
 	
+    double dmTNFRNA;
 	double dmTNF;
 	double dsurfTNFR1;
 	double dsurfTNFR2;
@@ -809,50 +830,24 @@ void Mac::solveTNFandIL10(GrGrid& grid, double dt)
 	double dsurfIL10R;
 	double dsurfBoundIL10R;
     
-    double Iksynth;
-    double IkTACE;
-    
-    
-    
+    double IkmRNA;
     
     // solving for TNF parameters that depend on IL10
     
-    // debug
-    
-    //cout << _kSynth << "    " << _kTACE << std::endl;
-    
-    //double temp1 = ((_PARAM(PARAM_GR_LINK_SYNTH_MM1) * _surfBoundIL10R) / (_PARAM(PARAM_GR_LINK_SYNTH_MM2) + _surfBoundIL10R));
-    //double temp2 = ((_PARAM(PARAM_GR_LINK_TACE_MM1) * _surfBoundIL10R) / (_PARAM(PARAM_GR_LINK_TACE_MM2) + _surfBoundIL10R));
-    
-    //double temp3 = (_PARAM(PARAM_GR_LINK_SYNTH_MM1) * _surfBoundIL10R);
-    //double temp4 = (_PARAM(PARAM_GR_LINK_SYNTH_MM2) + _surfBoundIL10R);
-
-    //cout << temp3 << "    " << temp4 << std::endl;
-    //cout << temp1 << "    " << temp2 << std::endl;
-    
-
-   
-    
-
-    Iksynth = _kSynth * (1.0 - ((_PARAM(PARAM_GR_LINK_SYNTH_MM1) * _surfBoundIL10R) / (_PARAM(PARAM_GR_LINK_SYNTH_MM2) + _surfBoundIL10R)));
-    IkTACE = _kTACE * (1.0 - ((_PARAM(PARAM_GR_LINK_TACE_MM1) * _surfBoundIL10R) / (_PARAM(PARAM_GR_LINK_TACE_MM2) + _surfBoundIL10R)));
-    
-    //cout << Iksynth << "    " << IkTACE << std::endl;
-    
-    //std::cin.ignore();
-    // debug
-    
+    IkmRNA = _kmRNA * (_PARAM(PARAM_GR_LINK_RNA_TAU) + ((1.0 - _PARAM(PARAM_GR_LINK_RNA_TAU))/(1.0 + pow(2.7183, ((_surfBoundIL10R - _PARAM(PARAM_GR_LINK_RNA_GAMMA))/_PARAM(PARAM_GR_LINK_RNA_DELTA))))));
+ 
     // end of TNF and IL10 linking
     
 	// TNF differential equations
-	dmTNF = (Iksynth - IkTACE * _mTNF) * dt;
+	dmTNFRNA = (IkmRNA - _PARAM(PARAM_GR_K_TRANS) * _mTNFRNA) * dt;
+	dmTNF = (_PARAM(PARAM_GR_K_TRANS) * _mTNFRNA - _kTACE * _mTNF) * dt;
 	dsurfTNFR1 = (_vTNFR1 - _PARAM(PARAM_GR_K_ON1) * tnf * _surfTNFR1 + koff1 * _surfBoundTNFR1 - _PARAM(PARAM_GR_K_T1) * _surfTNFR1 + _PARAM(PARAM_GR_K_REC1) * _intBoundTNFR1) * dt;
 	dsurfTNFR2 = (_vTNFR2 - _PARAM(PARAM_GR_K_ON2) * tnf * _surfTNFR2 + koff2 * _surfBoundTNFR2 - _PARAM(PARAM_GR_K_T2) * _surfTNFR2 + _PARAM(PARAM_GR_K_REC2) * _intBoundTNFR2) * dt;
 	dsurfBoundTNFR1 = (_PARAM(PARAM_GR_K_ON1) * tnf * _surfTNFR1 - koff1 * _surfBoundTNFR1 - _PARAM(PARAM_GR_K_INT1) * _surfBoundTNFR1) * dt;
 	dsurfBoundTNFR2 = (_PARAM(PARAM_GR_K_ON2) * tnf * _surfTNFR2 - koff2 * _surfBoundTNFR2 - _PARAM(PARAM_GR_K_INT2) * _surfBoundTNFR2 - _PARAM(PARAM_GR_K_SHED) * _surfBoundTNFR2) * dt;
 	dintBoundTNFR1 = (_PARAM(PARAM_GR_K_INT1) * _surfBoundTNFR1 - _PARAM(PARAM_GR_K_DEG1) * _intBoundTNFR1 - _PARAM(PARAM_GR_K_REC1) * _intBoundTNFR1) * dt;
 	dintBoundTNFR2 = (_PARAM(PARAM_GR_K_INT2) * _surfBoundTNFR2 - _PARAM(PARAM_GR_K_DEG2) * _intBoundTNFR2 - _PARAM(PARAM_GR_K_REC2) * _intBoundTNFR2) * dt;
-	dsTNF = ((density/Nav) * (IkTACE * _mTNF - _PARAM(PARAM_GR_K_ON1) * tnf * _surfTNFR1 + koff1 * _surfBoundTNFR1 - _PARAM(PARAM_GR_K_ON2) * tnf * _surfTNFR2 + koff2 * _surfBoundTNFR2)) * dt; 
+	dsTNF = ((density/Nav) * (_kTACE * _mTNF - _PARAM(PARAM_GR_K_ON1) * tnf * _surfTNFR1 + koff1 * _surfBoundTNFR1 - _PARAM(PARAM_GR_K_ON2) * tnf * _surfTNFR2 + koff2 * _surfBoundTNFR2)) * dt; 
 	dshedTNFR2 = ((density/Nav) * _PARAM(PARAM_GR_K_SHED) * _surfBoundTNFR2) * dt;
 	// end of TNF differential equations
     
@@ -863,6 +858,7 @@ void Mac::solveTNFandIL10(GrGrid& grid, double dt)
     // end of IL10 differential equations
     
     // update tnf variables
+	_mTNFRNA += dmTNFRNA;
 	_mTNF += dmTNF;
 	_surfTNFR1 += dsurfTNFR1;
 	_surfTNFR2 += dsurfTNFR2;
@@ -872,7 +868,7 @@ void Mac::solveTNFandIL10(GrGrid& grid, double dt)
 	_intBoundTNFR2 += dintBoundTNFR2;
 	tnf += dsTNF;
 	shedtnfr2 += dshedTNFR2;
-    
+	
     // update il10 variables
     _surfIL10R += dsurfIL10R;
     _surfBoundIL10R += dsurfBoundIL10R;
@@ -881,8 +877,10 @@ void Mac::solveTNFandIL10(GrGrid& grid, double dt)
 	cell.setTNF(Nav * vol * tnf);
 	cell.setShedTNFR2(Nav * vol * shedtnfr2);
     cell.setIL10(Nav * vol * il10);
-	if (_mTNF < 0 || _surfTNFR1 < 0 || _surfBoundTNFR1 < 0 || _surfTNFR2 < 0 || _surfBoundTNFR2 < 0)
-		std::cout << "Error: Negative Value of species in TNF/TNFR dynamics" << std::endl;
+	
+    
+	if (_mTNF < 0 || _surfTNFR1 < 0 || _surfBoundTNFR1 < 0 || _surfTNFR2 < 0 || _surfBoundTNFR2 < 0 || _mTNFRNA < 0)
+		std::cout << "Error: Negative Value of Species in TNF/TNFR dynamics" << std::endl;
     
     if (_surfIL10R < 0 || _surfBoundIL10R < 0)
         std::cout << "Error: Negative value of species in IL10/IL10R dynamics" << std::endl;
@@ -948,23 +946,27 @@ void Mac::solveTNFandIL10andNFkB(GrGrid& grid, double dt)
     double dsIL10;
 	double dsurfIL10R;
 	double dsurfBoundIL10R;
+    double IkmRNA;
     
-    double Ie3TNF;
-    double IkTACE;
+
     
     // solving for TNF parameters that depend on IL10
-    Ie3TNF = _PARAM(PARAM_GR_e3TNF) * (1.0 - ((_PARAM(PARAM_GR_LINK_SYNTH_MM1) * _surfBoundIL10R) / (_PARAM(PARAM_GR_LINK_SYNTH_MM2) + _surfBoundIL10R)));
-    IkTACE = _kTACE * (1.0 - ((_PARAM(PARAM_GR_LINK_TACE_MM1) * _surfBoundIL10R) / (_PARAM(PARAM_GR_LINK_TACE_MM2) + _surfBoundIL10R)));
+    
+    IkmRNA = _kmRNA * (_PARAM(PARAM_GR_LINK_RNA_TAU) + ((1.0 - _PARAM(PARAM_GR_LINK_RNA_TAU))/(1.0 + pow(2.7183, ((_surfBoundIL10R - _PARAM(PARAM_GR_LINK_RNA_GAMMA))/_PARAM(PARAM_GR_LINK_RNA_DELTA))))));
+    
     // end of TNF and IL10 linking
-	
-	dmTNF = ( Ie3TNF*_TNF - _kTACE * _mTNF) * dt;
+
+    
+     // CURRENTLY NOT LINKED WITH IL10 SINCE NFKB DYNAMICS HAVE NOT BEEN LOOKED AT
+    
+	dmTNF = (_PARAM(PARAM_GR_e3TNF)*_TNF - _kTACE * _mTNF) * dt;
 	dsurfTNFR1 = (_vTNFR1 - _PARAM(PARAM_GR_K_ON1) * tnf * _surfTNFR1 + (koff1+kdeg) * _surfBoundTNFR1 - _PARAM(PARAM_GR_K_T1) * _surfTNFR1 + _PARAM(PARAM_GR_K_REC1) * _intBoundTNFR1) * dt;
 	dsurfTNFR2 = (_vTNFR2 - _PARAM(PARAM_GR_K_ON2) * tnf * _surfTNFR2 + (koff2+kdeg) * _surfBoundTNFR2 - _PARAM(PARAM_GR_K_T2) * _surfTNFR2 + _PARAM(PARAM_GR_K_REC2) * _intBoundTNFR2) * dt;
 	dsurfBoundTNFR1 = (_PARAM(PARAM_GR_K_ON1) * tnf * _surfTNFR1 - (koff1+kdeg) * _surfBoundTNFR1 - _PARAM(PARAM_GR_K_INT1) * _surfBoundTNFR1) * dt;
 	dsurfBoundTNFR2 = (_PARAM(PARAM_GR_K_ON2) * tnf * _surfTNFR2 - (koff2+kdeg) * _surfBoundTNFR2 - _PARAM(PARAM_GR_K_INT2) * _surfBoundTNFR2 - _PARAM(PARAM_GR_K_SHED) * _surfBoundTNFR2) * dt;
 	dintBoundTNFR1 = (_PARAM(PARAM_GR_K_INT1) * _surfBoundTNFR1 - _PARAM(PARAM_GR_K_DEG1) * _intBoundTNFR1 - _PARAM(PARAM_GR_K_REC1) * _intBoundTNFR1) * dt;
 	dintBoundTNFR2 = (_PARAM(PARAM_GR_K_INT2) * _surfBoundTNFR2 - _PARAM(PARAM_GR_K_DEG2) * _intBoundTNFR2 - _PARAM(PARAM_GR_K_REC2) * _intBoundTNFR2) * dt;
-	dsTNF = ((density/Nav) * (IkTACE * _mTNF - _PARAM(PARAM_GR_K_ON1) * tnf * _surfTNFR1 + koff1 * _surfBoundTNFR1 - _PARAM(PARAM_GR_K_ON2) * tnf * _surfTNFR2 + koff2 * _surfBoundTNFR2)) * dt; 
+	dsTNF = ((density/Nav) * (_kTACE * _mTNF - _PARAM(PARAM_GR_K_ON1) * tnf * _surfTNFR1 + koff1 * _surfBoundTNFR1 - _PARAM(PARAM_GR_K_ON2) * tnf * _surfTNFR2 + koff2 * _surfBoundTNFR2)) * dt; 
 	dshedTNFR2 = ((density/Nav) * _PARAM(PARAM_GR_K_SHED) * _surfBoundTNFR2) * dt;
 	
 	// NF-kB dynamics model equations
@@ -1508,10 +1510,12 @@ void Mac::serialize(std::ostream& out) const
 	out << _surfBoundTNFR2 << std::endl;
 	out << _intBoundTNFR1 << std::endl;
 	out << _intBoundTNFR2 << std::endl;
+    out << _mTNFRNA << std::endl;
 	out << _vTNFR1 << std::endl;
 	out << _vTNFR2 << std::endl;
 	out << _kSynth << std::endl;
 	out << _kTACE << std::endl;
+    out << _kmRNA << std::endl;
     
     out << _surfIL10R << std::endl;
     out << _vIL10R << std::endl;
@@ -1584,10 +1588,12 @@ void Mac::deserialize(std::istream& in)
 	in >> _surfBoundTNFR2;
 	in >> _intBoundTNFR1;
 	in >> _intBoundTNFR2;
+    in >> _mTNFRNA;
 	in >> _vTNFR1;
 	in >> _vTNFR2;
 	in >> _kSynth;
 	in >> _kTACE;
+    in >> _kmRNA;
     
     in >> _surfIL10R;
     in >> _vIL10R;

@@ -84,7 +84,10 @@ const ParamDescription ParamsBase::_description[_PARAM_COUNT] =
 	// molecular TNF-associated parameters
 	{ "kSynthMac",							GR_NODE,	false,	false,	0.0,	0,	"#/cell.sec",		"Basal rate of mTNF synthesis by a macrophage" },
 	{ "kSynthTcell",						GR_NODE,	false,	false,	0.0,	0,	"#/cell.sec",		"Basal rate of mTNF synthesis by a T cell" },
-	{ "kTaceMac",							GR_NODE,	false,	false,	0.0,	0,	"1/sec",			"Basal rate of mTNF release from a macrophage" },
+	{ "kTrans",                             GR_NODE,	false,	false,	0.0,	0,	"1/sec",            "Rate of translation of TNF mRNA to mTNF" },
+    { "kRNAMac",                            GR_NODE,	false,	false,	0.0,	0,	"1/sec",            "Basal rate of TNF mRNA synthesis by a macrophage" },
+	{ "kRNATcell",                          GR_NODE,	false,	false,	0.0,	0,	"1/sec",            "Basal rate of TNF mRNA synthesis bt a T cell" },
+    { "kTaceMac",							GR_NODE,	false,	false,	0.0,	0,	"1/sec",			"Basal rate of mTNF release from a macrophage" },
 	{ "kTaceTcell",							GR_NODE,	false,	false,	0.0,	0,	"1/sec",			"Basal rate of mTNF release from a T cell" },
 	{ "KD1",								GR_NODE,	false,	false,	0.0,	0,	"M",				"sTNF/TNFR1 dissociation equilibrium constant" },
 	{ "KD2",								GR_NODE,	false,	false,	0.0,	0,	"M",				"sTNF/TNFR2 dissociation equilibrium constant" },
@@ -126,10 +129,10 @@ const ParamDescription ParamsBase::_description[_PARAM_COUNT] =
     // end of molecular IL10 associated parameters
 
     // TNF and IL10 linking parameters
-	{ "LinkTaceMM1",                        GR_NODE,	false,	false,	0.0,	0,	"",		            "IL10 on - TACE inhibition Michaelis-Menton Parameter 1" },
-	{ "LinkTaceMM2",                        GR_NODE,	false,	false,	0.0,	0,	"#/cell",		    "IL10 on - TACE inhibition Michaelis-Menton Parameter 2" },
-	{ "LinkSynthMM1",                       GR_NODE,	false,	false,	0.0,	0,	"",		            "IL10 on - SYNTH inhibition Michaelis-Menton Parameter 1" },
-	{ "LinkSynthMM2",                       GR_NODE,	false,	false,	0.0,	0,	"#/cell",		    "IL10 on - SYNTH inhibition Michaelis-Menton Parameter 2" },
+	{ "LinkRNADelta",                       GR_NODE,	false,	false,	0.0,	0,	"",                 "Logistic function parameter value - changes slope" },
+	{ "LinkRNAGamma",                       GR_NODE,	false,	false,	0.0,	0,	"",		            "Logistic function parameter value - changes where IC50 occurs" },
+	{ "LinkRNATau",                         GR_NODE,	false,	false,	0.0,	0,	"",                 "Logistic function parameter value - changes the minimum asymptote" },
+    { "LinkRNAMod",                         GR_NODE,	false,	false,	0.0,	0,	"",                 "Modification factor for when IL10 ODEs are not turned on" },
     { "LinkLogAlpha",                       GR_NODE,	false,	false,	0.0,	0,	"log10(ng/mL)",		"Coarse grained TNF/IL10 dose dependence parameter alpha" },
     { "LinkLogBeta",                        GR_NODE,	false,	false,	0.0,	0,	"log10(ng/mL)",     "Coarse grained TNF/IL10 dose dependence parameter beta" },
     // end of TNF and IL10 linking parameters

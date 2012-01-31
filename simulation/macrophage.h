@@ -36,10 +36,13 @@ private:
 	double _surfBoundTNFR2;
 	double _intBoundTNFR1; // No. of internalized TNF-bound TNFR1
 	double _intBoundTNFR2;
+    double _mTNFRNA;
 	double _vTNFR1; // Rate of TNFR1 synthesis by cell
 	double _vTNFR2;
 	double _kSynth; // Rate of mTNF synthesis by cell
 	double _kTACE; // Rate of mTNF release from cell by TACE activity
+    double _kmRNA; // Rate of RNA synthesis for mTNF
+    
     
     // IL10 associated atributes
     double _surfIL10R; // No. of cell surface IL10R

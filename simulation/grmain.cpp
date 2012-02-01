@@ -131,7 +131,7 @@ public:
     write("Tcyt"); write("Tcyt a"); write("Tcyt reg"); write("Tcyt d");
     write("Treg"); write("Treg r"); write("Treg d");
     write("Int. Mtb."); write("Ext. Mtb."); write("repExtMtb"); write("NonRepl Ext. Mtb."); write("Tot Mtb.");
-    write("TNF"); write("CCL2"); write("CCL5"); write("CXCL9"); 
+	write("TNF"); write("IL10"); write("CCL2"); write("CCL5"); write("CXCL9"); 
     write("AreaTNF"); write("AreaCellDensity"); write("LesionSize");
     write("MDC"); write("N4"); write("TH0"); write("TH1"); write("N8");
     write("T80"); write("T8"); write("TC"); write("TH0lung"); write("TH1lung");
@@ -158,7 +158,7 @@ public:
     FLOAT_TYPE repExtMtb = stats.getTotExtMtb() - stats.getTotNonRepExtMtb();
     write(stats.getTotIntMtb()); write(stats.getTotExtMtb()); write(repExtMtb); write(stats.getTotNonRepExtMtb()); write((stats.getTotIntMtb() + stats.getTotExtMtb()));
 
-    write(stats.getTotTNF()); write(stats.getTotCCL2()); write(stats.getTotCCL5());  write(stats.getTotCXCL9());
+	  write(stats.getTotTNF()); write(stats.getTotIL10()); write(stats.getTotCCL2()); write(stats.getTotCCL5());  write(stats.getTotCXCL9());
 
     FLOAT_TYPE lesionSize = 2 * sqrt((0.0004 * stats.getAreaCellDensity()) / PI);
     write(stats.getAreaTNF()); write(stats.getAreaCellDensity()); write(lesionSize);

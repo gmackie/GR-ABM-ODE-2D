@@ -603,7 +603,15 @@ void Mac::solveTNF(GrGrid& grid, double dt)
     
     // modulate TNF parameters based on equilibrium IL10 receptor equations since the il10 molecular equations are not active
     eqsurfBoundIL10R = (il10 * _surfIL10R) / (_PARAM(PARAM_GR_I_KD) + il10);
-    IkmRNA = _kmRNA * (_PARAM(PARAM_GR_LINK_RNA_TAU) + ((1.0 - _PARAM(PARAM_GR_LINK_RNA_TAU))/(1.0 + pow(2.7183, ((eqsurfBoundIL10R - _PARAM(PARAM_GR_LINK_RNA_GAMMA))/_PARAM(PARAM_GR_LINK_RNA_DELTA))))));
+    
+    if (_kmRNA > 0) {
+        IkmRNA = _kmRNA * ((_kSynth/_kmRNA)+ ((1.0 - (_kSynth/_kmRNA))/(1.0 + pow(2.7183, ((eqsurfBoundIL10R - _PARAM(PARAM_GR_LINK_RNA_GAMMA))/_PARAM(PARAM_GR_LINK_RNA_DELTA))))));
+    }
+    else
+    {
+        IkmRNA = 0.0;
+    }
+    
     // end of equilibrium calculations
                                                
     dmTNFRNA = (IkmRNA - _PARAM(PARAM_GR_K_TRANS) * _mTNFRNA) * dt;
@@ -696,7 +704,14 @@ void Mac::solveNFkBandTNF(GrGrid& grid, double dt)
     
     // modulate TNF parameters based on equilibrium IL10 receptor equations since the il10 molecular equations are not active
     eqsurfBoundIL10R = (il10 * _surfIL10R) / (_PARAM(PARAM_GR_I_KD) + il10);
-    IkmRNA = _kmRNA * (_PARAM(PARAM_GR_LINK_RNA_TAU) + ((1.0 - _PARAM(PARAM_GR_LINK_RNA_TAU))/(1.0 + pow(2.7183, ((eqsurfBoundIL10R - _PARAM(PARAM_GR_LINK_RNA_GAMMA))/_PARAM(PARAM_GR_LINK_RNA_DELTA))))));
+    
+    if (_kmRNA > 0) {
+        IkmRNA = _kmRNA * ((_kSynth/_kmRNA)+ ((1.0 - (_kSynth/_kmRNA))/(1.0 + pow(2.7183, ((eqsurfBoundIL10R - _PARAM(PARAM_GR_LINK_RNA_GAMMA))/_PARAM(PARAM_GR_LINK_RNA_DELTA))))));
+    }
+    else
+    {
+        IkmRNA = 0.0;
+    }
     
     // end of equilibrium calculations
     
@@ -835,7 +850,13 @@ void Mac::solveTNFandIL10(GrGrid& grid, double dt)
     
     // solving for TNF parameters that depend on IL10
     
-    IkmRNA = _kmRNA * (_PARAM(PARAM_GR_LINK_RNA_TAU) + ((1.0 - _PARAM(PARAM_GR_LINK_RNA_TAU))/(1.0 + pow(2.7183, ((_surfBoundIL10R - _PARAM(PARAM_GR_LINK_RNA_GAMMA))/_PARAM(PARAM_GR_LINK_RNA_DELTA))))));
+    if (_kmRNA > 0) {
+        IkmRNA = _kmRNA * ((_kSynth/_kmRNA)+ ((1.0 - (_kSynth/_kmRNA))/(1.0 + pow(2.7183, ((_surfBoundIL10R - _PARAM(PARAM_GR_LINK_RNA_GAMMA))/_PARAM(PARAM_GR_LINK_RNA_DELTA))))));
+    }
+    else
+    {
+        IkmRNA = 0.0;
+    }
     
     // end of TNF and IL10 linking
     
@@ -956,7 +977,13 @@ void Mac::solveTNFandIL10andNFkB(GrGrid& grid, double dt)
     
     // solving for TNF parameters that depend on IL10
     
-    IkmRNA = _kmRNA * (_PARAM(PARAM_GR_LINK_RNA_TAU) + ((1.0 - _PARAM(PARAM_GR_LINK_RNA_TAU))/(1.0 + pow(2.7183, ((_surfBoundIL10R - _PARAM(PARAM_GR_LINK_RNA_GAMMA))/_PARAM(PARAM_GR_LINK_RNA_DELTA))))));
+    if (_kmRNA > 0) {
+        IkmRNA = _kmRNA * ((_kSynth/_kmRNA)+ ((1.0 - (_kSynth/_kmRNA))/(1.0 + pow(2.7183, ((_surfBoundIL10R - _PARAM(PARAM_GR_LINK_RNA_GAMMA))/_PARAM(PARAM_GR_LINK_RNA_DELTA))))));
+    }
+    else
+    {
+        IkmRNA = 0.0;
+    }
     
     // end of TNF and IL10 linking
 

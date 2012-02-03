@@ -102,7 +102,6 @@ typedef enum {
     // TNF and IL10 linking parameters
     PARAM_GR_LINK_RNA_DELTA,
     PARAM_GR_LINK_RNA_GAMMA,
-    PARAM_GR_LINK_RNA_TAU,
     PARAM_GR_LINK_RNA_MOD,
     PARAM_GR_LINK_LOG_ALPHA,
     PARAM_GR_LINK_LOG_BETA,

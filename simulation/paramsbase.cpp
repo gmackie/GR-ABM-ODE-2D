@@ -131,7 +131,6 @@ const ParamDescription ParamsBase::_description[_PARAM_COUNT] =
     // TNF and IL10 linking parameters
 	{ "LinkRNADelta",                       GR_NODE,	false,	false,	0.0,	0,	"",                 "Logistic function parameter value - changes slope" },
 	{ "LinkRNAGamma",                       GR_NODE,	false,	false,	0.0,	0,	"",		            "Logistic function parameter value - changes where IC50 occurs" },
-	{ "LinkRNATau",                         GR_NODE,	false,	false,	0.0,	0,	"",                 "Logistic function parameter value - changes the minimum asymptote" },
     { "LinkRNAMod",                         GR_NODE,	false,	false,	0.0,	0,	"",                 "Modification factor for when IL10 ODEs are not turned on" },
     { "LinkLogAlpha",                       GR_NODE,	false,	false,	0.0,	0,	"log10(ng/mL)",		"Coarse grained TNF/IL10 dose dependence parameter alpha" },
     { "LinkLogBeta",                        GR_NODE,	false,	false,	0.0,	0,	"log10(ng/mL)",     "Coarse grained TNF/IL10 dose dependence parameter beta" },

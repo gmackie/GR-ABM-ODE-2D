@@ -130,7 +130,8 @@ private:
 	FLOAT_TYPE _T80lung;
 	FLOAT_TYPE _T8lung;
 	FLOAT_TYPE _TClung;
-
+	int _nCellTnfInhibit;
+	
 	size_t _intMtbFreqSize;
 	unsigned* _intMtbFreq;
 public:
@@ -288,6 +289,8 @@ public:
 	void setT80lung(FLOAT_TYPE val);
 	void setT8lung(FLOAT_TYPE val);
 	void setTClung(FLOAT_TYPE val);
+	int getNrOfCellsInhibited () const;
+	void incNrOfCellsInhibited ();
 };
 
 inline size_t GrStat::getIntMtbFreqSize() const
@@ -943,5 +946,16 @@ inline int GrStat::getNrOfMacDeact() const
 {
 	return _nMacDeact;
 }
+
+inline int GrStat::getNrOfCellsInhibited() const
+{
+	return _nCellTnfInhibit;
+}
+
+inline void GrStat::incNrOfCellsInhibited()
+{
+	_nCellTnfInhibit++;
+}
+
 
 #endif /* GRSTAT_H */

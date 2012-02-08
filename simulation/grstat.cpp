@@ -96,6 +96,7 @@ GrStat::GrStat()
 	, _T80lung(0)
 	, _T8lung(0)
 	, _TClung(0)
+	, _nCellTnfInhibit(0)
 
 		// + 1 because burst threshold might not be an integer value, and if not,
 		// when a macrophage's intMtb count is truncated to the floor(burst threshold)
@@ -342,6 +343,7 @@ void GrStat::resetAgentStats()
 	_nTcyt = _nTcytDead = _nTcytDownRegulated = _nTcytActive = 0;
 	
 	_nTreg = _nTregDead = _nTregActive = 0;
+	
 
   memset(_nMacApoptosisTNF, 0 , sizeof(int)*NMAC_STATES);
   memset(_intMtbFreq, 0, sizeof(unsigned)*_intMtbFreqSize);
@@ -360,6 +362,8 @@ void GrStat::reset()
 	_nCaseated = 0;
 
 	_areaTNF = _areaCellDensity = 0;
+	
+	_nCellTnfInhibit = 0;
 }
 
 void GrStat::serialize(std::ostream& out) const
@@ -401,6 +405,7 @@ void GrStat::serialize(std::ostream& out) const
 	out << _totCXCL9 << std::endl;
 
 	out << _nApoptosisFasFasL << std::endl;
+	
   for(unsigned i=0;i<NMAC_STATES;i++)
   	out << _nMacApoptosisTNF[i] << std::endl;
 
@@ -469,6 +474,7 @@ void GrStat::serialize(std::ostream& out) const
 	out << _T80lung << std::endl;
 	out << _T8lung << std::endl;
 	out << _TClung << std::endl;
+	out << _nCellTnfInhibit << std::endl;
 
 	Serialization::writeFooter(out, GrStat::_ClassName);
 }
@@ -585,6 +591,7 @@ void GrStat::deserialize(std::istream& in)
 	in >>_T80lung;
 	in >>_T8lung;
 	in >>_TClung;
+	in >> _nCellTnfInhibit;
 
 	if (!Serialization::readFooter(in, GrStat::_ClassName))
 	{

@@ -143,6 +143,7 @@ public:
     write("TcellApoptTNF");
     write("MrActivationTNF");
     write("MiActivationTNF");
+	write("NrOfMacsFullyInhibited");
     endRow();
 
   }
@@ -214,6 +215,7 @@ public:
     write(stats.getNrTcellApoptosisTNF());
     write(stats.getNrRestingMacActivationTNF());
     write(stats.getNrInfMacActivationTNF());
+	write(stats.getNrOfCellsInhibited()/100);
     oCSVStream::endRow();
   }
 };
@@ -245,7 +247,8 @@ void printStats(const GrSimulation* pSim) {
   #define INV_SZ (1.0 / (NROWS*NCOLS))
   printf("(%11.5f,%11.5f,%11.5f,%11.5f,%11.5f) ", stats.getTotTNF()*INV_SZ, stats.getTotIL10()*INV_SZ, stats.getTotCCL2()*INV_SZ, stats.getTotCCL5()*INV_SZ, stats.getTotCXCL9()*INV_SZ);
   printf("(%d,%d,%d,%d) ", stats.getNrSourcesMac(), stats.getNrSourcesTgam(), stats.getNrSourcesTcyt(), stats.getNrSourcesTreg());
-  printf("(%d, %.5f)\n", stats.getNrCaseated(), stats.getTotNonRepExtMtb());
+  printf("(%d, %.5f) ", stats.getNrCaseated(), stats.getTotNonRepExtMtb());
+  printf("(%d)\n", stats.getNrOfCellsInhibited()/100);
 }
 
 // Stopping criteria.

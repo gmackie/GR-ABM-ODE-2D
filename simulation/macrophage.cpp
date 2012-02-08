@@ -225,10 +225,10 @@ void Mac::secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDe
 			_c1rTNF = _PARAM(PARAM_GR_c1r);
 			_c1rrChemTNF = _PARAM(PARAM_GR_c1r);
 			cell.incNrSecretions();
-            _kISynth = 2.0 * _PARAM(PARAM_GR_I_K_SYNTH_MAC_INF);
+            _kISynth = 4.0 * _PARAM(PARAM_GR_I_K_SYNTH_MAC_INF);
             
             if (!il10rDynamics && !il10Depletion) {
-                cell.incIL10(2.0 * _PARAM(PARAM_MAC_SEC_RATE_IL10));
+                cell.incIL10(4.0 * _PARAM(PARAM_MAC_SEC_RATE_IL10));
             }
         }
 	}
@@ -330,7 +330,7 @@ void Mac::secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDe
 				cell.incCXCL9(_PARAM(PARAM_MAC_SEC_RATE_CXCL9));
 				_kSynth = _PARAM(PARAM_GR_K_SYNTH_MAC);
                 _kmRNA = _PARAM(PARAM_GR_K_RNA_MAC);
-                _kISynth = _kISynth = 2.0 * _PARAM(PARAM_GR_I_K_SYNTH_MAC_INF);
+                _kISynth = _kISynth = 4.0 * _PARAM(PARAM_GR_I_K_SYNTH_MAC_INF);
                 
                 if (!tnfrDynamics && !tnfDepletion)
                 {    
@@ -339,19 +339,10 @@ void Mac::secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDe
 					cell.incTNF(tnfMOD * _PARAM(PARAM_MAC_SEC_RATE_TNF));
                 }
                 if (!il10rDynamics && !il10Depletion) {
-                    cell.incIL10(2.0 * _PARAM(PARAM_MAC_SEC_RATE_IL10));
+                    cell.incIL10(4.0 * _PARAM(PARAM_MAC_SEC_RATE_IL10));
                 }
                 
                 cell.incNrSecretions();
-            }
-            
-            else
-            {
-                _kISynth = _kISynth = 2.0 * _PARAM(PARAM_GR_I_K_SYNTH_MAC_INF);
-                
-                if (!il10rDynamics && !il10Depletion) {
-                    cell.incIL10(2.0 * _PARAM(PARAM_MAC_SEC_RATE_IL10));
-                }
             }
         }
         else if (_state == MAC_ACTIVE) {
@@ -371,19 +362,10 @@ void Mac::secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDe
 					cell.incTNF(tnfMOD * _PARAM(PARAM_MAC_SEC_RATE_TNF));
                 }
                 if (!il10rDynamics && !il10Depletion) {
-                    cell.incIL10(0.5 * _PARAM(PARAM_MAC_SEC_RATE_IL10));
+                    cell.incIL10(0.0);
                 }
                 
                 cell.incNrSecretions();
-            }
-            
-            else
-            {
-                _kISynth = _PARAM(PARAM_GR_I_K_SYNTH_MAC_ACT);
-                
-                if (!il10rDynamics && !il10Depletion) {
-                    cell.incIL10(0.5 * _PARAM(PARAM_MAC_SEC_RATE_IL10));
-                }
             }
         }
         
@@ -817,7 +799,7 @@ void Mac::solveNFkBandTNF(GrGrid& grid, double dt)
 
 
 
-void Mac::solveTNFandIL10(GrGrid& grid, double dt)
+void Mac::solveTNFandIL10(GrGrid& grid, GrStat& stats, double dt, double currenttime)
 {
     GridCell& cell = grid(_row, _col);
 	
@@ -851,13 +833,18 @@ void Mac::solveTNFandIL10(GrGrid& grid, double dt)
     // solving for TNF parameters that depend on IL10
     
     if (_kmRNA > 0) {
-        IkmRNA = _kmRNA * ((_kSynth/_kmRNA)+ ((1.0 - (_kSynth/_kmRNA))/(1.0 + pow(2.7183, ((_surfBoundIL10R - _PARAM(PARAM_GR_LINK_RNA_GAMMA))/_PARAM(PARAM_GR_LINK_RNA_DELTA))))));
+        IkmRNA = _kmRNA * ((_kSynth/_kmRNA) + ((1.0 - (_kSynth/_kmRNA))/(1.0 + pow(2.7183, ((_surfBoundIL10R - _PARAM(PARAM_GR_LINK_RNA_GAMMA))/_PARAM(PARAM_GR_LINK_RNA_DELTA))))));
+		
+		if (IkmRNA <= 0.75)
+		{
+			stats.incNrOfCellsInhibited();
+		}
     }
     else
     {
         IkmRNA = 0.0;
     }
-    
+	
     // end of TNF and IL10 linking
     
 	// TNF differential equations
@@ -899,6 +886,29 @@ void Mac::solveTNFandIL10(GrGrid& grid, double dt)
     _surfBoundIL10R += dsurfBoundIL10R;
     il10 += dsIL10;
 	
+	if (currenttime == 99)
+	{
+		if (_state == MAC_INFECTED && _NFkB > 0 && _deactivationTime == -1)
+		{
+			cout << "NFkB Infected    " << IkmRNA << "     " << "Bound IL10    "<< _surfBoundIL10R << std::endl;
+		}
+		
+		if (_state == MAC_INFECTED && _NFkB < 1 && _deactivationTime == -1)
+		{
+			cout << "Infected    " << IkmRNA << "     " << "Bound IL10    "<< _surfBoundIL10R << std::endl;
+		}
+		
+		if (_state == MAC_ACTIVE && _NFkB > 0 && _deactivationTime == -1)
+		{
+			cout << "NFkB Active    " << IkmRNA << "     " << "Bound IL10    "<< _surfBoundIL10R << std::endl;
+		}
+		
+		if (_state == MAC_ACTIVE && _NFkB < 1 && _deactivationTime == -1)
+		{
+			cout << "Active    " << IkmRNA << "     " << "Bound IL10    "<< _surfBoundIL10R << std::endl;
+		}
+	
+	}
 	cell.setTNF(Nav * vol * tnf);
 	cell.setShedTNFR2(Nav * vol * shedtnfr2);
     cell.setIL10(Nav * vol * il10);

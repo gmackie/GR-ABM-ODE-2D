@@ -201,6 +201,7 @@ void Treg::solveTNF(GrGrid& grid, double dt)
     {
         IkmRNA = 0.0;
     }
+	
     // end of equilibrium calculations
     
     dmTNFRNA = (IkmRNA - _PARAM(PARAM_GR_K_TRANS) * _mTNFRNA) * dt;

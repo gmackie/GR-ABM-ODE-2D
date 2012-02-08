@@ -102,7 +102,7 @@ public:
 	void solveTNF (GrGrid& grid, double dt);
 	void solveNFkBandTNF (GrGrid& grid, double dt);
 	void solveNFkBODEsEquilibrium (double dt);
-    void solveTNFandIL10 (GrGrid& grid, double dt);
+    void solveTNFandIL10 (GrGrid& grid, GrStat& stats, double dt, double currenttime);
     void solveTNFandIL10andNFkB (GrGrid& grid, double dt);
     void solveIL10 (GrGrid& grid, double dt);
     void solveDegradation (GrGrid& grid, double dt, bool tnfrDynamics, bool il10rDynamics);

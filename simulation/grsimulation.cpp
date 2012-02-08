@@ -334,7 +334,7 @@ void GrSimulation::solve()
 		}
 		else if (_tnfrDynamics && _il10rDynamics)
         {
-            updateTNFandIL10Dynamics(dt);
+            updateTNFandIL10Dynamics(dt, t);
         }
         
         else if (_tnfrDynamics && !_il10rDynamics)
@@ -579,11 +579,11 @@ void GrSimulation::updateIL10Dynamics(double dt)
 
 
 
-void GrSimulation::updateTNFandIL10Dynamics(double dt)
+void GrSimulation::updateTNFandIL10Dynamics(double dt, double currenttime)
 {
 	for (MacList::iterator it = _macList.begin(); it != _macList.end(); it++)
 	{
-		it->solveTNFandIL10(_grid.getGrid(), dt);
+		it->solveTNFandIL10(_grid.getGrid(), _stats, dt, currenttime);
 	}
 	for (TgamList::iterator it = _tgamList.begin(); it != _tgamList.end(); it++)
 	{

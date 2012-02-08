@@ -57,7 +57,7 @@ private:
 	void secreteFromCaseations();
     void updateTNFDynamics(double dt);
     void updateIL10Dynamics(double dt);
-    void updateTNFandIL10Dynamics(double dt);
+    void updateTNFandIL10Dynamics(double dt, double currenttime);
     void updateNFkBandTNFandIL10Dynamics(double dt);
     void updateNFkBandTNFDynamics(double dt);
 	void adjustTNFDegradation(double dt);

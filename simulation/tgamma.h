@@ -42,9 +42,13 @@ private:
     double _vIL10R; // Rate of IL10R synthesis
     double _surfBoundIL10R; // No. of bound cell surface IL10R
     double _kISynth;
+    
+    int _nAntigenStim; // Number of successfull antigen stimulations
+    int _doubledeactivationtime; // Parameter allowing trasition of DOUBLE back to GAMMA
 	
 	void handleActive(const int time, GrGrid& grid, GrStat& stats);
 	void handleDownRegulated(const int time, GrGrid& grid, GrStat& stats);
+    void handleActiveDouble(const int time, GrGrid& grid, GrStat& stats);
 
 public:
 	Tgam();

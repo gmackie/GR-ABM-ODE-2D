@@ -44,7 +44,8 @@ private:
     double _kISynth;
     
     int _nAntigenStim; // Number of successfull antigen stimulations
-    int _doubledeactivationtime; // Parameter allowing trasition of DOUBLE back to GAMMA
+    int _nDownRegulated; // Number of downregulations
+    int _nICOS; // Number of ICOS stimulations
 	
 	void handleActive(const int time, GrGrid& grid, GrStat& stats);
 	void handleDownRegulated(const int time, GrGrid& grid, GrStat& stats);

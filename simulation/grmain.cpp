@@ -127,7 +127,7 @@ public:
   void outputHeader() {
     write("time");
     write("Mac"); write("Mr"); write("Mi"); write("Mci"); write("Ma"); write("Md");
-    write("Tgam"); write("Tgam a"); write("Tgam reg");  write("Tgam d");
+    write("Tgam"); write("Tgam a"); write("Tgam ad") ;write("Tgam reg");  write("Tgam d");
     write("Tcyt"); write("Tcyt a"); write("Tcyt reg"); write("Tcyt d");
     write("Treg"); write("Treg r"); write("Treg d");
     write("Int. Mtb."); write("Ext. Mtb."); write("repExtMtb"); write("NonRepl Ext. Mtb."); write("Tot Mtb.");
@@ -152,7 +152,7 @@ public:
 
     write(sim.getTime());
     write(stats.getNrOfMac()); write(stats.getNrOfMacResting()); write(stats.getNrOfMacInfected()); write(stats.getNrOfMacCInfected()); write(stats.getNrOfMacActive()); write(stats.getNrOfMacDead());
-    write(stats.getNrOfTgam()); write(stats.getNrOfTgamActive()); write(stats.getNrOfTgamDownRegulated()); write(stats.getNrOfTgamDead());
+    write(stats.getNrOfTgam()); write(stats.getNrOfTgamActive()); write(stats.getNrOfTgamDouble()); write(stats.getNrOfTgamDownRegulated()); write(stats.getNrOfTgamDead());
     write(stats.getNrOfTcyt()); write(stats.getNrOfTcytActive()); write(stats.getNrOfTcytDownRegulated()); write(stats.getNrOfTcytDead());
     write(stats.getNrOfTreg()); write(stats.getNrOfTregActive()); write(stats.getNrOfTregDead());
 
@@ -240,7 +240,7 @@ void printStats(const GrSimulation* pSim) {
   const GrStat& stats = pSim->getStats();
   printf("%-7d ", pSim->getTime());
   printf("%3d - (%d,%d,%d,%d,%d) ", stats.getNrOfMac(), stats.getNrOfMacResting(), stats.getNrOfMacInfected(), stats.getNrOfMacCInfected(), stats.getNrOfMacActive(), stats.getNrOfMacDead());
-  printf("%3d - (%d,%d,%d) ", stats.getNrOfTgam(), stats.getNrOfTgamActive(), stats.getNrOfTgamDownRegulated(), stats.getNrOfTgamDead());
+  printf("%3d - (%d,%d,%d,%d) ", stats.getNrOfTgam(), stats.getNrOfTgamActive(), stats.getNrOfTgamDouble(), stats.getNrOfTgamDownRegulated(), stats.getNrOfTgamDead());
   printf("%3d - (%d,%d,%d) ", stats.getNrOfTcyt(), stats.getNrOfTcytActive(), stats.getNrOfTcytDownRegulated(), stats.getNrOfTcytDead());
   printf("%3d - (%d,%d) ", stats.getNrOfTreg(), stats.getNrOfTregActive(), stats.getNrOfTregDead());
   printf("(%.5f, %.5f) ", stats.getTotExtMtb(), stats.getTotIntMtb());

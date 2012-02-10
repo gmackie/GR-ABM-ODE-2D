@@ -46,6 +46,7 @@ private:
 	int _nTgamActive;
 	int _nTgamDownRegulated;
 	int _nTgamDead;
+    int _nTgamDouble;
 
 	int _nTcyt;
 	int _nTcytActive;
@@ -177,6 +178,7 @@ public:
 	int getNrOfTgamActive() const;
 	int getNrOfTgamDownRegulated() const;
 	int getNrOfTgamDead() const;
+    int getNrOfTgamDouble() const;
 	int getNrOfTcytActive() const;
 	int getNrOfTcytDead() const;
 	int getNrOfTcytDownRegulated() const;
@@ -850,6 +852,11 @@ inline int GrStat::getNrOfTgamDownRegulated() const
 inline int GrStat::getNrOfTgam() const
 {
 	return _nTgam;
+}
+
+inline int GrStat::getNrOfTgamDouble() const
+{
+    return _nTgamDouble;
 }
 
 inline int GrStat::getNrOfTcytDead() const

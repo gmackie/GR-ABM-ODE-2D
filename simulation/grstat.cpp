@@ -26,6 +26,7 @@ GrStat::GrStat()
 	, _nTgamActive(0)
 	, _nTgamDownRegulated(0)
 	, _nTgamDead(0)
+    , _nTgamDouble(0)
 	, _nTcyt(0)
 	, _nTcytActive(0)
 	, _nTcytDownRegulated(0)
@@ -283,6 +284,9 @@ void GrStat::updateTgamStatistics(TgamState state)
 	case TGAM_DEAD:
 		_nTgamDead++;
 		break;
+    case TGAM_ACTIVE_DOUBLE:
+        _nTgamDouble++;
+        break;
   default: throw std::runtime_error("Unknown Tgam state"); break;
 	}
 
@@ -338,7 +342,7 @@ void GrStat::resetAgentStats()
 	_nMacDeact = _nMacDeactResting = _nMacDeactInfected = _nMacDeactCInfected =
 		_nMacDeactDead = _nMacDeactActive = 0;
 
-	_nTgam = _nTgamActive = _nTgamDead = _nTgamDownRegulated = 0;
+	_nTgam = _nTgamActive = _nTgamDouble = _nTgamDead = _nTgamDownRegulated = 0;
 	
 	_nTcyt = _nTcytDead = _nTcytDownRegulated = _nTcytActive = 0;
 	
@@ -383,6 +387,7 @@ void GrStat::serialize(std::ostream& out) const
 	out << _nTgamActive << std::endl;
 	out << _nTgamDownRegulated << std::endl;
 	out << _nTgamDead << std::endl;
+    out << _nTgamDouble << std::endl;
 
 	out << _nTcyt << std::endl;
 	out << _nTcytActive << std::endl;
@@ -499,6 +504,7 @@ void GrStat::deserialize(std::istream& in)
 	in >>_nTgamActive;
 	in >>_nTgamDownRegulated;
 	in >>_nTgamDead;
+    in >> _nTgamDouble;
 
 	in >>_nTcyt;
 	in >>_nTcytActive;

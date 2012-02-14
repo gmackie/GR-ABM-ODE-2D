@@ -215,7 +215,7 @@ void Tgam::handleActive(const int, GrGrid& grid, GrStat& stats)
         if (pMac && (pMac->getState() == MAC_INFECTED || pMac->getState() == MAC_CINFECTED))
         {
             
-            if (pMac && pMac->getStat1())
+            if (pMac && pMac->getICOS())
                 {
                     _nICOS ++;
                     cout << "ICOS" << std::endl;
@@ -228,12 +228,12 @@ void Tgam::handleActive(const int, GrGrid& grid, GrStat& stats)
                 }
             
         }
-        if (pMac && ((pMac->getState() == MAC_RESTING && pMac->getNFkB()) || (pMac->getState() == MAC_RESTING && pMac->getStat1()) || (pMac->getState() == MAC_ACTIVE)) && cell.getExtMtb() > _PARAM(PARAM_TGAM_THRESHOLD_EXT_MTB))
+        if (pMac && ((pMac->getState() == MAC_RESTING && pMac->getNFkB()) || (pMac->getState() == MAC_RESTING && pMac->getICOS()) || (pMac->getState() == MAC_ACTIVE)) && cell.getExtMtb() > _PARAM(PARAM_TGAM_THRESHOLD_EXT_MTB))
         {
             _nAntigenStim ++;
             cout << "Antigen Stim" << std::endl;
         }
-        if (pMac && ((pMac->getState() == MAC_RESTING && pMac->getStat1()) || (pMac->getState() == MAC_ACTIVE && pMac->getStat1())))
+        if (pMac && ((pMac->getState() == MAC_RESTING && pMac->getICOS()) || (pMac->getState() == MAC_ACTIVE && pMac->getICOS())))
         {
             _nICOS ++;
             cout << "ICOS" << std::endl;
@@ -244,7 +244,7 @@ void Tgam::handleActive(const int, GrGrid& grid, GrStat& stats)
     if (_nAntigenStim > 1) 
     {
         
-        double AgProb = 0.5 * (1 - pow(2.7183, (-_PARAM(PARAM_TGAM_PROB_AGSTIM)*(_nAntigenStim - 1.0))));
+        double AgProb = (1.0/3.0) * (1 - pow(2.7183, (-_PARAM(PARAM_TGAM_PROB_AGSTIM)*(_nAntigenStim - 1.0))));
         ProbSum += AgProb;
         
     }
@@ -253,7 +253,7 @@ void Tgam::handleActive(const int, GrGrid& grid, GrStat& stats)
     if (_nDownRegulated > 0) 
     {
         
-        double TGFProb = 0.25 * (1 - pow(2.7183, (-_PARAM(PARAM_TGAM_PROB_AGSTIM)*(_nDownRegulated))));
+        double TGFProb = (1.0/3.0) * (1 - pow(2.7183, (-_PARAM(PARAM_TGAM_PROB_TGFB)*(_nDownRegulated))));
         ProbSum += TGFProb;
         
     }
@@ -261,7 +261,8 @@ void Tgam::handleActive(const int, GrGrid& grid, GrStat& stats)
     if (_nICOS > 0) 
     {
         
-        double ICOSProb = 0.25 * (1 - pow(2.7183, (-_PARAM(PARAM_TGAM_PROB_AGSTIM)*(_nICOS))));
+		double ICOSProb = (1.0/3.0) * (1 - pow(2.7183, (-_PARAM(PARAM_TGAM_PROB_ICOS)*(_nICOS))));
+
         ProbSum += ICOSProb;
         
     }

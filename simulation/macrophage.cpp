@@ -22,6 +22,7 @@ Mac::Mac()
 	, _intMtb(-1.0)
 	, _NFkB(0)
 	, _stat1(0)
+	, _ICOS(0)
 	, _activationTime(-1)
 	, _deactivationTime(-1)
 	, _mTNF(-1.0)
@@ -88,6 +89,7 @@ Mac::Mac(int birthtime, int row, int col, MacState state, double intMtb, bool NF
 	, _intMtb(intMtb)
 	, _NFkB(NFkB)
 	, _stat1(stat1)
+	, _ICOS(0)
 	, _activationTime(-1)
 	, _deactivationTime(-1)
 	, _mTNF(0.0)
@@ -529,6 +531,11 @@ void Mac::computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tnf
 			_NFkB = _state == MAC_CINFECTED || _state == MAC_ACTIVE || tnfInducedNFkB ||
 				getExtMtbInMoore(grid) > _PARAM(PARAM_MAC_THRESHOLD_NFKB_EXTMTB);
 				//cell.getExtMtb() > _PARAM(PARAM_MAC_THRESHOLD_NFKB_EXTMTB);
+			
+			if (_stat1 && _surfBoundIL10R < _PARAM(PARAM_MAC_THRESHOLD_ICOS))
+			{
+				_ICOS = _stat1;
+			}
 
 			switch (_state)
 			{
@@ -1542,6 +1549,7 @@ void Mac::serialize(std::ostream& out) const
 	out << _intMtb << std::endl;
 	out << _NFkB << std::endl;
 	out << _stat1 << std::endl;
+	out << _ICOS << std::endl;
 	out << _activationTime << std::endl;
 	out << _deactivationTime << std::endl;
 	out << _mTNF << std::endl;
@@ -1620,6 +1628,7 @@ void Mac::deserialize(std::istream& in)
 	in >> _intMtb;
 	in >> _NFkB;
 	in >> _stat1;
+	in >> _ICOS;
 	in >> _activationTime;
 	in >> _deactivationTime;
 	in >> _mTNF;

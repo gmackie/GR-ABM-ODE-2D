@@ -26,6 +26,7 @@ private:
 	double _intMtb;
 	bool _NFkB;
 	bool _stat1;
+	bool _ICOS;
 	int _activationTime;
 	int _deactivationTime;
 	// TNF associated attributes
@@ -111,6 +112,7 @@ public:
 	void setNFkB(bool value);
 	bool getNFkB() const;
 	bool getStat1() const;
+	bool getICOS() const;
 	MacState getState() const;
 	MacState getNextState() const;
 	double getIntMtb() const;
@@ -164,6 +166,11 @@ inline bool Mac::getStat1() const
 inline bool Mac::getNFkB() const
 {
 	return _NFkB;
+}
+
+inline bool Mac::getICOS() const
+{
+	return _ICOS;
 }
 
 inline MacState Mac::getState() const

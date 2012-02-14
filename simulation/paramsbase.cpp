@@ -222,6 +222,7 @@ const ParamDescription ParamsBase::_description[_PARAM_COUNT] =
 	{ "movementBonusFactor",				MAC_NODE,	false,	true,	1.0,	1,	"",					"Bonus factor for neighbor compartment with highest chemical concentration" },
 	{ "initDensity",						MAC_NODE,	true,	true,	0.0,	0,	"",					"Initial density of resting macrophages on the grid" },
 	{ "thresholdICOS",						MAC_NODE,	false,	false,	0.0,	0,	"",					"Threshold for ICOS-L inhibition on a Mac by IL10" },
+	{ "mtbRecEnabled",						TCELL_NODE,	false,	false,	0.0,	0,	"#mtb",				"The tot mtb count above which T cell recruitment is enabled" },
 	{ "probRec",							TCELL_NODE,	true,	false,	0.0,	0,	"",					"Probability of recruiting a T cell" },
 	{ "probMoveToMac",						TCELL_NODE,	true,	false,	0.0,	0,	"",					"Probability of a T cell moving onto a compartment already containing a macrophage" },
 	{ "probMoveToTcell",					TCELL_NODE,	true,	false,	0.0,	0,	"",					"Probability of a T cell moving onto a compartment already containing another T cell" },

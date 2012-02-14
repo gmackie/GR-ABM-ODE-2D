@@ -37,6 +37,7 @@ GrSimulation::GrSimulation()
     , _il10rDynamics(false)
 	, _tnfDepletionTimeStep(-1)
     , _il10DepletionTimeStep(-1)
+	, _tcellRecruitmentBegun(false)
 {
 	for (int i = 0; i < NOUTCOMES; i++)
 		_pTTest[i] = NULL;
@@ -375,6 +376,11 @@ void GrSimulation::solve()
 
 	// update states and remove dead agents from lists and grid
 	updateStates();
+
+	// This must be after growExtMtb and updateStates, since updateStates updates the stats with intMtb count
+	// and growExtMtb updates the stats with extMtb counts.
+	// The mtb counts are set to zero at the start of function solve above.
+	checkTCellRecruitmentStart();
 	
 	// shuffle order of cells every hour for randomization in movement
 	if (_time % 6 == 0)

@@ -47,6 +47,10 @@ private:
 	int _tnfDepletionTimeStep;
     int _il10DepletionTimeStep;
 
+    // Whether or not TCell recruitment has been enabled.
+    // Once enabled it stays enabled even if the criteria by which it became enabled changes.
+    bool _tcellRecruitmentBegun;
+
 	void moveTcells();
 	void moveMacrophages();
 	void updateStates();
@@ -64,6 +68,7 @@ private:
     void adjustFauxDegradation(double dt, bool tnfrDynamics, bool il10rDynamics);
 	void growExtMtb();
 	void shuffleCells();
+	void checkTCellRecruitmentStart();
 
 public:
 	GrSimulation();
@@ -99,6 +104,7 @@ public:
 	OutcomeMethod getOutcomeMethod(int index) const;
 	void getOutcomeParameters(int index, int& samplePeriod, int& testPeriod, double& alpha) const;
 	void setOutcomeMethod(int index, OutcomeMethod method, double alpha, int testPeriod, int samplePeriod);
+	bool getTCellRecruitmentBegun();
 	void serialize(std::ostream& out) const;
 	void deserialize(std::istream& in);
 	void setRecruitment	(RecruitmentBase* pRecruitment);
@@ -109,6 +115,11 @@ public:
 
 	static void convertSimTime(const int time, int& rDays, int& rHours, int& rMinutes);
 };
+
+inline bool GrSimulation::getTCellRecruitmentBegun()
+{
+	return _tcellRecruitmentBegun;
+}
 
 inline void GrSimulation::setRecruitment(RecruitmentBase* pRecruitment)
 {
@@ -310,5 +321,16 @@ inline Treg* GrSimulation::createTreg(int row, int col, int birthtime, TregState
 
 	return pTreg;
 }
+
+inline void GrSimulation::checkTCellRecruitmentStart()
+{
+	FLOAT_TYPE totMtb = _stats.getTotExtMtb() + _stats.getTotIntMtb();
+
+	if (!_tcellRecruitmentBegun && (totMtb > _PARAM(PARAM_TCELL_MTB_RECRUITMENT_THRESHOLD)))
+	{
+		_tcellRecruitmentBegun = true;
+	}
+}
+
 
 #endif /* GRSIMULATION_H */

@@ -18,7 +18,7 @@ RecruitmentProb::~RecruitmentProb()
 
 void RecruitmentProb::recruit(GrSimulation& sim)
 {
-	const int timeTcellRecEnabled = _PARAM(PARAM_TCELL_TIME_RECRUITMENT_ENABLED);
+	//const int timeTcellRecEnabled = _PARAM(PARAM_TCELL_TIME_RECRUITMENT_ENABLED);
 	GridCellPtrVector& sources = sim.getGrid().getSources();
 	GrStat& stats = sim.getStats();
 
@@ -50,13 +50,13 @@ void RecruitmentProb::recruit(GrSimulation& sim)
 				recruitMac(sim, pSource);
 
 			// T cell recruitment
-			if (pSource->getNumberOfAgents() < 2 && sim.getTime() >= timeTcellRecEnabled)
+			if (sim.getTCellRecruitmentBegun() && pSource->getNumberOfAgents() < 2)
 				recruitTcell(sim, pSource);
 		}
 		else
 		{
 			// T cell recruitment
-			if (pSource->getNumberOfAgents() < 2 && sim.getTime() >= timeTcellRecEnabled)
+			if (sim.getTCellRecruitmentBegun() && pSource->getNumberOfAgents() < 2)
 				recruitTcell(sim, pSource);
 
 			// macrophage recruitment

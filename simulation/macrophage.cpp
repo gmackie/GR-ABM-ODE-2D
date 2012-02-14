@@ -227,10 +227,10 @@ void Mac::secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDe
 			_c1rTNF = _PARAM(PARAM_GR_c1r);
 			_c1rrChemTNF = _PARAM(PARAM_GR_c1r);
 			cell.incNrSecretions();
-            _kISynth = 4.0 * _PARAM(PARAM_GR_I_K_SYNTH_MAC_INF);
+            _kISynth = 2.0 * _PARAM(PARAM_GR_I_K_SYNTH_MAC_INF);
             
             if (!il10rDynamics && !il10Depletion) {
-                cell.incIL10(4.0 * _PARAM(PARAM_MAC_SEC_RATE_IL10));
+                cell.incIL10(2.0 * _PARAM(PARAM_MAC_SEC_RATE_IL10));
             }
         }
 	}
@@ -332,7 +332,7 @@ void Mac::secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDe
 				cell.incCXCL9(_PARAM(PARAM_MAC_SEC_RATE_CXCL9));
 				_kSynth = _PARAM(PARAM_GR_K_SYNTH_MAC);
                 _kmRNA = _PARAM(PARAM_GR_K_RNA_MAC);
-                _kISynth = _kISynth = 4.0 * _PARAM(PARAM_GR_I_K_SYNTH_MAC_INF);
+                _kISynth = _kISynth = 2.0 * _PARAM(PARAM_GR_I_K_SYNTH_MAC_INF);
                 
                 if (!tnfrDynamics && !tnfDepletion)
                 {    
@@ -341,7 +341,7 @@ void Mac::secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDe
 					cell.incTNF(tnfMOD * _PARAM(PARAM_MAC_SEC_RATE_TNF));
                 }
                 if (!il10rDynamics && !il10Depletion) {
-                    cell.incIL10(4.0 * _PARAM(PARAM_MAC_SEC_RATE_IL10));
+                    cell.incIL10(2.0 * _PARAM(PARAM_MAC_SEC_RATE_IL10));
                 }
                 
                 cell.incNrSecretions();

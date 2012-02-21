@@ -430,7 +430,7 @@ int main(int argc, char** argv)
   
   if (vm.count("version"))
   {
-    printVersion();
+	// Nothing to do - the version is always printed above.
     return 0;
   }
   
@@ -460,14 +460,7 @@ int main(int argc, char** argv)
   
   bool lhs = vm.count("lhs");
 
-  // Write the seed to a file, so runs can be repeated, except for lhs runs.
   bool screenDisplay = !(vm.count("quiet") || vm.count("lhs"));
-  if (!lhs)
-  {
-    std::ofstream seedStream("seed");
-    seedStream << seed << std::endl;
-    seedStream.close();
-  }
   
   RecruitmentBase* pRecr = (vm.count("ode") ? (RecruitmentBase*)new RecruitmentLnODEPure() : (RecruitmentBase*)new RecruitmentProb());
   
@@ -501,8 +494,25 @@ int main(int argc, char** argv)
     	exit(1);
     }
 
-    pSim->deserialize(f);
     f.close();
+    boost::iostreams::filtering_istream in;
+    if (s.compare(s.size()-2, 2, "gz") == 0)
+    {
+      in.push(boost::iostreams::gzip_decompressor());
+    }
+    in.push(boost::iostreams::file_source(s));
+    pSim->deserialize(in);
+	std::cerr << "grmain seed: " << g_Rand.getSeed() << std::endl; //DBG
+  }
+
+  // Write the seed to a file, so runs can be repeated, except for lhs runs.
+  // This must come after any load of a saved state, so the correct seed is written,
+  // since that loads a saved seed.
+  if (!lhs)
+  {
+    std::ofstream seedStream("seed");
+    seedStream << seed << std::endl;
+    seedStream.close();
   }
 
   buildSim(pSim, diffMethodEnum, pRecr, vm.count("tnfr-dynamics"), vm.count("il10r-dynamics"), vm.count("NFkB-dynamics"),

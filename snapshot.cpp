@@ -9,6 +9,9 @@
 #include <QPainter>
 #include <QPen>
 #include <QFont>
+#include <boost/iostreams/device/file.hpp>
+#include <boost/iostreams/filtering_stream.hpp>
+#include <boost/iostreams/filter/gzip.hpp>
 
 Snapshot::Snapshot(const QString& dirName, const QString& fileName)
 	: _outFile(fileName.toLatin1().data(), std::ios_base::trunc)
@@ -144,13 +147,21 @@ void Snapshot::takeStateSnapshot(int time, const Simulation& sim)
 	GrSimulation::convertSimTime(time, days, hours, minutes);
 
 	QString fileName = _dirName + QDir::separator() +
-			QString("%1d%2h%3m.state").arg(days, 3, 10, QChar('0')).
+			QString("%1d%2h%3m.state.gz").arg(days, 3, 10, QChar('0')).
 			arg(hours, 2, 10, QChar('0')).arg(minutes, 2, 10, QChar('0'));
 
-	std::ofstream out(fileName.toLatin1().data(), std::ios_base::trunc);
+    namespace bio = boost::iostreams;
+    bio::filtering_ostream out;
+    out.push(bio::gzip_compressor());
+    out.push(bio::file_sink(fileName.toStdString()));
+
 	if (out.good())
 	{
 		sim.saveState(out);
+	}
+	else
+	{
+		std::cerr << " Snapshot::takeStateSnapshot, unable to save state to " << fileName.toStdString() << std::endl;
 	}
 }
 

@@ -1549,7 +1549,13 @@ void MainWindow::saveState()
 	QString fileName = QFileDialog::getSaveFileName(this, "Save state", "", "*");
 	if (fileName != QString::null)
 	{
-		std::ofstream out(fileName.toLatin1().data());
+
+		fileName += ".state.gz";
+	    namespace bio = boost::iostreams;
+	    bio::filtering_ostream out;
+	    out.push(bio::gzip_compressor());
+	    out.push(bio::file_sink(fileName.toStdString()));
+
 		if (!out.good())
 		{
 			QMessageBox::critical(this, "Lung ABM",
@@ -1559,9 +1565,7 @@ void MainWindow::saveState()
 		else
 		{
 			sim.saveState(out);
-
 			out.flush();
-			out.close();
 		}
 	}
 }

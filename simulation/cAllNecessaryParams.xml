@@ -212,7 +212,7 @@
 		<Treg
 			thresholdRec = "0.2"
 			probRec = "0.1"
-            probDownReg = "1.0"
+            probTregDeactivate = "1.0"
 			/>
 	</Tcell>
 	<Mtb

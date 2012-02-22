@@ -35,7 +35,7 @@ public:
 	virtual ~Agent();
 	virtual void move(GrGrid& grid) = 0;
 	virtual void secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDepletion, bool il10rDynamics, bool il10Depletion) = 0;
-	virtual void computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tnfrDynamics, bool nfkbDynamics, bool il10rDynamics) = 0;
+	virtual void computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tnfrDynamics, bool nfkbDynamics, bool il10rDynamics, bool tgammatransition) = 0;
 	virtual void updateState() = 0;
 	virtual void kill() = 0;
 	virtual void deactivate(const int time) = 0;

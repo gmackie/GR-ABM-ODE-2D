@@ -2,7 +2,7 @@
  * grsimulation.h
  *
  *  Created on: 05-nov-2009
- *      Author: M. El-Kebir
+ *      Author: M. El-Kebirƒ
  */
 
 #ifndef GRSIMULATION_H
@@ -42,6 +42,7 @@ private:
 	bool _tnfrDynamics;
 	bool _nfkbDynamics;
     bool _il10rDynamics;
+    bool _tgammatransition;
 
 	// Inhibits tnf secretion if true and if not using tnfr dynamics.
 	int _tnfDepletionTimeStep;
@@ -97,6 +98,8 @@ public:
     void setIl10rDynamics(bool il10rdynamics);
     int getIl10DepletionTimeStep() const;
     void setIl10DepletionTimeStep (int il10DepletionTimeStep);
+    bool getTgammaTransition() const;
+    void setTgammaTransition(bool tgammatransition);
 	double getAreaThreshold() const;
 	void setAreaThreshold(double areaThreshold);
 	double getAreaThresholdCellDensity() const;
@@ -236,6 +239,16 @@ inline int GrSimulation::getIl10DepletionTimeStep() const
 inline void GrSimulation::setIl10DepletionTimeStep(int il10DepletionTimeStep)
 {
     _il10DepletionTimeStep = il10DepletionTimeStep;
+}
+
+inline bool GrSimulation::getTgammaTransition() const
+{
+    return _tgammatransition;
+}
+
+inline void GrSimulation::setTgammaTransition(bool tgammatransition)
+{
+    _tgammatransition = tgammatransition;
 }
 
 inline const MacList& GrSimulation::getMacList() const

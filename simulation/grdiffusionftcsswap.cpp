@@ -25,9 +25,9 @@ void GrDiffusionFTCS_Swap::diffuse(GrSimulationGrid& grSim) const
 	const double muShedTNFR2 = _PARAM(PARAM_GR_D_SHED_TNFR2) * 6 / (4e-6);
 	const double muChemokines = _PARAM(PARAM_GR_D_CHEMOKINES) * 6 / (4e-6);
     const double muIL10 = _PARAM(PARAM_GR_D_IL10) * 6 / (4e-6);
-	const double degTNF = _PARAM(PARAM_GR_DEG_TNF);
-	const double degChemokines = _PARAM(PARAM_GR_DEG_CHEMOKINES);
-    const double degIL10 = _PARAM(PARAM_GR_DEG_IL10);
+    const double degTNFode = _PARAM(PARAM_GR_K_DEG);
+    const double degIL10ode = _PARAM(PARAM_GR_I_K_DEG);
+    const double degChemokinesode = _PARAM(PARAM_GR_CHEMOKINE_K_DEG);
 	const double ratioCCL5toCCL2 = _PARAM(PARAM_MAC_SEC_RATE_CCL5) / _PARAM(PARAM_MAC_SEC_RATE_CCL2);
 	const double ratioCXCL9toCCL2 = _PARAM(PARAM_MAC_SEC_RATE_CXCL9) / _PARAM(PARAM_MAC_SEC_RATE_CCL2);
 
@@ -64,8 +64,9 @@ void GrDiffusionFTCS_Swap::diffuse(GrSimulationGrid& grSim) const
 				if (res <= _cutOffValue)
 					res = 0;
 
-				res *= degTNF;
-				newCell.setTNF(res);
+                double resdeg = res - (res * degTNFode * dt);
+                
+				newCell.setTNF(resdeg);
 
 				double shedtnfr2_i_j_old = cell.getShedTNFR2();
 				double shedtnfr2_i_min_1_j = cell_i_min_1_j.getShedTNFR2();
@@ -82,7 +83,8 @@ void GrDiffusionFTCS_Swap::diffuse(GrSimulationGrid& grSim) const
 				// degradation of shedTNFR2 is neglected because unbinding reaction is much faster
 				res = res * (1 - _PARAM(PARAM_GR_KD2) * _PARAM(PARAM_GR_K_ON2) * dt);
 				newCell.setShedTNFR2(res);
-				double temp = newCell.getTNF();
+				
+                double temp = newCell.getTNF();
 				newCell.setTNF(temp + _PARAM(PARAM_GR_KD2) * _PARAM(PARAM_GR_K_ON2) * res * dt);
 
                 
@@ -99,9 +101,23 @@ void GrDiffusionFTCS_Swap::diffuse(GrSimulationGrid& grSim) const
                     res = 0;
                 }
                 
-                res *= degIL10;
-                newCell.setIL10(res);
+                resdeg = res - (res * degIL10ode * dt);
                 
+//                
+//                if (res > 0 || resdeg > 0) {
+//                    double diff = (res - resdeg);
+//                    cout << diff << std::endl;
+//                }
+                
+//                newCell.setIL10(res);
+                
+                
+//                if ( i == 50 && j == 50) {
+//                    cout << il10_i_j_old << "    " << resdeg << "     " << res << std::endl;
+//                }
+                
+                
+                newCell.setIL10(resdeg);
                 
 				double ccl2_i_j_old = cell.getCCL2();
 				double ccl2_i_min_1_j = cell_i_min_1_j.getCCL2();
@@ -115,11 +131,11 @@ void GrDiffusionFTCS_Swap::diffuse(GrSimulationGrid& grSim) const
 				if (res <= _cutOffValue)
 					res = 0;
 
-				res *= degChemokines;
+                resdeg = res - (res * degChemokinesode * dt);
 
-				newCell.setCCL2(res);
-				newCell.setCCL5(res * ratioCCL5toCCL2);
-				newCell.setCXCL9(res * ratioCXCL9toCCL2);
+				newCell.setCCL2(resdeg);
+				newCell.setCCL5(resdeg * ratioCCL5toCCL2);
+				newCell.setCXCL9(resdeg * ratioCXCL9toCCL2);
 
 				double macAttractant_i_j_old = cell.getMacAttractant();
 				double macAttractant_i_min_1_j = cell_i_min_1_j.getMacAttractant();
@@ -133,8 +149,9 @@ void GrDiffusionFTCS_Swap::diffuse(GrSimulationGrid& grSim) const
 				if (res <= _cutOffValue)
 					res = 0;
 
-				res *= degChemokines;
-				newCell.setMacAttractant(res);
+                resdeg = res - (res * degChemokinesode * dt);
+                
+				newCell.setMacAttractant(resdeg);
 			}	/* j, columns */
 		}	/*i, rows */
 

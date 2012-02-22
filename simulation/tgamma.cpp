@@ -20,6 +20,7 @@ Tgam::Tgam()
 	, _state(TGAM_DEAD)
 	, _nextState(TGAM_DEAD)
 	, _deactivationTime(-1)
+    , _transitionTime(-1)
 	, _mTNF(-1.0)
 	, _surfTNFR1(-1.0)
 	, _surfTNFR2(-1.0)
@@ -52,6 +53,7 @@ Tgam::Tgam(int birthtime, int row, int col, TgamState state)
 	, _state(state)
 	, _nextState(state)
 	, _deactivationTime(-1)
+    , _transitionTime(-1)
 	, _mTNF(0.0)
 	, _surfTNFR1(g_Rand.getReal(_PARAM(PARAM_GR_MEAN_TNFR1_TCELL)-_PARAM(PARAM_GR_STD_TNFR1_TCELL),_PARAM(PARAM_GR_MEAN_TNFR1_TCELL)+_PARAM(PARAM_GR_STD_TNFR1_TCELL)))
 	, _surfTNFR2(g_Rand.getReal(_PARAM(PARAM_GR_MEAN_TNFR2_TCELL)-_PARAM(PARAM_GR_STD_TNFR2_TCELL),_PARAM(PARAM_GR_MEAN_TNFR2_TCELL)+_PARAM(PARAM_GR_STD_TNFR2_TCELL)))
@@ -106,8 +108,14 @@ void Tgam::secrete(GrGrid& grid, bool tnfrDynamics, bool, bool tnfDepletion, boo
     
     
     if (_state == TGAM_ACTIVE_DOUBLE) {
+        _kISynth = 0.5 * _PARAM(PARAM_GR_I_K_SYNTH_TCELL);
+    }
+    
+    else if (_state == TGAM_INDUCED_REG)
+    {
         _kISynth = _PARAM(PARAM_GR_I_K_SYNTH_TCELL);
     }
+    
     else
     {
         _kISynth = 0;
@@ -129,7 +137,7 @@ void Tgam::secrete(GrGrid& grid, bool tnfrDynamics, bool, bool tnfDepletion, boo
     }
 }
 
-void Tgam::computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tnfrDynamics, bool, bool)
+void Tgam::computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tnfrDynamics, bool, bool, bool tgammatransition)
 {
     
     GridCell& cell = grid(_row, _col);
@@ -164,7 +172,7 @@ void Tgam::computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tn
 			_nextState = TGAM_DEAD;
 			break;
 		case TGAM_ACTIVE:
-			handleActive(time, grid, stats);
+			handleActive(time, grid, stats, tgammatransition);
 			break;
 		case TGAM_DOWN_REGULATED:
 			handleDownRegulated(time, grid, stats);
@@ -172,117 +180,154 @@ void Tgam::computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tn
         case TGAM_ACTIVE_DOUBLE:
             handleActiveDouble(time, grid, stats);
             break;
+        case TGAM_INDUCED_REG:
+            handleInducedReg(time, grid, stats);
+            break;
                 
     default: throw std::runtime_error("Unknown Tgam state");
 		}
 	}
 }
 
-void Tgam::handleActive(const int, GrGrid& grid, GrStat& stats)
+void Tgam::handleActive(const int time, GrGrid& grid, GrStat& stats, bool tgammatransition)
 {
 	GridCell& cell = grid(_row, _col);
 	
     double ProbSum = 0.0; // Initialize the probability sum for transition to TGAM_ACTIVE_DOUBLE
 
-    if (cell.hasMac())
-	{
-		// get the macrophage
-		Mac* pMac = dynamic_cast<Mac*>(cell.getAgent(0));
-		if (!pMac) pMac = dynamic_cast<Mac*>(cell.getAgent(1));
-
-		// If the mac died on this time step ignore it.
-		if (pMac->getNextState() == MAC_DEAD)
-		{
-			return;
-		}
-
-		
-
-		// Fas/FasL induced apoptosis with probability
-		if (pMac &&
-			(pMac->getState() == MAC_INFECTED || pMac->getState() == MAC_CINFECTED) &&
-			g_Rand.getReal() < _PARAM(PARAM_TGAM_PROB_APOPTOSIS_FAS_FASL))
-		{
-			stats.incApoptosisFasFasL();
-			pMac->apoptosis(grid);
-			pMac->kill();
-
-			cell.incNrKillings();
-		}
-        
-        
-        // If mac does not die then check for Tgam10 conditions - Macs
-        if (pMac && (pMac->getState() == MAC_INFECTED || pMac->getState() == MAC_CINFECTED))
+    
+    if (tgammatransition) 
+    {
+        if (cell.hasMac())
         {
+            // get the macrophage
+            Mac* pMac = dynamic_cast<Mac*>(cell.getAgent(0));
+            if (!pMac) pMac = dynamic_cast<Mac*>(cell.getAgent(1));
             
-            if (pMac && pMac->getICOS())
+            // If the mac died on this time step ignore it.
+            if (pMac->getNextState() == MAC_DEAD)
+            {
+                return;
+            }
+            
+            
+            
+            // Fas/FasL induced apoptosis with probability
+            if (pMac &&
+                (pMac->getState() == MAC_INFECTED || pMac->getState() == MAC_CINFECTED) &&
+                g_Rand.getReal() < _PARAM(PARAM_TGAM_PROB_APOPTOSIS_FAS_FASL))
+            {
+                stats.incApoptosisFasFasL();
+                pMac->apoptosis(grid);
+                pMac->kill();
+                
+                cell.incNrKillings();
+            }
+            
+            // If mac does not die then check for Tgam10 conditions - Macs
+            if (pMac && (pMac->getState() == MAC_INFECTED || pMac->getState() == MAC_CINFECTED))
+            {
+                
+                if (pMac && pMac->getICOS())
                 {
                     _nICOS ++;
-                    cout << "ICOS" << std::endl;
+//                    cout << "ICOS" << std::endl;
                 }
-            
-            if (g_Rand.getReal() < _PARAM(PARAM_TGAM_PROB_ANTIGEN_PRESENTATION))
+                
+                if (g_Rand.getReal() < _PARAM(PARAM_TGAM_PROB_ANTIGEN_PRESENTATION))
                 {
                     _nAntigenStim ++;
-                    cout << "Antigen Stim" << std::endl;
+//                    cout << "Antigen Stim" << std::endl;
                 }
+                
+            }
+            if (pMac && ((pMac->getState() == MAC_RESTING && pMac->getNFkB()) || (pMac->getState() == MAC_RESTING && pMac->getICOS()) || (pMac->getState() == MAC_ACTIVE)) && cell.getExtMtb() > _PARAM(PARAM_TGAM_THRESHOLD_EXT_MTB)) // CHECK THIS!
+            {
+                _nAntigenStim ++;
+//                cout << "Antigen Stim" << std::endl;
+            }
+            if (pMac && ((pMac->getState() == MAC_RESTING && pMac->getICOS()) || (pMac->getState() == MAC_ACTIVE && pMac->getICOS())))
+            {
+                _nICOS ++;
+//                cout << "ICOS" << std::endl;
+            }
             
         }
-        if (pMac && ((pMac->getState() == MAC_RESTING && pMac->getNFkB()) || (pMac->getState() == MAC_RESTING && pMac->getICOS()) || (pMac->getState() == MAC_ACTIVE)) && cell.getExtMtb() > _PARAM(PARAM_TGAM_THRESHOLD_EXT_MTB))
+        
+        if (_nAntigenStim > 1) 
         {
-            _nAntigenStim ++;
-            cout << "Antigen Stim" << std::endl;
-        }
-        if (pMac && ((pMac->getState() == MAC_RESTING && pMac->getICOS()) || (pMac->getState() == MAC_ACTIVE && pMac->getICOS())))
-        {
-            _nICOS ++;
-            cout << "ICOS" << std::endl;
+            
+            double AgProb = (1.0/3.0) * (1 - pow(2.7183, (-_PARAM(PARAM_TGAM_PROB_AGSTIM)*(_nAntigenStim - 1.0))));
+            ProbSum += AgProb;
+            
         }
         
-	}
-    
-    if (_nAntigenStim > 1) 
-    {
         
-        double AgProb = (1.0/3.0) * (1 - pow(2.7183, (-_PARAM(PARAM_TGAM_PROB_AGSTIM)*(_nAntigenStim - 1.0))));
-        ProbSum += AgProb;
+        if (_nDownRegulated > 0) 
+        {
+            
+            double TGFProb = (1.0/3.0) * (1 - pow(2.7183, (-_PARAM(PARAM_TGAM_PROB_TGFB)*(_nDownRegulated))));
+            ProbSum += TGFProb;
+            
+        }
         
-    }
-    
-    
-    if (_nDownRegulated > 0) 
-    {
+        if (_nICOS > 0) 
+        {
+            
+            double ICOSProb = (1.0/3.0) * (1 - pow(2.7183, (-_PARAM(PARAM_TGAM_PROB_ICOS)*(_nICOS))));
+            
+            ProbSum += ICOSProb;
+            
+        }
         
-        double TGFProb = (1.0/3.0) * (1 - pow(2.7183, (-_PARAM(PARAM_TGAM_PROB_TGFB)*(_nDownRegulated))));
-        ProbSum += TGFProb;
+//        cout << "ProbabilitySum:   " << ProbSum << std::endl;
         
-    }
-    
-    if (_nICOS > 0) 
-    {
         
-		double ICOSProb = (1.0/3.0) * (1 - pow(2.7183, (-_PARAM(PARAM_TGAM_PROB_ICOS)*(_nICOS))));
+        if (g_Rand.getReal() < ProbSum) {
+            
+            _nextState = TGAM_ACTIVE_DOUBLE;
+            _transitionTime = time;
+        }
+        else
+        {
+            _nextState = TGAM_ACTIVE;
+        }
+        
+        if (ProbSum < 0 || ProbSum > 1) {
+            std::cout << "Error: Probability of Transition to IL10 Producing Tgamma is  " << ProbSum << std::endl;
+        }
 
-        ProbSum += ICOSProb;
-        
     }
     
-    cout << "ProbabilitySum:   " << ProbSum << std::endl;
-    
-    
-    if (g_Rand.getReal() < ProbSum) {
-        
-        _nextState = TGAM_ACTIVE_DOUBLE;
-    }
     else
     {
-        _nextState = TGAM_ACTIVE;
+        if (cell.hasMac())
+        {
+            // get the macrophage
+            Mac* pMac = dynamic_cast<Mac*>(cell.getAgent(0));
+            if (!pMac) pMac = dynamic_cast<Mac*>(cell.getAgent(1));
+            
+            // If the mac died on this time step ignore it.
+            if (pMac->getNextState() == MAC_DEAD)
+            {
+                return;
+            }
+            
+            _nextState = TGAM_ACTIVE;
+            
+            // Fas/FasL induced apoptosis with probability
+            if (pMac &&
+                (pMac->getState() == MAC_INFECTED || pMac->getState() == MAC_CINFECTED) &&
+                g_Rand.getReal() < _PARAM(PARAM_TGAM_PROB_APOPTOSIS_FAS_FASL))
+            {
+                stats.incApoptosisFasFasL();
+                pMac->apoptosis(grid);
+                pMac->kill();
+                
+                cell.incNrKillings();
+            }
+        }
     }
-    
-    if (ProbSum < 0 || ProbSum > 1) {
-        std::cout << "Error:Probability of Transition to IL10 Producing Tgamma is  " << ProbSum << std::endl;
-    }
-    
 }
 
 void Tgam::handleDownRegulated(const int time, GrGrid&, GrStat&)
@@ -299,9 +344,17 @@ void Tgam::handleDownRegulated(const int time, GrGrid&, GrStat&)
 
 void Tgam::handleActiveDouble(const int time, GrGrid& grid, GrStat& stats)
 {
-    // Carries out same action as TGAM_ACTIVE but secretes IL10
+    // Carries out same action as TGAM_ACTIVE but secretes half rate of IL10
     // Distinct state so it is easier to track
     
+    if (time - _transitionTime >= _PARAM(PARAM_TGAM_TIMESPAN_DOUBLE)) {
+        _nextState = TGAM_INDUCED_REG;
+    }
+    else
+    {
+        _nextState = TGAM_ACTIVE_DOUBLE;
+    }
+
     GridCell& cell = grid(_row, _col);
 	
 	if (cell.hasMac())
@@ -332,16 +385,27 @@ void Tgam::handleActiveDouble(const int time, GrGrid& grid, GrStat& stats)
 	}
 }
 
+void Tgam::handleInducedReg(const int time, GrGrid& grid, GrStat& stats)
+{
+    _nextState = TGAM_INDUCED_REG;
+}
+
 void Tgam::deactivate(const int time)
 {
     if (_state == TGAM_ACTIVE || _state == TGAM_ACTIVE_DOUBLE) {
         _nDownRegulated ++;
-        cout << _nDownRegulated << std::endl;
-        cout << "TGF-B" << std::endl;
+//        cout << _nDownRegulated << std::endl;
+//        cout << "TGF-B" << std::endl;
     }
+    
+    if (_state == TGAM_INDUCED_REG) {
+        _nextState = TGAM_INDUCED_REG;
+    }
+    else
+    {
 	_nextState = _state = TGAM_DOWN_REGULATED;
 	_deactivationTime = time;
-
+    }
 }
 
 void Tgam::updateState()
@@ -617,6 +681,7 @@ void Tgam::serialize(std::ostream& out) const
 	out << intVal << std::endl;
 
 	out << _deactivationTime << std::endl;
+    out << _transitionTime << std::endl;
 	out << _mTNF << std::endl;
 	out << _surfTNFR1 << std::endl;
 	out << _surfTNFR2 << std::endl;
@@ -663,6 +728,7 @@ void Tgam::deserialize(std::istream& in)
 	_nextState = (TgamState) intVal;
 
 	in >> _deactivationTime;
+    in >> _transitionTime;
 	in >> _mTNF;
 	in >> _surfTNFR1;
 	in >> _surfTNFR2;

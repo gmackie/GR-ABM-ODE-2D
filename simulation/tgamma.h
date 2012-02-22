@@ -22,6 +22,7 @@ private:
 	TgamState _state;
 	TgamState _nextState;
 	int _deactivationTime;
+    int _transitionTime;
 	// TNF associated attributes
 	double _mTNF; // No. of mTNF on the cell membrane
 	double _surfTNFR1; // No. of cell surface TNFR1
@@ -47,9 +48,10 @@ private:
     int _nDownRegulated; // Number of downregulations
     int _nICOS; // Number of ICOS stimulations
 	
-	void handleActive(const int time, GrGrid& grid, GrStat& stats);
+	void handleActive(const int time, GrGrid& grid, GrStat& stats, bool tgammatransition);
 	void handleDownRegulated(const int time, GrGrid& grid, GrStat& stats);
     void handleActiveDouble(const int time, GrGrid& grid, GrStat& stats);
+    void handleInducedReg(const int time, GrGrid& grid, GrStat& stats);
 
 public:
 	Tgam();
@@ -57,7 +59,7 @@ public:
 	~Tgam();
 	void move(GrGrid& grid);
 	void secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDepletion, bool il10rDynamics, bool il10Depletion);
-	void computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tnfrDynamics, bool nfkbDynamics, bool il10rDynamics);
+	void computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tnfrDynamics, bool nfkbDynamics, bool il10rDynamics, bool tgmmatransition);
 	void updateState();
 	void solveTNF (GrGrid& grid, double dt);
     void solveTNFandIL10 (GrGrid&, double dt);

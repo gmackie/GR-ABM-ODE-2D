@@ -35,6 +35,7 @@ GrSimulation::GrSimulation()
 	, _tnfrDynamics(false)
 	, _nfkbDynamics(false)
     , _il10rDynamics(false)
+    , _tgammatransition(false)
 	, _tnfDepletionTimeStep(-1)
     , _il10DepletionTimeStep(-1)
 	, _tcellRecruitmentBegun(false)
@@ -75,6 +76,7 @@ void GrSimulation::serialize(std::ostream& out) const
     out << _il10rDynamics << std::endl;
 	out << _tnfDepletionTimeStep << std::endl;
     out << _il10DepletionTimeStep << std::endl;
+    out << _tgammatransition <<std::endl;
 
 	// serialize grid
 	_grid.serialize(out);
@@ -147,6 +149,7 @@ void GrSimulation::deserialize(std::istream& in)
     in >> _il10rDynamics;
 	in >> _tnfDepletionTimeStep;
     in >> _il10DepletionTimeStep;
+    in >> _tgammatransition;
 
 	// deserialize grid
 	_grid.deserialize(in);
@@ -483,19 +486,19 @@ void GrSimulation::computeNextStates()
 {
 	for (MacList::iterator it = _macList.begin(); it != _macList.end(); it++)
 	{
-		it->computeNextState(_time, _grid.getGrid(), _stats, _tnfrDynamics, _nfkbDynamics, _il10rDynamics);
+		it->computeNextState(_time, _grid.getGrid(), _stats, _tnfrDynamics, _nfkbDynamics, _il10rDynamics, _tgammatransition);
 	}
 	for (TgamList::iterator it = _tgamList.begin(); it != _tgamList.end(); it++)
 	{
-		it->computeNextState(_time, _grid.getGrid(), _stats, _tnfrDynamics, _nfkbDynamics, _il10rDynamics);
+		it->computeNextState(_time, _grid.getGrid(), _stats, _tnfrDynamics, _nfkbDynamics, _il10rDynamics, _tgammatransition);
 	}
 	for (TcytList::iterator it = _tcytList.begin(); it != _tcytList.end(); it++)
 	{
-		it->computeNextState(_time, _grid.getGrid(), _stats, _tnfrDynamics, _nfkbDynamics, _il10rDynamics);
+		it->computeNextState(_time, _grid.getGrid(), _stats, _tnfrDynamics, _nfkbDynamics, _il10rDynamics, _tgammatransition);
 	}
 	for (TregList::iterator it = _tregList.begin(); it != _tregList.end(); it++)
 	{
-		it->computeNextState(_time, _grid.getGrid(), _stats, _tnfrDynamics, _nfkbDynamics, _il10rDynamics);
+		it->computeNextState(_time, _grid.getGrid(), _stats, _tnfrDynamics, _nfkbDynamics, _il10rDynamics, _tgammatransition);
 	} 
 }
 

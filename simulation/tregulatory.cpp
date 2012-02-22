@@ -97,7 +97,7 @@ void Treg::deactivate(const int)
 {
 }
 
-void Treg::computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tnfrDynamics, bool, bool)
+void Treg::computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tnfrDynamics, bool, bool, bool)
 {
 	GridCell& cell = grid(_row, _col);
 	double tnfBoundFraction = cell.getTNF() / (cell.getTNF() + _PARAM(PARAM_GR_KD1) * 48.16e11);
@@ -147,11 +147,11 @@ void Treg::handleResting(const int time, GrGrid& grid, GrStat&)
 			Agent* pAgent0 = cell.getAgent(0);
 			Agent* pAgent1 = cell.getAgent(1);
 
-			if (pAgent0)
+			if (pAgent0 && g_Rand.getReal() <= _PARAM(PARAM_TREG_PROB_DOWN_REGULATE))
 			{
 				pAgent0->deactivate(time);
 			}
-			else if (pAgent1)
+			else if (pAgent1 && g_Rand.getReal() <= _PARAM(PARAM_TREG_PROB_DOWN_REGULATE))
 			{
 				pAgent1->deactivate(time);
 			}

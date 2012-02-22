@@ -47,6 +47,7 @@ private:
 	int _nTgamDownRegulated;
 	int _nTgamDead;
     int _nTgamDouble;
+    int _nTgamInduced;
 
 	int _nTcyt;
 	int _nTcytActive;
@@ -67,6 +68,8 @@ private:
 	FLOAT_TYPE _totCCL2;
 	FLOAT_TYPE _totCCL5;
 	FLOAT_TYPE _totCXCL9;
+    FLOAT_TYPE _totTNFR1int;
+    FLOAT_TYPE _totkmRNA;
 
 	int _nApoptosisFasFasL;
 	int _nMacApoptosisTNF[NMAC_STATES];
@@ -179,6 +182,7 @@ public:
 	int getNrOfTgamDownRegulated() const;
 	int getNrOfTgamDead() const;
     int getNrOfTgamDouble() const;
+    int getNrOfTgamInduced() const;
 	int getNrOfTcytActive() const;
 	int getNrOfTcytDead() const;
 	int getNrOfTcytDownRegulated() const;
@@ -193,6 +197,8 @@ public:
 	FLOAT_TYPE getTotCCL2() const;
 	FLOAT_TYPE getTotCCL5() const;
 	FLOAT_TYPE getTotCXCL9() const;
+    FLOAT_TYPE getTotTNFR1int() const;
+    FLOAT_TYPE getTotkmRNA() const;
 	void updateAgentStatistics(Agent* a);
 protected:
 	void updateMacStatistics(MacState state);
@@ -214,6 +220,8 @@ public:
 	void incTotCCL2(FLOAT_TYPE dCCL2);
 	void incTotCCL5(FLOAT_TYPE dCCL5);
 	void incTotCXCL9(FLOAT_TYPE dCXCL9);
+    void incTotTNFR1int(FLOAT_TYPE dTNFR1int);
+    void incTotkmRNA(FLOAT_TYPE dkmRNA);
 	int getNrApoptosisFasFasL() const;
 	int getNrMacApoptosisTNF() const;
   int getNrMacApoptosisTNF(MacState s) const;
@@ -729,6 +737,16 @@ inline void GrStat::incTotCXCL9(FLOAT_TYPE dCXCL9)
 	_totCXCL9 += dCXCL9;
 }
 
+inline void GrStat::incTotTNFR1int(FLOAT_TYPE dTNFR1int)
+{
+    _totTNFR1int += dTNFR1int;
+}
+
+inline void GrStat::incTotkmRNA(FLOAT_TYPE dkmRNA)
+{
+    _totkmRNA += dkmRNA;
+}
+
 inline FLOAT_TYPE GrStat::getTotMacAttractant() const
 {
 	return _totMacAttractant;
@@ -757,6 +775,16 @@ inline FLOAT_TYPE GrStat::getTotCCL5() const
 inline FLOAT_TYPE GrStat::getTotCXCL9() const
 {
 	return _totCXCL9;
+}
+
+inline FLOAT_TYPE GrStat::getTotTNFR1int() const
+{
+    return _totTNFR1int;
+}
+
+inline FLOAT_TYPE GrStat::getTotkmRNA() const
+{
+    return _totkmRNA;
 }
 
 inline FLOAT_TYPE GrStat::getTotExtMtb() const
@@ -857,6 +885,11 @@ inline int GrStat::getNrOfTgam() const
 inline int GrStat::getNrOfTgamDouble() const
 {
     return _nTgamDouble;
+}
+
+inline int GrStat::getNrOfTgamInduced() const
+{
+    return _nTgamInduced;
 }
 
 inline int GrStat::getNrOfTcytDead() const

@@ -27,6 +27,7 @@ GrStat::GrStat()
 	, _nTgamDownRegulated(0)
 	, _nTgamDead(0)
     , _nTgamDouble(0)
+    , _nTgamInduced(0)
 	, _nTcyt(0)
 	, _nTcytActive(0)
 	, _nTcytDownRegulated(0)
@@ -43,6 +44,8 @@ GrStat::GrStat()
 	, _totCCL2(0)
 	, _totCCL5(0)
 	, _totCXCL9(0)
+    , _totTNFR1int(0)
+    , _totkmRNA(0)
 	, _nApoptosisFasFasL(0)
 	, _nMacApoptosisTNF()
 	, _nTcellApoptosisTNF(0)
@@ -287,6 +290,10 @@ void GrStat::updateTgamStatistics(TgamState state)
     case TGAM_ACTIVE_DOUBLE:
         _nTgamDouble++;
         break;
+    case TGAM_INDUCED_REG:
+        _nTgamInduced++;
+        break;
+            
   default: throw std::runtime_error("Unknown Tgam state"); break;
 	}
 
@@ -342,7 +349,7 @@ void GrStat::resetAgentStats()
 	_nMacDeact = _nMacDeactResting = _nMacDeactInfected = _nMacDeactCInfected =
 		_nMacDeactDead = _nMacDeactActive = 0;
 
-	_nTgam = _nTgamActive = _nTgamDouble = _nTgamDead = _nTgamDownRegulated = 0;
+	_nTgam = _nTgamActive = _nTgamDouble = _nTgamDead = _nTgamDownRegulated = _nTgamInduced = 0;
 	
 	_nTcyt = _nTcytDead = _nTcytDownRegulated = _nTcytActive = 0;
 	
@@ -367,7 +374,7 @@ void GrStat::reset()
 
 	_areaTNF = _areaCellDensity = 0;
 	
-	_nCellTnfInhibit = 0;
+	_nCellTnfInhibit = _totTNFR1int = _totkmRNA = 0;
 }
 
 void GrStat::serialize(std::ostream& out) const
@@ -388,6 +395,7 @@ void GrStat::serialize(std::ostream& out) const
 	out << _nTgamDownRegulated << std::endl;
 	out << _nTgamDead << std::endl;
     out << _nTgamDouble << std::endl;
+    out << _nTgamInduced << std::endl;
 
 	out << _nTcyt << std::endl;
 	out << _nTcytActive << std::endl;
@@ -408,6 +416,8 @@ void GrStat::serialize(std::ostream& out) const
 	out << _totCCL2 << std::endl;
 	out << _totCCL5 << std::endl;
 	out << _totCXCL9 << std::endl;
+    out << _totTNFR1int << std::endl;
+    out << _totkmRNA << std::endl;
 
 	out << _nApoptosisFasFasL << std::endl;
 	
@@ -504,7 +514,8 @@ void GrStat::deserialize(std::istream& in)
 	in >>_nTgamActive;
 	in >>_nTgamDownRegulated;
 	in >>_nTgamDead;
-    in >> _nTgamDouble;
+    in >>_nTgamDouble;
+    in >>_nTgamInduced;
 
 	in >>_nTcyt;
 	in >>_nTcytActive;
@@ -525,6 +536,8 @@ void GrStat::deserialize(std::istream& in)
 	in >>_totCCL2;
 	in >>_totCCL5;
 	in >>_totCXCL9;
+    in >>_totTNFR1int;
+    in >>_totkmRNA;
 
 	in >>_nApoptosisFasFasL;
   for(unsigned i=0;i<NMAC_STATES;i++)

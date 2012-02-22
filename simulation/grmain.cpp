@@ -131,7 +131,7 @@ public:
     write("Tcyt"); write("Tcyt a"); write("Tcyt reg"); write("Tcyt d");
     write("Treg"); write("Treg r"); write("Treg d");
     write("Int. Mtb."); write("Ext. Mtb."); write("repExtMtb"); write("NonRepl Ext. Mtb."); write("Tot Mtb.");
-	write("TNF"); write("IL10"); write("CCL2"); write("CCL5"); write("CXCL9"); 
+      write("TNF"); write("IntTNFR1"); write("TotMiMa kmRNA"); write("IL10"); write("CCL2"); write("CCL5"); write("CXCL9"); 
     write("AreaTNF"); write("AreaCellDensity"); write("LesionSize");
     write("MDC"); write("N4"); write("TH0"); write("TH1"); write("N8");
     write("T80"); write("T8"); write("TC"); write("TH0lung"); write("TH1lung");
@@ -159,7 +159,7 @@ public:
     FLOAT_TYPE repExtMtb = stats.getTotExtMtb() - stats.getTotNonRepExtMtb();
     write(stats.getTotIntMtb()); write(stats.getTotExtMtb()); write(repExtMtb); write(stats.getTotNonRepExtMtb()); write((stats.getTotIntMtb() + stats.getTotExtMtb()));
 
-	  write(stats.getTotTNF()); write(stats.getTotIL10()); write(stats.getTotCCL2()); write(stats.getTotCCL5());  write(stats.getTotCXCL9());
+      write(stats.getTotTNF()); write(stats.getTotTNFR1int()); write(stats.getTotkmRNA()); write(stats.getTotIL10()); write(stats.getTotCCL2()); write(stats.getTotCCL5());  write(stats.getTotCXCL9());
 
     FLOAT_TYPE lesionSize = 2 * sqrt((0.0004 * stats.getAreaCellDensity()) / PI);
     write(stats.getAreaTNF()); write(stats.getAreaCellDensity()); write(lesionSize);
@@ -240,7 +240,7 @@ void printStats(const GrSimulation* pSim) {
   const GrStat& stats = pSim->getStats();
   printf("%-7d ", pSim->getTime());
   printf("%3d - (%d,%d,%d,%d,%d) ", stats.getNrOfMac(), stats.getNrOfMacResting(), stats.getNrOfMacInfected(), stats.getNrOfMacCInfected(), stats.getNrOfMacActive(), stats.getNrOfMacDead());
-  printf("%3d - (%d,%d,%d,%d) ", stats.getNrOfTgam(), stats.getNrOfTgamActive(), stats.getNrOfTgamDouble(), stats.getNrOfTgamDownRegulated(), stats.getNrOfTgamDead());
+  printf("%3d - (%d,%d,%d,%d,%d) ", stats.getNrOfTgam(), stats.getNrOfTgamActive(), stats.getNrOfTgamDouble(), stats.getNrOfTgamInduced(), stats.getNrOfTgamDownRegulated(), stats.getNrOfTgamDead());
   printf("%3d - (%d,%d,%d) ", stats.getNrOfTcyt(), stats.getNrOfTcytActive(), stats.getNrOfTcytDownRegulated(), stats.getNrOfTcytDead());
   printf("%3d - (%d,%d) ", stats.getNrOfTreg(), stats.getNrOfTregActive(), stats.getNrOfTregDead());
   printf("(%.5f, %.5f) ", stats.getTotExtMtb(), stats.getTotIntMtb());
@@ -301,7 +301,7 @@ void run(GrSimulation* pSim, int stateInterval, int csvInterval, bool screenDisp
   }
 }
 void buildSim(GrSimulation* pSim, DiffusionMethod diffMethod, RecruitmentBase* pRecr, bool tnfrDynamics, bool il10rDynamics,
-              bool nfkbDynamics, int tnfDepletionTimeStep, int il10DepletionTimeStep, float areaTNFThreshold, float areaCellDensityThreshold) {
+              bool nfkbDynamics, int tnfDepletionTimeStep, int il10DepletionTimeStep, bool tgammatransition, float areaTNFThreshold, float areaCellDensityThreshold) {
   
 	pSim->setTnfrDynamics(tnfrDynamics || nfkbDynamics); // when NFkB is turned on, tnfr dynamics will be on automatically.
     
@@ -309,29 +309,40 @@ void buildSim(GrSimulation* pSim, DiffusionMethod diffMethod, RecruitmentBase* p
     cout << "------------------" << std::endl;
     
     if (tnfrDynamics == 1 || nfkbDynamics == 1) {
-        cout << "TNF  Dynamics  -  On" << std::endl;
+        cout << "TNF  Dynamics   -  On" << std::endl;
     }
     else
     {
-        cout << "TNF  Dynamics  -  Off" << std::endl;
+        cout << "TNF  Dynamics   -  Off" << std::endl;
     }
     pSim->setIl10rDynamics(il10rDynamics);
     if (il10rDynamics == 1) {
-        cout << "IL10 Dynamics  -  On" << std::endl;
+        cout << "IL10 Dynamics   -  On" << std::endl;
     }
     else
     {
-        cout << "IL10 Dynamics  -  Off" << std::endl;
+        cout << "IL10 Dynamics   -  Off" << std::endl;
     }
     pSim->setNfkbDynamics(nfkbDynamics);
     if (nfkbDynamics == 1) {
-        cout << "NFkB Dynamics  -  On" << std::endl;
+        cout << "NFkB Dynamics   -  On" << std::endl;
     }
     else
     {
-        cout << "NFkB Dynamics  -  Off" << std::endl;
+        cout << "NFkB Dynamics   -  Off" << std::endl;
     }
-	pSim->setTnfDepletionTimeStep(tnfDepletionTimeStep);
+	
+    pSim->setTgammaTransition(tgammatransition);
+    
+    if (tgammatransition == 1) {
+        cout << "Treg Induction  -  On" << std::endl;
+    }
+    else
+    {
+        cout << "Treg Induction  -  Off" << std::endl;
+    }
+    
+    pSim->setTnfDepletionTimeStep(tnfDepletionTimeStep);
     pSim->setIl10DepletionTimeStep(il10DepletionTimeStep);
 	pSim->setRecruitment(pRecr);
 	pSim->setDiffusionMethod(diffMethod);
@@ -402,6 +413,7 @@ int main(int argc, char** argv)
 	("tnfr-dynamics", "Use molecular level TNF/TNFR dynamics in the model")
     ("il10r-dynamics", "Use molecular level IL10/IL10R dynamics in the model")
 	("NFkB-dynamics", "Use molecular level intracellular NFkB dynamics in the model")
+    ("Treg-induction", "Allow Tregs to be induced from Tgams in the model")
 	("tnf-depletion", po::value<int>()->default_value(-1), "The time step at which to stop secreting tnf, including by tnfr dynamics. -1: no depletion")
     ("il10-depletion", po::value<int>()->default_value(-1), "The time step at which to stop secreting il10, including by il10r dynamics. -1: no depletion");
 	
@@ -516,7 +528,7 @@ int main(int argc, char** argv)
   }
 
   buildSim(pSim, diffMethodEnum, pRecr, vm.count("tnfr-dynamics"), vm.count("il10r-dynamics"), vm.count("NFkB-dynamics"),
-           vm["tnf-depletion"].as<int>(), vm["il10-depletion"].as<int>(), vm["area-tnf-threshold"].as<float>(),
+           vm["tnf-depletion"].as<int>(), vm["il10-depletion"].as<int>(),vm.count("Treg-induction"), vm["area-tnf-threshold"].as<float>(),
               vm["area-cell-density-threshold"].as<float>());
     
   if (!vm.count("load")){

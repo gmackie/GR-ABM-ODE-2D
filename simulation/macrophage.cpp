@@ -466,7 +466,7 @@ void Mac::apoptosis(GrGrid& grid)
 	}
 }
 
-void Mac::computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tnfrDynamics, bool nfkbDynamics, bool)
+void Mac::computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tnfrDynamics, bool nfkbDynamics, bool, bool)
 {
 	GridCell& cell = grid(_row, _col);
 	double tnfBoundFraction = cell.getTNF() / (cell.getTNF() + _PARAM(PARAM_GR_KD1) * 48.16e11);
@@ -842,7 +842,7 @@ void Mac::solveTNFandIL10(GrGrid& grid, GrStat& stats, double dt, double current
     if (_kmRNA > 0) {
         IkmRNA = _kmRNA * ((_kSynth/_kmRNA) + ((1.0 - (_kSynth/_kmRNA))/(1.0 + pow(2.7183, ((_surfBoundIL10R - _PARAM(PARAM_GR_LINK_RNA_GAMMA))/_PARAM(PARAM_GR_LINK_RNA_DELTA))))));
 		
-		if (IkmRNA <= 0.75)
+		if (IkmRNA <= 0.30)
 		{
 			stats.incNrOfCellsInhibited();
 		}
@@ -897,22 +897,30 @@ void Mac::solveTNFandIL10(GrGrid& grid, GrStat& stats, double dt, double current
 	{
 		if (_state == MAC_INFECTED && _NFkB > 0 && _deactivationTime == -1)
 		{
-			cout << "NFkB Infected    " << IkmRNA << "     " << "Bound IL10    "<< _surfBoundIL10R << std::endl;
+//			cout << "NFkB Infected    " << IkmRNA << "     " << "Bound IL10    "<< _surfBoundIL10R << "     " << "IntBound TNFR1    " << _intBoundTNFR1 << std::endl;
+            stats.incTotTNFR1int(_intBoundTNFR1);
+            stats.incTotkmRNA(IkmRNA);
 		}
 		
 		if (_state == MAC_INFECTED && _NFkB < 1 && _deactivationTime == -1)
 		{
-			cout << "Infected    " << IkmRNA << "     " << "Bound IL10    "<< _surfBoundIL10R << std::endl;
+//			cout << "Infected    " << IkmRNA << "     " << "Bound IL10    "<< _surfBoundIL10R << "     " << "IntBound TNFR1    " << _intBoundTNFR1 << std::endl;
+            stats.incTotTNFR1int(_intBoundTNFR1);
+            stats.incTotkmRNA(IkmRNA);
 		}
 		
 		if (_state == MAC_ACTIVE && _NFkB > 0 && _deactivationTime == -1)
 		{
-			cout << "NFkB Active    " << IkmRNA << "     " << "Bound IL10    "<< _surfBoundIL10R << std::endl;
+//			cout << "NFkB Active    " << IkmRNA << "     " << "Bound IL10    "<< _surfBoundIL10R << "     " << "IntBound TNFR1    " << _intBoundTNFR1 << std::endl;
+            stats.incTotTNFR1int(_intBoundTNFR1);
+            stats.incTotkmRNA(IkmRNA);
 		}
 		
 		if (_state == MAC_ACTIVE && _NFkB < 1 && _deactivationTime == -1)
 		{
-			cout << "Active    " << IkmRNA << "     " << "Bound IL10    "<< _surfBoundIL10R << std::endl;
+//			cout << "Active    " << IkmRNA << "     " << "Bound IL10    "<< _surfBoundIL10R << "     " << "IntBound TNFR1    " << _intBoundTNFR1 << std::endl;
+            stats.incTotTNFR1int(_intBoundTNFR1);
+            stats.incTotkmRNA(IkmRNA);
 		}
 	
 	}
@@ -920,6 +928,7 @@ void Mac::solveTNFandIL10(GrGrid& grid, GrStat& stats, double dt, double current
 	cell.setShedTNFR2(Nav * vol * shedtnfr2);
     cell.setIL10(Nav * vol * il10);
 	
+    
     
 	if (_mTNF < 0 || _surfTNFR1 < 0 || _surfBoundTNFR1 < 0 || _surfTNFR2 < 0 || _surfBoundTNFR2 < 0 || _mTNFRNA < 0)
 		std::cout << "Error: Negative Value of Species in TNF/TNFR dynamics" << std::endl;

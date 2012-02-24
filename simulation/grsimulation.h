@@ -337,11 +337,25 @@ inline Treg* GrSimulation::createTreg(int row, int col, int birthtime, TregState
 
 inline void GrSimulation::checkTCellRecruitmentStart()
 {
-	FLOAT_TYPE totMtb = _stats.getTotExtMtb() + _stats.getTotIntMtb();
-
-	if (!_tcellRecruitmentBegun && (totMtb > _PARAM(PARAM_TCELL_MTB_RECRUITMENT_THRESHOLD)))
+	if (_tcellRecruitmentBegun)
 	{
-		_tcellRecruitmentBegun = true;
+		return;
+	}
+
+	if (_PARAM(PARAM_TCELL_MTB_RECRUITMENT_THRESHOLD) > 0)
+	{
+		FLOAT_TYPE totMtb = _stats.getTotExtMtb() + _stats.getTotIntMtb();
+		if (totMtb > _PARAM(PARAM_TCELL_MTB_RECRUITMENT_THRESHOLD))
+		{
+			_tcellRecruitmentBegun = true;
+		}
+	}
+	else
+	{
+		if (_time >= _PARAM(PARAM_TCELL_TIME_RECRUITMENT_ENABLED))
+		{
+			_tcellRecruitmentBegun = true;
+		}
 	}
 }
 

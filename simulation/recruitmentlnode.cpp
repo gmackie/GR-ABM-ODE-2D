@@ -186,6 +186,10 @@ void RecruitmentLnODE::recruitMacsGetTcellSources(GrSimulation& sim, GrStat& sta
 			{
 				stats.incNrSourcesActiveMac();
 			}
+			else
+			{
+				stats.incNrSourcesCrowdedMac();
+			}
 		}
 
 		// macrophage recruitment
@@ -201,6 +205,10 @@ void RecruitmentLnODE::recruitMacsGetTcellSources(GrSimulation& sim, GrStat& sta
 				stats.incNrSourcesActiveTgam();
 				tcellSources[TCELL_TYPE_GAM].push_back(std::make_pair(threshold, pSource));
 			}
+			else
+			{
+				stats.incNrSourcesCrowdedTgam();
+			}
 		}
 
 		if (TcytRecruitmentThreshold(pSource, threshold))
@@ -212,6 +220,10 @@ void RecruitmentLnODE::recruitMacsGetTcellSources(GrSimulation& sim, GrStat& sta
 				stats.incNrSourcesActiveTcyt();
 				tcellSources[TCELL_TYPE_CYT].push_back(std::make_pair(threshold, pSource));
 			}
+			else
+			{
+				stats.incNrSourcesCrowdedTcyt();
+			}
 		}
 
 		if (TregRecruitmentThreshold(pSource, threshold))
@@ -222,6 +234,10 @@ void RecruitmentLnODE::recruitMacsGetTcellSources(GrSimulation& sim, GrStat& sta
 			{
 				stats.incNrSourcesActiveTreg();
 				tcellSources[TCELL_TYPE_REG].push_back(std::make_pair(threshold, pSource));
+			}
+			else
+			{
+				stats.incNrSourcesCrowdedTreg();
 			}
 		}
 	}
@@ -251,7 +267,10 @@ void RecruitmentLnODE::recruitTcells(GrSimulation& sim, GrStat& stats,
 
 		// check whether the T cell has died while in the queue
 		if (tcell._birthtime + _PARAM(PARAM_TCELL_AGE) < sim.getTime())
+		{
+			stats.incNrQueuedDie(tcell._type);
 			continue;
+		}
 
 		// pick a source
 		GridCell* pSource = NULL;
@@ -283,12 +302,15 @@ void RecruitmentLnODE::recruitTcells(GrSimulation& sim, GrStat& stats,
 			{
 			case TCELL_TYPE_CYT:
 				sim.createTcyt(pSource->getRow(), pSource->getCol(), tcell._birthtime, TCYT_ACTIVE);
+				stats.incNrTgamRecruited();
 				break;
 			case TCELL_TYPE_GAM:
 				sim.createTgam(pSource->getRow(), pSource->getCol(), tcell._birthtime, TGAM_ACTIVE);
+				stats.incNrTcytRecruited();
 				break;
 			case TCELL_TYPE_REG:
 				sim.createTreg(pSource->getRow(), pSource->getCol(), tcell._birthtime, TREG_ACTIVE);
+				stats.incNrTregRecruited();
 				break;
 			default:
 				assert(false);

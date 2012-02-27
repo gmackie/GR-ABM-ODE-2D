@@ -138,12 +138,17 @@ public:
     write("T80lung"); write("T8lung"); write("TClung");
     write("Outcome (1)"); write("Outcome (2)");
     write("NrSourcesMac"); write("NrSourcesTgam"); write("NrSourcesTcyt"); write("NrSourcesTreg");
+    write("NrSourcesMacActivatedFree"); write("NrSourcesTgamActivatedFree"); write("NrSourcesTcytActivatedFree"); write("NrSourcesTregActivatedFree");
+    write("NrSourcesMacCrowded"); write("NrSourcesTgamCrowded"); write("NrSourcesTcytCrowded"); write("NrSourcesTregCrowded");
     write("NrCaseated");
     write("MacApoptosisTNF"); write("MrApoptTNF"); write("MiApoptTNF"); write("MciApoptTNF");  write("MaApoptTNF");
     write("TcellApoptTNF");
     write("MrActivationTNF");
     write("MiActivationTNF");
 	write("NrOfMacsFullyInhibited");
+	write("TgamQueued"); write("TcytQueued"); write("TregQueued");
+	write("TgamQueuedDie"); write("TcytQueuedDie"); write("TregQueuedDie");
+	write("TgamRecruited"); write("TcytRecruited"); write("TregRecruited");
     endRow();
 
   }
@@ -196,6 +201,8 @@ public:
       }
     }
     write(stats.getNrSourcesMac()); write(stats.getNrSourcesTgam());  write(stats.getNrSourcesTcyt()); write(stats.getNrSourcesTreg());
+    write(stats.getNrSourcesActiveMac()); write(stats.getNrSourcesActiveTgam());  write(stats.getNrSourcesActiveTcyt()); write(stats.getNrSourcesActiveTreg());
+    write(stats.getNrSourcesCrowdedMac()); write(stats.getNrSourcesCrowdedTgam());  write(stats.getNrSourcesCrowdedTcyt()); write(stats.getNrSourcesCrowdedTreg());
     write(stats.getNrCaseated());
 
     int startState = 1; // Skip the dead state: apoptosis doesn't occur for an already dead mac.
@@ -216,6 +223,11 @@ public:
     write(stats.getNrRestingMacActivationTNF());
     write(stats.getNrInfMacActivationTNF());
 	write(stats.getNrOfCellsInhibited()/100);
+
+	write(stats.getNrTgamQueued()); write(stats.getNrTcytQueued()); write(stats.getNrTregQueued());
+	write(stats.getNrTgamQueuedDie()); write(stats.getNrTcytQueuedDie()); write(stats.getNrTregQueuedDie());
+	write(stats.getNrTgamRecruited()); write(stats.getNrTcytRecruited()); write(stats.getNrTregRecruited());
+
     oCSVStream::endRow();
   }
 };

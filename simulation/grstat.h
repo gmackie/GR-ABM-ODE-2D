@@ -20,6 +20,7 @@
 #include <functional>
 #include <algorithm>
 #include <numeric>
+#include <sstream>
 
 
 typedef enum {	GR_CONTAINMENT, GR_CONTAINMENT_INCONSISTENT, GR_CLEARANCE,
@@ -90,6 +91,16 @@ private:
 	int _nSourceTcyt;
 	int _nSourceTreg;
 
+	int _nSourceMacActive;
+	int _nSourceTgamActive;
+	int _nSourceTcytActive;
+	int _nSourceTregActive;
+
+	int _nSourceMacCrowded;
+	int _nSourceTgamCrowded;
+	int _nSourceTcytCrowded;
+	int _nSourceTregCrowded;
+
 	int _nMacStat1;
 	int _nMacStat1Resting;
 	int _nMacStat1Infected;
@@ -114,13 +125,19 @@ private:
 	int _queueTgam;
 	int _queueTcyt;
 	int _queueTreg;
+
+	int _queueTgamDie;
+	int _queueTcytDie;
+	int _queueTregDie;
+
+	int _recruitedTgam;
+	int _recruitedTcyt;
+	int _recruitedTreg;
+
 	FLOAT_TYPE _fluxTgam;
 	FLOAT_TYPE _fluxTcyt;
 	FLOAT_TYPE _fluxTreg;
-	int _nSourceMacActive;
-	int _nSourceTgamActive;
-	int _nSourceTcytActive;
-	int _nSourceTregActive;
+
 	FLOAT_TYPE _MDC;
 	FLOAT_TYPE _N4;
 	FLOAT_TYPE _TH0;
@@ -224,7 +241,7 @@ public:
     void incTotkmRNA(FLOAT_TYPE dkmRNA);
 	int getNrApoptosisFasFasL() const;
 	int getNrMacApoptosisTNF() const;
-  int getNrMacApoptosisTNF(MacState s) const;
+	int getNrMacApoptosisTNF(MacState s) const;
 	int getNrTcellApoptosisTNF() const;
 	int getNrRestingMacActivationTNF() const;
 	int getNrInfMacActivationTNF() const;
@@ -233,6 +250,7 @@ public:
 	void incTcellApoptosisTNF();
 	void incRestingMacActivationTNF();
 	void incInfMacActivationTNF();
+
 	int getNrSourcesMac() const;
 	int getNrSourcesTgam() const;
 	int getNrSourcesTcyt() const;
@@ -241,6 +259,7 @@ public:
 	void incNrSourcesTgam();
 	void incNrSourcesTcyt();
 	void incNrSourcesTreg();
+
 	int getNrSourcesActiveMac() const;
 	int getNrSourcesActiveTgam() const;
 	int getNrSourcesActiveTcyt() const;
@@ -249,6 +268,17 @@ public:
 	void incNrSourcesActiveTgam();
 	void incNrSourcesActiveTcyt();
 	void incNrSourcesActiveTreg();
+
+	int getNrSourcesCrowdedMac() const;
+	int getNrSourcesCrowdedTgam() const;
+	int getNrSourcesCrowdedTcyt() const;
+	int getNrSourcesCrowdedTreg() const;
+	void incNrSourcesCrowdedMac();
+	void incNrSourcesCrowdedTgam();
+	void incNrSourcesCrowdedTcyt();
+	void incNrSourcesCrowdedTreg();
+
+
 	int getNrBactAct() const;
 	void incNrBactAct();
 	int getAreaTNF() const;
@@ -261,12 +291,29 @@ public:
 	void setGrStatus(int index, GrStatus status);
 	void serialize(std::ostream& out) const;
 	void deserialize(std::istream& in);
+
 	int getNrTgamQueued() const;
 	void setNrTgamQueued(int count);
 	int getNrTcytQueued() const;
 	void setNrTcytQueued(int count);
 	int getNrTregQueued() const;
 	void setNrTregQueued(int count);
+
+	int getNrTgamQueuedDie() const;
+	void incNrTgamQueuedDie();
+	int getNrTcytQueuedDie() const;
+	void incNrTcytQueuedDie();
+	int getNrTregQueuedDie() const;
+	void incNrTregQueuedDie();
+	void incNrQueuedDie(TcellType type);
+
+	int getNrTgamRecruited() const;
+	void incNrTgamRecruited();
+	int getNrTcytRecruited() const;
+	void incNrTcytRecruited();
+	int getNrTregRecruited() const;
+	void incNrTregRecruited();
+
 	FLOAT_TYPE getFluxTgam() const;
 	void setFluxTgam(FLOAT_TYPE flux);
 	FLOAT_TYPE getFluxTcyt() const;
@@ -456,6 +503,26 @@ inline void GrStat::setNrTgamQueued(int count)
 	_queueTgam = count;
 }
 
+inline int GrStat::getNrTgamQueuedDie() const
+{
+	return _queueTgamDie;
+}
+
+inline void GrStat::incNrTgamQueuedDie()
+{
+	_queueTgamDie++;
+}
+
+inline int GrStat::getNrTgamRecruited() const
+{
+	return _recruitedTgam;
+}
+
+inline void GrStat::incNrTgamRecruited()
+{
+	_recruitedTgam++;
+}
+
 inline FLOAT_TYPE GrStat::getFluxTgam() const
 {
 	return _fluxTgam;
@@ -476,6 +543,26 @@ inline void GrStat::setNrTcytQueued(int count)
 	_queueTcyt = count;
 }
 
+inline int GrStat::getNrTcytQueuedDie() const
+{
+	return _queueTcytDie;
+}
+
+inline void GrStat::incNrTcytQueuedDie()
+{
+	_queueTcytDie++;
+}
+
+inline int GrStat::getNrTcytRecruited() const
+{
+	return _recruitedTcyt;
+}
+
+inline void GrStat::incNrTcytRecruited()
+{
+	_recruitedTcyt++;
+}
+
 inline FLOAT_TYPE GrStat::getFluxTcyt() const
 {
 	return _fluxTcyt;
@@ -494,6 +581,46 @@ inline int GrStat::getNrTregQueued() const
 inline void GrStat::setNrTregQueued(int count)
 {
 	_queueTreg = count;
+}
+
+inline int GrStat::getNrTregQueuedDie() const
+{
+	return _queueTregDie;
+}
+
+inline void GrStat::incNrTregQueuedDie()
+{
+	_queueTregDie++;
+}
+
+inline void GrStat::incNrQueuedDie(TcellType type)
+{
+	switch (type)
+	{
+		case TCELL_TYPE_CYT:
+			incNrTcytQueuedDie();
+			break;
+		case TCELL_TYPE_REG:
+			incNrTregQueuedDie();
+			break;
+		case TCELL_TYPE_GAM:
+			incNrTgamQueuedDie();
+			break;
+		default:
+			std::ostringstream os;
+			os << "GrStat::incNrQueuedDie: invalid T cell type of " << type << ", cannot continue...";
+			throw std::runtime_error(os.str());
+	}
+}
+
+inline int GrStat::getNrTregRecruited() const
+{
+	return _recruitedTreg;
+}
+
+inline void GrStat::incNrTregRecruited()
+{
+	_recruitedTreg++;
 }
 
 inline FLOAT_TYPE GrStat::getFluxTreg() const
@@ -636,6 +763,46 @@ inline void GrStat::incNrSourcesActiveTcyt()
 inline void GrStat::incNrSourcesActiveTreg()
 {
 	_nSourceTregActive++;
+}
+
+inline int GrStat::getNrSourcesCrowdedMac() const
+{
+	return _nSourceMacCrowded;
+}
+
+inline int GrStat::getNrSourcesCrowdedTgam() const
+{
+	return _nSourceTgamCrowded;
+}
+
+inline int GrStat::getNrSourcesCrowdedTcyt() const
+{
+	return _nSourceTcytCrowded;
+}
+
+inline int GrStat::getNrSourcesCrowdedTreg() const
+{
+	return _nSourceTregCrowded;
+}
+
+inline void GrStat::incNrSourcesCrowdedMac()
+{
+	_nSourceMacCrowded++;
+}
+
+inline void GrStat::incNrSourcesCrowdedTgam()
+{
+	_nSourceTgamCrowded++;
+}
+
+inline void GrStat::incNrSourcesCrowdedTcyt()
+{
+	_nSourceTcytCrowded++;
+}
+
+inline void GrStat::incNrSourcesCrowdedTreg()
+{
+	_nSourceTregCrowded++;
 }
 
 inline int GrStat::getNrApoptosisFasFasL() const

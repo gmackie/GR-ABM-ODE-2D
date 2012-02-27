@@ -17,7 +17,7 @@
 class RecruitmentLnODE : public RecruitmentBase
 {
 protected:
-	enum TcellType {TCELL_TYPE_CYT, TCELL_TYPE_REG, TCELL_TYPE_GAM, TCELL_TYPE_COUNT};
+
 	static const int _nrConditions = 43;
 
 	static const int _idxMDC = 13;

@@ -725,6 +725,11 @@ bool ParamsBase::checkParams() const
 
 	res &= movementBonusFactorCheck(PARAM_MAC_MOVEMENT_BONUSFACTOR, "macrophage");
 	res &= movementBonusFactorCheck(PARAM_TCELL_MOVEMENT_BONUSFACTOR, "T cell");
+	if (getParam(PARAM_MAC_THRESHOLD_BURST_CI_INTMTB) <= getParam(PARAM_MAC_THRESHOLD_BECOME_CI_INTMTB))
+	{
+		std::cerr << " nrIntMtbCInf, " << getParam(PARAM_MAC_THRESHOLD_BECOME_CI_INTMTB) << ", is >= nrIntMtbBurstCInf, " << getParam(PARAM_MAC_THRESHOLD_BURST_CI_INTMTB) << std::endl;
+		res = false;
+	}
 
 	return res;
 }

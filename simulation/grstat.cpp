@@ -61,6 +61,14 @@ GrStat::GrStat()
 	, _nSourceTgam(0)
 	, _nSourceTcyt(0)
 	, _nSourceTreg(0)
+	, _nSourceMacActive(0)
+	, _nSourceTgamActive(0)
+	, _nSourceTcytActive(0)
+	, _nSourceTregActive(0)
+	, _nSourceMacCrowded(0)
+	, _nSourceTgamCrowded(0)
+	, _nSourceTcytCrowded(0)
+	, _nSourceTregCrowded(0)
 	, _nMacStat1(0)
 	, _nMacStat1Resting(0)
 	, _nMacStat1Infected(0)
@@ -80,13 +88,15 @@ GrStat::GrStat()
 	, _queueTgam(0)
 	, _queueTcyt(0)
 	, _queueTreg(0)
+	, _queueTgamDie(0)
+	, _queueTcytDie(0)
+	, _queueTregDie(0)
+	, _recruitedTgam(0)
+	, _recruitedTcyt(0)
+	, _recruitedTreg(0)
 	, _fluxTgam(0)
 	, _fluxTcyt(0)
 	, _fluxTreg(0)
-	, _nSourceMacActive(0)
-	, _nSourceTgamActive(0)
-	, _nSourceTcytActive(0)
-	, _nSourceTregActive(0)
 	, _MDC(0)
 	, _N4(0)
 	, _TH0(0)
@@ -153,7 +163,13 @@ void GrStat::updateAgentStatistics(Agent* a)
       assert(pMac != NULL);
       _macIntMtbStats[pMac->getState()](pMac->getIntMtb());
       if(pMac->getState() == MAC_INFECTED || pMac->getState() == MAC_CINFECTED){
-        assert(pMac->getIntMtb() < _PARAM(PARAM_MAC_THRESHOLD_BURST_CI_INTMTB));
+
+    	// This can happen if  _PARAM(PARAM_MAC_THRESHOLD_BURST_CI_INTMTB) < _PARAM(PARAM_MAC_THRESHOLD_BECOME_CI_INTMTB)
+    	// or if the intMtb growth rate is high enough for intMtb for a mac > both PARAM(PARAM_MAC_THRESHOLD_BECOME_CI_INTMTB)
+    	// and _PARAM(PARAM_MAC_THRESHOLD_BURST_CI_INTMTB). In either case intMtb >  _PARAM(PARAM_MAC_THRESHOLD_BURST_CI_INTMTB)
+    	// when an Mi becomes an MCi. The new MCi won't burst until the next time step, so the assert condition would be true here.
+        //assert(pMac->getIntMtb() < _PARAM(PARAM_MAC_THRESHOLD_BURST_CI_INTMTB));
+
         assert(pMac->getIntMtb() < _intMtbFreqSize);
 
         _intMtbFreq[int(pMac->getIntMtb())]++;
@@ -355,6 +371,12 @@ void GrStat::resetAgentStats()
 	
 	_nTreg = _nTregDead = _nTregActive = 0;
 	
+	_queueTgam = _queueTcyt = _queueTreg = 0;
+
+	_queueTgamDie = _queueTcytDie = _queueTregDie = 0;
+
+	_recruitedTgam = _recruitedTcyt = _recruitedTreg = 0;
+
 
   memset(_nMacApoptosisTNF, 0 , sizeof(int)*NMAC_STATES);
   memset(_intMtbFreq, 0, sizeof(unsigned)*_intMtbFreqSize);
@@ -369,6 +391,8 @@ void GrStat::reset()
 	_nSourceMac = _nSourceTcyt = _nSourceTgam = _nSourceTreg = 0;
 	
 	_nSourceMacActive = _nSourceTcytActive = _nSourceTgamActive = _nSourceTregActive = 0;
+
+	_nSourceMacCrowded = _nSourceTcytCrowded = _nSourceTgamCrowded = _nSourceTregCrowded = 0;
 
 	_nCaseated = 0;
 

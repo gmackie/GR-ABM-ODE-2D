@@ -121,6 +121,8 @@ inline std::istream& operator>>(std::istream& s, Pos& p) {
   return s;
 }
 
+unsigned int createTimeSeed();
+
 // global variables
 extern Rand g_Rand;
 

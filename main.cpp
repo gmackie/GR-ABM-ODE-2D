@@ -35,12 +35,6 @@ void printVersion()
 	std::cout << "Version: " << GR_VERSION << std::endl;
 }
 
-unsigned long getSeed()
-{
-	const QTime curTime = QTime::currentTime();
-	return curTime.hour() * 3600 + curTime.minute() * 60 + curTime.second();
-}
-
 void setupScriptingMode(MainWindow& mainWindow)
 {
 	Ui::MainWindowClass& ui = mainWindow.getUI();
@@ -72,13 +66,14 @@ Snapshot* setupOutput(MainWindow& mainWindow, const std::string& outputDir, bool
 int main(int argc, char *argv[])
 {
   std::cout << "GRID SIZE: NROWS: " << NROWS << " NCOLS: " << NCOLS << std::endl;
+
 	QApplication a(argc, argv);
 
 	bool ode;
 	bool tnfrDynamics;
 	bool nfkbDynamics;
 	int tnfDepletionTimeStep;
-	unsigned long seed;
+	unsigned int seed;
 	bool seedSpecified;
 	int diffMethod;
 	std::string inputFileName;
@@ -114,7 +109,7 @@ int main(int argc, char *argv[])
 	desc.add_options()
 		("help,h", "Help message")
 		("input-file,i", po::value<std::string>(&inputFileName), "Input file name")
-		("seed,s", po::value<unsigned long>(&seed))
+		("seed,s", po::value<unsigned int>(&seed))
 		("diffusion,d", po::value<int>(&diffMethod)->default_value(3),
 				"Diffusion method:\n0 - FTCS\n1 - BTCS (SOR, correct)\n2 - BTCS (SOR, wrong)\n3 - FTCS Grid Swap")
 		("timesteps,t", po::value<int>(&timesteps), "Number of time steps to simulate\nTakes precedence over --days")
@@ -175,7 +170,7 @@ int main(int argc, char *argv[])
 		seedSpecified = vm.count("seed");
 		if (!seedSpecified)
 		{
-			seed = getSeed();
+			seed = createTimeSeed();
 		}
 		g_Rand.setSeed(seed);
 

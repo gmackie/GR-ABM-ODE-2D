@@ -67,7 +67,7 @@
              <x>0</x>
              <y>0</y>
              <width>256</width>
-             <height>528</height>
+             <height>530</height>
             </rect>
            </property>
            <attribute name="label">
@@ -140,7 +140,7 @@
                  <number>1</number>
                 </property>
                 <property name="maximum">
-                 <number>10000000</number>
+                 <number>2147483647</number>
                 </property>
                 <property name="singleStep">
                  <number>1</number>
@@ -180,8 +180,8 @@
               <rect>
                <x>0</x>
                <y>20</y>
-               <width>251</width>
-               <height>92</height>
+               <width>253</width>
+               <height>93</height>
               </rect>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_6">
@@ -627,7 +627,7 @@
              <x>0</x>
              <y>0</y>
              <width>256</width>
-             <height>466</height>
+             <height>468</height>
             </rect>
            </property>
            <attribute name="label">
@@ -1878,7 +1878,7 @@
      <x>0</x>
      <y>0</y>
      <width>534</width>
-     <height>27</height>
+     <height>25</height>
     </rect>
    </property>
   </widget>

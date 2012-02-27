@@ -371,7 +371,7 @@ int main(int argc, char** argv)
 {
   printVersion();
   std::cout << "GRID SIZE: NROWS: " << NROWS << " NCOLS: " << NCOLS << std::endl;
-  unsigned long seed;
+  unsigned int seed;
   std::string paramFile;
   std::string outputDir;
 	
@@ -387,9 +387,6 @@ int main(int argc, char** argv)
 	 * curTime to define a unique seed.
 	 *
 	 * */
-	struct timeval curTimeHiRes;
-  if (gettimeofday(&curTimeHiRes, NULL) != 0)
-		throw runtime_error("Error getting current high resolution time.");
 	
 	po::options_description general("General");
 	general.add_options()
@@ -399,19 +396,19 @@ int main(int argc, char** argv)
 	            "This option is implied by --lhs.")
 	("output-dir,o", po::value<std::string>(&outputDir)->default_value("./"), "Output directory")
 	("input-file,i", po::value<std::string>(&paramFile), "Parameter file")
-	("seed,s", po::value<unsigned long>(&seed), "RNG seed, default is based on the current time");
+	("seed,s", po::value<unsigned int>(&seed), "RNG seed, default is based on the current time");
 
   po::options_description stats("Statistics");
   stats.add_options()
   ("moi", "Generate csv file of internal MTB statistics, saved in -moi.csv")
   ("stats", "Generate csv file of general statistics, saved in .csv")
-	("csv-interval", po::value<unsigned>()->default_value(1), "CSV update interval (10 min timesteps)");
+  ("csv-interval", po::value<unsigned>()->default_value(1), "CSV update interval (10 min timesteps)");
 
   po::options_description sim_opts("Simulation");
   sim_opts.add_options()
   ("load,l", po::value<std::string>(), "Load from a saved state")
 	("timesteps,t", po::value<unsigned>(), "Number of time steps to simulate\n"
-                                    "Takes precedence over --days")
+									"Takes precedence over --days")
 	("days", po::value<unsigned>()->default_value(200), "Number of days to simulate")
 	("state-interval", po::value<unsigned>()->default_value(0), "State save interval (10 min timesteps)")
 	("diffusion,d", po::value<unsigned>()->default_value(3),
@@ -432,7 +429,7 @@ int main(int argc, char** argv)
   po::options_description lhs_opts("LHS");
   lhs_opts.add_options()
   ("lhs", "Running as part of an LHS run")
-	("seedadj", po::value<unsigned long>(), "Seed adjustment for cluster runs");
+  ("seedadj", po::value<unsigned int>(), "Seed adjustment for cluster runs");
 
   po::options_description desc("Allowed Options");
   desc.add(general).add(stats).add(sim_opts).add(simdyn_opts).add(lhs_opts);
@@ -448,7 +445,7 @@ int main(int argc, char** argv)
 	catch (std::exception& e)
 	{
 		std::cerr << e.what() << std::endl;
-    printUsage(argv[0], desc);
+		printUsage(argv[0], desc);
 		return 1;
 	}
   
@@ -469,18 +466,12 @@ int main(int argc, char** argv)
   else 
     timeToSimulate = vm["timesteps"].as<unsigned>();
   
-  // If we just use time in seconds we will get duplicate seeds when doing a large number of runs,
-  // such as running a big LHS on a cluster.
-  // If we use just the micro-second part of the high resolution time we only get seeds that vary
-  // between 1 and 1,000,000.
-  // So we XOR the two times, which gives a larger range of seeds, with the lower order part varying
-  // with a higher resolution than we would get just by using seconds.
-  if (!vm.count("seed"))
-    seed = curTimeHiRes.tv_sec ^ curTimeHiRes.tv_usec;
+   if (!vm.count("seed"))
+    seed = createTimeSeed();
   
   // Adjust the seed if a seed adjustment was specified.
   if (vm.count("seedadj"))
-    seed = seed ^ (vm["seedadj"].as<unsigned long>());
+    seed = seed ^ (vm["seedadj"].as<unsigned int>());
   
   bool lhs = vm.count("lhs");
 
@@ -526,7 +517,15 @@ int main(int argc, char** argv)
     }
     in.push(boost::iostreams::file_source(s));
     pSim->deserialize(in);
-	std::cerr << "grmain seed: " << g_Rand.getSeed() << std::endl; //DBG
+  }
+
+  buildSim(pSim, diffMethodEnum, pRecr, vm.count("tnfr-dynamics"), vm.count("il10r-dynamics"), vm.count("NFkB-dynamics"),
+           vm["tnf-depletion"].as<int>(), vm["il10-depletion"].as<int>(),vm.count("Treg-induction"), vm["area-tnf-threshold"].as<float>(),
+              vm["area-cell-density-threshold"].as<float>());
+
+  if (!vm.count("load")){
+    g_Rand.setSeed(seed);
+    pSim->init();
   }
 
   // Write the seed to a file, so runs can be repeated, except for lhs runs.
@@ -535,18 +534,10 @@ int main(int argc, char** argv)
   if (!lhs)
   {
     std::ofstream seedStream("seed");
-    seedStream << seed << std::endl;
+    seedStream << g_Rand.getSeed() << std::endl;
     seedStream.close();
   }
 
-  buildSim(pSim, diffMethodEnum, pRecr, vm.count("tnfr-dynamics"), vm.count("il10r-dynamics"), vm.count("NFkB-dynamics"),
-           vm["tnf-depletion"].as<int>(), vm["il10-depletion"].as<int>(),vm.count("Treg-induction"), vm["area-tnf-threshold"].as<float>(),
-              vm["area-cell-density-threshold"].as<float>());
-    
-  if (!vm.count("load")){
-    g_Rand.setSeed(seed);
-    pSim->init();
-  }
   if(outputDir[outputDir.size()-1] != '/')
     outputDir += '/';
 

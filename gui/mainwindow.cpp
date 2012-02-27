@@ -9,6 +9,7 @@
 #include <QShortcut>
 #include <vector>
 #include <list>
+#include <limits>
 
 #include "simulation.h"
 #include "colormaps/rainbow.h"
@@ -360,6 +361,9 @@ void MainWindow::initSimulationTab()
 	_ui.comboBoxDiffusion->addItem(_DIFF_SOR_CORRECT);
 	_ui.comboBoxDiffusion->addItem(_DIFF_SOR_WRONG);
 	_ui.comboBoxDiffusion->addItem(_DIFF_FTCS_SWAP);
+
+	// So seeds don't get truncated.
+	_ui.spinBoxSeed->setMaximum(INT_MAX);
 
 	_ui.spinBoxSeed->setValue((int) g_Rand.getSeed());
 
@@ -918,7 +922,7 @@ void MainWindow::setColorMap(const QString& value)
 
 void MainWindow::updateSeed(int value)
 {
-	g_Rand.setSeed((unsigned long) value);
+	g_Rand.setSeed((unsigned int) value);
 }
 
 void MainWindow::updateDelay(int value)
@@ -1530,6 +1534,12 @@ void MainWindow::loadState(std::string fileName)
 		sim.loadState(in);
 
 		// update diffusion and seed in the user interface
+		// The seed in the saved state (and in the Rand class) is of type unsigned int.
+		// In _ui.spinBoxSeed, which is a QSpinBox obejct, it is int. So seeds from a saved
+		// state might be truncated, most likely if they were originally based on a time value,
+		// which is typically unsigned int. This is won't be a problem until about the year 2037.
+		// The max 32 bit int is 2147483647. The number of seconds since 1970 (how unix time values
+		// are defined) doesn't reach 2147483647 until about the year 2037.
 		_ui.spinBoxSeed->setValue((int) g_Rand.getSeed());
 		_ui.comboBoxDiffusion->setCurrentIndex(sim.getDiffusionMethod());
 

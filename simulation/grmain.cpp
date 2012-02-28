@@ -136,7 +136,6 @@ public:
     write("MDC"); write("N4"); write("TH0"); write("TH1"); write("N8");
     write("T80"); write("T8"); write("TC"); write("TH0lung"); write("TH1lung");
     write("T80lung"); write("T8lung"); write("TClung");
-    write("Outcome (1)"); write("Outcome (2)");
     write("NrSourcesMac"); write("NrSourcesTgam"); write("NrSourcesTcyt"); write("NrSourcesTreg");
     write("NrSourcesMacActivatedFree"); write("NrSourcesTgamActivatedFree"); write("NrSourcesTcytActivatedFree"); write("NrSourcesTregActivatedFree");
     write("NrSourcesMacCrowded"); write("NrSourcesTgamCrowded"); write("NrSourcesTcytCrowded"); write("NrSourcesTregCrowded");
@@ -164,7 +163,7 @@ public:
     FLOAT_TYPE repExtMtb = stats.getTotExtMtb() - stats.getTotNonRepExtMtb();
     write(stats.getTotIntMtb()); write(stats.getTotExtMtb()); write(repExtMtb); write(stats.getTotNonRepExtMtb()); write((stats.getTotIntMtb() + stats.getTotExtMtb()));
 
-      write(stats.getTotTNF()); write(stats.getTotTNFR1int()); write(stats.getTotkmRNA()); write(stats.getTotIL10()); write(stats.getTotCCL2()); write(stats.getTotCCL5());  write(stats.getTotCXCL9());
+    write(stats.getTotTNF()); write(stats.getTotTNFR1int()); write(stats.getTotkmRNA()); write(stats.getTotIL10()); write(stats.getTotCCL2()); write(stats.getTotCCL5());  write(stats.getTotCXCL9());
 
     FLOAT_TYPE lesionSize = 2 * sqrt((0.0004 * stats.getAreaCellDensity()) / PI);
     write(stats.getAreaTNF()); write(stats.getAreaCellDensity()); write(lesionSize);
@@ -173,33 +172,6 @@ public:
     write(stats.getT80()); write(stats.getT8()); write(stats.getTC());  write(stats.getTH0lung()); write(stats.getTH1lung());
     write(stats.getT80lung()); write(stats.getT8lung()); write(stats.getTClung());
 
-    for (int i = 0; i < NOUTCOMES; i++)
-    {
-      switch (stats.getGrStatus(i))
-      {
-        case GR_CLEARANCE:
-          write("Clearance");
-          break;
-        case GR_CONTAINMENT:
-          write("Containment");
-          break;
-        case GR_CONTAINMENT_INCONSISTENT:
-          write("Containment?");
-          break;
-        case GR_DISSEMINATION:
-          write("Dissemination");
-          break;
-        case GR_DISSEMINATION_INCONSISTENT:
-          write("Dissemination?");
-          break;
-        case GR_UNKNOWN:
-          write("Unknown");
-          break;
-        case GR_NONE:
-          write("None");
-          break;
-      }
-    }
     write(stats.getNrSourcesMac()); write(stats.getNrSourcesTgam());  write(stats.getNrSourcesTcyt()); write(stats.getNrSourcesTreg());
     write(stats.getNrSourcesActiveMac()); write(stats.getNrSourcesActiveTgam());  write(stats.getNrSourcesActiveTcyt()); write(stats.getNrSourcesActiveTreg());
     write(stats.getNrSourcesCrowdedMac()); write(stats.getNrSourcesCrowdedTgam());  write(stats.getNrSourcesCrowdedTcyt()); write(stats.getNrSourcesCrowdedTreg());

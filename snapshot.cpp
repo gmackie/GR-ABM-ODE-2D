@@ -100,10 +100,6 @@ Snapshot::Snapshot(const QString& dirName, const QString& fileName)
 		<< ','
 		<< "\"TClung\""
 		<< ','
-		<< "\"Outcome (1)\""
-		<< ','
-		<< "\"Outcome (2)\""
-		<< ','
 		<< "\"NrSourcesMac\""
 		<< ','
 		<< "\"NrSourcesTgam\""
@@ -264,36 +260,6 @@ void Snapshot::takeSnapshot(const int time, const GrStat& stats)
 		<< stats.getT8lung()
 		<< ','
 		<< stats.getTClung();
-
-	for (int i = 0; i < NOUTCOMES; i++)
-	{
-		_outFile << ',';
-
-		switch (stats.getGrStatus(i))
-		{
-			case GR_CLEARANCE:
-				_outFile << "\"Clearance\"";
-				break;
-			case GR_CONTAINMENT:
-				_outFile << "\"Containment\"";
-				break;
-			case GR_CONTAINMENT_INCONSISTENT:
-				_outFile << "\"Containment?\"";
-				break;
-			case GR_DISSEMINATION:
-				_outFile << "\"Dissemination\"";
-				break;
-			case GR_DISSEMINATION_INCONSISTENT:
-				_outFile << "\"Dissemination?\"";
-				break;
-			case GR_UNKNOWN:
-				_outFile << "\"Unknown\"";
-				break;
-			case GR_NONE:
-				_outFile << "\"None\"";
-				break;
-		}
-	}
 
 	int startState = 1; // Skip the dead state: apoptosis doesn't occur for an already dead mac.
 	static int totMacApoptosisTNF[NMAC_STATES] = {0}; //Just temporary for Mohammed Fallahi

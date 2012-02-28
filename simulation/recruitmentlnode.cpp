@@ -120,6 +120,11 @@ void RecruitmentLnODE::updateQueue(const int time, GrStat& stats)
 	stats.setFluxTcyt(tcellFlux[TCELL_TYPE_CYT]);
 	stats.setFluxTreg(tcellFlux[TCELL_TYPE_REG]);
 
+	// update stats
+	stats.setNrTgamQueued(_tcellQueueCount[TCELL_TYPE_GAM]);
+	stats.setNrTcytQueued(_tcellQueueCount[TCELL_TYPE_CYT]);
+	stats.setNrTregQueued(_tcellQueueCount[TCELL_TYPE_REG]);
+
 	/*for (int i = 0; i < TCELL_TYPE_COUNT; i++)
 	{
 		TcellType type = (TcellType) i;
@@ -302,11 +307,11 @@ void RecruitmentLnODE::recruitTcells(GrSimulation& sim, GrStat& stats,
 			{
 			case TCELL_TYPE_CYT:
 				sim.createTcyt(pSource->getRow(), pSource->getCol(), tcell._birthtime, TCYT_ACTIVE);
-				stats.incNrTgamRecruited();
+				stats.incNrTcytRecruited();
 				break;
 			case TCELL_TYPE_GAM:
 				sim.createTgam(pSource->getRow(), pSource->getCol(), tcell._birthtime, TGAM_ACTIVE);
-				stats.incNrTcytRecruited();
+				stats.incNrTgamRecruited();
 				break;
 			case TCELL_TYPE_REG:
 				sim.createTreg(pSource->getRow(), pSource->getCol(), tcell._birthtime, TREG_ACTIVE);
@@ -321,11 +326,6 @@ void RecruitmentLnODE::recruitTcells(GrSimulation& sim, GrStat& stats,
 
 
 	_tcellQueue = newTcellQueue;
-
-	// update stats
-	stats.setNrTgamQueued(_tcellQueueCount[TCELL_TYPE_GAM]);
-	stats.setNrTcytQueued(_tcellQueueCount[TCELL_TYPE_CYT]);
-	stats.setNrTregQueued(_tcellQueueCount[TCELL_TYPE_REG]);
 }
 
 void RecruitmentLnODE::recruit(GrSimulation& sim)

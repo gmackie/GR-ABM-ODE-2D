@@ -371,12 +371,6 @@ void GrStat::resetAgentStats()
 	
 	_nTreg = _nTregDead = _nTregActive = 0;
 	
-	_queueTgam = _queueTcyt = _queueTreg = 0;
-
-	_queueTgamDie = _queueTcytDie = _queueTregDie = 0;
-
-	_recruitedTgam = _recruitedTcyt = _recruitedTreg = 0;
-
 
   memset(_nMacApoptosisTNF, 0 , sizeof(int)*NMAC_STATES);
   memset(_intMtbFreq, 0, sizeof(unsigned)*_intMtbFreqSize);
@@ -395,6 +389,12 @@ void GrStat::reset()
 	_nSourceMacCrowded = _nSourceTcytCrowded = _nSourceTgamCrowded = _nSourceTregCrowded = 0;
 
 	_nCaseated = 0;
+
+	_queueTgam = _queueTcyt = _queueTreg = 0;
+
+	_queueTgamDie = _queueTcytDie = _queueTregDie = 0;
+
+	_recruitedTgam = _recruitedTcyt = _recruitedTreg = 0;
 
 	_areaTNF = _areaCellDensity = 0;
 	

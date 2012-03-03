@@ -15,6 +15,7 @@ HEADERS += scalardatasets/scalartotmtbdataset.h \
     simulation/tinyxml/tinyxml.h \
     simulation/tinyxml/tinystr.h \
     simulation/recruitmentlnodepure.h \
+    simulation/recruitmentlnodeproxy.h \    
     simulation/recruitmentlnode.h \
     simulation/recruitmentprob.h \
     simulation/recruitmentbase.h \
@@ -99,6 +100,7 @@ SOURCES += simulation/serialization.cpp \
     simulation/tinyxml/tinyxml.cpp \
     simulation/tinyxml/tinystr.cpp \
     simulation/recruitmentlnodepure.cpp \
+    simulation/recruitmentlnodeproxy.cpp \
     simulation/recruitmentlnode.cpp \
     simulation/recruitmentprob.cpp \
     simulation/recruitmentbase.cpp \

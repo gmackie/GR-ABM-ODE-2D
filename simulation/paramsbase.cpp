@@ -308,17 +308,14 @@ const ParamDescription ParamsBase::_description[_PARAM_COUNT] =
 	{ "areaCellDensityStopppingTimeStep2",	GR_NODE,	true,	true,	0.0,	0,	"",					"Time step at which to check areaCellDensityStoppingThreshold" },
 };
 
-ParamsBase::ParamsBase(bool ode)
-	: _ode(ode)
-	, _doubleParam()
+ParamsBase::ParamsBase()
+	: _doubleParam()
 	, _intParam()
 	, _initialMacs()
 	, _initialExtMtb()
 {
 	memset(_doubleParam, 0, sizeof(double) * PARAM_DOUBLE_COUNT);
 	memset(_intParam, 0, sizeof(int) * PARAM_INT_COUNT);
-
-
 }
 
 ParamsBase::~ParamsBase()

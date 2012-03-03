@@ -317,7 +317,6 @@ protected:
 	static const ParamDescription _description[];
 
 	TiXmlDocument _xmlDoc;
-	bool _ode;
 
 	bool _paramsRead[PARAM_DOUBLE_COUNT + PARAM_INT_COUNT];
 	double _doubleParam[PARAM_DOUBLE_COUNT];
@@ -325,7 +324,7 @@ protected:
 	PosVector _initialMacs;
 	PosVector _initialExtMtb;
 
-	ParamsBase(bool ode);
+	ParamsBase();
 	virtual ~ParamsBase();
 
 	void defineDefaults();
@@ -410,11 +409,6 @@ inline const std::string& ParamsBase::getXmlElementName(XmlElement element)
 inline const std::string& ParamsBase::getXmlElementDescription(XmlElement element)
 {
 	return _element[element].description;
-}
-
-inline bool ParamsBase::getUseOde() const
-{
-	return _ode;
 }
 
 inline PosVector ParamsBase::getInitialMacs() const

@@ -18,6 +18,7 @@
 #include "recruitmentlnode.h"
 #include "recruitmentlnodepure.h"
 #include "recruitmentprob.h"
+#include "recruitmentlnodeproxy.h"
 #include <iostream>
 #include <sstream>
 #include <fstream>
@@ -341,8 +342,10 @@ void buildSim(GrSimulation* pSim, DiffusionMethod diffMethod, RecruitmentBase* p
 
 int main(int argc, char** argv)
 {
+  std::cout << std::endl;
   printVersion();
   std::cout << "GRID SIZE: NROWS: " << NROWS << " NCOLS: " << NCOLS << std::endl;
+
   unsigned int seed;
   std::string paramFile;
   std::string outputDir;
@@ -383,6 +386,7 @@ int main(int argc, char** argv)
 									"Takes precedence over --days")
 	("days", po::value<unsigned>()->default_value(200), "Number of days to simulate")
 	("state-interval", po::value<unsigned>()->default_value(0), "State save interval (10 min timesteps)")
+	("recr", po::value<unsigned>()->default_value(0), "recruitment:\n0 - probability\n1 - lymph node ode proxy\n2 - lymph node ode pure")
 	("diffusion,d", po::value<unsigned>()->default_value(3),
 	 "Diffusion method:\n0 - FTCS\n1 - BTCS (SOR, correct)\n2 - BTCS (SOR, wrong)\n3 - FTCS Grid Swap")
 	("area-tnf-threshold", po::value<float>()->default_value(0.5),"Threshold for granuloma area defined by TNF, in the range [0.0, 1.0]\n")
@@ -390,7 +394,6 @@ int main(int argc, char** argv)
 
   po::options_description simdyn_opts("Simulation Dynamics");
   simdyn_opts.add_options()
-	("ode", "Use integrated lymph node ODE for recruitment")
 	("tnfr-dynamics", "Use molecular level TNF/TNFR dynamics in the model")
     ("il10r-dynamics", "Use molecular level IL10/IL10R dynamics in the model")
 	("NFkB-dynamics", "Use molecular level intracellular NFkB dynamics in the model")
@@ -449,8 +452,25 @@ int main(int argc, char** argv)
 
   bool screenDisplay = !(vm.count("quiet") || vm.count("lhs"));
   
-  RecruitmentBase* pRecr = (vm.count("ode") ? (RecruitmentBase*)new RecruitmentLnODEPure() : (RecruitmentBase*)new RecruitmentProb());
-  
+  RecruitmentBase* pRecr;
+  switch (vm["recr"].as<unsigned>())
+  {
+    case 0:
+      pRecr = (RecruitmentBase*)new RecruitmentProb();
+      break;
+    case 1:
+      pRecr = (RecruitmentBase*)new RecruitmentLnODEProxy();
+      break;
+    case 2:
+      pRecr = (RecruitmentBase*)new RecruitmentLnODEPure();
+
+      break;
+    default:
+      std::cerr << std::endl <<"Unsupported recruitment method" << std::endl << std::endl;
+      printUsage(argv[0], desc);
+      exit(1);
+  }
+
   DiffusionMethod diffMethodEnum;
   switch (vm["diffusion"].as<unsigned>())
   {
@@ -466,7 +486,7 @@ int main(int argc, char** argv)
       exit(1);
   }
 
-  if (!Params::getInstance(true)->fromXml(paramFile.c_str())) //Must be done before making GrSimulation
+  if (!Params::getInstance()->fromXml(paramFile.c_str())) //Must be done before making GrSimulation
     throw std::runtime_error("Unable to get parameters from file, cannot continue...");
 
   GrSimulation* pSim = new GrSimulation();

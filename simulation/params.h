@@ -17,13 +17,13 @@ class Params : public ParamsBase
 {
 public:
 
-	static Params* getInstance(bool ode = false);
+	static Params* getInstance();
 	static bool reinit(const char* filename);
 
 	bool fromXml(const char* filename);
 
 protected:
-	Params(bool ode);
+	Params();
 	virtual ~Params();
 
 	bool readParam(const TiXmlElement* pElement, const TiXmlAttribute* pAttrib,  ParamDoubleType param);
@@ -34,10 +34,10 @@ private:
 
 };
 
-inline Params* Params::getInstance(bool ode)
+inline Params* Params::getInstance()
 {
 	if (!_pInstance)
-		_pInstance = new Params(ode);
+		_pInstance = new Params();
 
 	return _pInstance;
 }

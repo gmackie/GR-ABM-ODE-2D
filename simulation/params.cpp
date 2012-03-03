@@ -12,8 +12,8 @@
 
 Params* Params::_pInstance = NULL;
 
-Params::Params(bool ode)
-	: ParamsBase(ode)
+Params::Params()
+	: ParamsBase()
 {
 	// Make sure _pInstance is defined when instantiating a Params object,
 	// even if not using getInstance or reinit. This could happen if
@@ -27,7 +27,7 @@ Params::~Params()
 
 bool Params::reinit(const char* filename)
 {
-	Params* pNewInstance = new Params(false);
+	Params* pNewInstance = new Params();
 	if (!pNewInstance->fromXml(filename))
 	{
 		delete pNewInstance;

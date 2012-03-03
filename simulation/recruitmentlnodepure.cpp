@@ -16,7 +16,7 @@ RecruitmentLnODEPure::~RecruitmentLnODEPure()
 {
 }
 
-void RecruitmentLnODEPure::solveODE(GrStat& stats)
+void RecruitmentLnODEPure::solveODE(const int, GrStat& stats)
 {
 	const double dt = 1.0/14400.0;
 

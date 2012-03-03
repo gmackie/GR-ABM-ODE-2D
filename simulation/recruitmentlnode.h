@@ -5,6 +5,13 @@
  *      Author: mohammed
  */
 
+/*
+ * This class originally was used to run a lymph node ode that used a DLL created by Matlab.
+ * The Matlab DLL is no longer used, but everything in this function is used by subclasses,
+ * except that they override the solveODE function.
+ *
+ */
+
 #ifndef RECRUITMENTLNODE_H_
 #define RECRUITMENTLNODE_H_
 
@@ -45,7 +52,7 @@ protected:
 
 	void init();
 	void updateInitialConditions(GrStat& stats);
-	virtual void solveODE(GrStat& stats);
+	virtual void solveODE(const int time, GrStat& stats);
 	void updateQueue(const int time, GrStat& stats);
 	void recruitMacsGetTcellSources(GrSimulation& sim, GrStat& stats,
 			ThresholdGridCellPtrList tcellSources[TCELL_TYPE_COUNT]);

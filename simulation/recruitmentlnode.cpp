@@ -50,7 +50,7 @@ void RecruitmentLnODE::init()
 	}
 }
 
-void RecruitmentLnODE::solveODE(GrStat&)
+void RecruitmentLnODE::solveODE(const int, GrStat&)
 {
 	std::string cmd = _odeApp;
 	cmd += " '[";
@@ -337,7 +337,7 @@ void RecruitmentLnODE::recruit(GrSimulation& sim)
 	updateInitialConditions(stats);
 
 	// solve the ODE for 10 minutes
-	solveODE(stats);
+	solveODE(sim.getTime(), stats);
 
 	// update T cell queue according to new fluxes
 	updateQueue(sim.getTime(), stats);

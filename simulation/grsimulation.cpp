@@ -248,6 +248,7 @@ void GrSimulation::init()
 		}
 
 		pMac->setIntMtb(1);
+		_statsPrevious.incTotIntMtb(1);
 		_stats.incTotIntMtb(1);
 	}
 
@@ -255,6 +256,7 @@ void GrSimulation::init()
 	for (PosVector::const_iterator it = initExtMtb.begin(); it != initExtMtb.end(); it++)
 	{
 		_grid(it->first, it->second).incExtMtb(1);
+		_statsPrevious.incTotExtMtb(1);
 		_stats.incTotExtMtb(1);
 	}
 

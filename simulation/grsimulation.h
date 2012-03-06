@@ -301,12 +301,12 @@ inline GrStat& GrSimulation::getStats()
 
 inline const GrStat& GrSimulation::getStatsPrevious() const
 {
-	return _stats;
+	return _statsPrevious;
 }
 
 inline GrStat& GrSimulation::getStatsPrevious()
 {
-	return _stats;
+	return _statsPrevious;
 }
 
 inline Mac* GrSimulation::createMac(int row, int col, int birthtime, MacState state, bool NFkB, bool stat1)

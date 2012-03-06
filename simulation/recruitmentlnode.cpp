@@ -50,7 +50,7 @@ void RecruitmentLnODE::init()
 	}
 }
 
-void RecruitmentLnODE::solveODE(const int, GrStat&)
+void RecruitmentLnODE::solveODE(const int, const GrStat&, GrStat&)
 {
 	std::string cmd = _odeApp;
 	cmd += " '[";
@@ -331,13 +331,14 @@ void RecruitmentLnODE::recruitTcells(GrSimulation& sim, GrStat& stats,
 void RecruitmentLnODE::recruit(GrSimulation& sim)
 {
 	/* Solve the ODE */
+	const GrStat& statsPrevious = sim.getStatsPrevious();
 	GrStat& stats = sim.getStats();
 
 	// update initial conditions (MDC)
 	updateInitialConditions(stats);
 
 	// solve the ODE for 10 minutes
-	solveODE(sim.getTime(), stats);
+	solveODE(sim.getTime(), statsPrevious, stats);
 
 	// update T cell queue according to new fluxes
 	updateQueue(sim.getTime(), stats);

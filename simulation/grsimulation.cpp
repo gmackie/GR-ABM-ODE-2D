@@ -26,6 +26,7 @@ GrSimulation::GrSimulation()
 	, _tgamList()
 	, _tcytList()
 	, _tregList()
+	, _statsPrevious()
 	, _stats()
 	, _areaThreshold(0.5f)
 	, _areaThresholdCellDensity(0.5f)
@@ -110,6 +111,7 @@ void GrSimulation::serialize(std::ostream& out) const
 	}
 
 	// serialize statistics
+	_statsPrevious.serialize(out);
 	_stats.serialize(out);
 
 	// serialize random number generator
@@ -211,6 +213,7 @@ void GrSimulation::deserialize(std::istream& in)
 	}
 
 	// deserialize statistics
+	_statsPrevious.deserialize(in);
 	_stats.deserialize(in);
 
 	// deserialize random number generator
@@ -393,6 +396,9 @@ void GrSimulation::solve()
 
 	// perform t-test
 	updateT_Test();
+
+	// Copy statistics, so we can use them on the next time step.
+	_statsPrevious = _stats;
 }
 
 void GrSimulation::updateStates()

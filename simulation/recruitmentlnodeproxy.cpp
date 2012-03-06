@@ -19,12 +19,12 @@ RecruitmentLnODEProxy::~RecruitmentLnODEProxy() {
 	// TODO Auto-generated destructor stub
 }
 
-void RecruitmentLnODEProxy::solveODE(const int time, GrStat& stats)
+void RecruitmentLnODEProxy::solveODE(const int time, const GrStat& statsPrevious, GrStat& stats)
 {
 	int boundaryTime = _PARAM(PARAM_TCELL_LYMPH_PROXY_BOUNDARY_TIME);
 
-	FLOAT_TYPE totMtb = stats.getTotExtMtb() + stats.getTotIntMtb();
-	FLOAT_TYPE replicatingMtb =  totMtb - stats.getTotNonRepExtMtb();
+	FLOAT_TYPE totMtb = statsPrevious.getTotExtMtb() + statsPrevious.getTotIntMtb();
+	FLOAT_TYPE replicatingMtb =  totMtb - statsPrevious.getTotNonRepExtMtb();
 
 	// In function RecruitmentLnODE::updateQueue the T gam flux is based on _odeInitialConditions[_idxEffectorT8] +  _odeInitialConditions[_idxEffectorTH1],
 	// both of which are defined by the lymph node ODE. Here in the proxy calculation we calculate a single value for T gam flux,
@@ -49,4 +49,8 @@ void RecruitmentLnODEProxy::solveODE(const int time, GrStat& stats)
 		_odeInitialConditions[_idxEffectorT8] = 0.0012 * pow(replicatingMtb, 2) + 2.0676 * replicatingMtb + 144.54;
 		_odeInitialConditions[_idxCTL] = 0.0005 * pow(replicatingMtb, 2) + 0.7956 * replicatingMtb + 55.803;
 	}
+
+    stats.setTH1lung(_odeInitialConditions[_idxEffectorTH1]);
+    stats.setT8lung(_odeInitialConditions[_idxEffectorT8]);
+    stats.setTClung(_odeInitialConditions[_idxCTL]);
 }

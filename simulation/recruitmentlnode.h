@@ -52,7 +52,7 @@ protected:
 
 	void init();
 	void updateInitialConditions(GrStat& stats);
-	virtual void solveODE(const int time, GrStat& stats);
+	virtual void solveODE(const int time, const GrStat& statsPrevious, GrStat& stats);
 	void updateQueue(const int time, GrStat& stats);
 	void recruitMacsGetTcellSources(GrSimulation& sim, GrStat& stats,
 			ThresholdGridCellPtrList tcellSources[TCELL_TYPE_COUNT]);

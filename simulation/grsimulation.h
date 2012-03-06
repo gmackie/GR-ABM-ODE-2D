@@ -33,7 +33,10 @@ private:
 	TgamList _tgamList;
 	TcytList _tcytList;
 	TregList _tregList;
+
+	GrStat _statsPrevious; // The stats at the start of a time step - from the end of the previous time step.
 	GrStat _stats;
+
 	double _areaThreshold;
 	double _areaThresholdCellDensity;
 	GrDiffusion* _pDiffusion;
@@ -78,8 +81,13 @@ public:
 	void solve();
 	void performT_Test();
 	int getTime() const;
+
 	const GrStat& getStats() const;
 	GrStat& getStats();
+
+	const GrStat& getStatsPrevious() const;
+	GrStat& getStatsPrevious();
+
 	const GrGrid& getGrid() const;
 	GrGrid& getGrid();
 	const MacList& getMacList() const;
@@ -287,6 +295,16 @@ inline const GrStat& GrSimulation::getStats() const
 }
 
 inline GrStat& GrSimulation::getStats()
+{
+	return _stats;
+}
+
+inline const GrStat& GrSimulation::getStatsPrevious() const
+{
+	return _stats;
+}
+
+inline GrStat& GrSimulation::getStatsPrevious()
 {
 	return _stats;
 }

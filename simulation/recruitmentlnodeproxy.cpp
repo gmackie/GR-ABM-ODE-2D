@@ -7,6 +7,8 @@
 
 #include "recruitmentlnodeproxy.h"
 
+using namespace std;
+
 RecruitmentLnODEProxy::RecruitmentLnODEProxy()
 : RecruitmentLnODE("", "")
 {
@@ -19,9 +21,9 @@ RecruitmentLnODEProxy::~RecruitmentLnODEProxy() {
 
 void RecruitmentLnODEProxy::solveODE(const int time, GrStat& stats)
 {
-	int boundaryTime = 20 * TIME_STEPS_PER_DAY;
+	int boundaryTime = _PARAM(PARAM_TCELL_LYMPH_PROXY_BOUNDARY_TIME);
 
-	FLOAT_TYPE totMtb = stats. getTotExtMtb() + stats.getTotIntMtb();
+	FLOAT_TYPE totMtb = stats.getTotExtMtb() + stats.getTotIntMtb();
 	FLOAT_TYPE replicatingMtb =  totMtb - stats.getTotNonRepExtMtb();
 
 	// In function RecruitmentLnODE::updateQueue the T gam flux is based on _odeInitialConditions[_idxEffectorT8] +  _odeInitialConditions[_idxEffectorTH1],

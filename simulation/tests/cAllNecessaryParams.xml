@@ -185,6 +185,7 @@
 	<Tcell
 		maxAge = "432"
 		timeRecEnabled = "2880"
+		lymphProxyBoundaryTime = "2880"
         mtbRecEnabled = "35"
 		probMoveToMac = "0.015"
 		probMoveToTcell = "0.08"

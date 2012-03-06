@@ -293,6 +293,7 @@ const ParamDescription ParamsBase::_description[_PARAM_COUNT] =
 	{ "initNumber",							MAC_NODE,	true,	true,	0.0,	0,	"",					"Initial number of resting macrophages on the grid" },
 	{ "maxAge",								TCELL_NODE,	true,	false,	0.0,	0,	"#timesteps",		"Maximal T cell age" },
 	{ "timeRecEnabled",						TCELL_NODE,	true,	false,	0.0,	0,	"#timesteps",		"Time after which T cell recruitment is enabled" },
+	{ "lymphProxyBoundaryTime",				TCELL_NODE,	true,	false,	0.0,	0,	"#timesteps",		"Time when T cell lymph ode proxy recruitment switches between early and late calculations for T cell fluxes." },
 	{ "maxTimeReg",							TGAM_NODE,	true,	false,	0.0,	0,	"#timesteps",		"Time span during which a Tgam cell remains down-regulated" },
     { "maxTimeDouble",						TGAM_NODE,	true,	false,	0.0,	0,	"#timesteps",		"Time span during which a Tgam cell remains double producer" },
     { "maxTimeReg",							TCYT_NODE,	true,	false,	0.0,	0,	"#timesteps",		"Time span during which a Tcyt cell remains down-regulated" },

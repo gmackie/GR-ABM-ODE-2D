@@ -269,6 +269,7 @@ typedef enum {
 	PARAM_MAC_INIT_NUMBER,
 	PARAM_TCELL_AGE,
 	PARAM_TCELL_TIME_RECRUITMENT_ENABLED,
+	PARAM_TCELL_LYMPH_PROXY_BOUNDARY_TIME,
 	PARAM_TGAM_TIMESPAN_REGULATED,
     PARAM_TGAM_TIMESPAN_DOUBLE,
 	PARAM_TCYT_TIMESPAN_REGULATED,
@@ -337,7 +338,7 @@ protected:
 	bool readParam(const TiXmlElement* pElement, const std::string paramName, double* pVar, double defaultVal, bool prob);
 	bool readParam(const TiXmlElement* pElement, const std::string paramName, int* pVar, bool pos);
 	bool readParam(const TiXmlElement* pElement, const std::string paramName, int* pVar, int defaultVal, bool pos);
-  bool readParam(const TiXmlElement*, std::string, Pos&);
+	bool readParam(const TiXmlElement*, std::string, Pos&);
 
 	bool readInitElement(const TiXmlElement* pRootElement);
 	void computeParams();
@@ -355,7 +356,6 @@ public:
 	static const std::string& getXmlElementName(XmlElement element);
 	static const std::string& getXmlElementDescription(XmlElement element);
 
-	bool getUseOde() const;
 	bool fromXml(const char* filename);
 	bool toXml(const char* filename) const;
 	const TiXmlDocument& getXmlDoc() const;

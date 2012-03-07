@@ -54,6 +54,8 @@ public:
     static const QString _DATASET_CCL2_GRADIENT;
     static const QString _DATASET_CXCL9;
     static const QString _DATASET_CXCL9_GRADIENT;
+	static const QString _DATASET_IL10;
+    static const QString _DATASET_IL10_GRADIENT;
     static const QString _DATASET_ATTRACTANT;
     static const QString _DATASET_ATTRACTANT_GRADIENT;
     static const QString _DATASET_TNF_ATTR_EXTMTB;

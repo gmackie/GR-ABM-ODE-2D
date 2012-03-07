@@ -48,6 +48,7 @@ HEADERS += scalardatasets/scalartotmtbdataset.h \
     scalardatasets/scalarccl2dataset.h \
     scalardatasets/scalarccl5dataset.h \
     scalardatasets/scalarcxcl9dataset.h \
+    scalardatasets/scalaril10dataset.h \
     scalardatasets/scalardataset.h \
     scalardatasets/scalardivergencedataset.h \
     scalardatasets/scalarextmtbdataset.h \

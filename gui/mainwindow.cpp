@@ -28,6 +28,7 @@
 #include "scalardatasets/scalarccl2dataset.h"
 #include "scalardatasets/scalarccl5dataset.h"
 #include "scalardatasets/scalarcxcl9dataset.h"
+#include "scalardatasets/scalaril10dataset.h"
 #include "scalardatasets/scalarextmtbdataset.h"
 #include "scalardatasets/scalarintmtbdataset.h"
 #include "scalardatasets/scalartotmtbdataset.h"
@@ -64,6 +65,8 @@ const QString MainWindow::_DATASET_CCL5 = "CCL5";
 const QString MainWindow::_DATASET_CCL5_GRADIENT = "grad CCL5";
 const QString MainWindow::_DATASET_CXCL9 = "CXCL9";
 const QString MainWindow::_DATASET_CXCL9_GRADIENT = "grad CXCL9";
+const QString MainWindow::_DATASET_IL10 = "IL10";
+const QString MainWindow::_DATASET_IL10_GRADIENT = "grad IL10";
 const QString MainWindow::_DATASET_TNF_ATTR_EXTMTB = "TNF Attr extMtb";
 const QString MainWindow::_DATASET_CELL_DENSITY = "Cell Density";
 const QString MainWindow::_DATASET_EXTMTB = "Ext. Mtb";
@@ -76,6 +79,7 @@ const QString MainWindow::_SCALAR_DATASETS[] = {
 		_DATASET_CCL2,
 		_DATASET_CCL5,
 		_DATASET_CXCL9,
+		_DATASET_IL10,
 		_DATASET_EXTMTB,
 		_DATASET_INTMTB,
 		_DATASET_TOTMTB,
@@ -433,6 +437,7 @@ void MainWindow::initSmokeTab()
 	_ui.comboBoxSmokeDataset->addItem(_DATASET_CCL2);
 	_ui.comboBoxSmokeDataset->addItem(_DATASET_CCL5);
 	_ui.comboBoxSmokeDataset->addItem(_DATASET_CXCL9);
+	_ui.comboBoxSmokeDataset->addItem(_DATASET_IL10);
 	_ui.comboBoxSmokeDataset->addItem(_DATASET_EXTMTB);
 	_ui.comboBoxSmokeDataset->addItem(_DATASET_INTMTB);
 	_ui.comboBoxSmokeDataset->addItem(_DATASET_TOTMTB);
@@ -449,6 +454,7 @@ void MainWindow::initGlyphsTab()
 	_ui.comboBoxGlyphScalarDataset->addItem(_DATASET_CCL2);
 	_ui.comboBoxGlyphScalarDataset->addItem(_DATASET_CCL5);
 	_ui.comboBoxGlyphScalarDataset->addItem(_DATASET_CXCL9);
+	_ui.comboBoxGlyphScalarDataset->addItem(_DATASET_IL10);
 	_ui.comboBoxGlyphScalarDataset->addItem(_DATASET_EXTMTB);
 	_ui.comboBoxGlyphScalarDataset->addItem(_DATASET_INTMTB);
 	_ui.comboBoxGlyphScalarDataset->addItem(_DATASET_ATTRACTANT);
@@ -458,6 +464,7 @@ void MainWindow::initGlyphsTab()
 	_ui.comboBoxGlyphVectorDataset->addItem(_DATASET_CCL2_GRADIENT);
 	_ui.comboBoxGlyphVectorDataset->addItem(_DATASET_CCL5_GRADIENT);
 	_ui.comboBoxGlyphVectorDataset->addItem(_DATASET_CXCL9_GRADIENT);
+	_ui.comboBoxGlyphVectorDataset->addItem(_DATASET_IL10_GRADIENT);
 	_ui.comboBoxGlyphVectorDataset->addItem(_DATASET_ATTRACTANT_GRADIENT);
 
 	/* configure _ui.comboBoxGlyphType */
@@ -1187,6 +1194,10 @@ ScalarDataset* MainWindow::getNewScalarDataset(const QString& value)
 	{
 		pScalarDataset = new ScalarCxcl9Dataset();
 	}
+	else if (value == _DATASET_IL10)
+	{
+		pScalarDataset = new ScalarIl10Dataset();
+	}	
 	else if (value == _DATASET_EXTMTB)
 	{
 		pScalarDataset = new ScalarExtMtbDataset();
@@ -1241,6 +1252,11 @@ VectorDataset* MainWindow::getNewVectorDataset(const QString& value)
 	{
 		ScalarCxcl9Dataset* pScalarCxcl9Dataset = new ScalarCxcl9Dataset();
 		pVectorDataset = new VectorGradientDataset(pScalarCxcl9Dataset, _pItfc->getVectorGlyphGrid());
+	}
+	else if (value == _DATASET_IL10_GRADIENT)
+	{
+		ScalarIl10Dataset* pScalarIl10Dataset = new ScalarIl10Dataset();
+		pVectorDataset = new VectorGradientDataset(pScalarIl10Dataset, _pItfc->getVectorGlyphGrid());
 	}
 	else if (value == _DATASET_ATTRACTANT_GRADIENT)
 	{

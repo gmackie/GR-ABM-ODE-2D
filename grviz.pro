@@ -61,10 +61,8 @@ HEADERS += scalardatasets/scalartotmtbdataset.h \
     simulation/gr.h \
     simulation/grdiffusion.h \
     simulation/grdiffusionbtcs.h \
-    simulation/grdiffusionftcs.h \
     simulation/grdiffusionwrongbtcs.h \
     simulation/grgrid.h \
-    simulation/gridcell.h \
     simulation/grsimulation.h \
     simulation/grstat.h \
     simulation/macrophage.h \
@@ -127,12 +125,10 @@ SOURCES += simulation/serialization.cpp \
     simulation/ttest.cpp \
     simulation/grdiffusionbtcs.cpp \
     simulation/grdiffusionwrongbtcs.cpp \
-    simulation/grdiffusionftcs.cpp \
     simulation/grdiffusion.cpp \
     simulation/areatest.cpp \
     simulation/onlinestat.cpp \
     simulation/grstat.cpp \
-    simulation/gridcell.cpp \
     simulation/agent.cpp \
     simulation/grgrid.cpp \
     simulation/grsimulation.cpp \
@@ -163,6 +159,7 @@ QMAKE_CXXFLAGS_RELEASE += -O3 -fopenmp -DOPENMP -Wno-strict-aliasing
 QMAKE_LFLAGS_RELEASE += -fopenmp -DOPENMP
 isEmpty(BOOST_PREFIX):BOOST_PREFIX=/usr
 INCLUDEPATH += $$quote($${BOOST_PREFIX}/include)
+LIBS += -lGLU
 
 unix:system(grep -qE \"Ubuntu|Red Hat\" /etc/issue) {
   LIBS += -lboost_program_options -lboost_iostreams -lboost_serialization
@@ -182,8 +179,6 @@ exists( .git/ ) {
 
 DEFINES += SVN_VERSION=\\\"$$VERSION\\\"
 DEFINES += TIXML_USE_STL
-
-DEFINES += __DIM__="$(if $(DIM),$(DIM),100)"
 
 macx { 
     # Have qmake create make files that put the executable

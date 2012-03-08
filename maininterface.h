@@ -31,7 +31,7 @@
 class MainInterface
 {
 public:
-	MainInterface(Visualization* pAgentVisualization, ScalarAgentGridBase* pScalarAgentGrid);
+	MainInterface(const Pos& dim, Visualization* pAgentVisualization, ScalarAgentGridBase* pScalarAgentGrid);
 	virtual ~MainInterface();
 	void doStep();
 	ScalarNormalizer* getScalarSmokeNormalizer();

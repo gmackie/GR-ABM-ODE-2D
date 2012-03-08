@@ -6,6 +6,7 @@
  */
 
 #include "tgamma.h"
+#include "macrophage.h"
 #include "grgrid.h"
 #include "serialization.h"
 
@@ -102,7 +103,6 @@ void Tgam::secrete(GrGrid& grid, bool tnfrDynamics, bool, bool tnfDepletion, boo
 		return;
 	}
 	
-	GridCell& cell = grid(_row, _col);
 	_kSynth = _PARAM(PARAM_GR_K_SYNTH_TCELL);
     _kmRNA = _PARAM(PARAM_GR_K_RNA_TCELL);
     
@@ -131,17 +131,16 @@ void Tgam::secrete(GrGrid& grid, bool tnfrDynamics, bool, bool tnfDepletion, boo
     
 	if (!tnfrDynamics && !tnfDepletion)
     {    
-        double il10 = log(((cell.getIL10() * MW_IL10 * 1e6)/(Nav * vol))); // converting il10 concentration to log(ng/mL) for use in dose dependence
+        double il10 = log(((grid.il10(_pos) * MW_IL10 * 1e6)/(Nav * vol))); // converting il10 concentration to log(ng/mL) for use in dose dependence
         double tnfMOD = (1.0/(1.0 + exp((il10 + _PARAM(PARAM_GR_LINK_LOG_ALPHA))/_PARAM(PARAM_GR_LINK_LOG_BETA)))); // calculate the fraction of inhibition
-		cell.incTNF(tnfMOD * _PARAM(PARAM_TGAM_SEC_RATE_TNF));
+		grid.TNF(_pos) += (tnfMOD * _PARAM(PARAM_TGAM_SEC_RATE_TNF));
     }
 }
 
 void Tgam::computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tnfrDynamics, bool, bool, bool tgammatransition)
 {
     
-    GridCell& cell = grid(_row, _col);
-	double tnfBoundFraction = cell.getTNF() / (cell.getTNF() + _PARAM(PARAM_GR_KD1) * 48.16e11);
+	double tnfBoundFraction = grid.TNF(_pos) / (grid.TNF(_pos) + _PARAM(PARAM_GR_KD1) * 48.16e11);
 
     
 	// check if it is time to die
@@ -191,38 +190,36 @@ void Tgam::computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tn
 
 void Tgam::handleActive(const int time, GrGrid& grid, GrStat& stats, bool tgammatransition)
 {
-	GridCell& cell = grid(_row, _col);
-	
     double ProbSum = 0.0; // Initialize the probability sum for transition to TGAM_ACTIVE_DOUBLE
 
-    
-    if (tgammatransition) 
-    {
-        if (cell.hasMac())
-        {
-            // get the macrophage
-            Mac* pMac = dynamic_cast<Mac*>(cell.getAgent(0));
-            if (!pMac) pMac = dynamic_cast<Mac*>(cell.getAgent(1));
-            
-            // If the mac died on this time step ignore it.
-            if (pMac->getNextState() == MAC_DEAD)
-            {
-                return;
-            }
-            
-            
-            
-            // Fas/FasL induced apoptosis with probability
-            if (pMac &&
-                (pMac->getState() == MAC_INFECTED || pMac->getState() == MAC_CINFECTED) &&
-                g_Rand.getReal() < _PARAM(PARAM_TGAM_PROB_APOPTOSIS_FAS_FASL))
-            {
-                stats.incApoptosisFasFasL();
-                pMac->apoptosis(grid);
-                pMac->kill();
-                
-                cell.incNrKillings();
-            }
+    if(tgammatransition)
+	{
+		if (grid.hasAgentType(MAC, _pos))
+		{
+			// get the macrophage
+			Mac* pMac = dynamic_cast<Mac*>(grid.agent(_pos, 0));
+			if (!pMac) pMac = dynamic_cast<Mac*>(grid.agent(_pos, 1));
+
+			// If the mac died on this time step ignore it.
+			if (pMac->getNextState() == MAC_DEAD)
+			{
+				return;
+			}
+
+
+			// Fas/FasL induced apoptosis with probability
+			if (pMac &&
+				(pMac->getState() == MAC_INFECTED || pMac->getState() == MAC_CINFECTED) &&
+				g_Rand.getReal() < _PARAM(PARAM_TGAM_PROB_APOPTOSIS_FAS_FASL))
+			{
+				stats.incApoptosisFasFasL();
+				pMac->apoptosis(grid);
+				pMac->kill();
+
+				grid.incKillings(_pos);
+			}
+
+
             
             // If mac does not die then check for Tgam10 conditions - Macs
             if (pMac && (pMac->getState() == MAC_INFECTED || pMac->getState() == MAC_CINFECTED))
@@ -241,16 +238,16 @@ void Tgam::handleActive(const int time, GrGrid& grid, GrStat& stats, bool tgamma
                 }
                 
             }
-            if (pMac && ((pMac->getState() == MAC_RESTING && pMac->getNFkB()) || (pMac->getState() == MAC_RESTING && pMac->getICOS()) || (pMac->getState() == MAC_ACTIVE)) && cell.getExtMtb() > _PARAM(PARAM_TGAM_THRESHOLD_EXT_MTB)) // CHECK THIS!
-            {
-                _nAntigenStim ++;
-//                cout << "Antigen Stim" << std::endl;
-            }
-            if (pMac && ((pMac->getState() == MAC_RESTING && pMac->getICOS()) || (pMac->getState() == MAC_ACTIVE && pMac->getICOS())))
-            {
-                _nICOS ++;
-//                cout << "ICOS" << std::endl;
-            }
+        	if (pMac && ((pMac->getState() == MAC_RESTING && pMac->getNFkB()) || (pMac->getState() == MAC_RESTING && pMac->getICOS()) || (pMac->getState() == MAC_ACTIVE)) && grid.extMTB(_pos) > _PARAM(PARAM_TGAM_THRESHOLD_EXT_MTB))
+        	{
+         	   _nAntigenStim ++;
+//         	   cout << "Antigen Stim" << std::endl;
+       		 }
+        	if (pMac && ((pMac->getState() == MAC_RESTING && pMac->getICOS()) || (pMac->getState() == MAC_ACTIVE && pMac->getICOS())))
+       	 {
+	            _nICOS ++;
+// 	           cout << "ICOS" << std::endl;
+	        }
             
         }
         
@@ -301,11 +298,11 @@ void Tgam::handleActive(const int time, GrGrid& grid, GrStat& stats, bool tgamma
     
     else
     {
-        if (cell.hasMac())
+        if (grid.hasAgentType(MAC, _pos))
         {
             // get the macrophage
-            Mac* pMac = dynamic_cast<Mac*>(cell.getAgent(0));
-            if (!pMac) pMac = dynamic_cast<Mac*>(cell.getAgent(1));
+            Mac* pMac = dynamic_cast<Mac*>(grid.agent(_pos, 0));
+            if (!pMac) pMac = dynamic_cast<Mac*>(grid.agent(_pos, 1));
             
             // If the mac died on this time step ignore it.
             if (pMac->getNextState() == MAC_DEAD)
@@ -324,7 +321,7 @@ void Tgam::handleActive(const int time, GrGrid& grid, GrStat& stats, bool tgamma
                 pMac->apoptosis(grid);
                 pMac->kill();
                 
-                cell.incNrKillings();
+                grid.incKillings(_pos);
             }
         }
     }
@@ -355,13 +352,11 @@ void Tgam::handleActiveDouble(const int time, GrGrid& grid, GrStat& stats)
         _nextState = TGAM_ACTIVE_DOUBLE;
     }
 
-    GridCell& cell = grid(_row, _col);
-	
-	if (cell.hasMac())
+	if (grid.hasAgentType(MAC, _pos))
 	{
 		// get the macrophage
-		Mac* pMac = dynamic_cast<Mac*>(cell.getAgent(0));
-		if (!pMac) pMac = dynamic_cast<Mac*>(cell.getAgent(1));
+		Mac* pMac = dynamic_cast<Mac*>(grid.agent(_pos, 0));
+		if (!pMac) pMac = dynamic_cast<Mac*>(grid.agent(_pos, 1));
         
 		// If the mac died on this time step ignore it.
 		if (pMac->getNextState() == MAC_DEAD)
@@ -380,7 +375,7 @@ void Tgam::handleActiveDouble(const int time, GrGrid& grid, GrStat& stats)
 			pMac->apoptosis(grid);
 			pMac->kill();
             
-			cell.incNrKillings();
+			grid.incKillings(_pos);
 		}
 	}
 }
@@ -415,17 +410,15 @@ void Tgam::updateState()
 
 void Tgam::solveTNF(GrGrid& grid, double dt)
 {
-    GridCell& cell = grid(_row, _col);
-    
 	double koff1 = _PARAM(PARAM_GR_K_ON1) * _PARAM(PARAM_GR_KD1);
 	double koff2 = _PARAM(PARAM_GR_K_ON2) * _PARAM(PARAM_GR_KD2);
 	double density = 1.25e11; // used for conversion of conc. unit (M -> #/cell) based on cell and microcompartment volumes 
 	double Nav = 6.02e23; // Avogadro Number
 	double vol = 8.0e-12; // volume of a cell in liter
 	
-	double tnf = cell.getTNF() / (Nav * vol);
-	double shedtnfr2 = cell.getShedTNFR2() / (Nav * vol);
-    double il10 = cell.getIL10() /(Nav * vol);
+	double tnf = grid.TNF(_pos) / (Nav * vol);
+	double shedtnfr2 = grid.shedTNFR2(_pos) / (Nav * vol);
+    double il10 = grid.il10(_pos) /(Nav * vol);
 	
     double dmTNFRNA;
 	double dmTNF;
@@ -474,8 +467,8 @@ void Tgam::solveTNF(GrGrid& grid, double dt)
 	tnf += dsTNF;
 	shedtnfr2 += dshedTNFR2;
 	
-	cell.setTNF(Nav * vol * tnf);
-	cell.setShedTNFR2(Nav * vol * shedtnfr2);
+	grid.TNF(_pos) = (Nav * vol * tnf);
+	grid.shedTNFR2(_pos) = (Nav * vol * shedtnfr2);
 	if (_mTNF < 0 || _surfTNFR1 < 0 || _surfBoundTNFR1 < 0 || _surfTNFR2 < 0 || _surfBoundTNFR2 < 0 || _mTNFRNA < 0)
 		std::cout << "Error: Negative Value of Species in TNF/TNFR dynamics" << std::endl;
     
@@ -485,17 +478,15 @@ void Tgam::solveTNF(GrGrid& grid, double dt)
 
 void Tgam::solveTNFandIL10(GrGrid& grid, double dt)
 {
-    GridCell& cell = grid(_row, _col);
-	
 	double koff1 = _PARAM(PARAM_GR_K_ON1) * _PARAM(PARAM_GR_KD1);
 	double koff2 = _PARAM(PARAM_GR_K_ON2) * _PARAM(PARAM_GR_KD2);
 	double density = 1.25e11; // used for conversion of conc. unit (M -> #/cell) based on cell and microcompartment volumes 
 	double Nav = 6.02e23; // Avogadro Number
 	double vol = 8.0e-12; // volume of a cell in liter
 	
-	double tnf = cell.getTNF() / (Nav * vol);
-	double shedtnfr2 = cell.getShedTNFR2() / (Nav * vol);
-    double il10 = cell.getIL10() / (Nav * vol);
+	double tnf = grid.TNF(_pos) / (Nav * vol);
+	double shedtnfr2 = grid.shedTNFR2(_pos) / (Nav * vol);
+    double il10 = grid.il10(_pos) / (Nav * vol);
 	
     double dmTNFRNA;
 	double dmTNF;
@@ -562,9 +553,9 @@ void Tgam::solveTNFandIL10(GrGrid& grid, double dt)
     _surfBoundIL10R += dsurfBoundIL10R;
     il10 += dsIL10;
 	
-	cell.setTNF(Nav * vol * tnf);
-	cell.setShedTNFR2(Nav * vol * shedtnfr2);
-    cell.setIL10(Nav * vol * il10);
+	grid.TNF(_pos) = (Nav * vol * tnf);
+	grid.shedTNFR2(_pos) = (Nav * vol * shedtnfr2);
+    grid.il10(_pos) = (Nav * vol * il10);
 	
     
 	if (_mTNF < 0 || _surfTNFR1 < 0 || _surfBoundTNFR1 < 0 || _surfTNFR2 < 0 || _surfBoundTNFR2 < 0 || _mTNFRNA < 0)
@@ -578,13 +569,11 @@ void Tgam::solveTNFandIL10(GrGrid& grid, double dt)
 
 void Tgam::solveIL10(GrGrid& grid, double dt)
 {
-    GridCell& cell = grid(_row, _col);
-    
     double density = 1.25e11; // used for conversion of conc. unit (M -> #/cell) based on cell and microcompartment volumes 
 	double Nav = 6.02e23; // Avogadro Number
 	double vol = 8.0e-12; // volume of a cell in liter
     
-    double il10 = cell.getIL10() / (Nav * vol);
+    double il10 = grid.il10(_pos) / (Nav * vol);
     
     double dsIL10;
 	double dsurfIL10R;
@@ -601,7 +590,7 @@ void Tgam::solveIL10(GrGrid& grid, double dt)
     _surfBoundIL10R += dsurfBoundIL10R;
     il10 += dsIL10;
     
-    cell.setIL10(Nav * vol * il10);
+    grid.il10(_pos) = (Nav * vol * il10);
     
     if (_surfIL10R < 0 || _surfBoundIL10R < 0)
         std::cout << "Error: Negative value of species in IL10/IL10R dynamics" << std::endl;
@@ -610,8 +599,6 @@ void Tgam::solveIL10(GrGrid& grid, double dt)
 
 void Tgam::solveDegradation(GrGrid& grid, double dt, bool tnfrDynamics, bool il10rDynamics)
 {
-    GridCell& cell = grid(_row, _col);
-    
     double Nav = 6.02e23; // Avagadros #
     double vol = 8.0e-12; // volume of a cell in L
     
@@ -619,23 +606,19 @@ void Tgam::solveDegradation(GrGrid& grid, double dt, bool tnfrDynamics, bool il1
         
         // simulate the effect of TNF internalization by cells in the form of degradation. Only for TNF
         double dtnf;
-        double tnf = cell.getTNF();
+        double& tnf = grid.TNF(_pos);
         dtnf = -_PARAM(PARAM_GR_K_INT1) * (tnf / (tnf + _PARAM(PARAM_GR_KD1) * Nav * vol)) * _PARAM(PARAM_GR_MEAN_TNFR1_TCELL) * dt * 0.4;
         tnf += dtnf;  
-        
-        cell.setTNF(tnf);
     }
     
     if (!il10rDynamics) {
         
         double dil10;
-        double il10 = cell.getIL10();
+        double& il10 = grid.il10(_pos);
         
         // simulate the effect of IL10 internalization in the form of degradation. Only for IL10
         dil10 = -_PARAM(PARAM_GR_I_K_INT) * (il10 / (il10 + _PARAM(PARAM_GR_I_KD) * Nav * vol)) * _PARAM(PARAM_GR_I_IL10R_TCELL) * dt * _PARAM(PARAM_GR_I_MOD);
         il10 += dil10;  
-        
-        cell.setIL10(il10);
         
     }
     

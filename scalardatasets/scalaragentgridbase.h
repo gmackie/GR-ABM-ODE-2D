@@ -14,13 +14,13 @@
 class ScalarAgentGridBase : public Grid
 {
 public:
-	ScalarAgentGridBase();
+	ScalarAgentGridBase(size_t dim);
 	virtual ~ScalarAgentGridBase();
 	virtual void evaluate(const Simulation* pSimulation) = 0;
 };
 
-inline ScalarAgentGridBase::ScalarAgentGridBase()
-	: Grid(Simulation::_DIM)
+inline ScalarAgentGridBase::ScalarAgentGridBase(size_t dim)
+	: Grid(dim)
 {
 }
 

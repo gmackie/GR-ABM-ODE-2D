@@ -17,19 +17,14 @@ const std::string Agent::_ClassName = "Agent";
 Agent::Agent()
 	: _birthTime(-1)
 	, _deathTime(-1)
-	, _row(-1)
-	, _col(-1)
 {
 }
 
 Agent::Agent(int birthtime, int deathtime, int row, int col)
 	: _birthTime(birthtime)
 	, _deathTime(deathtime)
-	, _row(row)
-	, _col(col)
+	, _pos(row, col)
 {
-	assert(0 <= _row && _row < NROWS);
-	assert(0 <= _col && _col < NCOLS);
 }
 
 Agent::~Agent()
@@ -39,45 +34,44 @@ Agent::~Agent()
 Pos Agent::moveAgent(GrGrid& grid, bool ccl2, bool ccl5, bool cxcl9, bool attractant, double bonusFactor)
 {
 	int DestinationOrdinal = getDestinationOrdinal(grid, ccl2, ccl5, cxcl9, attractant, bonusFactor);
-	return compartmentOrdinalToCoordinates(DestinationOrdinal);
+	return compartmentOrdinalToCoordinates(DestinationOrdinal, grid.getRange());
 }
 
 int Agent::getDestinationOrdinal(GrGrid& grid, bool ccl2, bool ccl5, bool cxcl9, bool attractant, double bonusFactor)
 {
-	GridCell& cell = grid(_row, _col);
 
 	double min = _PARAM(PARAM_GR_MIN_CHEMOTAXIS);
 	double max = _PARAM(PARAM_GR_MAX_CHEMOTAXIS);
 
-	bool ccl2Switch = min < cell.getCCL2() && cell.getCCL2() < max;
-	bool ccl5Switch = min < cell.getCCL5() && cell.getCCL5() < max;
-	bool cxcl9Switch = min < cell.getCXCL9() && cell.getCXCL9() < max;
+	bool ccl2Switch =  min < grid.CCL2(_pos) && grid.CCL2(_pos) < max;
+	bool ccl5Switch =  min < grid.CCL5(_pos) && grid.CCL5(_pos) < max;
+	bool cxcl9Switch = min < grid.CXCL9(_pos)  && grid.CXCL9(_pos) < max;
 
-	double prob[9] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
+	Scalar prob[MOORE_COUNT] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
 
+  int _row(GETROW(_pos)), _col(GETCOL(_pos));
 	int k = 0;
-	for (int i = -1; i <= 1; i++)
-	{
-		for (int j = -1; j <= 1; j++)
-		{
-			if (ccl2 && ccl2Switch)
-				prob[k] += grid(MOD_ROW(_row + i), MOD_COL(_col + j)).getCCL2();
-			if (ccl5 && ccl5Switch)
-				prob[k] += grid(MOD_ROW(_row + i), MOD_COL(_col + j)).getCCL5();
-			if (cxcl9 && cxcl9Switch)
-				prob[k] += grid(MOD_ROW(_row + i), MOD_COL(_col + j)).getCXCL9();
-			if (attractant)
-				prob[k] += grid(MOD_ROW(_row + i), MOD_COL(_col + j)).getMacAttractant();
-
-			k++;
-		}
-	}
+  for (int i = -1; i <= 1; i++)
+  {
+    for (int j = -1; j <= 1; j++)
+    {
+      if (ccl2 && ccl2Switch)
+        prob[k] += grid.CCL2(Pos(grid.mod_row(_row + i), grid.mod_col(_col + j)));
+      if (ccl5 && ccl5Switch)
+        prob[k] += grid.CCL5(Pos(grid.mod_row(_row + i), grid.mod_col(_col + j)));
+      if (cxcl9 && cxcl9Switch)
+        prob[k] += grid.CXCL9(Pos(grid.mod_row(_row + i), grid.mod_col(_col + j)));
+      if (attractant)
+        prob[k] += grid.macAttractant(Pos(grid.mod_row(_row + i), grid.mod_col(_col + j)));
+      k++;
+    }
+  }
 	
 	// multiply highest probability with bonusFactor,
 	// and while we are at it, determine the sum
 	k = 0;
 	double sum = 0;
-	for (int i = 0; i < 9; i++)
+	for (int i = 0; i < MOORE_COUNT; i++)
 	{
 		if (prob[i] > prob[k])
 			k = i;
@@ -89,12 +83,13 @@ int Agent::getDestinationOrdinal(GrGrid& grid, bool ccl2, bool ccl5, bool cxcl9,
 	if (sum > 0.0)
 	{
 		// normalize
-		for (int i = 0; i < 9; i++)
+		for (int i = 0; i < MOORE_COUNT; i++)
 			prob[i] /= sum;
 
 		// compute cumulative array
-		double cumProb[9] = {prob[0], 0, 0, 0, 0, 0, 0, 0, 0};
-		for (int i = 1; i < 9; i++)
+		double cumProb[MOORE_COUNT];
+    cumProb[0] = prob[0];
+		for (int i = 1; i < MOORE_COUNT; i++)
 		{
 			cumProb[i] = (cumProb[i - 1] + prob[i]);
 		}
@@ -115,10 +110,11 @@ int Agent::getDestinationOrdinal(GrGrid& grid, bool ccl2, bool ccl5, bool cxcl9,
 	 * 3 4 5
 	 * 6 7 8
 	 */
+  assert(0 <= k && k < MOORE_COUNT);
 	return k;
 }
 
-Pos Agent::compartmentOrdinalToCoordinates(int ordinal) const
+Pos Agent::compartmentOrdinalToCoordinates(int ordinal, const Pos& dim) const
 {
 
 	/**
@@ -130,8 +126,8 @@ Pos Agent::compartmentOrdinalToCoordinates(int ordinal) const
 	 */
 	int dRow = ((ordinal / 3) % 3) - 1;
 	int dCol = ordinal % 3 - 1;
-	int newRow = MOD_ROW(_row + dRow);
-	int newCol = MOD_COL(_col + dCol);
+	int newRow = (_pos.x + dRow + dim.x) % dim.x;
+	int newCol = (_pos.y + dCol + dim.y) % dim.y;
 
 	return Pos(newRow, newCol);
 
@@ -145,8 +141,8 @@ void Agent::serialize(std::ostream& out) const
 
 	out << _birthTime << std::endl;
 	out << _deathTime << std::endl;
-	out << _row << std::endl;
-	out << _col << std::endl;
+	out << _pos.x << std::endl;
+	out << _pos.y << std::endl;
 
 	Serialization::writeFooter(out, Agent::_ClassName);
 }
@@ -162,8 +158,8 @@ void Agent::deserialize(std::istream& in)
 
 	in >> _birthTime;
 	in >> _deathTime;
-	in >> _row;
-	in >> _col;
+	in >> _pos.x;
+	in >> _pos.y;
 
 	if (!Serialization::readFooter(in, Agent::_ClassName))
 	{

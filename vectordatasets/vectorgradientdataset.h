@@ -41,14 +41,15 @@ inline VectorGradientDataset::~VectorGradientDataset()
 
 inline void VectorGradientDataset::getVector(const Simulation* pSimulation, int row, int col, vec2f& res) const
 {
-	row = moduloDIM(row);
-	col = moduloDIM(col);
+  const Pos& dim = pSimulation->getSize();
+	row = moduloDIM(row, dim.x);
+	col = moduloDIM(col, dim.y);
 
-	float scalarLeft = _pScalarDataset->getScalar(pSimulation, row, moduloDIM(col - 1));
-	float scalarRight = _pScalarDataset->getScalar(pSimulation, row, moduloDIM(col + 1));
+	float scalarLeft = _pScalarDataset->getScalar(pSimulation, row, moduloDIM(col - 1, dim.x));
+	float scalarRight = _pScalarDataset->getScalar(pSimulation, row, moduloDIM(col + 1, dim.x));
 
-	float scalarDown = _pScalarDataset->getScalar(pSimulation, moduloDIM(row - 1), col);
-	float scalarUp = _pScalarDataset->getScalar(pSimulation, moduloDIM(row + 1), col);
+	float scalarDown = _pScalarDataset->getScalar(pSimulation, moduloDIM(row - 1, dim.y), col);
+	float scalarUp = _pScalarDataset->getScalar(pSimulation, moduloDIM(row + 1, dim.y), col);
 
 	res[0] = 0.5f * (scalarRight - scalarLeft);
 	res[1] = 0.5f * (scalarUp - scalarDown);
@@ -56,11 +57,12 @@ inline void VectorGradientDataset::getVector(const Simulation* pSimulation, int 
 
 inline void VectorGradientDataset::getVectorNN(const Simulation* pSimulation, const vec2f& pos, vec2f& res) const
 {
-	float scalarLeft = _pScalarDataset->getScalarNN(pSimulation, moduloDIM(pos[0] - 1), pos[1]);
-	float scalarRight = _pScalarDataset->getScalarNN(pSimulation, moduloDIM(pos[0] + 1), pos[1]);
+  const Pos& dim = pSimulation->getSize();
+	float scalarLeft = _pScalarDataset->getScalarNN(pSimulation, moduloDIM(pos[0] - 1, dim.x), pos[1]);
+	float scalarRight = _pScalarDataset->getScalarNN(pSimulation, moduloDIM(pos[0] + 1, dim.x), pos[1]);
 
-	float scalarDown = _pScalarDataset->getScalarNN(pSimulation, pos[0], moduloDIM(pos[1] - 1));
-	float scalarUp = _pScalarDataset->getScalarNN(pSimulation, pos[0], moduloDIM(pos[1] + 1));
+	float scalarDown = _pScalarDataset->getScalarNN(pSimulation, pos[0], moduloDIM(pos[1] - 1, dim.y));
+	float scalarUp = _pScalarDataset->getScalarNN(pSimulation, pos[0], moduloDIM(pos[1] + 1, dim.y));
 
 	res[0] = (scalarRight - scalarLeft) / 2.0f;
 	res[1] = (scalarUp - scalarDown) / 2.0f;
@@ -68,11 +70,12 @@ inline void VectorGradientDataset::getVectorNN(const Simulation* pSimulation, co
 
 inline void VectorGradientDataset::getVectorBL(const Simulation* pSimulation, const vec2f& pos, vec2f& res) const
 {
-	float scalarLeft = _pScalarDataset->getScalarBL(pSimulation, moduloDIM(pos[0] - 1), pos[1]);
-	float scalarRight = _pScalarDataset->getScalarBL(pSimulation, moduloDIM(pos[0] + 1), pos[1]);
+  const Pos& dim = pSimulation->getSize();
+	float scalarLeft = _pScalarDataset->getScalarBL(pSimulation, moduloDIM(pos[0] - 1, dim.x), pos[1]);
+	float scalarRight = _pScalarDataset->getScalarBL(pSimulation, moduloDIM(pos[0] + 1, dim.x), pos[1]);
 
-	float scalarDown = _pScalarDataset->getScalarBL(pSimulation, pos[0], moduloDIM(pos[1] -	1));
-	float scalarUp = _pScalarDataset->getScalarBL(pSimulation, pos[0], moduloDIM(pos[1] + 1));
+	float scalarDown = _pScalarDataset->getScalarBL(pSimulation, pos[0], moduloDIM(pos[1] -	1, dim.y));
+	float scalarUp = _pScalarDataset->getScalarBL(pSimulation, pos[0], moduloDIM(pos[1] + 1, dim.y));
 
 	res[0] = (scalarRight - scalarLeft) / 2.0f;
 	res[1] = (scalarUp - scalarDown) / 2.0f;

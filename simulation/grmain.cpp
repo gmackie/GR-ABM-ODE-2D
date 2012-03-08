@@ -161,12 +161,12 @@ public:
     write(stats.getNrOfTcyt()); write(stats.getNrOfTcytActive()); write(stats.getNrOfTcytDownRegulated()); write(stats.getNrOfTcytDead());
     write(stats.getNrOfTreg()); write(stats.getNrOfTregActive()); write(stats.getNrOfTregDead());
 
-    FLOAT_TYPE repExtMtb = stats.getTotExtMtb() - stats.getTotNonRepExtMtb();
+    Scalar repExtMtb = stats.getTotExtMtb() - stats.getTotNonRepExtMtb();
     write(stats.getTotIntMtb()); write(stats.getTotExtMtb()); write(repExtMtb); write(stats.getTotNonRepExtMtb()); write((stats.getTotIntMtb() + stats.getTotExtMtb()));
 
     write(stats.getTotTNF()); write(stats.getTotTNFR1int()); write(stats.getTotkmRNA()); write(stats.getTotIL10()); write(stats.getTotCCL2()); write(stats.getTotCCL5());  write(stats.getTotCXCL9());
 
-    FLOAT_TYPE lesionSize = 2 * sqrt((0.0004 * stats.getAreaCellDensity()) / PI);
+    Scalar lesionSize = 2 * sqrt((0.0004 * stats.getAreaCellDensity()) / PI);
     write(stats.getAreaTNF()); write(stats.getAreaCellDensity()); write(lesionSize);
 
     write(stats.getMDC()); write(stats.getN4()); write(stats.getTH0()); write(stats.getTH1()); write(stats.getN8());
@@ -223,13 +223,14 @@ void saveState(const GrSimulation* pSim, int time, std::string dir=std::string("
 
 void printStats(const GrSimulation* pSim) {
   const GrStat& stats = pSim->getStats();
+  size_t sz = pSim->getGrid().getSize();
   printf("%-7d ", pSim->getTime());
   printf("%3d - (%d,%d,%d,%d,%d) ", stats.getNrOfMac(), stats.getNrOfMacResting(), stats.getNrOfMacInfected(), stats.getNrOfMacCInfected(), stats.getNrOfMacActive(), stats.getNrOfMacDead());
   printf("%3d - (%d,%d,%d,%d,%d) ", stats.getNrOfTgam(), stats.getNrOfTgamActive(), stats.getNrOfTgamDouble(), stats.getNrOfTgamInduced(), stats.getNrOfTgamDownRegulated(), stats.getNrOfTgamDead());
   printf("%3d - (%d,%d,%d) ", stats.getNrOfTcyt(), stats.getNrOfTcytActive(), stats.getNrOfTcytDownRegulated(), stats.getNrOfTcytDead());
   printf("%3d - (%d,%d) ", stats.getNrOfTreg(), stats.getNrOfTregActive(), stats.getNrOfTregDead());
   printf("(%.5f, %.5f) ", stats.getTotExtMtb(), stats.getTotIntMtb());
-  #define INV_SZ (1.0 / (NROWS*NCOLS))
+  #define INV_SZ (1.0 / sz)
   printf("(%11.5f,%11.5f,%11.5f,%11.5f,%11.5f) ", stats.getTotTNF()*INV_SZ, stats.getTotIL10()*INV_SZ, stats.getTotCCL2()*INV_SZ, stats.getTotCCL5()*INV_SZ, stats.getTotCXCL9()*INV_SZ);
   printf("(%d,%d,%d,%d) ", stats.getNrSourcesMac(), stats.getNrSourcesTgam(), stats.getNrSourcesTcyt(), stats.getNrSourcesTreg());
   printf("(%d, %.5f) ", stats.getNrCaseated(), stats.getTotNonRepExtMtb());
@@ -243,7 +244,7 @@ void printStats(const GrSimulation* pSim) {
 bool shouldStop(int time, GrSimulation* pSim)
 {
 	const GrStat& stats = pSim->getStats();
-	FLOAT_TYPE totMtb = stats.getTotExtMtb() + stats.getTotIntMtb();
+	Scalar totMtb = stats.getTotExtMtb() + stats.getTotIntMtb();
 	int areaCellDensity = stats.getAreaCellDensity();
 
   // Stop if too large
@@ -344,9 +345,8 @@ int main(int argc, char** argv)
 {
   std::cout << std::endl;
   printVersion();
-  std::cout << "GRID SIZE: NROWS: " << NROWS << " NCOLS: " << NCOLS << std::endl;
-
-  unsigned int seed;
+  unsigned long seed;
+  size_t dim;
   std::string paramFile;
   std::string outputDir;
 	
@@ -371,7 +371,7 @@ int main(int argc, char** argv)
 	            "This option is implied by --lhs.")
 	("output-dir,o", po::value<std::string>(&outputDir)->default_value("./"), "Output directory")
 	("input-file,i", po::value<std::string>(&paramFile), "Parameter file")
-	("seed,s", po::value<unsigned int>(&seed), "RNG seed, default is based on the current time");
+	("seed,s", po::value(&seed), "RNG seed, default is based on the current time");
 
   po::options_description stats("Statistics");
   stats.add_options()
@@ -381,13 +381,14 @@ int main(int argc, char** argv)
 
   po::options_description sim_opts("Simulation");
   sim_opts.add_options()
+  ("dim,d", po::value(&dim)->default_value(100), "Size of simulation grid")
   ("load,l", po::value<std::string>(), "Load from a saved state")
 	("timesteps,t", po::value<unsigned>(), "Number of time steps to simulate\n"
 									"Takes precedence over --days")
 	("days", po::value<unsigned>()->default_value(200), "Number of days to simulate")
 	("state-interval", po::value<unsigned>()->default_value(0), "State save interval (10 min timesteps)")
 	("recr", po::value<unsigned>()->default_value(0), "recruitment:\n0 - probability\n1 - lymph node ode proxy\n2 - lymph node ode pure")
-	("diffusion,d", po::value<unsigned>()->default_value(3),
+	("diffusion", po::value<unsigned>()->default_value(3),
 	 "Diffusion method:\n0 - FTCS\n1 - BTCS (SOR, correct)\n2 - BTCS (SOR, wrong)\n3 - FTCS Grid Swap")
 	("area-tnf-threshold", po::value<float>()->default_value(0.5),"Threshold for granuloma area defined by TNF, in the range [0.0, 1.0]\n")
 	("area-cell-density-threshold", po::value<float>()->default_value(0.5),"Threshold for granuloma area defined by cell density, in the range [0.0, 1.0]");
@@ -423,6 +424,9 @@ int main(int argc, char** argv)
 		printUsage(argv[0], desc);
 		return 1;
 	}
+
+  std::cout<<"GRID SIZE: NROWS: "<<dim<<" NCOLS: "<<dim<<std::endl;
+  Pos pdim(dim, dim);
   
   if (vm.count("version"))
   {
@@ -486,28 +490,22 @@ int main(int argc, char** argv)
       exit(1);
   }
 
-  if (!Params::getInstance()->fromXml(paramFile.c_str())) //Must be done before making GrSimulation
+  if (!Params::getInstance(pdim)->fromXml(paramFile.c_str())) //Must be done before making GrSimulation
     throw std::runtime_error("Unable to get parameters from file, cannot continue...");
 
-  GrSimulation* pSim = new GrSimulation();
+  GrSimulation* pSim = new GrSimulation(pdim);
   assert(pSim != NULL);
-  if (vm.count("load")){
-	std::string s = vm["load"].as<std::string>();
-    std::ifstream f(s.c_str());
-
-    if(!f)
-    {
-    	std::cerr << "Saved state " << s << " does not exist." << std::endl;
-    	exit(1);
-    }
-
-    f.close();
-    boost::iostreams::filtering_istream in;
-    if (s.compare(s.size()-2, 2, "gz") == 0)
-    {
-      in.push(boost::iostreams::gzip_decompressor());
-    }
-    in.push(boost::iostreams::file_source(s));
+  if(vm.count("load")) {
+    namespace bio = boost::iostreams;
+    std::string savedf = vm["load"].as<std::string>();
+    size_t found = string::npos;
+    bio::filtering_istream in;
+    if((found = savedf.rfind(".")) != string::npos && savedf.substr(found) == ".gz")
+      in.push(bio::gzip_decompressor());   //Compressed?
+    bio::file_source fileSource(savedf);
+    in.push(fileSource);
+    if(!in)
+      throw std::runtime_error("Failed to open saved state file");
     pSim->deserialize(in);
   }
 

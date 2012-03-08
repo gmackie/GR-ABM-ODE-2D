@@ -309,8 +309,9 @@ const ParamDescription ParamsBase::_description[_PARAM_COUNT] =
 	{ "areaCellDensityStopppingTimeStep2",	GR_NODE,	true,	true,	0.0,	0,	"",					"Time step at which to check areaCellDensityStoppingThreshold" },
 };
 
-ParamsBase::ParamsBase()
-	: _doubleParam()
+ParamsBase::ParamsBase(const Pos& dim)
+  	: _dim(dim)
+	, _doubleParam()
 	, _intParam()
 	, _initialMacs()
 	, _initialExtMtb()
@@ -486,7 +487,7 @@ bool ParamsBase::readParam(const TiXmlElement* pElement, const std::string param
     break;
   default:
     if(val == std::string("center"))
-      p = Pos(NROWS/2, NCOLS/2);
+      p = Pos(_dim.x/2, _dim.y/2);
     else {
       std::stringstream ss(val);
       ss>>p; //throws parse error
@@ -522,20 +523,20 @@ bool ParamsBase::readInitElement(const TiXmlElement* pRootElement)
           Pos offset;
           res |= readParam(pInitChildElement, "offset", offset);
           if(res) {
-            pos.first += offset.first;
-            pos.second += offset.second;
+            pos.x += offset.x;
+            pos.y += offset.y;
           }
         }
         else {
-  				res = readParam(pInitChildElement, "row", &pos.first, true);
-  				res &= readParam(pInitChildElement, "col", &pos.second, true);
+  				res = readParam(pInitChildElement, "row", &pos.x, true);
+  				res &= readParam(pInitChildElement, "col", &pos.y, true);
         }
 
-				if (!(0 <= pos.first && pos.first < NROWS) ||
-					!(0 <= pos.second && pos.second < NCOLS))
+				if (!(0 <= pos.x && pos.x < _dim.x) ||
+					!(0 <= pos.y && pos.y < _dim.y))
 				{
 					res = false;
-					std::cerr << "Position (" << pos.first << "," << pos.second
+					std::cerr << "Position (" << pos.x << "," << pos.y
 							<< ") is out of range" << std::endl;
 				}
 				else
@@ -550,20 +551,20 @@ bool ParamsBase::readInitElement(const TiXmlElement* pRootElement)
           Pos offset;
           res |= readParam(pInitChildElement, "offset", offset);
           if(res) {
-            pos.first += offset.first;
-            pos.second += offset.second;
+            pos.x += offset.x;
+            pos.y += offset.y;
           }
         }
         else {
-  				res = readParam(pInitChildElement, "row", &pos.first, true);
-  				res &= readParam(pInitChildElement, "col", &pos.second, true);
+  				res = readParam(pInitChildElement, "row", &pos.x, true);
+  				res &= readParam(pInitChildElement, "col", &pos.y, true);
         }
 
-				if (!(0 <= pos.first && pos.first < NROWS) ||
-					!(0 <= pos.second && pos.second < NCOLS))
+				if (!(0 <= pos.x && pos.x < _dim.x) ||
+					!(0 <= pos.y && pos.y < _dim.y))
 				{
 					res = false;
-					std::cerr << "Position (" << pos.first << "," << pos.second
+					std::cerr << "Position (" << pos.x << "," << pos.y
 							<< ") is out of range" << std::endl;
 				}
 				else
@@ -583,7 +584,7 @@ bool ParamsBase::readInitElement(const TiXmlElement* pRootElement)
 	{
 		// No "Init" element was specified.
 		// Put one infected macrophage in the middle of the grid.
-		Pos pos(NROWS/2, NCOLS/2);
+		Pos pos(_dim.x/2, _dim.y/2);
 		_initialMacs.push_back(pos);
 	}
 
@@ -685,16 +686,16 @@ bool ParamsBase::readElement(const TiXmlElement* pElement, bool paramsRead[])
 void ParamsBase::computeParams()
 {
   if(_paramsRead[PARAM_MAC_INIT_DENSITY])
-    setParam(PARAM_MAC_INIT_NUMBER, getParam(PARAM_MAC_INIT_DENSITY) * FLOAT_TYPE(NROWS*NCOLS));
+    setParam(PARAM_MAC_INIT_NUMBER, getParam(PARAM_MAC_INIT_DENSITY) * Scalar(_dim.x*_dim.y));
   else if(_paramsRead[PARAM_MAC_INIT_NUMBER])
-    setParam(PARAM_MAC_INIT_DENSITY, getParam(PARAM_MAC_INIT_NUMBER) / FLOAT_TYPE(NROWS*NCOLS));
+    setParam(PARAM_MAC_INIT_DENSITY, getParam(PARAM_MAC_INIT_NUMBER) / Scalar(_dim.x*_dim.y));
   else
     throw std::runtime_error("Initial resting macs not specified in parameter file");
 
   if(_paramsRead[PARAM_SOURCE_DENSITY])
-    setParam(PARAM_GR_NR_SOURCES, getParam(PARAM_SOURCE_DENSITY) * FLOAT_TYPE(NROWS*NCOLS));
+    setParam(PARAM_GR_NR_SOURCES, getParam(PARAM_SOURCE_DENSITY) * Scalar(_dim.x*_dim.y));
   else if(_paramsRead[PARAM_GR_NR_SOURCES])
-    setParam(PARAM_SOURCE_DENSITY, getParam(PARAM_GR_NR_SOURCES) / FLOAT_TYPE(NROWS*NCOLS));
+    setParam(PARAM_SOURCE_DENSITY, getParam(PARAM_GR_NR_SOURCES) / Scalar(_dim.x*_dim.y));
   else
     throw std::runtime_error("Sources not specified in parameter file");
 

@@ -41,16 +41,16 @@ inline ScalarDivergenceDataset::~ScalarDivergenceDataset()
 
 inline float ScalarDivergenceDataset::getScalar(const Simulation* pSimulation, int row, int col) const
 {
-	row = moduloDIM(row);
-	col = moduloDIM(col);
+	row = moduloDIM(pSimulation->getSize().y, row);
+	col = moduloDIM(pSimulation->getSize().x, col);
 
 	vec2f vectorLeft, vectorRight;
-	_pVectorDataset->getVector(pSimulation, row, moduloDIM(col - 1), vectorLeft);
-	_pVectorDataset->getVector(pSimulation, row, moduloDIM(col + 1), vectorRight);
+	_pVectorDataset->getVector(pSimulation, row, moduloDIM(pSimulation->getSize().x, col - 1), vectorLeft);
+	_pVectorDataset->getVector(pSimulation, row, moduloDIM(pSimulation->getSize().x, col + 1), vectorRight);
 
 	vec2f vectorDown, vectorUp;
-	_pVectorDataset->getVector(pSimulation, moduloDIM(row - 1), col, vectorDown);
-	_pVectorDataset->getVector(pSimulation, moduloDIM(row + 1), col, vectorUp);
+	_pVectorDataset->getVector(pSimulation, moduloDIM(pSimulation->getSize().y, row - 1), col, vectorDown);
+	_pVectorDataset->getVector(pSimulation, moduloDIM(pSimulation->getSize().y, row + 1), col, vectorUp);
 
 	float dX = 0.5f * (vectorRight[0] - vectorLeft[0]);
 	float dY = 0.5f * (vectorUp[1] - vectorDown[1]);
@@ -64,12 +64,12 @@ inline float ScalarDivergenceDataset::getScalarNN(const Simulation* pSimulation,
 	float deltaY = 1;
 
 	vec2f vectorLeft, vectorRight;
-	vectorLeft = _pVectorDataset->getVectorNN(pSimulation, moduloDIM(x - deltaX < _MIN_X ? _MAX_X : x - deltaX), y);
-	vectorRight = _pVectorDataset->getVectorNN(pSimulation, moduloDIM(x + deltaX > _MAX_X ? _MIN_X : x + deltaX), y);
+	vectorLeft = _pVectorDataset->getVectorNN(pSimulation, moduloDIM(pSimulation->getSize().x, x - deltaX < _MIN_X ? _MAX_X : x - deltaX), y);
+	vectorRight = _pVectorDataset->getVectorNN(pSimulation, moduloDIM(pSimulation->getSize().x, x + deltaX > _MAX_X ? _MIN_X : x + deltaX), y);
 
 	vec2f vectorDown, vectorUp;
-	vectorDown = _pVectorDataset->getVectorNN(pSimulation, x, moduloDIM(y - deltaY < _MIN_Y ? _MAX_Y : y - deltaY));
-	vectorUp = _pVectorDataset->getVectorNN(pSimulation, x, moduloDIM(y + deltaY > _MAX_Y ? _MIN_Y : y + deltaY));
+	vectorDown = _pVectorDataset->getVectorNN(pSimulation, x, moduloDIM(pSimulation->getSize().y, y - deltaY < _MIN_Y ? _MAX_Y : y - deltaY));
+	vectorUp = _pVectorDataset->getVectorNN(pSimulation, x, moduloDIM(pSimulation->getSize().y, y + deltaY > _MAX_Y ? _MIN_Y : y + deltaY));
 
 	float dX = (vectorRight[0] - vectorLeft[0]) / (2.0f * deltaX);
 	float dY = (vectorUp[1] - vectorDown[1]) / (2.0f * deltaY);
@@ -83,12 +83,12 @@ inline float ScalarDivergenceDataset::getScalarBL(const Simulation* pSimulation,
 	float deltaY = 1;
 
 	vec2f vectorLeft, vectorRight;
-	vectorLeft = _pVectorDataset->getVectorBL(pSimulation, moduloDIM(x - deltaX < _MIN_X ? _MAX_X : x - deltaX), y);
-	vectorRight = _pVectorDataset->getVectorBL(pSimulation, moduloDIM(x + deltaX > _MAX_X ? _MIN_X : x + deltaX), y);
+	vectorLeft = _pVectorDataset->getVectorBL(pSimulation, moduloDIM(pSimulation->getSize().x, x - deltaX < _MIN_X ? _MAX_X : x - deltaX), y);
+	vectorRight = _pVectorDataset->getVectorBL(pSimulation, moduloDIM(pSimulation->getSize().x, x + deltaX > _MAX_X ? _MIN_X : x + deltaX), y);
 
 	vec2f vectorDown, vectorUp;
-	vectorDown = _pVectorDataset->getVectorBL(pSimulation, x, moduloDIM(y - deltaY < _MIN_Y ? _MAX_Y : y - deltaY));
-	vectorUp = _pVectorDataset->getVectorBL(pSimulation, x, moduloDIM(y + deltaY > _MAX_Y ? _MIN_Y : y + deltaY));
+	vectorDown = _pVectorDataset->getVectorBL(pSimulation, x, moduloDIM(pSimulation->getSize().y, y - deltaY < _MIN_Y ? _MAX_Y : y - deltaY));
+	vectorUp = _pVectorDataset->getVectorBL(pSimulation, x, moduloDIM(pSimulation->getSize().y, y + deltaY > _MAX_Y ? _MIN_Y : y + deltaY));
 
 	float dX = (vectorRight[0] - vectorLeft[0]) / (2.0f * deltaX);
 	float dY = (vectorUp[1] - vectorDown[1]) / (2.0f * deltaY);

@@ -39,13 +39,15 @@ inline float ScalarDataset::getScalarNN(const Simulation* pSimulation, float x, 
 	int col = (int)x;
 	int row = (int)y;
 
+  const Pos& dim = pSimulation->getSize();
+
 	if (x - col >= 0.5)
 	{
-		col = moduloDIM(col + 1);
+		col = moduloDIM(col + 1, dim.x);
 	}
 	if (y - row >= 0.5)
 	{
-		row = moduloDIM(row + 1);
+		row = moduloDIM(row + 1, dim.y);
 	}
 
 	return getScalar(pSimulation, row, col);
@@ -58,15 +60,16 @@ inline float ScalarDataset::getScalarNN(const Simulation* pSimulation, const vec
 
 inline float ScalarDataset::getScalarBL(const Simulation* pSimulation, float x, float y) const
 {
-	x = moduloDIM(x);
-	y = moduloDIM(y);
+  const Pos& dim = pSimulation->getSize();
+	x = moduloDIM(x, dim.x);
+	y = moduloDIM(y, dim.y);
 
 	int col = (int)x;
 	int row = (int)y;
 
 	// make sure that we do not index out of bounds
-	int sucRow = moduloDIM(row + 1);
-	int sucCol = moduloDIM(col + 1);
+	int sucRow = moduloDIM(row + 1, dim.x);
+	int sucCol = moduloDIM(col + 1, dim.y);
 
 	// first get the four scalar values of the cell
 	float v1 = getScalar(pSimulation, row, col);

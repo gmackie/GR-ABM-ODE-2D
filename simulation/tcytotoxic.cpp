@@ -6,6 +6,7 @@
  */
 
 #include "tcytotoxic.h"
+#include "macrophage.h"
 #include "grgrid.h"
 #include "serialization.h"
 
@@ -91,7 +92,6 @@ void Tcyt::secrete(GrGrid& grid, bool tnfrDynamics, bool, bool tnfDepletion, boo
 		return;
 	}
 	
-	GridCell& cell = grid(_row, _col);
 	_kSynth = _PARAM(PARAM_GR_K_SYNTH_TCELL)/10;
     _kmRNA = _PARAM(PARAM_GR_K_RNA_TCELL)/10;
     _kISynth = 0.0;
@@ -103,21 +103,20 @@ void Tcyt::secrete(GrGrid& grid, bool tnfrDynamics, bool, bool tnfDepletion, boo
     
 	if (!tnfrDynamics && !tnfDepletion)
     {    
-        double il10 = log(((cell.getIL10() * MW_IL10 * 1e6)/(Nav * vol))); // converting il10 concentration to log(ng/mL) for use in dose dependence
-        double tnfMOD = (1.0/(1.0 + exp((il10 + _PARAM(PARAM_GR_LINK_LOG_ALPHA))/_PARAM(PARAM_GR_LINK_LOG_BETA)))); // calculate the fraction of inhibition
+       const double il10 = log(((grid.il10(_pos) * MW_IL10 * 1e6)/(Nav * vol))); // converting il10 concentration to log(ng/mL) for use in dose dependence
+       const double tnfMOD = (1.0/(1.0 + exp((il10 + _PARAM(PARAM_GR_LINK_LOG_ALPHA))/_PARAM(PARAM_GR_LINK_LOG_BETA)))); // calculate the fraction of inhibition
         
-		cell.incTNF(tnfMOD * _PARAM(PARAM_TCYT_SEC_RATE_TNF));
+		grid.TNF(_pos) += (tnfMOD * _PARAM(PARAM_TCYT_SEC_RATE_TNF));
     }
     if (!il10rDynamics && !il10Depletion) {
-        cell.incIL10(_PARAM(PARAM_TCYT_SEC_RATE_IL10));
+        grid.il10(_pos) += (_PARAM(PARAM_TCYT_SEC_RATE_IL10));
     }
     
 }
 
 void Tcyt::computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tnfrDynamics, bool, bool, bool)
 {
-	GridCell& cell = grid(_row, _col);
-	double tnfBoundFraction = cell.getTNF() / (cell.getTNF() + _PARAM(PARAM_GR_KD1) * 48.16e11);
+	double tnfBoundFraction = grid.TNF(_pos) / (grid.TNF(_pos) + _PARAM(PARAM_GR_KD1) * 48.16e11);
 
 	// check if it is time to die
 	if (timeToDie(time))
@@ -160,12 +159,11 @@ void Tcyt::computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tn
 
 void Tcyt::handleActive(const int, GrGrid& grid, GrStat&)
 {
-	GridCell& cell = grid(_row, _col);
 
-	if (cell.hasMac())
+	if (grid.hasAgentType(MAC, _pos))
 	{
-		Mac* pMac = dynamic_cast<Mac*>(cell.getAgent(0));
-		if (!pMac) pMac = dynamic_cast<Mac*>(cell.getAgent(1));
+		Mac* pMac = dynamic_cast<Mac*>(grid.agent(_pos, 0));
+		if (!pMac) pMac = dynamic_cast<Mac*>(grid.agent(_pos, 1));
 
 		assert(pMac);
 
@@ -183,7 +181,7 @@ void Tcyt::handleActive(const int, GrGrid& grid, GrStat&)
 				pMac->kill();
 
 				// contribute to caseation
-				if (!cell.incNrKillings())
+				if (!grid.incKillings(_pos))
 					_nextState = TCYT_ACTIVE;
 			}
 			else if (pMac->getState() == MAC_CINFECTED)
@@ -193,7 +191,7 @@ void Tcyt::handleActive(const int, GrGrid& grid, GrStat&)
 				{
 					pMac->setIntMtb(0);
 					pMac->kill();
-					if (!cell.incNrKillings())
+					if (!grid.incKillings(_pos))
 						_nextState = TCYT_ACTIVE;
 				}
 				else
@@ -203,7 +201,7 @@ void Tcyt::handleActive(const int, GrGrid& grid, GrStat&)
 
 					pMac->setIntMtb(0);
 					pMac->kill();
-					if (!cell.incNrKillings())
+					if (!grid.incKillings(_pos))
 						_nextState = TCYT_ACTIVE;
 				}
 			}
@@ -236,17 +234,15 @@ void Tcyt::updateState()
 
 void Tcyt::solveTNF(GrGrid& grid, double dt)
 {
-    GridCell& cell = grid(_row, _col);
-    
 	double koff1 = _PARAM(PARAM_GR_K_ON1) * _PARAM(PARAM_GR_KD1);
 	double koff2 = _PARAM(PARAM_GR_K_ON2) * _PARAM(PARAM_GR_KD2);
 	double density = 1.25e11; // used for conversion of conc. unit (M -> #/cell) based on cell and microcompartment volumes 
 	double Nav = 6.02e23; // Avogadro Number
 	double vol = 8.0e-12; // volume of a cell in liter
 	
-	double tnf = cell.getTNF() / (Nav * vol);
-	double shedtnfr2 = cell.getShedTNFR2() / (Nav * vol);
-    double il10 = cell.getIL10() /(Nav * vol);
+	double tnf = grid.TNF(_pos) / (Nav * vol);
+	double shedtnfr2 = grid.shedTNFR2(_pos) / (Nav * vol);
+    double il10 = grid.il10(_pos) /(Nav * vol);
 	
     double dmTNFRNA;
 	double dmTNF;
@@ -295,8 +291,8 @@ void Tcyt::solveTNF(GrGrid& grid, double dt)
 	tnf += dsTNF;
 	shedtnfr2 += dshedTNFR2;
 	
-	cell.setTNF(Nav * vol * tnf);
-	cell.setShedTNFR2(Nav * vol * shedtnfr2);
+	grid.TNF(_pos) = (Nav * vol * tnf);
+	grid.shedTNFR2(Nav * vol * shedtnfr2);
 	if (_mTNF < 0 || _surfTNFR1 < 0 || _surfBoundTNFR1 < 0 || _surfTNFR2 < 0 || _surfBoundTNFR2 < 0 || _mTNFRNA < 0)
 		std::cout << "Error: Negative Value of Species in TNF/TNFR dynamics" << std::endl;
     
@@ -306,7 +302,6 @@ void Tcyt::solveTNF(GrGrid& grid, double dt)
 
 void Tcyt::solveTNFandIL10(GrGrid& grid, double dt)
 {
-    GridCell& cell = grid(_row, _col);
 	
 	double koff1 = _PARAM(PARAM_GR_K_ON1) * _PARAM(PARAM_GR_KD1);
 	double koff2 = _PARAM(PARAM_GR_K_ON2) * _PARAM(PARAM_GR_KD2);
@@ -314,9 +309,9 @@ void Tcyt::solveTNFandIL10(GrGrid& grid, double dt)
 	double Nav = 6.02e23; // Avogadro Number
 	double vol = 8.0e-12; // volume of a cell in liter
 	
-	double tnf = cell.getTNF() / (Nav * vol);
-	double shedtnfr2 = cell.getShedTNFR2() / (Nav * vol);
-    double il10 = cell.getIL10() / (Nav * vol);
+	double tnf = grid.TNF(_pos) / (Nav * vol);
+	double shedtnfr2 = grid.shedTNFR2(_pos) / (Nav * vol);
+    double il10 = grid.il10(_pos) / (Nav * vol);
 	
     double dmTNFRNA;
 	double dmTNF;
@@ -383,9 +378,9 @@ void Tcyt::solveTNFandIL10(GrGrid& grid, double dt)
     _surfBoundIL10R += dsurfBoundIL10R;
     il10 += dsIL10;
 	
-	cell.setTNF(Nav * vol * tnf);
-	cell.setShedTNFR2(Nav * vol * shedtnfr2);
-    cell.setIL10(Nav * vol * il10);
+	grid.TNF(_pos) = (Nav * vol * tnf);
+	grid.shedTNFR2(_pos) = (Nav * vol * shedtnfr2);
+    grid.il10(_pos) = (Nav * vol * il10);
 	
     
 	if (_mTNF < 0 || _surfTNFR1 < 0 || _surfBoundTNFR1 < 0 || _surfTNFR2 < 0 || _surfBoundTNFR2 < 0 || _mTNFRNA < 0)
@@ -400,13 +395,11 @@ void Tcyt::solveTNFandIL10(GrGrid& grid, double dt)
 
 void Tcyt::solveIL10(GrGrid& grid, double dt)
 {
-    GridCell& cell = grid(_row, _col);
-    
     double density = 1.25e11; // used for conversion of conc. unit (M -> #/cell) based on cell and microcompartment volumes 
 	double Nav = 6.02e23; // Avogadro Number
 	double vol = 8.0e-12; // volume of a cell in liter
     
-    double il10 = cell.getIL10() / (Nav * vol);
+    double il10 = grid.il10(_pos) / (Nav * vol);
     
     double dsIL10;
 	double dsurfIL10R;
@@ -423,7 +416,7 @@ void Tcyt::solveIL10(GrGrid& grid, double dt)
     _surfBoundIL10R += dsurfBoundIL10R;
     il10 += dsIL10;
     
-    cell.setIL10(Nav * vol * il10);
+    grid.il10(_pos) = (Nav * vol * il10);
     
     if (_surfIL10R < 0 || _surfBoundIL10R < 0)
         std::cout << "Error: Negative value of species in IL10/IL10R dynamics" << std::endl;
@@ -432,8 +425,6 @@ void Tcyt::solveIL10(GrGrid& grid, double dt)
 
 void Tcyt::solveDegradation(GrGrid& grid, double dt, bool tnfrDynamics, bool il10rDynamics)
 {
-    GridCell& cell = grid(_row, _col);
-    
     double Nav = 6.02e23; // Avagadros #
     double vol = 8.0e-12; // volume of a cell in L
     
@@ -441,23 +432,23 @@ void Tcyt::solveDegradation(GrGrid& grid, double dt, bool tnfrDynamics, bool il1
         
         // simulate the effect of TNF internalization by cells in the form of degradation. Only for TNF
         double dtnf;
-        double tnf = cell.getTNF();
+        double tnf = grid.TNF(_pos);
             dtnf = -_PARAM(PARAM_GR_K_INT1) * (tnf / (tnf + _PARAM(PARAM_GR_KD1) * Nav * vol)) * _PARAM(PARAM_GR_MEAN_TNFR1_TCELL) * dt * 0.4;
             tnf += dtnf;  
         
-        cell.setTNF(tnf);
+        grid.TNF(_pos) = (tnf);
     }
     
     if (!il10rDynamics) {
         
         double dil10;
-        double il10 = cell.getIL10();
+        double il10 = grid.il10(_pos);
         
         // simulate the effect of IL10 internalization in the form of degradation. Only for IL10
         dil10 = -_PARAM(PARAM_GR_I_K_INT) * (il10 / (il10 + _PARAM(PARAM_GR_I_KD) * Nav * vol)) * _PARAM(PARAM_GR_I_IL10R_TCELL) * dt * _PARAM(PARAM_GR_I_MOD);
         il10 += dil10;  
 
-        cell.setIL10(il10);
+        grid.il10(_pos) = (il10);
         
     }
     

@@ -9,9 +9,9 @@
 #include "simulation.h"
 #include "datasets/grid.h"
 
-VectorGrid::VectorGrid()
-	: Grid(Simulation::_DIM)
-	, _grid(_DIM * _DIM)
+VectorGrid::VectorGrid(size_t _DIM)
+	: Grid(_DIM)
+	, _grid(_DIM*_DIM)
 {
 	for (int i = 0; i < _DIM; i++) // row
 	{

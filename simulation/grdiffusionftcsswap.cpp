@@ -16,6 +16,66 @@ GrDiffusionFTCS_Swap::~GrDiffusionFTCS_Swap()
 {
 }
 
+//Assumes padding on borders
+static void diffuse(const Scalar* grid, Scalar* newgrid, const Pos& dim, const Scalar diffuse, const Scalar degrade, const Scalar cutOff) {
+  Scalar up, dn, lt, rt, ct;
+  #define DT (6.0)
+  for(int i=0;i<GETROW(dim);i++)
+    for(int j=0;j<GETCOL(dim);j++)
+    {
+      up  = grid[Indexer::padInd(dim, i-1,j)];
+      lt  = grid[Indexer::padInd(dim, i,j-1)];
+      ct  = grid[Indexer::padInd(dim, i,j)];
+      rt  = grid[Indexer::padInd(dim, i,j+1)];
+      dn  = grid[Indexer::padInd(dim, i+1,j)];
+      Scalar& nc = newgrid[Indexer::padInd(dim, i,j)];
+      nc = ct + diffuse * (up + dn + lt + rt - Scalar(4.0) * ct);
+      nc = nc <= cutOff ? Scalar(0.0) : nc;
+      nc *= (1.0 - degrade * DT);
+    }
+}
+
+void GrDiffusionFTCS_Swap::diffuse(GrSimulationGrid& grSim) const {
+	GrGrid& grid = grSim.getCurrentGrid();
+	GrGrid& nextGrid = grSim.getNextGrid();
+#pragma omp parallel sections //if(_threaded)   //Spawns a new team of threads
+{
+  #pragma omp section
+  {
+    ::diffuse(grid.TNF(), nextGrid.TNF(), grid.getRange(), _PARAM(PARAM_GR_D_TNF) * 6 / (4e-6), _PARAM(PARAM_GR_K_DEG), _cutOffValue);
+  }
+  #pragma omp section
+  {
+    ::diffuse(grid.shedTNFR2(), nextGrid.shedTNFR2(), grid.getRange(), _PARAM(PARAM_GR_D_SHED_TNFR2) * 6 / (4e-6), 1.0, _cutOffValue);
+  }
+  #pragma omp section
+  {
+    ::diffuse(grid.macAttractant(), nextGrid.macAttractant(), grid.getRange(), _PARAM(PARAM_GR_D_CHEMOKINES) * 6 / (4e-6), _PARAM(PARAM_GR_CHEMOKINE_K_DEG), _cutOffValue);
+  }
+  #pragma omp section
+  {
+    ::diffuse(grid.CCL2(), nextGrid.CCL2(), grid.getRange(), _PARAM(PARAM_GR_D_CHEMOKINES) * 6 / (4e-6), _PARAM(PARAM_GR_CHEMOKINE_K_DEG), _cutOffValue);
+  }
+  #pragma omp section
+  {
+    ::diffuse(grid.il10(), nextGrid.il10(), grid.getRange(), _PARAM(PARAM_GR_D_IL10) * 6 / (4e-6), _PARAM(PARAM_GR_I_K_DEG), _cutOffValue);
+  }
+} //omp parallel
+
+  const Scalar dt = 6.0;
+	const Scalar ratioCCL5toCCL2 = _PARAM(PARAM_MAC_SEC_RATE_CCL5) / _PARAM(PARAM_MAC_SEC_RATE_CCL2);
+	const Scalar ratioCXCL9toCCL2 = _PARAM(PARAM_MAC_SEC_RATE_CXCL9) / _PARAM(PARAM_MAC_SEC_RATE_CCL2);
+  Pos p;
+  for(p.x = 0; p.x < grid.getRange().x; ++p.x)
+    for(p.y = 0; p.y < grid.getRange().y; ++p.y) {
+      nextGrid.shedTNFR2(p) *= (1 - _PARAM(PARAM_GR_KD2) * _PARAM(PARAM_GR_K_ON2) * dt);
+      nextGrid.TNF(p) += (_PARAM(PARAM_GR_KD2) * _PARAM(PARAM_GR_K_ON2) * nextGrid.shedTNFR2(p) * dt);
+      nextGrid.CXCL9(p) = nextGrid.CCL2(p) * ratioCXCL9toCCL2;
+      nextGrid.CCL5(p) = nextGrid.CCL2(p) * ratioCCL5toCCL2;
+    }
+  grSim.swap();
+}
+/*
 void GrDiffusionFTCS_Swap::diffuse(GrSimulationGrid& grSim) const
 {
 	GrGrid& currentGrid = grSim.getCurrentGrid();
@@ -152,10 +212,11 @@ void GrDiffusionFTCS_Swap::diffuse(GrSimulationGrid& grSim) const
                 resdeg = res - (res * degChemokinesode * dt);
                 
 				newCell.setMacAttractant(resdeg);
-			}	/* j, columns */
-		}	/*i, rows */
+			}	// j, columns
+		}	// i, rows
 
 		grSim.swap();
 
-	}	/* t, timesteps */
+	}	// t, timesteps
 }
+*/

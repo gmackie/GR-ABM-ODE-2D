@@ -29,7 +29,7 @@ inline ScalarTnfDataset::~ScalarTnfDataset()
 
 inline float ScalarTnfDataset::getScalar(const Simulation* pSimulation, int row, int col) const
 {
-	return pSimulation->getGrGrid()(row, col).getTNF();
+	return pSimulation->getGrGrid().TNF(row, col);
 }
 
 #endif /* SCALARTNFDATASET_H_ */

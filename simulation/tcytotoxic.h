@@ -59,7 +59,7 @@ public:
     void solveTNFandIL10 (GrGrid& grid, double dt);
     void solveIL10 (GrGrid& grid, double dt);
     void solveDegradation (GrGrid& grid, double dt, bool tnfrDynamics, bool il10rDynamics);
-	TcytState getState() const;
+	int getState() const;
 	TcytState getNextState() const;
 	void deactivate(const int time);
 	void kill();
@@ -83,7 +83,7 @@ inline int Tcyt::getDeactivationTime() const
 	return _deactivationTime;
 }
 
-inline TcytState Tcyt::getState() const
+inline int Tcyt::getState() const
 {
 	return _state;
 }

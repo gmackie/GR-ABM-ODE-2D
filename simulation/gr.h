@@ -20,6 +20,7 @@
 #include <algorithm>
 #include <utility>
 #include "rand.h"
+#include "pos.h"
 
 #ifndef SVN_VERSION
 #define GR_VERSION "12022010"
@@ -28,21 +29,21 @@
 #endif
 
 #if defined(USE_FLOAT)
-typedef float FLOAT_TYPE;
-#define FLOAT_TYPE_PRECISION (FLT_DIG+2)
+typedef float Scalar;
+#define Scalar_PRECISION (FLT_DIG+2)
 #else
-typedef double FLOAT_TYPE;
-#define FLOAT_TYPE_PRECISION (DBL_DIG+2)
+typedef double Scalar;
+#define Scalar_PRECISION (DBL_DIG+2)
 #endif
 
-#ifndef __DIM__
-  #define __DIM__ (100)
-#endif //__DIM__
-#define NROWS (__DIM__)
-#define NCOLS (__DIM__)
+//#ifndef __DIM__
+//  #define __DIM__ (100)
+//#endif //__DIM__
+//#define NROWS (__DIM__)
+//#define NCOLS (__DIM__)
 
-#define MOD_ROW(val) ((((val) + NROWS)) % NROWS)
-#define MOD_COL(val) ((((val) + NCOLS)) % NCOLS)
+//#define MOD_ROW(val) ((((val) + NROWS)) % NROWS)
+//#define MOD_COL(val) ((((val) + NCOLS)) % NCOLS)
 #define NOUTCOMES 2
 #define TIME_STEPS_PER_DAY 144
 
@@ -60,7 +61,6 @@ typedef double FLOAT_TYPE;
 
 // forward class declarations
 class GrSimulation;
-class GridCell;
 class GrGrid;
 class Params;
 class Tcell;
@@ -73,7 +73,6 @@ class RecruitmentBase;
 class GrStats;
 
 // typedefs
-typedef std::list<GridCell*> GridCellPtrList;
 typedef std::list<Mac> MacList;
 typedef std::list<Tgam> TgamList;
 typedef std::list<Tcyt> TcytList;
@@ -82,7 +81,6 @@ typedef std::list<Mac*> MacPtrList;
 typedef std::list<Tgam*> TgamPtrList;
 typedef std::list<Tcyt*> TcytPtrList;
 typedef std::list<Treg*> TregPtrList;
-typedef std::vector<GridCell*> GridCellPtrVector;
 typedef std::vector<Mac> MacVector;
 typedef std::vector<Tgam> TgamVector;
 typedef std::vector<Tcyt> TcytVector;
@@ -91,10 +89,8 @@ typedef std::vector<Mac*> MacPtrVector;
 typedef std::vector<Tgam*> TgamPtrVector;
 typedef std::vector<Tcyt*> TcytPtrVector;
 typedef std::vector<Treg*> TregPtrVector;
-typedef std::pair<int, int> Pos;
-typedef std::vector<Pos> PosVector;
-typedef std::pair<double, GridCell*> ThresholdGridCellPtrPair;
-typedef std::list<ThresholdGridCellPtrPair> ThresholdGridCellPtrList;
+typedef std::pair<double, Pos> ThresholdPosPair;
+typedef std::list<ThresholdPosPair> ThresholdPosList;
 
 typedef enum {DIFF_REC_EQ = 0, DIFF_SOR_CORRECT = 1, DIFF_SOR_WRONG = 2, DIFF_REC_EQ_SWAP = 3} DiffusionMethod;
 typedef enum {OUTCOME_AREA = 0, OUTCOME_MTB = 1, OUTCOME_NONE = 2} OutcomeMethod;
@@ -107,21 +103,7 @@ typedef enum {TCYT_DEAD, TCYT_ACTIVE, TCYT_DOWN_REGULATED, NTCYT_STATES} TcytSta
 typedef enum {TREG_DEAD, TREG_ACTIVE, NTREG_STATES} TregState;
 typedef int State;
 
-inline std::ostream& operator<<(std::ostream& s, const Pos& p) {
-  return s<<'('<<p.first<<','<<p.second<<')';
-}
-inline std::istream& operator>>(std::istream& s, Pos& p) {
-  char tmp;
-  s>>tmp; assert(tmp == '(');
-  s>>p.first;
-  s>>tmp; assert(tmp == ',');
-  s>>p.first;
-  s>>tmp; assert(tmp == ')');
-  return s;
-}
-
 unsigned int createTimeSeed();
-
 // global variables
 extern Rand g_Rand;
 

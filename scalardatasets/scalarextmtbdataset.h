@@ -29,7 +29,7 @@ inline ScalarExtMtbDataset::~ScalarExtMtbDataset()
 
 inline float ScalarExtMtbDataset::getScalar(const Simulation* pSimulation, int row, int col) const
 {
-	return pSimulation->getGrGrid()(row, col).getExtMtb();
+	return pSimulation->getGrGrid().extMTB(row, col);
 }
 
 #endif /* SCALAREXTMTBDATASET_H_ */

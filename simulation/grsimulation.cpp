@@ -10,7 +10,6 @@
 #include "grdiffusion.h"
 #include "grdiffusionbtcs.h"
 #include "grdiffusionwrongbtcs.h"
-#include "grdiffusionftcs.h"
 #include "grdiffusionftcsswap.h"
 #include "areatest.h"
 #include "mtbtest.h"
@@ -19,9 +18,9 @@
 
 const std::string GrSimulation::_ClassName = "GrSimulation";
 
-GrSimulation::GrSimulation()
+GrSimulation::GrSimulation(const Pos& dim)
 	: _time(0)
-	, _grid()
+	, _grid(dim)
 	, _macList()
 	, _tgamList()
 	, _tcytList()
@@ -167,7 +166,7 @@ void GrSimulation::deserialize(std::istream& in)
 
 		// update attributes of dummy mac and add to grid
 		pMac->deserialize(in);
-		assert_res(_grid(pMac->getRow(), pMac->getCol()).addAgent(pMac));
+		assert_res(_grid.getGrid().addAgent(pMac, pMac->getPosition()));
 	}
 
 	// deserialize tgam cells
@@ -181,7 +180,7 @@ void GrSimulation::deserialize(std::istream& in)
 
 		// update attributes of dummy tgam and add to grid
 		pTgam->deserialize(in);
-		assert_res(_grid(pTgam->getRow(), pTgam->getCol()).addAgent(pTgam));
+		assert_res(_grid.getGrid().addAgent(pTgam, pTgam->getPosition()));
 	}
 
 	// deserialize tcyt cells
@@ -195,7 +194,7 @@ void GrSimulation::deserialize(std::istream& in)
 
 		// update attributes of dummy tcyt and add to grid
 		pTcyt->deserialize(in);
-		assert_res(_grid(pTcyt->getRow(), pTcyt->getCol()).addAgent(pTcyt));
+		assert_res(_grid.getGrid().addAgent(pTcyt, pTcyt->getPosition()));
 	}
 
 	// deserialize treg cells
@@ -209,7 +208,7 @@ void GrSimulation::deserialize(std::istream& in)
 
 		// update attributes of dummy mac and add to grid
 		pTreg->deserialize(in);
-		assert_res(_grid(pTreg->getRow(), pTreg->getCol()).addAgent(pTreg));
+		assert_res(_grid.getGrid().addAgent(pTreg, pTreg->getPosition()));
 	}
 
 	// deserialize statistics
@@ -237,7 +236,7 @@ void GrSimulation::init()
 	// Place initial infected macrophages on the grid
 	for (PosVector::const_iterator it = initMacs.begin(); it != initMacs.end(); it++)
 	{
-		Mac* pMac = createMac(it->first, it->second,
+		Mac* pMac = createMac(it->x, it->y,
 			g_Rand.getInt(-1, -maxMacAge), MAC_INFECTED, false, false);
 		
 		if (_nfkbDynamics)
@@ -255,7 +254,7 @@ void GrSimulation::init()
 	// Place initial extracellular bacteria on the grid
 	for (PosVector::const_iterator it = initExtMtb.begin(); it != initExtMtb.end(); it++)
 	{
-		_grid(it->first, it->second).incExtMtb(1);
+		_grid.getGrid().extMTB(*it) += 1;
 		_statsPrevious.incTotExtMtb(1);
 		_stats.incTotExtMtb(1);
 	}
@@ -264,7 +263,7 @@ void GrSimulation::init()
 	// macrophages to the grid
 	int count = _PARAM(PARAM_MAC_INIT_NUMBER);
 
-	int nrGridCompartments = (NROWS*NCOLS);
+	int nrGridCompartments = (_grid.getSize());
 	if (count > nrGridCompartments)
 	{
 		std::cerr << "The number of initial resting macrophages to place on the grid, " << count << ", is > the number of grid compartments, " << nrGridCompartments << "." << std::endl;
@@ -273,9 +272,9 @@ void GrSimulation::init()
 
 	while (count > 0)
 	{
-		int row = g_Rand.getInt(NROWS);
-		int col = g_Rand.getInt(NCOLS);
-		if (!_grid(row, col).hasMac())
+		int row = g_Rand.getInt(_grid.getRange().x);
+		int col = g_Rand.getInt(_grid.getRange().y);
+		if (!_grid.getGrid().hasAgentType(MAC, Pos(row, col)))
 		{
 			Mac* newMac = createMac(row, col, g_Rand.getInt(-1, -maxMacAge), MAC_RESTING, false, false);
 			if (_nfkbDynamics)
@@ -416,17 +415,17 @@ void GrSimulation::updateStates()
 			_stats.incTotIntMtb(mac.getIntMtb());
 
 		if (mac.getNFkB())
-			_stats.updateMacNFkBStatistics(mac.getState());
+			_stats.updateMacNFkBStatistics((MacState)mac.getState());
 
 		if (mac.getStat1())
-			_stats.updateMacStat1Statistics(mac.getState());
+			_stats.updateMacStat1Statistics((MacState)mac.getState());
 
 		if (mac.isDeactivated())
-			_stats.updateMacDeactStatistics(mac.getState());
+			_stats.updateMacDeactStatistics((MacState)mac.getState());
 
 		if (mac.isDead())
 		{
-			assert_res(_grid(mac.getRow(), mac.getCol()).removeAgent(&mac));
+			assert_res(_grid.getGrid().removeAgent(&mac));
 			it = _macList.erase(it);
 		}
 		else
@@ -444,7 +443,7 @@ void GrSimulation::updateStates()
 
 		if (tgam.isDead())
 		{
-			assert_res(_grid(tgam.getRow(), tgam.getCol()).removeAgent(&tgam));
+			assert_res(_grid.getGrid().removeAgent(&tgam));
 			it = _tgamList.erase(it);
 		}
 		else
@@ -462,7 +461,7 @@ void GrSimulation::updateStates()
 
 		if (tcyt.isDead())
 		{
-			assert_res(_grid(tcyt.getRow(), tcyt.getCol()).removeAgent(&tcyt));
+			assert_res(_grid.getGrid().removeAgent(&tcyt));
 			it = _tcytList.erase(it);
 		}
 		else
@@ -480,7 +479,7 @@ void GrSimulation::updateStates()
 
 		if (it->isDead())
 		{
-			assert_res(_grid(treg.getRow(), treg.getCol()).removeAgent(&treg));
+			assert_res(_grid.getGrid().removeAgent(&treg));
 			it = _tregList.erase(it);
 		}
 		else
@@ -537,17 +536,19 @@ void GrSimulation::secreteFromTcells(bool tnfDepletion, bool il10Depletion)
 void GrSimulation::secreteFromCaseations()
 {
 	// secrete chemokines from caseated compartments only if infection is not cleared
-	for (int i = 0; i < NROWS; i++)
+  Pos p;
+  GrGrid& g = _grid.getGrid();
+  const Pos& dim = g.getRange();
+	for (p.x = 0; p.x < dim.x; p.x++)
 	{
-		for (int j = 0; j < NCOLS; j++)
+		for (p.y = 0; p.y < dim.y; p.y++)
 		{
-			GridCell& cell = _grid(i, j);
-			if (cell.isCaseated())
+			if (g.isCaseated(p))
 			{
-				cell.incCCL2(0.25 * _PARAM(PARAM_MAC_SEC_RATE_CCL2));
-				cell.incCCL5(0.25 * _PARAM(PARAM_MAC_SEC_RATE_CCL5));
-				cell.incCXCL9(0.25 * _PARAM(PARAM_MAC_SEC_RATE_CXCL9));
-			    cell.incMacAttractant(_PARAM(PARAM_GR_SEC_RATE_ATTRACTANT));
+				g.CCL2(p) += (0.25 * _PARAM(PARAM_MAC_SEC_RATE_CCL2));
+				g.CCL5(p) += (0.25 * _PARAM(PARAM_MAC_SEC_RATE_CCL5));
+				g.CXCL9(p) += (0.25 * _PARAM(PARAM_MAC_SEC_RATE_CXCL9));
+			    g.macAttractant(p) += (_PARAM(PARAM_GR_SEC_RATE_ATTRACTANT));
 			}
 		}
 	}
@@ -714,17 +715,18 @@ void GrSimulation::growExtMtb()
 	const double growthRate = _PARAM(PARAM_EXTMTB_GROWTH_RATE) - 1;
 	const double upperBound = _PARAM(PARAM_EXTMTB_UPPER_BOUND);
 
-	for (int row = 0; row < NROWS; row++)
+  GrGrid& g = _grid.getGrid();
+  const Pos& dim = g.getRange();
+  Pos p;
+	for (p.x = 0; p.x < dim.x; p.x++)
 	{
-		for (int col = 0; col < NCOLS; col++)
+		for (p.y = 0; p.y < dim.y; p.y++)
 		{
-			GridCell& cell = _grid(row, col);
+			Scalar& extMtb = g.extMTB(p);
 			
-			double extMtb = cell.getExtMtb();
-			
-			if (cell.isCaseated())
+			if (g.isCaseated(p))
 			{
-				// Bacteria don't grow in caseated compartments
+				// Bacteria don't gp.x in caseated compartments
 				_stats.incNrCaseated();
 				_stats.incTotNonRepExtMtb(extMtb);
 				_stats.incTotExtMtb(extMtb);
@@ -732,21 +734,21 @@ void GrSimulation::growExtMtb()
 			else
 			{
 				double dExtMtb = growthRate * extMtb * (1.0 - extMtb / upperBound);
-				cell.incExtMtb(dExtMtb);
-				_stats.incTotExtMtb(cell.getExtMtb());
+        extMtb += dExtMtb;
+				_stats.incTotExtMtb(extMtb);
 			}
 
-			_stats.incTotMacAttractant(cell.getMacAttractant());
-			_stats.incTotTNF(cell.getTNF());
-            _stats.incTotIL10(cell.getIL10());
-			_stats.incTotCCL2(cell.getCCL2());
-			_stats.incTotCCL5(cell.getCCL5());
-			_stats.incTotCXCL9(cell.getCXCL9());
+			_stats.incTotMacAttractant(g.macAttractant(p));
+			_stats.incTotTNF(g.TNF(p));
+            _stats.incTotIL10(g.il10(p));
+			_stats.incTotCCL2(g.CCL2(p));
+			_stats.incTotCCL5(g.CCL5(p));
+			_stats.incTotCXCL9(g.CXCL9(p));
 
-			if (cell.getTNF() >= _areaThreshold)
+			if (g.TNF(p) >= _areaThreshold)
 				_stats.incAreaTNF();
 
-			if (cell.getCellDensity(_grid.getGrid()) >= _areaThresholdCellDensity)
+			if (g.getCellDensity(p) >= _areaThresholdCellDensity)
 			{
 				_stats.incAreaCellDensity();
 			}
@@ -756,22 +758,22 @@ void GrSimulation::growExtMtb()
 
 void GrSimulation::adjustTNFDegradation(double dt)
 {	
-	for (int row = 0; row < NROWS; row++)
+  Pos pos;
+  GrGrid& grid = _grid.getGrid();
+	for (pos.x = 0; pos.x < grid.getRange().x; pos.x++)
 	{
-		for (int col = 0; col < NCOLS; col++)
+		for (pos.y = 0; pos.y < grid.getRange().y; pos.y++)
 		{
-			GridCell& cell = _grid(row, col);
-			
 			// simulate the effect of TNF internalization by cells in the form of degradation. only for TNF
 			double dtnf;
-			double tnf = cell.getTNF();
-			if (cell.hasMac())
+			Scalar& tnf = grid.TNF(pos);
+			if (grid.hasAgentType(MAC, pos))
 			{
 				dtnf = -_PARAM(PARAM_GR_K_INT1) * (tnf / (tnf + _PARAM(PARAM_GR_KD1) * 48.16e11)) * 1500 * dt * 0.4;
 				tnf += dtnf;
 			}
             
-            if (cell.hasTcell())
+            if (grid.hasTcell(pos))
             {
                 dtnf = -_PARAM(PARAM_GR_K_INT1) * (tnf / (tnf + _PARAM(PARAM_GR_KD1) * 48.16e11)) * 800 * dt * 0.4;
                 tnf += dtnf;  
@@ -779,8 +781,6 @@ void GrSimulation::adjustTNFDegradation(double dt)
             
 			// dtnf = -_PARAM(PARAM_GR_K_INT1) * (tnf / (tnf + _PARAM(PARAM_GR_KD1) * 48.16e11)) * 800 * (cell.hasTcell()) * dt * 0.4;
 			// tnf += dtnf;
-			
-			cell.setTNF(tnf);
 		}
 	}
 }
@@ -836,15 +836,14 @@ void GrSimulation::setDiffusionMethod(DiffusionMethod method)
 
 		switch (method)
 		{
-		case DIFF_REC_EQ:
-			_pDiffusion = new GrDiffusionFTCS();
-			break;
 		case DIFF_SOR_CORRECT:
 			_pDiffusion = new GrDiffusionBTCS();
 			break;
 		case DIFF_SOR_WRONG:
 			_pDiffusion = new GrDiffusionWrongBTCS();
 			break;
+    	case DIFF_REC_EQ:
+      		std::clog<<"Warning: DIFF_REC_EQ disabled, defaulting to DIFF_REC_EQ_SWAP"<<std::endl;
 		case DIFF_REC_EQ_SWAP:
 			_pDiffusion = new GrDiffusionFTCS_Swap();
 			break;

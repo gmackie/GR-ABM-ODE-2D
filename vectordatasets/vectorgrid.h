@@ -26,7 +26,7 @@ private:
 	std::vector<VectorGridItem> _grid;
 
 public:
-	VectorGrid();
+	VectorGrid(size_t dim);
 	~VectorGrid();
 	void evaluate(const Simulation* pSimulation, VectorDataset* pVectorDataset, bool useNN);
 	int count() const;

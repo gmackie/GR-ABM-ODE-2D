@@ -113,7 +113,7 @@ public:
 	bool getNFkB() const;
 	bool getStat1() const;
 	bool getICOS() const;
-	MacState getState() const;
+	int getState() const;
 	MacState getNextState() const;
 	double getIntMtb() const;
 	void setIntMtb(double intMtb);
@@ -173,9 +173,9 @@ inline bool Mac::getICOS() const
 	return _ICOS;
 }
 
-inline MacState Mac::getState() const
+inline int Mac::getState() const
 {
-	return _state;
+	return (int)_state;
 }
 
 inline MacState Mac::getNextState() const

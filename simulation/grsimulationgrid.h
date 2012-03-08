@@ -16,8 +16,11 @@
 // an a GrSimulationGrid object refer to/operate on the current grid.
 class GrSimulationGrid {
 public:
-	GrSimulationGrid();
+	GrSimulationGrid(const Pos& dim);
 	virtual ~GrSimulationGrid();
+
+  const Pos& getRange() const { return getGrid().getRange(); }
+  size_t getSize() const { return getGrid().getSize(); }
 
 	const GrGrid& getCurrentGrid() const;
 	GrGrid& getCurrentGrid();
@@ -31,9 +34,7 @@ public:
 	// These all refer to/operate on the current grid.
 	const GrGrid& getGrid() const;
 	GrGrid& getGrid();
-	GridCell& operator ()(int row, int col);
-	GridCell operator ()(int row, int col) const;
-	GridCellPtrVector& getSources();
+	const PosVector& getSources();
 	void initSources();
 	void serialize(std::ostream& out) const;
 	void deserialize(std::istream& in);
@@ -72,17 +73,7 @@ inline GrGrid& GrSimulationGrid::getGrid()
 	return (*_pCurrentGrid);
 }
 
-inline GridCell& GrSimulationGrid::operator ()(int row, int col)
-{
-	return (*_pCurrentGrid)(row, col);
-}
-
-inline GridCell GrSimulationGrid::operator ()(int row, int col) const
-{
-	return (*_pCurrentGrid)(row, col);
-}
-
-inline GridCellPtrVector& GrSimulationGrid::getSources()
+inline const PosVector& GrSimulationGrid::getSources()
 {
 	return _pCurrentGrid->getSources();
 }

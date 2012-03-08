@@ -30,26 +30,20 @@ void Tcell::moveTcell(GrGrid& grid, bool ccl2, bool ccl5, bool cxcl9)
 {
 	Pos pos  = Agent::moveAgent(grid, ccl2, ccl5, cxcl9, false, _PARAM(PARAM_TCELL_MOVEMENT_BONUSFACTOR));
 	
-	int newRow = pos.first;
-	int newCol = pos.second;
-
-	GridCell& cell = grid(_row, _col);
-	GridCell& newCell = grid(newRow, newCol);
-
 	// Check whether newCell is not caseated and contains empty slots
-	if (newCell.getNumberOfAgents() != 2 && !newCell.isCaseated())
+  size_t n = grid.getNumberOfAgents(pos);
+	if (n != 2 && !grid.isCaseated(pos))
 	{
 		// Move with p = 1, if newCell is empty
 		// Move with p = _PROB_MOVE_TCELL_TO_MAC, if newCell contains a macrophage
 		// Move with p = _PROB_MOVE_TCELL_TO_TCELL, if newCell contains a T cell
-		if ((newCell.getNumberOfAgents() == 0) ||
-			(newCell.hasMac() && g_Rand.getReal() < _PARAM(PARAM_TCELL_PROB_MOVE_TO_MAC)) ||
-			(newCell.hasTcell() && g_Rand.getReal() < _PARAM(PARAM_TCELL_PROB_MOVE_TO_TCELL)))
+		if ((n == 0) ||
+			(grid.hasAgentType(MAC, pos) && g_Rand.getReal() < _PARAM(PARAM_TCELL_PROB_MOVE_TO_MAC)) ||
+			(grid.hasTcell(pos) && g_Rand.getReal() < _PARAM(PARAM_TCELL_PROB_MOVE_TO_TCELL)))
 		{
-			_row = newRow;
-			_col = newCol;
-			assert_res(cell.removeAgent(this));
-			newCell.addAgent(this);
+			assert_res(grid.removeAgent(this));
+			grid.addAgent(this, pos);
+      _pos = pos;
 		}
 	}
 }

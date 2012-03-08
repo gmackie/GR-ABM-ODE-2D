@@ -69,7 +69,7 @@ void GLWindow::updateSelectedCellStats()
 	{
 		const ScalarAgentGrid* pAgentGrid = static_cast<ScalarAgentGrid*>(_pItfc->getScalarAgentGrid());
 		const ScalarAgentItem& item
-			= pAgentGrid->getGrid()[_selRow * Simulation::_DIM + _selCol];
+			= pAgentGrid->getGrid()[_selRow * _ui.glWidget->dim.x + _selCol];
 
 		QString str = QString("pos = (%1,%2)").arg(_selCol).arg(_selRow);
 
@@ -322,7 +322,7 @@ void GLWindow::moveSelectionLeft()
 {
 	if (_selRow != -1 && _selCol != -1)
 	{
-		emit updateSelection(_selRow, MOD_COL(_selCol - 1));
+		emit updateSelection(_selRow, (_selCol - 1 + _ui.glWidget->dim.x) % _ui.glWidget->dim.x);
 	}
 }
 
@@ -330,7 +330,7 @@ void GLWindow::moveSelectionRight()
 {
 	if (_selRow != -1 && _selCol != -1)
 	{
-		emit updateSelection(_selRow, MOD_COL(_selCol + 1));
+		emit updateSelection(_selRow, (_selCol + 1 + _ui.glWidget->dim.x) % _ui.glWidget->dim.x);
 	}
 }
 
@@ -338,7 +338,7 @@ void GLWindow::moveSelectionUp()
 {
 	if (_selRow != -1 && _selCol != -1)
 	{
-		emit updateSelection(MOD_ROW(_selRow + 1), _selCol);
+		emit updateSelection((_selCol + 1 + _ui.glWidget->dim.y) % _ui.glWidget->dim.y, _selCol);
 	}
 }
 
@@ -346,7 +346,7 @@ void GLWindow::moveSelectionDown()
 {
 	if (_selRow != -1 && _selCol != -1)
 	{
-		emit updateSelection(MOD_ROW(_selRow - 1), _selCol);
+		emit updateSelection((_selCol - 1 + _ui.glWidget->dim.y) % _ui.glWidget->dim.y, _selCol);
 	}
 }
 

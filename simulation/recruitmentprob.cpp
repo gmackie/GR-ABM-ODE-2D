@@ -19,62 +19,64 @@ RecruitmentProb::~RecruitmentProb()
 void RecruitmentProb::recruit(GrSimulation& sim)
 {
 	//const int timeTcellRecEnabled = _PARAM(PARAM_TCELL_TIME_RECRUITMENT_ENABLED);
-	GridCellPtrVector& sources = sim.getGrid().getSources();
+  GrGrid& grid = sim.getGrid();
+	const std::vector<Pos>& sources = grid.getSources();
 	GrStat& stats = sim.getStats();
 
-	for (GridCellPtrVector::iterator it = sources.begin();
+	for (PosVector::const_iterator it = sources.begin();
 		it != sources.end();
 		it++)
 	{
-		GridCell* pSource = *it;
+		const Pos& pSource = *it;
 
 		// if the source is caseated continue
-		if (pSource->isCaseated())
+		if (grid.isCaseated(pSource))
 			continue;
 
 		// update stats
-		if (MacRecruitmentThreshold(pSource))
+		if (MacRecruitmentThreshold(grid, pSource))
 			stats.incNrSourcesMac();
-		if (TgamRecruitmentThreshold(pSource))
+		if (TgamRecruitmentThreshold(grid, pSource))
 			stats.incNrSourcesTgam();
-		if (TcytRecruitmentThreshold(pSource))
+		if (TcytRecruitmentThreshold(grid, pSource))
 			stats.incNrSourcesTcyt();
-		if (TregRecruitmentThreshold(pSource))
+		if (TregRecruitmentThreshold(grid, pSource))
 			stats.incNrSourcesTreg();
 
 		// Randomly choose the order of mac and T cell recruitment, so there isn't a bias in favor of one type of cell.
 		if (g_Rand.getReal() < 0.5)
 		{
 			// macrophage recruitment
-			if (pSource->getNumberOfAgents() < 2 && !pSource->hasMac())
+			if (grid.getNumberOfAgents(pSource) < 2 && !grid.hasAgentType(MAC, pSource))
 				recruitMac(sim, pSource);
 
 			// T cell recruitment
-			if (sim.getTCellRecruitmentBegun() && pSource->getNumberOfAgents() < 2)
+			if (sim.getTCellRecruitmentBegun() && grid.getNumberOfAgents(pSource) < 2)
 				recruitTcell(sim, pSource);
 		}
 		else
 		{
 			// T cell recruitment
-			if (sim.getTCellRecruitmentBegun() && pSource->getNumberOfAgents() < 2)
+			if (sim.getTCellRecruitmentBegun() && grid.getNumberOfAgents(pSource) < 2)
 				recruitTcell(sim, pSource);
 
 			// macrophage recruitment
-			if (pSource->getNumberOfAgents() < 2 && !pSource->hasMac())
+			if (grid.getNumberOfAgents(pSource) < 2 && !grid.hasAgentType(MAC, pSource))
 				recruitMac(sim, pSource);
 		}
 	}
 }
 
-void RecruitmentProb::recruitMac(GrSimulation& sim, GridCell* pSource)
+void RecruitmentProb::recruitMac(GrSimulation& sim, const Pos& pSource)
 {
-	assert(!pSource->isCaseated() && pSource->getNumberOfAgents() < 2 && !pSource->hasMac());
+  GrGrid& grid = sim.getGrid();
+	assert(!grid.isCaseated(pSource) && grid.getNumberOfAgents(pSource) < 2 && !grid.hasAgentType(MAC, pSource));
 
 	// if the number of macrophages on the grid is less than _INITIAL_NUMBER_OF_MACROPHAGES,
 	// recruit a resting macrophage
 	if (sim.getStats().getNrOfMac() < _PARAM(PARAM_MAC_INIT_NUMBER))
 	{
-		Mac* newMac = sim.createMac(pSource->getRow(), pSource->getCol(),
+		Mac* newMac = sim.createMac(pSource.x, pSource.y,
 			sim.getTime() - g_Rand.getInt(_PARAM(PARAM_MAC_AGE)), MAC_RESTING, false, false);
 		if (sim.getNfkbDynamics())
 		{
@@ -85,12 +87,12 @@ void RecruitmentProb::recruitMac(GrSimulation& sim, GridCell* pSource)
 	}
 	else
 	{
-		bool macThreshold = MacRecruitmentThreshold(pSource);
+		bool macThreshold = MacRecruitmentThreshold(grid, pSource);
 
 		if (macThreshold && g_Rand.getReal() < _PARAM(PARAM_MAC_PROB_RECRUITMENT))
 		{
-			pSource->incNrRecruitments();
-			Mac* newMac = sim.createMac(pSource->getRow(), pSource->getCol(),
+      ++grid.nRecruitments(pSource);
+			Mac* newMac = sim.createMac(pSource.x, pSource.y,
 				sim.getTime() - g_Rand.getInt(_PARAM(PARAM_MAC_AGE)), MAC_RESTING, false, false);
 			if (sim.getNfkbDynamics())
 			{
@@ -102,13 +104,14 @@ void RecruitmentProb::recruitMac(GrSimulation& sim, GridCell* pSource)
 	}
 }
 
-void RecruitmentProb::recruitTcell(GrSimulation& sim, GridCell* pSource)
+void RecruitmentProb::recruitTcell(GrSimulation& sim, const Pos& pSource)
 {
-	assert(!pSource->isCaseated() && pSource->getNumberOfAgents() < 2);
+  GrGrid& grid = sim.getGrid();
+	assert(!grid.isCaseated(pSource) && grid.getNumberOfAgents(pSource) < 2);
 
-	bool tgamThreshold = TgamRecruitmentThreshold(pSource);
-	bool tcytThreshold = TcytRecruitmentThreshold(pSource);
-	bool tregThreshold = TregRecruitmentThreshold(pSource);
+	bool tgamThreshold = TgamRecruitmentThreshold(grid, pSource);
+	bool tcytThreshold = TcytRecruitmentThreshold(grid, pSource);
+	bool tregThreshold = TregRecruitmentThreshold(grid, pSource);
 
 	if (g_Rand.getReal() < _PARAM(PARAM_TCELL_PROB_RECRUITMENT))
 	{
@@ -118,8 +121,8 @@ void RecruitmentProb::recruitTcell(GrSimulation& sim, GridCell* pSource)
 			// recruit a Tgam cell if allowed
 			if (tgamThreshold)
 			{
-				pSource->incNrRecruitments();
-				sim.createTgam(pSource->getRow(), pSource->getCol(),
+				++grid.nRecruitments(pSource);
+				sim.createTgam(pSource.x, pSource.y,
 					sim.getTime() - g_Rand.getInt(_PARAM(PARAM_TCELL_AGE), 1), TGAM_ACTIVE);
 			}
 		}
@@ -128,8 +131,8 @@ void RecruitmentProb::recruitTcell(GrSimulation& sim, GridCell* pSource)
 			// recruit a Tcyt cell if allowed
 			if (tcytThreshold)
 			{
-				pSource->incNrRecruitments();
-				sim.createTcyt(pSource->getRow(), pSource->getCol(),
+				++grid.nRecruitments(pSource);
+				sim.createTcyt(pSource.x, pSource.y,
 					sim.getTime() - g_Rand.getInt(_PARAM(PARAM_TCELL_AGE), 1), TCYT_ACTIVE);
 			}
 		}
@@ -138,8 +141,8 @@ void RecruitmentProb::recruitTcell(GrSimulation& sim, GridCell* pSource)
 			// recruit a Treg cell if allowed
 			if (tregThreshold)
 			{
-				pSource->incNrRecruitments();
-				sim.createTreg(pSource->getRow(), pSource->getCol(),
+				++grid.nRecruitments(pSource);
+				sim.createTreg(pSource.x, pSource.y,
 					sim.getTime() - g_Rand.getInt(_PARAM(PARAM_TCELL_AGE), 1), TREG_ACTIVE);
 			}
 		}

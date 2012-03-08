@@ -16,8 +16,8 @@
 class RecruitmentProb : public RecruitmentBase
 {
 private:
-	void recruitMac(GrSimulation& sim, GridCell* pSource);
-	void recruitTcell(GrSimulation& sim, GridCell* pSource);
+	void recruitMac(GrSimulation& sim, const Pos& pSource);
+	void recruitTcell(GrSimulation& sim, const Pos& pSource);
 
 public:
 	RecruitmentProb();

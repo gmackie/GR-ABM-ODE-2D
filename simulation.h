@@ -42,10 +42,9 @@ private:
 	bool stopCondition();
 
 public:
-	static const int _DIM = NROWS;
 
 	/* The following methods are thread-safe */
-	Simulation();
+	Simulation(const Pos& dim);
 	virtual ~Simulation();
 	void run();
 	void stop();
@@ -55,6 +54,7 @@ public:
 	void modelUnlock() const;
 	int getTime() const;
 	int getTimeToSimulate() const;
+  const Pos& getSize() const { return getGrGrid().getRange(); }
 	bool getUpdated() const;
 	double getAreaThreshold() const;
 	DiffusionMethod getDiffusionMethod() const;

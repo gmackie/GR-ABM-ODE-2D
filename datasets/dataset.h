@@ -13,8 +13,8 @@
 class Dataset
 {
 protected:
-	int moduloDIM(int value) const;
-	float moduloDIM(float value) const;
+	int moduloDIM(int value, int dim) const;
+	float moduloDIM(float value, int dim) const;
 
 public:
 	Dataset();
@@ -30,16 +30,16 @@ inline Dataset::~Dataset()
 {
 }
 
-inline int Dataset::moduloDIM(int value) const
+inline int Dataset::moduloDIM(int value, int dim) const
 {
 	if (value < 0)
 	{
-		value += (value * -1 / Simulation::_DIM + 1) * Simulation::_DIM;
+		value += (value * -1 / dim + 1) * dim;
 		return value;
 	}
-	else if (value >= Simulation::_DIM)
+	else if (value >= dim)
 	{
-		return value % Simulation::_DIM;
+		return value % dim;
 	}
 	else
 	{
@@ -47,15 +47,15 @@ inline int Dataset::moduloDIM(int value) const
 	}
 }
 
-inline float Dataset::moduloDIM(float value) const
+inline float Dataset::moduloDIM(float value, int dim) const
 {
 	while (value < 0.0f)
 	{
-		value += Simulation::_DIM;
+		value += dim;
 	}
-	while (value >= Simulation::_DIM)
+	while (value >= dim)
 	{
-		value -= Simulation::_DIM;
+		value -= dim;
 	}
 
 	return value;

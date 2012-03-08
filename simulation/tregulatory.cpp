@@ -83,12 +83,10 @@ void Treg::move(GrGrid& grid)
 void Treg::secrete(GrGrid& grid, bool, bool, bool, bool il10rDynamics, bool il10Depletion)
 {
     
-    GridCell& cell = grid(_row, _col);
-    
     _kISynth = _PARAM(PARAM_GR_I_K_SYNTH_TCELL);
     
     if (!il10rDynamics && !il10Depletion) {
-        cell.incIL10(_PARAM(PARAM_TREG_SEC_RATE_IL10));
+        grid.il10(_pos) += (_PARAM(PARAM_TREG_SEC_RATE_IL10));
     }
     
 }
@@ -99,8 +97,7 @@ void Treg::deactivate(const int)
 
 void Treg::computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tnfrDynamics, bool, bool, bool)
 {
-	GridCell& cell = grid(_row, _col);
-	double tnfBoundFraction = cell.getTNF() / (cell.getTNF() + _PARAM(PARAM_GR_KD1) * 48.16e11);
+	double tnfBoundFraction = grid.TNF(_pos) / (grid.TNF(_pos) + _PARAM(PARAM_GR_KD1) * 48.16e11);
 
 	// check if it is time to die
 	if (timeToDie(time))
@@ -143,9 +140,9 @@ void Treg::handleResting(const int time, GrGrid& grid, GrStat&)
 	{
 		for (int j = -1; j <= 1; j++)
 		{
-			GridCell& cell = grid(MOD_ROW(_row + i), MOD_COL(_col + j));
-			Agent* pAgent0 = cell.getAgent(0);
-			Agent* pAgent1 = cell.getAgent(1);
+      Pos p(grid.mod_row(_pos.x+i), grid.mod_col(_pos.y+j));
+			Agent* pAgent0 = grid.agent(p, 0);
+			Agent* pAgent1 = grid.agent(p, 1);
 
 			if (pAgent0 && g_Rand.getReal() <= _PARAM(PARAM_TREG_PROB_DOWN_REGULATE))
 			{
@@ -166,17 +163,15 @@ void Treg::updateState()
 
 void Treg::solveTNF(GrGrid& grid, double dt)
 {
-    GridCell& cell = grid(_row, _col);
-    
 	double koff1 = _PARAM(PARAM_GR_K_ON1) * _PARAM(PARAM_GR_KD1);
 	double koff2 = _PARAM(PARAM_GR_K_ON2) * _PARAM(PARAM_GR_KD2);
 	double density = 1.25e11; // used for conversion of conc. unit (M -> #/cell) based on cell and microcompartment volumes 
 	double Nav = 6.02e23; // Avogadro Number
 	double vol = 8.0e-12; // volume of a cell in liter
 	
-	double tnf = cell.getTNF() / (Nav * vol);
-	double shedtnfr2 = cell.getShedTNFR2() / (Nav * vol);
-    double il10 = cell.getIL10() /(Nav * vol);
+	double tnf = grid.TNF(_pos) / (Nav * vol);
+	double shedtnfr2 = grid.shedTNFR2(_pos) / (Nav * vol);
+    double il10 = grid.il10(_pos) /(Nav * vol);
 	
     double dmTNFRNA;
 	double dmTNF;
@@ -226,8 +221,8 @@ void Treg::solveTNF(GrGrid& grid, double dt)
 	tnf += dsTNF;
 	shedtnfr2 += dshedTNFR2;
 	
-	cell.setTNF(Nav * vol * tnf);
-	cell.setShedTNFR2(Nav * vol * shedtnfr2);
+	grid.TNF(_pos) = (Nav * vol * tnf);
+	grid.shedTNFR2(_pos) = (Nav * vol * shedtnfr2);
 	if (_mTNF < 0 || _surfTNFR1 < 0 || _surfBoundTNFR1 < 0 || _surfTNFR2 < 0 || _surfBoundTNFR2 < 0 || _mTNFRNA < 0)
 		std::cout << "Error: Negative Value of Species in TNF/TNFR dynamics" << std::endl;
     
@@ -237,17 +232,15 @@ void Treg::solveTNF(GrGrid& grid, double dt)
 
 void Treg::solveTNFandIL10(GrGrid& grid, double dt)
 {
-    GridCell& cell = grid(_row, _col);
-	
 	double koff1 = _PARAM(PARAM_GR_K_ON1) * _PARAM(PARAM_GR_KD1);
 	double koff2 = _PARAM(PARAM_GR_K_ON2) * _PARAM(PARAM_GR_KD2);
 	double density = 1.25e11; // used for conversion of conc. unit (M -> #/cell) based on cell and microcompartment volumes 
 	double Nav = 6.02e23; // Avogadro Number
 	double vol = 8.0e-12; // volume of a cell in liter
 	
-	double tnf = cell.getTNF() / (Nav * vol);
-	double shedtnfr2 = cell.getShedTNFR2() / (Nav * vol);
-    double il10 = cell.getIL10() / (Nav * vol);
+	double tnf = grid.TNF(_pos) / (Nav * vol);
+	double shedtnfr2 = grid.shedTNFR2(_pos) / (Nav * vol);
+    double il10 = grid.il10(_pos) / (Nav * vol);
 	
     double dmTNFRNA;
 	double dmTNF;
@@ -312,9 +305,9 @@ void Treg::solveTNFandIL10(GrGrid& grid, double dt)
     _surfBoundIL10R += dsurfBoundIL10R;
     il10 += dsIL10;
 	
-	cell.setTNF(Nav * vol * tnf);
-	cell.setShedTNFR2(Nav * vol * shedtnfr2);
-    cell.setIL10(Nav * vol * il10);
+	grid.TNF(_pos) = (Nav * vol * tnf);
+	grid.shedTNFR2(_pos) = (Nav * vol * shedtnfr2);
+    grid.il10(_pos) = (Nav * vol * il10);
 	
     
 	if (_mTNF < 0 || _surfTNFR1 < 0 || _surfBoundTNFR1 < 0 || _surfTNFR2 < 0 || _surfBoundTNFR2 < 0 || _mTNFRNA < 0)
@@ -328,13 +321,11 @@ void Treg::solveTNFandIL10(GrGrid& grid, double dt)
 
 void Treg::solveIL10(GrGrid& grid, double dt)
 {
-    GridCell& cell = grid(_row, _col);
-    
     double density = 1.25e11; // used for conversion of conc. unit (M -> #/cell) based on cell and microcompartment volumes 
 	double Nav = 6.02e23; // Avogadro Number
 	double vol = 8.0e-12; // volume of a cell in liter
     
-    double il10 = cell.getIL10() / (Nav * vol);
+    double il10 = grid.il10(_pos) / (Nav * vol);
     
     double dsIL10;
 	double dsurfIL10R;
@@ -351,7 +342,7 @@ void Treg::solveIL10(GrGrid& grid, double dt)
     _surfBoundIL10R += dsurfBoundIL10R;
     il10 += dsIL10;
     
-    cell.setIL10(Nav * vol * il10);
+    grid.il10(_pos) = (Nav * vol * il10);
     
     if (_surfIL10R < 0 || _surfBoundIL10R < 0)
         std::cout << "Error: Negative value of species in IL10/IL10R dynamics" << std::endl;
@@ -360,8 +351,6 @@ void Treg::solveIL10(GrGrid& grid, double dt)
 
 void Treg::solveDegradation(GrGrid& grid, double dt, bool tnfrDynamics, bool il10rDynamics)
 {
-    GridCell& cell = grid(_row, _col);
-    
     double Nav = 6.02e23; // Avagadros #
     double vol = 8.0e-12; // volume of a cell in L
     
@@ -369,23 +358,23 @@ void Treg::solveDegradation(GrGrid& grid, double dt, bool tnfrDynamics, bool il1
         
         // simulate the effect of TNF internalization by cells in the form of degradation. Only for TNF
         double dtnf;
-        double tnf = cell.getTNF();
+        double tnf = grid.TNF(_pos);
         dtnf = -_PARAM(PARAM_GR_K_INT1) * (tnf / (tnf + _PARAM(PARAM_GR_KD1) * Nav * vol)) * _PARAM(PARAM_GR_MEAN_TNFR1_TCELL) * dt * 0.4;
         tnf += dtnf;  
         
-        cell.setTNF(tnf);
+        grid.TNF(_pos) = (tnf);
     }
     
     if (!il10rDynamics) {
         
         double dil10;
-        double il10 = cell.getIL10();
+        double il10 = grid.il10(_pos);
         
         // simulate the effect of IL10 internalization in the form of degradation. Only for IL10
         dil10 = -_PARAM(PARAM_GR_I_K_INT) * (il10 / (il10 + _PARAM(PARAM_GR_I_KD) * Nav * vol)) * _PARAM(PARAM_GR_I_IL10R_TCELL) * dt * _PARAM(PARAM_GR_I_MOD);
         il10 += dil10;  
         
-        cell.setIL10(il10);
+        grid.il10(_pos) = (il10);
         
     }
     

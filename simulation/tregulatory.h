@@ -56,7 +56,7 @@ public:
     void solveTNFandIL10 (GrGrid& grid, double dt);
     void solveIL10 (GrGrid& grid, double dt);
     void solveDegradation (GrGrid& grid, double dt, bool tnfrDynamics, bool il10rDynamics);
-	TregState getState() const;
+	int getState() const;
 	TregState getNextState() const;
 	void kill();
 	void deactivate(const int time);
@@ -74,7 +74,7 @@ inline AgentType Treg::getAgentType() const
 	return TREG;
 }
 
-inline TregState Treg::getState() const
+inline int Treg::getState() const
 {
 	return _state;
 }

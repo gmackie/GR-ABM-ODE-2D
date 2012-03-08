@@ -28,7 +28,7 @@ private:
 	std::vector<ScalarGridItem> _grid;
 
 public:
-	ScalarGrid();
+	ScalarGrid(size_t dim);
 	~ScalarGrid();
 	void evaluate(const Simulation* pSimulation, ScalarDataset* pScalarDataset, bool useNN);
 	int count() const;

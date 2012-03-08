@@ -27,7 +27,7 @@ inline ScalarAttractantDataset::~ScalarAttractantDataset()
 
 inline float ScalarAttractantDataset::getScalar(const Simulation* pSimulation, int row, int col) const
 {
-	return pSimulation->getGrGrid()(row, col).getMacAttractant();
+	return pSimulation->getGrGrid().macAttractant(row, col);
 }
 
 

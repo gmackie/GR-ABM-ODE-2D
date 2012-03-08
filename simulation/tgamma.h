@@ -65,7 +65,7 @@ public:
     void solveTNFandIL10 (GrGrid&, double dt);
     void solveIL10 (GrGrid&, double dt);
     void solveDegradation (GrGrid& grid, double dt, bool tnfrDynamics, bool il10rDynamics);
-	TgamState getState() const;
+	int getState() const;
 	TgamState getNextState() const;
 	void deactivate(const int time);
 	void kill();
@@ -89,7 +89,7 @@ inline int Tgam::getDeactivationTime() const
 	return _deactivationTime;
 }
 
-inline TgamState Tgam::getState() const
+inline int Tgam::getState() const
 {
 	return _state;
 }

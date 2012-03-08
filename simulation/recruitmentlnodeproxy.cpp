@@ -23,8 +23,8 @@ void RecruitmentLnODEProxy::solveODE(const int time, const GrStat& statsPrevious
 {
 	int boundaryTime = _PARAM(PARAM_TCELL_LYMPH_PROXY_BOUNDARY_TIME);
 
-	FLOAT_TYPE totMtb = statsPrevious.getTotExtMtb() + statsPrevious.getTotIntMtb();
-	FLOAT_TYPE replicatingMtb =  totMtb - statsPrevious.getTotNonRepExtMtb();
+	Scalar totMtb = statsPrevious.getTotExtMtb() + statsPrevious.getTotIntMtb();
+	Scalar replicatingMtb =  totMtb - statsPrevious.getTotNonRepExtMtb();
 
 	// In function RecruitmentLnODE::updateQueue the T gam flux is based on _odeInitialConditions[_idxEffectorT8] +  _odeInitialConditions[_idxEffectorTH1],
 	// both of which are defined by the lymph node ODE. Here in the proxy calculation we calculate a single value for T gam flux,
@@ -35,8 +35,8 @@ void RecruitmentLnODEProxy::solveODE(const int time, const GrStat& statsPrevious
 	{
 		if (replicatingMtb > 0.0)
 		{
-			_odeInitialConditions[_idxEffectorT8] = std::max<FLOAT_TYPE>(0, (2.0496 * log(replicatingMtb) - 6.5451));
-			_odeInitialConditions[_idxCTL] = std::max<FLOAT_TYPE>(0, (0.779 * log(replicatingMtb) - 2.491));
+			_odeInitialConditions[_idxEffectorT8] = std::max<Scalar>(0, (2.0496 * log(replicatingMtb) - 6.5451));
+			_odeInitialConditions[_idxCTL] = std::max<Scalar>(0, (0.779 * log(replicatingMtb) - 2.491));
 		}
 		else
 		{

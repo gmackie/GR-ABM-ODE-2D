@@ -56,6 +56,8 @@ private:
 	void updateViewport(int width, int height);
 	vec3f mapWindowCoordinatesToModelCoordinates(int mx, int my);
 	void handleAddSeed(int mx, int my);
+public:
+  Pos dim;
 };
 
 inline void GLWidget::setDepth(float depth)

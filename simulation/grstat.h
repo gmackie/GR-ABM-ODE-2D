@@ -36,41 +36,25 @@ private:
 	 * !!! If the data members change then the serialize and deserialize functions need to be updated !!!
 	 */
 
-	int _nMac;
-	int _nMacResting;
-	int _nMacInfected;
-	int _nMacCInfected;
-	int _nMacActive;
-	int _nMacDead;
+  int _nAgents[NAGENTS];
+	int _nMac[NMAC_STATES];
+	int _nTgam[NTGAM_STATES];
+	int _nTcyt[NTCYT_STATES];
+	int _nTreg[NTREG_STATES];
 
-	int _nTgam;
-	int _nTgamActive;
-	int _nTgamDownRegulated;
-	int _nTgamDead;
-    int _nTgamDouble;
-    int _nTgamInduced;
+	Scalar _totExtMtb;			// Replicating and non-replicating bacteria: all ExtMtb in all compartments
+	Scalar _totNonRepExtMtb;	// Non-replicating bacteria: in caseated compartments.
+	Scalar _totIntMtb;
 
-	int _nTcyt;
-	int _nTcytActive;
-	int _nTcytDownRegulated;
-	int _nTcytDead;
+	Scalar _totMacAttractant;
+	Scalar _totTNF;
+    Scalar _totIL10;
+	Scalar _totCCL2;
+	Scalar _totCCL5;
+	Scalar _totCXCL9;
 
-	int _nTreg;
-	int _nTregActive;
-	int _nTregDead;
-
-	FLOAT_TYPE _totExtMtb;			// Replicating and non-replicating bacteria: all ExtMtb in all compartments
-	FLOAT_TYPE _totNonRepExtMtb;	// Non-replicating bacteria: in caseated compartments.
-	FLOAT_TYPE _totIntMtb;
-
-	FLOAT_TYPE _totMacAttractant;
-	FLOAT_TYPE _totTNF;
-    FLOAT_TYPE _totIL10;
-	FLOAT_TYPE _totCCL2;
-	FLOAT_TYPE _totCCL5;
-	FLOAT_TYPE _totCXCL9;
-    FLOAT_TYPE _totTNFR1int;
-    FLOAT_TYPE _totkmRNA;
+    Scalar _totTNFR1int;
+    Scalar _totkmRNA;
 
 	int _nApoptosisFasFasL;
 	int _nMacApoptosisTNF[NMAC_STATES];
@@ -79,41 +63,18 @@ private:
 	int _nRestingMacActivationTNF;
 	int _nInfMacActivationTNF;
 
-	int _nMacNFkB;
-	int _nMacNFkBResting;
-	int _nMacNFkBInfected;
-	int _nMacNFkBCInfected;
-	int _nMacNFkBActive;
-	int _nMacNFkBDead;
+	int _nMacNFkB[NMAC_STATES];
 
-	int _nSourceMac;
-	int _nSourceTgam;
-	int _nSourceTcyt;
-	int _nSourceTreg;
+	int _nSource[NAGENTS];
+	int _nSourceActive[NAGENTS];
 
-	int _nSourceMacActive;
-	int _nSourceTgamActive;
-	int _nSourceTcytActive;
-	int _nSourceTregActive;
-
-	int _nSourceMacCrowded;
+	int _nSourceMacCrowded;	// Should be an array
 	int _nSourceTgamCrowded;
 	int _nSourceTcytCrowded;
 	int _nSourceTregCrowded;
 
-	int _nMacStat1;
-	int _nMacStat1Resting;
-	int _nMacStat1Infected;
-	int _nMacStat1CInfected;
-	int _nMacStat1Active;
-	int _nMacStat1Dead;
-
-	int _nMacDeact;
-	int _nMacDeactResting;
-	int _nMacDeactInfected;
-	int _nMacDeactCInfected;
-	int _nMacDeactActive;
-	int _nMacDeactDead;
+	int _nMacStat1[NMAC_STATES];
+	int _nMacDeact[NMAC_STATES];
 
 	int _nBactAct;
 	int _areaTNF;
@@ -134,29 +95,29 @@ private:
 	int _recruitedTcyt;
 	int _recruitedTreg;
 
-	FLOAT_TYPE _fluxTgam;
-	FLOAT_TYPE _fluxTcyt;
-	FLOAT_TYPE _fluxTreg;
+	Scalar _fluxTgam;
+	Scalar _fluxTcyt;
+	Scalar _fluxTreg;
 
-	FLOAT_TYPE _MDC;
-	FLOAT_TYPE _N4;
-	FLOAT_TYPE _TH0;
-	FLOAT_TYPE _TH1;
-	FLOAT_TYPE _N8;
-	FLOAT_TYPE _T80;
-	FLOAT_TYPE _T8;
-	FLOAT_TYPE _TC;
-	FLOAT_TYPE _TH0lung;
-	FLOAT_TYPE _TH1lung;
-	FLOAT_TYPE _T80lung;
-	FLOAT_TYPE _T8lung;
-	FLOAT_TYPE _TClung;
+	Scalar _MDC;
+	Scalar _N4;
+	Scalar _TH0;
+	Scalar _TH1;
+	Scalar _N8;
+	Scalar _T80;
+	Scalar _T8;
+	Scalar _TC;
+	Scalar _TH0lung;
+	Scalar _TH1lung;
+	Scalar _T80lung;
+	Scalar _T8lung;
+	Scalar _TClung;
 	int _nCellTnfInhibit;
 	
 	size_t _intMtbFreqSize;
 	unsigned* _intMtbFreq;
 public:
-  typedef ba::accumulator_set<FLOAT_TYPE, ba::stats< ba::features< ba::tag::variance, ba::tag::min, ba::tag::max, ba::tag::median > > > Stat;
+  typedef ba::accumulator_set<Scalar, ba::stats< ba::features< ba::tag::variance, ba::tag::min, ba::tag::max, ba::tag::median > > > Stat;
 private:
   Stat _macIntMtbStats[NMAC_STATES];
 
@@ -205,40 +166,35 @@ public:
 	int getNrOfTcytDownRegulated() const;
 	int getNrOfTregActive() const;
 	int getNrOfTregDead() const;
-	FLOAT_TYPE getTotExtMtb() const;
-	FLOAT_TYPE getTotNonRepExtMtb() const;
-	FLOAT_TYPE getTotIntMtb() const;
-	FLOAT_TYPE getTotMacAttractant() const;
-	FLOAT_TYPE getTotTNF() const;
-    FLOAT_TYPE getTotIL10() const;
-	FLOAT_TYPE getTotCCL2() const;
-	FLOAT_TYPE getTotCCL5() const;
-	FLOAT_TYPE getTotCXCL9() const;
-    FLOAT_TYPE getTotTNFR1int() const;
-    FLOAT_TYPE getTotkmRNA() const;
+	Scalar getTotExtMtb() const;
+	Scalar getTotNonRepExtMtb() const;
+	Scalar getTotIntMtb() const;
+	Scalar getTotMacAttractant() const;
+	Scalar getTotTNF() const;
+    Scalar getTotIL10() const;
+	Scalar getTotCCL2() const;
+	Scalar getTotCCL5() const;
+	Scalar getTotCXCL9() const;
+    Scalar getTotTNFR1int() const;
+    Scalar getTotkmRNA() const;
 	void updateAgentStatistics(Agent* a);
-protected:
-	void updateMacStatistics(MacState state);
-	void updateTgamStatistics(TgamState state);
-	void updateTcytStatistics(TcytState state);
-	void updateTregStatistics(TregState state);
 public:
 	void updateMacNFkBStatistics(MacState state);
 	void updateMacStat1Statistics(MacState state);
 	void updateMacDeactStatistics(MacState state);
 	void resetAgentStats();
 	void reset();
-	void incTotExtMtb(FLOAT_TYPE dExtMtb);
-	void incTotNonRepExtMtb(FLOAT_TYPE dNonRepExtMtb);
-	void incTotIntMtb(FLOAT_TYPE dIntMtb);
-	void incTotMacAttractant(FLOAT_TYPE dMacAttractant);
-	void incTotTNF(FLOAT_TYPE dTNF);
-    void incTotIL10(FLOAT_TYPE dIL10);
-	void incTotCCL2(FLOAT_TYPE dCCL2);
-	void incTotCCL5(FLOAT_TYPE dCCL5);
-	void incTotCXCL9(FLOAT_TYPE dCXCL9);
-    void incTotTNFR1int(FLOAT_TYPE dTNFR1int);
-    void incTotkmRNA(FLOAT_TYPE dkmRNA);
+	void incTotExtMtb(Scalar dExtMtb);
+	void incTotNonRepExtMtb(Scalar dNonRepExtMtb);
+	void incTotIntMtb(Scalar dIntMtb);
+	void incTotMacAttractant(Scalar dMacAttractant);
+	void incTotTNF(Scalar dTNF);
+    void incTotIL10(Scalar dIL10);
+	void incTotCCL2(Scalar dCCL2);
+	void incTotCCL5(Scalar dCCL5);
+	void incTotCXCL9(Scalar dCXCL9);
+    void incTotTNFR1int(Scalar dTNFR1int);
+    void incTotkmRNA(Scalar dkmRNA);
 	int getNrApoptosisFasFasL() const;
 	int getNrMacApoptosisTNF() const;
 	int getNrMacApoptosisTNF(MacState s) const;
@@ -298,7 +254,6 @@ public:
 	void setNrTcytQueued(int count);
 	int getNrTregQueued() const;
 	void setNrTregQueued(int count);
-
 	int getNrTgamQueuedDie() const;
 	void incNrTgamQueuedDie();
 	int getNrTcytQueuedDie() const;
@@ -314,38 +269,38 @@ public:
 	int getNrTregRecruited() const;
 	void incNrTregRecruited();
 
-	FLOAT_TYPE getFluxTgam() const;
-	void setFluxTgam(FLOAT_TYPE flux);
-	FLOAT_TYPE getFluxTcyt() const;
-	void setFluxTcyt(FLOAT_TYPE flux);
-	FLOAT_TYPE getFluxTreg() const;
-	void setFluxTreg(FLOAT_TYPE flux);
-	FLOAT_TYPE getMDC() const;
-	void setMDC(FLOAT_TYPE MDC);
-	FLOAT_TYPE getN4() const;
-	FLOAT_TYPE getTH0() const;
-	FLOAT_TYPE getTH1() const;
-	FLOAT_TYPE getN8() const;
-	FLOAT_TYPE getT80() const;
-	FLOAT_TYPE getT8() const;
-	FLOAT_TYPE getTC() const;
-	FLOAT_TYPE getTH0lung() const;
-	FLOAT_TYPE getTH1lung() const;
-	FLOAT_TYPE getT80lung() const;
-	FLOAT_TYPE getT8lung() const;
-	FLOAT_TYPE getTClung() const;
-	void setN4(FLOAT_TYPE val);
-	void setTH0(FLOAT_TYPE val);
-	void setTH1(FLOAT_TYPE val);
-	void setN8(FLOAT_TYPE val);
-	void setT80(FLOAT_TYPE val);
-	void setT8(FLOAT_TYPE val);
-	void setTC(FLOAT_TYPE val);
-	void setTH0lung(FLOAT_TYPE val);
-	void setTH1lung(FLOAT_TYPE val);
-	void setT80lung(FLOAT_TYPE val);
-	void setT8lung(FLOAT_TYPE val);
-	void setTClung(FLOAT_TYPE val);
+	Scalar getFluxTgam() const;
+	void setFluxTgam(Scalar flux);
+	Scalar getFluxTcyt() const;
+	void setFluxTcyt(Scalar flux);
+	Scalar getFluxTreg() const;
+	void setFluxTreg(Scalar flux);
+	Scalar getMDC() const;
+	void setMDC(Scalar MDC);
+	Scalar getN4() const;
+	Scalar getTH0() const;
+	Scalar getTH1() const;
+	Scalar getN8() const;
+	Scalar getT80() const;
+	Scalar getT8() const;
+	Scalar getTC() const;
+	Scalar getTH0lung() const;
+	Scalar getTH1lung() const;
+	Scalar getT80lung() const;
+	Scalar getT8lung() const;
+	Scalar getTClung() const;
+	void setN4(Scalar val);
+	void setTH0(Scalar val);
+	void setTH1(Scalar val);
+	void setN8(Scalar val);
+	void setT80(Scalar val);
+	void setT8(Scalar val);
+	void setTC(Scalar val);
+	void setTH0lung(Scalar val);
+	void setTH1lung(Scalar val);
+	void setT80lung(Scalar val);
+	void setT8lung(Scalar val);
+	void setTClung(Scalar val);
 	int getNrOfCellsInhibited () const;
 	void incNrOfCellsInhibited ();
 };
@@ -363,132 +318,132 @@ inline const GrStat::Stat* GrStat::getIntMtbStats(size_t &s) const {
   s = size_t(NMAC_STATES);
   return _macIntMtbStats;
 }
-inline void GrStat::setN4(FLOAT_TYPE val)
+inline void GrStat::setN4(Scalar val)
 {
 	_N4 = val;
 }
 
-inline void GrStat::setTH0(FLOAT_TYPE val)
+inline void GrStat::setTH0(Scalar val)
 {
 	_TH0 = val;
 }
 
-inline void GrStat::setTH1(FLOAT_TYPE val)
+inline void GrStat::setTH1(Scalar val)
 {
 	_TH1 = val;
 }
 
-inline void GrStat::setN8(FLOAT_TYPE val)
+inline void GrStat::setN8(Scalar val)
 {
 	_N8 = val;
 }
 
-inline void GrStat::setT80(FLOAT_TYPE val)
+inline void GrStat::setT80(Scalar val)
 {
 	_T80 = val;
 }
 
-inline void GrStat::setT8(FLOAT_TYPE val)
+inline void GrStat::setT8(Scalar val)
 {
 	_T8 = val;
 }
 
-inline void GrStat::setTC(FLOAT_TYPE val)
+inline void GrStat::setTC(Scalar val)
 {
 	_TC = val;
 }
 
-inline void GrStat::setTH0lung(FLOAT_TYPE val)
+inline void GrStat::setTH0lung(Scalar val)
 {
 	_TH0lung = val;
 }
 
-inline void GrStat::setTH1lung(FLOAT_TYPE val)
+inline void GrStat::setTH1lung(Scalar val)
 {
 	_TH1lung = val;
 }
 
-inline void GrStat::setT80lung(FLOAT_TYPE val)
+inline void GrStat::setT80lung(Scalar val)
 {
 	_T80lung = val;
 }
 
-inline void GrStat::setT8lung(FLOAT_TYPE val)
+inline void GrStat::setT8lung(Scalar val)
 {
 	_T8lung = val;
 }
 
-inline void GrStat::setTClung(FLOAT_TYPE val)
+inline void GrStat::setTClung(Scalar val)
 {
 	_TClung = val;
 }
 
-inline FLOAT_TYPE GrStat::getN4() const
+inline Scalar GrStat::getN4() const
 {
 	return _N4;
 }
 
-inline FLOAT_TYPE GrStat::getTH0() const
+inline Scalar GrStat::getTH0() const
 {
 	return _TH0;
 }
 
-inline FLOAT_TYPE GrStat::getTH1() const
+inline Scalar GrStat::getTH1() const
 {
 	return _TH1;
 }
 
-inline FLOAT_TYPE GrStat::getN8() const
+inline Scalar GrStat::getN8() const
 {
 	return _N8;
 }
 
-inline FLOAT_TYPE GrStat::getT80() const
+inline Scalar GrStat::getT80() const
 {
 	return _T80;
 }
 
-inline FLOAT_TYPE GrStat::getT8() const
+inline Scalar GrStat::getT8() const
 {
 	return _T8;
 }
 
-inline FLOAT_TYPE GrStat::getTC() const
+inline Scalar GrStat::getTC() const
 {
 	return _TC;
 }
 
-inline FLOAT_TYPE GrStat::getTH0lung() const
+inline Scalar GrStat::getTH0lung() const
 {
 	return _TH0lung;
 }
 
-inline FLOAT_TYPE GrStat::getTH1lung() const
+inline Scalar GrStat::getTH1lung() const
 {
 	return _TH1lung;
 }
 
-inline FLOAT_TYPE GrStat::getT80lung() const
+inline Scalar GrStat::getT80lung() const
 {
 	return _T80lung;
 }
 
-inline FLOAT_TYPE GrStat::getT8lung() const
+inline Scalar GrStat::getT8lung() const
 {
 	return _T8lung;
 }
 
-inline FLOAT_TYPE GrStat::getTClung() const
+inline Scalar GrStat::getTClung() const
 {
 	return _TClung;
 }
 
-inline FLOAT_TYPE GrStat::getMDC() const
+inline Scalar GrStat::getMDC() const
 {
 	return _MDC;
 }
 
-inline void GrStat::setMDC(FLOAT_TYPE MDC)
+inline void GrStat::setMDC(Scalar MDC)
 {
 	_MDC = MDC;
 }
@@ -523,12 +478,12 @@ inline void GrStat::incNrTgamRecruited()
 	_recruitedTgam++;
 }
 
-inline FLOAT_TYPE GrStat::getFluxTgam() const
+inline Scalar GrStat::getFluxTgam() const
 {
 	return _fluxTgam;
 }
 
-inline void GrStat::setFluxTgam(FLOAT_TYPE flux)
+inline void GrStat::setFluxTgam(Scalar flux)
 {
 	_fluxTgam = flux;
 }
@@ -563,12 +518,12 @@ inline void GrStat::incNrTcytRecruited()
 	_recruitedTcyt++;
 }
 
-inline FLOAT_TYPE GrStat::getFluxTcyt() const
+inline Scalar GrStat::getFluxTcyt() const
 {
 	return _fluxTcyt;
 }
 
-inline void GrStat::setFluxTcyt(FLOAT_TYPE flux)
+inline void GrStat::setFluxTcyt(Scalar flux)
 {
 	_fluxTcyt = flux;
 }
@@ -623,12 +578,12 @@ inline void GrStat::incNrTregRecruited()
 	_recruitedTreg++;
 }
 
-inline FLOAT_TYPE GrStat::getFluxTreg() const
+inline Scalar GrStat::getFluxTreg() const
 {
 	return _fluxTreg;
 }
 
-inline void GrStat::setFluxTreg(FLOAT_TYPE flux)
+inline void GrStat::setFluxTreg(Scalar flux)
 {
 	_fluxTreg = flux;
 }
@@ -687,82 +642,82 @@ inline void GrStat::incNrCaseated()
 
 inline int GrStat::getNrSourcesMac() const
 {
-	return _nSourceMac;
+	return _nSource[MAC];
 }
 
 inline int GrStat::getNrSourcesTgam() const
 {
-	return _nSourceTgam;
+	return _nSource[TGAM];
 }
 
 inline int GrStat::getNrSourcesTcyt() const
 {
-	return _nSourceTcyt;
+	return _nSource[TCYT];
 }
 
 inline int GrStat::getNrSourcesTreg() const
 {
-	return _nSourceTreg;
+	return _nSource[TREG];
 }
 
 inline void GrStat::incNrSourcesMac()
 {
-	_nSourceMac++;
+	_nSource[MAC]++;
 }
 
 inline void GrStat::incNrSourcesTgam()
 {
-	_nSourceTgam++;
+	_nSource[TGAM]++;
 }
 
 inline void GrStat::incNrSourcesTcyt()
 {
-	_nSourceTcyt++;
+	_nSource[TCYT]++;
 }
 
 inline void GrStat::incNrSourcesTreg()
 {
-	_nSourceTreg++;
+	_nSource[TREG]++;
 }
 
 inline int GrStat::getNrSourcesActiveMac() const
 {
-	return _nSourceMacActive;
+	return _nSourceActive[MAC];
 }
 
 inline int GrStat::getNrSourcesActiveTgam() const
 {
-	return _nSourceTgamActive;
+	return _nSourceActive[TGAM];
 }
 
 inline int GrStat::getNrSourcesActiveTcyt() const
 {
-	return _nSourceTcytActive;
+	return _nSourceActive[TCYT];
 }
 
 inline int GrStat::getNrSourcesActiveTreg() const
 {
-	return _nSourceTregActive;
+	return _nSourceActive[TREG];
 }
 
 inline void GrStat::incNrSourcesActiveMac()
 {
-	_nSourceMacActive++;
+	_nSourceActive[MAC]++;
 }
 
 inline void GrStat::incNrSourcesActiveTgam()
 {
-	_nSourceTgamActive++;
+	_nSourceActive[TGAM]++;
 }
 
 inline void GrStat::incNrSourcesActiveTcyt()
 {
-	_nSourceTcytActive++;
+	_nSourceActive[TCYT]++;
 }
 
 inline void GrStat::incNrSourcesActiveTreg()
 {
-	_nSourceTregActive++;
+	_nSourceActive[TREG]++;
 }
 
 inline int GrStat::getNrSourcesCrowdedMac() const
@@ -859,299 +814,299 @@ inline void GrStat::incInfMacActivationTNF()
 	_nInfMacActivationTNF++;
 }
 
-inline void GrStat::incTotExtMtb(FLOAT_TYPE dExtMtb)
+inline void GrStat::incTotExtMtb(Scalar dExtMtb)
 {
 	_totExtMtb += dExtMtb;
 }
 
-inline void GrStat::incTotNonRepExtMtb(FLOAT_TYPE dNonRepExtMtb)
+inline void GrStat::incTotNonRepExtMtb(Scalar dNonRepExtMtb)
 {
 	_totNonRepExtMtb += dNonRepExtMtb;
 }
 
-inline void GrStat::incTotIntMtb(FLOAT_TYPE dIntMtb)
+inline void GrStat::incTotIntMtb(Scalar dIntMtb)
 {
 	_totIntMtb += dIntMtb;
 }
 
-inline void GrStat::incTotMacAttractant(FLOAT_TYPE dMacAttractant)
+inline void GrStat::incTotMacAttractant(Scalar dMacAttractant)
 {
 	_totMacAttractant += dMacAttractant;
 }
 
-inline void GrStat::incTotTNF(FLOAT_TYPE dTNF)
+inline void GrStat::incTotTNF(Scalar dTNF)
 {
 	_totTNF += dTNF;
 }
 
-inline void GrStat::incTotIL10(FLOAT_TYPE dIL10)
+inline void GrStat::incTotIL10(Scalar dIL10)
 {
     _totIL10 += dIL10;
 }
 
-inline void GrStat::incTotCCL2(FLOAT_TYPE dCCL2)
+inline void GrStat::incTotCCL2(Scalar dCCL2)
 {
 	_totCCL2 += dCCL2;
 }
 
-inline void GrStat::incTotCCL5(FLOAT_TYPE dCCL5)
+inline void GrStat::incTotCCL5(Scalar dCCL5)
 {
 	_totCCL5 += dCCL5;
 }
 
-inline void GrStat::incTotCXCL9(FLOAT_TYPE dCXCL9)
+inline void GrStat::incTotCXCL9(Scalar dCXCL9)
 {
 	_totCXCL9 += dCXCL9;
 }
 
-inline void GrStat::incTotTNFR1int(FLOAT_TYPE dTNFR1int)
+inline void GrStat::incTotTNFR1int(Scalar dTNFR1int)
 {
     _totTNFR1int += dTNFR1int;
 }
 
-inline void GrStat::incTotkmRNA(FLOAT_TYPE dkmRNA)
+inline void GrStat::incTotkmRNA(Scalar dkmRNA)
 {
     _totkmRNA += dkmRNA;
 }
 
-inline FLOAT_TYPE GrStat::getTotMacAttractant() const
+inline Scalar GrStat::getTotMacAttractant() const
 {
 	return _totMacAttractant;
 }
 
-inline FLOAT_TYPE GrStat::getTotTNF() const
+inline Scalar GrStat::getTotTNF() const
 {
 	return _totTNF;
 }
 
-inline FLOAT_TYPE GrStat::getTotIL10() const
+inline Scalar GrStat::getTotIL10() const
 {
     return _totIL10;
 }
 
-inline FLOAT_TYPE GrStat::getTotCCL2() const
+inline Scalar GrStat::getTotCCL2() const
 {
 	return _totCCL2;
 }
 
-inline FLOAT_TYPE GrStat::getTotCCL5() const
+inline Scalar GrStat::getTotCCL5() const
 {
 	return _totCCL5;
 }
 
-inline FLOAT_TYPE GrStat::getTotCXCL9() const
+inline Scalar GrStat::getTotCXCL9() const
 {
 	return _totCXCL9;
 }
 
-inline FLOAT_TYPE GrStat::getTotTNFR1int() const
+inline Scalar GrStat::getTotTNFR1int() const
 {
     return _totTNFR1int;
 }
 
-inline FLOAT_TYPE GrStat::getTotkmRNA() const
+inline Scalar GrStat::getTotkmRNA() const
 {
     return _totkmRNA;
 }
 
-inline FLOAT_TYPE GrStat::getTotExtMtb() const
+inline Scalar GrStat::getTotExtMtb() const
 {
 	return _totExtMtb;
 }
 
-inline FLOAT_TYPE GrStat::getTotNonRepExtMtb() const
+inline Scalar GrStat::getTotNonRepExtMtb() const
 {
 	return _totNonRepExtMtb;
 }
 
-inline FLOAT_TYPE GrStat::getTotIntMtb() const
+inline Scalar GrStat::getTotIntMtb() const
 {
 	return _totIntMtb;
 }
 
 inline int GrStat::getNrOfMacResting() const
 {
-	return _nMacResting;
+	return _nMac[MAC_RESTING];
 }
 
 inline int GrStat::getNrOfMacInfected() const
 {
-	return _nMacInfected;
+	return _nMac[MAC_INFECTED];
 }
 
 inline int GrStat::getNrOfMacCInfected() const
 {
-	return _nMacCInfected;
+	return _nMac[MAC_CINFECTED];
 }
 
 inline int GrStat::getNrOfMacActive() const
 {
-	return _nMacActive;
+	return _nMac[MAC_ACTIVE];
 }
 
 inline int GrStat::getNrOfMacDead() const
 {
-	return _nMacDead;
+	return _nMac[MAC_DEAD];
 }
 
 inline int GrStat::getNrOfMac() const
 {
-	return _nMac;
+	return _nAgents[MAC];
 }
 
 inline int GrStat::getNrOfMacNFkBResting() const
 {
-	return _nMacNFkBResting;
+	return _nMacNFkB[MAC_RESTING];
 }
 
 inline int GrStat::getNrOfMacNFkBInfected() const
 {
-	return _nMacNFkBInfected;
+	return _nMacNFkB[MAC_INFECTED];
 }
 
 inline int GrStat::getNrOfMacNFkBCInfected() const
 {
-	return _nMacNFkBCInfected;
+	return _nMacNFkB[MAC_CINFECTED];
 }
 
 inline int GrStat::getNrOfMacNFkBActive() const
 {
-	return _nMacNFkBActive;
+	return _nMacNFkB[MAC_ACTIVE];
 }
 
 inline int GrStat::getNrOfMacNFkBDead() const
 {
-	return _nMacNFkBDead;
+	return _nMacNFkB[MAC_DEAD];
 }
 
 inline int GrStat::getNrOfMacNFkB() const
 {
-	return _nMacNFkB;
+	return std::accumulate(_nMacNFkB, _nMacNFkB+NMAC_STATES, 0);
 }
 
 inline int GrStat::getNrOfTgamActive() const
 {
-	return _nTgamActive;
+	return _nTgam[TGAM_ACTIVE];
 }
 
 inline int GrStat::getNrOfTgamDead() const
 {
-	return _nTgamDead;
+	return _nTgam[TGAM_DEAD];
 }
 
 inline int GrStat::getNrOfTgamDownRegulated() const
 {
-	return _nTgamDownRegulated;
+	return _nTgam[TGAM_DOWN_REGULATED];
 }
 
 inline int GrStat::getNrOfTgam() const
 {
-	return _nTgam;
+  return _nAgents[TGAM];
 }
 
 inline int GrStat::getNrOfTgamDouble() const
 {
-    return _nTgamDouble;
+    return _nTgam[TGAM_ACTIVE_DOUBLE];
 }
 
 inline int GrStat::getNrOfTgamInduced() const
 {
-    return _nTgamInduced;
+    return _nTgam[TGAM_INDUCED_REG];
 }
 
 inline int GrStat::getNrOfTcytDead() const
 {
-	return _nTcytDead;
+	return _nTcyt[TCYT_DEAD];
 }
 
 inline int GrStat::getNrOfTcytActive() const
 {
-	return _nTcytActive;
+	return _nTcyt[TCYT_ACTIVE];
 }
 
 inline int GrStat::getNrOfTcytDownRegulated() const
 {
-	return _nTcytDownRegulated;
+	return _nTcyt[TCYT_DOWN_REGULATED];
 }
 
 inline int GrStat::getNrOfTcyt() const
 {
-	return _nTcyt;
+	return _nAgents[TCYT];
 }
 
 inline int GrStat::getNrOfTregDead() const
 {
-	return _nTregDead;
+	return _nTreg[TREG_DEAD];
 }
 
 inline int GrStat::getNrOfTregActive() const
 {
-	return _nTregActive;
+	return _nTreg[TREG_ACTIVE];
 }
 
 inline int GrStat::getNrOfTreg() const
 {
-	return _nTreg;
+	return _nAgents[TREG];
 }
 
 inline int GrStat::getNrOfMacStat1Resting() const
 {
-	return _nMacStat1Resting;
+	return _nMacStat1[MAC_RESTING];
 }
 
 inline int GrStat::getNrOfMacStat1Infected() const
 {
-	return _nMacStat1Infected;
+	return _nMacStat1[MAC_INFECTED];
 }
 
 inline int GrStat::getNrOfMacStat1CInfected() const
 {
-	return _nMacStat1CInfected;
+	return _nMacStat1[MAC_CINFECTED];
 }
 
 inline int GrStat::getNrOfMacStat1Active() const
 {
-	return _nMacStat1Active;
+	return _nMacStat1[MAC_ACTIVE];
 }
 
 inline int GrStat::getNrOfMacStat1Dead() const
 {
-	return _nMacStat1Dead;
+	return _nMacStat1[MAC_DEAD];
 }
 
 inline int GrStat::getNrOfMacStat1() const
 {
-	return _nMacStat1;
+	return std::accumulate(_nMacStat1,_nMacStat1+NMAC_STATES,0);
 }
 
 inline int GrStat::getNrOfMacDeactResting() const
 {
-	return _nMacDeactResting;
+	return _nMacDeact[MAC_RESTING];
 }
 
 inline int GrStat::getNrOfMacDeactInfected() const
 {
-	return _nMacDeactInfected;
+	return _nMacDeact[MAC_INFECTED];
 }
 
 inline int GrStat::getNrOfMacDeactCInfected() const
 {
-	return _nMacDeactCInfected;
+	return _nMacDeact[MAC_CINFECTED];
 }
 
 inline int GrStat::getNrOfMacDeactActive() const
 {
-	return _nMacDeactActive;
+	return _nMacDeact[MAC_ACTIVE];
 }
 
 inline int GrStat::getNrOfMacDeactDead() const
 {
-	return _nMacDeactDead;
+	return _nMacDeact[MAC_DEAD];
 }
 
 inline int GrStat::getNrOfMacDeact() const
 {
-	return _nMacDeact;
+	return std::accumulate(_nMacDeact,_nMacDeact+NMAC_STATES,0);
 }
 
 inline int GrStat::getNrOfCellsInhibited() const

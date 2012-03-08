@@ -141,12 +141,12 @@ void GLWidget::mouseReleaseEvent(QMouseEvent* pEvent)
 		// Compute the array index that corresponds to the cursor location
 		vec3f coordinates = mapWindowCoordinatesToModelCoordinates(mx, my);
 
-		int X = (int) floorf(Simulation::_DIM / _MAX_X * coordinates[0]);
-		int Y = (int) floorf(Simulation::_DIM / _MAX_Y * coordinates[1]);
+		int X = (int) floorf(dim.x / _MAX_X * coordinates[0]);
+		int Y = (int) floorf(dim.y / _MAX_Y * coordinates[1]);
 
-		if (X > (Simulation::_DIM - 1))
+		if (X > (dim.x - 1))
 			return;
-		if (Y > (Simulation::_DIM - 1))
+		if (Y > (dim.y - 1))
 			return;
 		if (X < 0)
 			return;

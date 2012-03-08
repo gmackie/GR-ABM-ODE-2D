@@ -23,11 +23,10 @@ protected:
 	 */
 	int _birthTime;
 	int _deathTime;
-	int _row;
-	int _col;
+  Pos _pos;
 	Pos moveAgent(GrGrid& grid, bool ccl2, bool ccl5, bool cxcl9, bool attractant, double bonusFactor);
 	int getDestinationOrdinal(GrGrid& grid, bool ccl2, bool ccl5, bool cxcl9, bool attractant, double bonusFactor);
-	Pos compartmentOrdinalToCoordinates(int ordinal) const;
+	Pos compartmentOrdinalToCoordinates(int ordinal, const Pos& dim) const;
 
 public:
 	Agent();
@@ -42,6 +41,8 @@ public:
 	virtual bool isDead() = 0;
 	virtual void print() const = 0;
 	virtual AgentType getAgentType() const = 0;
+  virtual int getState() const = 0;
+  const Pos& getPosition() const;
 	int getRow() const;
 	int getCol() const;
 	int getBirthTime() const;
@@ -50,6 +51,10 @@ public:
 	virtual void serialize(std::ostream& out) const;
 	virtual void deserialize(std::istream& in);
 };
+
+inline const Pos& Agent::getPosition() const {
+  return _pos;
+}
 
 inline int Agent::getDeathTime() const
 {
@@ -68,12 +73,12 @@ inline int Agent::getBirthTime() const
 
 inline int Agent::getRow() const
 {
-	return _row;
+	return _pos.x;
 }
 
 inline int Agent::getCol() const
 {
-	return _col;
+	return _pos.y;
 }
 
 #endif /* AGENT_H */

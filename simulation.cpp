@@ -11,12 +11,12 @@
 #include <stdlib.h>
 #include <cstring>
 
-Simulation::Simulation()
+Simulation::Simulation(const Pos& dim)
 	: _mutex(QMutex::Recursive)
 	, _modelMutex(QMutex::Recursive)
 	, _time(0)
-	, _gr(new GrSimulation())
-	, _grid()
+	, _gr(new GrSimulation(dim))
+	, _grid(dim)
 	, _delay(0)
 	, _updated(false)
 	, _stopFlag(false)

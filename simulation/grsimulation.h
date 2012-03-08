@@ -75,7 +75,7 @@ private:
 	void checkTCellRecruitmentStart();
 
 public:
-	GrSimulation();
+	GrSimulation(const Pos& dim);
 	~GrSimulation();
 	void init();
 	void solve();
@@ -314,7 +314,7 @@ inline Mac* GrSimulation::createMac(int row, int col, int birthtime, MacState st
 	_macList.push_back(Mac(birthtime, row, col, state, 0, NFkB, stat1));
 	Mac* pMac = &_macList.back();
 	
-	assert_res(_grid(row, col).addAgent(pMac));
+	assert_res(_grid.getGrid().addAgent(pMac, row, col));
 	_stats.updateAgentStatistics(pMac);
 
 	return pMac;
@@ -325,7 +325,7 @@ inline Tgam* GrSimulation::createTgam(int row, int col, int birthtime, TgamState
 	_tgamList.push_back(Tgam(birthtime, row, col, state));
 	Tgam* pTgam = &_tgamList.back();
 	
-	assert_res(_grid(row, col).addAgent(pTgam));
+	assert_res(_grid.getGrid().addAgent(pTgam, row, col));
 	_stats.updateAgentStatistics(pTgam);
 
 	return pTgam;
@@ -336,7 +336,7 @@ inline Tcyt* GrSimulation::createTcyt(int row, int col, int birthtime, TcytState
 	_tcytList.push_back(Tcyt(birthtime, row, col, state));
 	Tcyt* pTcyt = &_tcytList.back();
 	
-	assert_res(_grid(row, col).addAgent(pTcyt));
+	assert_res(_grid.getGrid().addAgent(pTcyt, row, col));
 	_stats.updateAgentStatistics(pTcyt);
 
 	return pTcyt;
@@ -347,7 +347,7 @@ inline Treg* GrSimulation::createTreg(int row, int col, int birthtime, TregState
 	_tregList.push_back(Treg(birthtime, row, col, state));
 	Treg* pTreg = &_tregList.back();
 	
-	assert_res(_grid(row, col).addAgent(pTreg));
+	assert_res(_grid.getGrid().addAgent(pTreg, row, col));
 	_stats.updateAgentStatistics(pTreg);
 
 	return pTreg;
@@ -362,7 +362,7 @@ inline void GrSimulation::checkTCellRecruitmentStart()
 
 	if (_PARAM(PARAM_TCELL_MTB_RECRUITMENT_THRESHOLD) > 0)
 	{
-		FLOAT_TYPE totMtb = _stats.getTotExtMtb() + _stats.getTotIntMtb();
+		Scalar totMtb = _stats.getTotExtMtb() + _stats.getTotIntMtb();
 		if (totMtb > _PARAM(PARAM_TCELL_MTB_RECRUITMENT_THRESHOLD))
 		{
 			_tcellRecruitmentBegun = true;

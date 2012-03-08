@@ -29,7 +29,7 @@ inline ScalarCcl5Dataset::~ScalarCcl5Dataset()
 
 inline float ScalarCcl5Dataset::getScalar(const Simulation* pSimulation, int row, int col) const
 {
-	return pSimulation->getGrGrid()(row, col).getCCL5();
+	return pSimulation->getGrGrid().CCL5(row, col);
 }
 
 #endif /* SCALARCCL5DATASET_H_ */

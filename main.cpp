@@ -66,16 +66,24 @@ Snapshot* setupOutput(MainWindow& mainWindow, const std::string& outputDir, bool
 
 int main(int argc, char *argv[])
 {
+<<<<<<< HEAD
 	std::cout << std::endl;
 	printVersion();
 	std::cout << "GRID SIZE: NROWS: " << NROWS << " NCOLS: " << NCOLS << std::endl;
 
+=======
+>>>>>>> grid
 	QApplication a(argc, argv);
 
 	bool tnfrDynamics;
 	bool nfkbDynamics;
 	int tnfDepletionTimeStep;
+<<<<<<< HEAD
 	unsigned int seed;
+=======
+	unsigned long seed;
+  size_t dim;
+>>>>>>> grid
 	bool seedSpecified;
 	int diffMethod;
 	std::string inputFileName;
@@ -111,9 +119,15 @@ int main(int argc, char *argv[])
 	desc.add_options()
 		("help,h", "Help message")
 		("input-file,i", po::value<std::string>(&inputFileName), "Input file name")
+<<<<<<< HEAD
 		("seed,s", po::value<unsigned int>(&seed))
 		("recr", po::value<unsigned>()->default_value(0), "recruitment:\n0 - probability\n1 - lymph node ode proxy\n2 - lymph node ode pure")
 		("diffusion,d", po::value<int>(&diffMethod)->default_value(3),
+=======
+		("seed,s", po::value<unsigned long>(&seed))
+    ("dim,d", po::value(&dim)->default_value(100))
+		("diffusion", po::value<int>(&diffMethod)->default_value(3),
+>>>>>>> grid
 				"Diffusion method:\n0 - FTCS\n1 - BTCS (SOR, correct)\n2 - BTCS (SOR, wrong)\n3 - FTCS Grid Swap")
 		("timesteps,t", po::value<int>(&timesteps), "Number of time steps to simulate\nTakes precedence over --days")
 		("days", po::value<int>(&nDays)->default_value(200), "Number of days to simulate")
@@ -155,6 +169,7 @@ int main(int argc, char *argv[])
 		po::store(po::command_line_parser(argc, argv).options(desc).positional(p).run(), vm);
 		po::notify(vm);
 
+    std::cout << "GRID SIZE: NROWS: " << dim << " NCOLS: " << dim << std::endl;
 		if (vm.count("version"))
 		{
 			// Nothing to do - the version is always printed above.
@@ -194,7 +209,11 @@ int main(int argc, char *argv[])
 			}
 		}
 
+<<<<<<< HEAD
 		if (!Params::getInstance()->fromXml(inputFileName.c_str()))
+=======
+		if (!Params::getInstance(ode, Pos(dim, dim))->fromXml(inputFileName.c_str()))
+>>>>>>> grid
 			return 1;
 
 		if (!(0 <= diffMethod && diffMethod < 4))
@@ -298,9 +317,9 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-	ScalarAgentGrid agentGrid;
-	AgentsVisualization agentsVisualization(Simulation::_DIM, &agentGrid);
-	MainInterface itfc(&agentsVisualization, &agentGrid);
+	ScalarAgentGrid agentGrid(dim);
+	AgentsVisualization agentsVisualization(dim, &agentGrid);
+	MainInterface itfc(Pos(dim, dim), &agentsVisualization, &agentGrid);
 	GLWindow glWindow(&itfc);
 	ParamWindow paramWindow(&itfc);
 	MainWindow w(&itfc, &glWindow, &paramWindow, new StatWidget(), new AgentsWidget(&agentsVisualization));

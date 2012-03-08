@@ -56,14 +56,15 @@ inline void VectorDataset::getVectorNN(const Simulation* pSimulation, const vec2
 {
 	int col = (int)pos[0];
 	int row = (int)pos[1];
+  const Pos& dim = pSimulation->getSize();
 
 	if (pos[0] - col >= 0.5)
 	{
-		col = moduloDIM(col + 1);
+		col = moduloDIM(col + 1, dim.x);
 	}
 	if (pos[1] - row >= 0.5)
 	{
-		row = moduloDIM(row + 1);
+		row = moduloDIM(row + 1, dim.y);
 	}
 
 	getVector(pSimulation, row, col, res);
@@ -90,9 +91,11 @@ inline void VectorDataset::getVectorBL(const Simulation* pSimulation, const vec2
 	int col = (int)pos[0];
 	int row = (int)pos[1];
 
+  const Pos& dim = pSimulation->getSize();
+
 	// make sure that we do not index out of bounds
-	int sucRow = moduloDIM(row + 1);
-	int sucCol = moduloDIM(col + 1);
+	int sucRow = moduloDIM(row + 1, dim.x);
+	int sucCol = moduloDIM(col + 1, dim.y);
 
 	// first get the four vectors of the cell
 	vec2f p1;

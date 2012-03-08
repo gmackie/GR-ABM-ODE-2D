@@ -55,10 +55,10 @@ protected:
 	virtual void solveODE(const int time, const GrStat& statsPrevious, GrStat& stats);
 	void updateQueue(const int time, GrStat& stats);
 	void recruitMacsGetTcellSources(GrSimulation& sim, GrStat& stats,
-			ThresholdGridCellPtrList tcellSources[TCELL_TYPE_COUNT]);
-	void recruitMac(GrSimulation& sim, GridCell* pSource);
+			ThresholdPosList tcellSources[TCELL_TYPE_COUNT]);
+	void recruitMac(GrSimulation& sim, const Pos& pSource);
 	void recruitTcells(GrSimulation& sim, GrStat& stats,
-			ThresholdGridCellPtrList tcellSources[TCELL_TYPE_COUNT]);
+			ThresholdPosList tcellSources[TCELL_TYPE_COUNT]);
 
 public:
 	RecruitmentLnODE(const std::string& odeApp, const std::string& odeTmpFile);

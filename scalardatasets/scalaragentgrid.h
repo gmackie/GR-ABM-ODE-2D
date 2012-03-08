@@ -45,7 +45,7 @@ private:
 	TregList _tregList;
 
 public:
-	ScalarAgentGrid();
+	ScalarAgentGrid(size_t _DIM);
 	~ScalarAgentGrid();
 	void evaluate(const Simulation* pSimulation);
 	const std::vector<ScalarAgentItem>& getGrid() const;

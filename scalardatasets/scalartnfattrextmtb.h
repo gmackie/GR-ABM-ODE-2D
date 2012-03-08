@@ -45,9 +45,9 @@ inline ScalarTnfAttrExtMtb::~ScalarTnfAttrExtMtb()
 
 inline float ScalarTnfAttrExtMtb::getScalar(const Simulation* pSimulation, int row, int col) const
 {
-	return pSimulation->getGrGrid()(row, col).getTNF()
-           + pSimulation->getGrGrid()(row, col).getMacAttractant()
-           + pSimulation->getGrGrid()(row, col).getExtMtb();
+	return pSimulation->getGrGrid().TNF(row, col)
+           + pSimulation->getGrGrid().macAttractant(row, col)
+           + pSimulation->getGrGrid().extMTB(row, col);
 }
 
 #endif /* SCALARTNFATTREXTMTB_H_ */

@@ -9,11 +9,11 @@
 #include "simulation.h"
 #include <fstream>
 
-ScalarGrid::ScalarGrid()
-	: Grid(Simulation::_DIM)
+ScalarGrid::ScalarGrid(size_t _dim)
+	: Grid(_dim)
 	, _min(FLT_MAX)
 	, _max(FLT_MIN)
-	, _grid(_DIM * _DIM)
+	, _grid(_dim * _dim)
 {
 	for (int i = 0; i < _DIM; i++) // row
 	{

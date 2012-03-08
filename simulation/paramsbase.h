@@ -318,6 +318,7 @@ protected:
 	static const ParamDescription _description[];
 
 	TiXmlDocument _xmlDoc;
+  	Pos _dim;
 
 	bool _paramsRead[PARAM_DOUBLE_COUNT + PARAM_INT_COUNT];
 	double _doubleParam[PARAM_DOUBLE_COUNT];
@@ -325,7 +326,7 @@ protected:
 	PosVector _initialMacs;
 	PosVector _initialExtMtb;
 
-	ParamsBase();
+	ParamsBase(const Pos& dim);
 	virtual ~ParamsBase();
 
 	void defineDefaults();

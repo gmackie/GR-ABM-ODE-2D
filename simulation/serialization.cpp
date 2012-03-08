@@ -49,6 +49,7 @@ bool Serialization::readHeaderFooter(std::istream& in, std::string className, st
 					<< std::endl
 					<< "and that each member which is serialized is deserialized and in the same order as it was serialized."
 					<< std::endl;
+    throw std::ios_base::failure("Failed to deserialize");
 		return false;
 	}
 

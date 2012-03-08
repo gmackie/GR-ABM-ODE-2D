@@ -16,25 +16,11 @@
 const std::string GrStat::_ClassName = "GrStat";
 
 GrStat::GrStat()
-	: _nMac(0)
-	, _nMacResting(0)
-	, _nMacInfected(0)
-	, _nMacCInfected(0)
-	, _nMacActive(0)
-	, _nMacDead(0)
-	, _nTgam(0)
-	, _nTgamActive(0)
-	, _nTgamDownRegulated(0)
-	, _nTgamDead(0)
-    , _nTgamDouble(0)
-    , _nTgamInduced(0)
-	, _nTcyt(0)
-	, _nTcytActive(0)
-	, _nTcytDownRegulated(0)
-	, _nTcytDead(0)
-	, _nTreg(0)
-	, _nTregActive(0)
-	, _nTregDead(0)
+  : _nAgents()
+	, _nMac()
+	, _nTgam()
+	, _nTcyt()
+	, _nTreg()
 	, _totExtMtb(0)
 	, _totNonRepExtMtb(0)
 	, _totIntMtb(0)
@@ -51,36 +37,10 @@ GrStat::GrStat()
 	, _nTcellApoptosisTNF(0)
 	, _nRestingMacActivationTNF(0)
 	, _nInfMacActivationTNF(0)
-	, _nMacNFkB(0)
-	, _nMacNFkBResting(0)
-	, _nMacNFkBInfected(0)
-	, _nMacNFkBCInfected(0)
-	, _nMacNFkBActive(0)
-	, _nMacNFkBDead(0)
-	, _nSourceMac(0)
-	, _nSourceTgam(0)
-	, _nSourceTcyt(0)
-	, _nSourceTreg(0)
-	, _nSourceMacActive(0)
-	, _nSourceTgamActive(0)
-	, _nSourceTcytActive(0)
-	, _nSourceTregActive(0)
-	, _nSourceMacCrowded(0)
-	, _nSourceTgamCrowded(0)
-	, _nSourceTcytCrowded(0)
-	, _nSourceTregCrowded(0)
-	, _nMacStat1(0)
-	, _nMacStat1Resting(0)
-	, _nMacStat1Infected(0)
-	, _nMacStat1CInfected(0)
-	, _nMacStat1Active(0)
-	, _nMacStat1Dead(0)
-	, _nMacDeact(0)
-	, _nMacDeactResting(0)
-	, _nMacDeactInfected(0)
-	, _nMacDeactCInfected(0)
-	, _nMacDeactActive(0)
-	, _nMacDeactDead(0)
+	, _nMacNFkB()
+	, _nSource()
+	, _nMacStat1()
+	, _nMacDeact()
 	, _nBactAct(0)
 	, _areaTNF(0)
 	, _areaCellDensity(0)
@@ -97,6 +57,7 @@ GrStat::GrStat()
 	, _fluxTgam(0)
 	, _fluxTcyt(0)
 	, _fluxTreg(0)
+	, _nSourceActive()
 	, _MDC(0)
 	, _N4(0)
 	, _TH0(0)
@@ -155,6 +116,7 @@ GrStat::~GrStat()
 void GrStat::updateAgentStatistics(Agent* a)
 {
   assert(a!=NULL);
+  ++_nAgents[a->getAgentType()];
   switch(a->getAgentType())
   {
     case MAC:
@@ -174,203 +136,51 @@ void GrStat::updateAgentStatistics(Agent* a)
 
         _intMtbFreq[int(pMac->getIntMtb())]++;
       }
-      updateMacStatistics(static_cast<Mac*>(pMac)->getState());
+      ++_nMac[a->getState()];
       break;
     }
     case TGAM:
-      updateTgamStatistics(static_cast<Tgam*>(a)->getState());
+      ++_nTgam[a->getState()];
       break;
     case TCYT:
-      updateTcytStatistics(static_cast<Tcyt*>(a)->getState());
+      ++_nTcyt[a->getState()];
       break;
     case TREG:
-      updateTregStatistics(static_cast<Treg*>(a)->getState());
+      ++_nTreg[a->getState()];
       break;
     default:
       throw std::runtime_error("Unknown agent type");
   }
 }
-void GrStat::updateMacStatistics(MacState state)
-{
-	switch (state)
-	{
-	case MAC_RESTING:
-		_nMacResting++;
-		break;
-	case MAC_INFECTED:
-		_nMacInfected++;
-		break;
-	case MAC_CINFECTED:
-		_nMacCInfected++;
-		break;
-	case MAC_ACTIVE:
-		_nMacActive++;
-		break;
-	case MAC_DEAD:
-		_nMacDead++;
-		break;
-  default: throw std::runtime_error("Unknown Mac state"); break;
-	}
-
-	_nMac++;
-}
 
 void GrStat::updateMacNFkBStatistics(MacState state)
 {
-	switch (state)
-	{
-	case MAC_RESTING:
-		_nMacNFkBResting++;
-		break;
-	case MAC_INFECTED:
-		_nMacNFkBInfected++;
-		break;
-	case MAC_CINFECTED:
-		_nMacNFkBCInfected++;
-		break;
-	case MAC_ACTIVE:
-		_nMacNFkBActive++;
-		break;
-	case MAC_DEAD:
-		_nMacNFkBDead++;
-		break;
-  default: throw std::runtime_error("Unknown Mac state"); break;
-	}
-
-	_nMacNFkB++;
+  assert(state >= 0 && state < NMAC_STATES);
+  ++_nMacNFkB[state];
 }
 
 void GrStat::updateMacStat1Statistics(MacState state)
 {
-	switch (state)
-	{
-	case MAC_RESTING:
-		_nMacStat1Resting++;
-		break;
-	case MAC_INFECTED:
-		_nMacStat1Infected++;
-		break;
-	case MAC_CINFECTED:
-		_nMacStat1CInfected++;
-		break;
-	case MAC_ACTIVE:
-		_nMacStat1Active++;
-		break;
-	case MAC_DEAD:
-		_nMacStat1Dead++;
-		break;
-  default: throw std::runtime_error("Unknown Mac state"); break;
-	}
-
-	_nMacStat1++;
+  assert(state >= 0 && state < NMAC_STATES);
+  ++_nMacStat1[state];
 }
 
 void GrStat::updateMacDeactStatistics(MacState state)
 {
-	switch (state)
-	{
-	case MAC_RESTING:
-		_nMacDeactResting++;
-		break;
-	case MAC_INFECTED:
-		_nMacDeactInfected++;
-		break;
-	case MAC_CINFECTED:
-		_nMacDeactCInfected++;
-		break;
-	case MAC_ACTIVE:
-		_nMacDeactActive++;
-		break;
-	case MAC_DEAD:
-		_nMacDeactDead++;
-		break;
-  default: throw std::runtime_error("Unknown Mac state"); break;
-	}
-
-	_nMacDeact++;
-}
-
-void GrStat::updateTgamStatistics(TgamState state)
-{
-	switch (state)
-	{
-	case TGAM_ACTIVE:
-		_nTgamActive++;
-		break;
-	case TGAM_DOWN_REGULATED:
-		_nTgamDownRegulated++;
-		break;
-	case TGAM_DEAD:
-		_nTgamDead++;
-		break;
-    case TGAM_ACTIVE_DOUBLE:
-        _nTgamDouble++;
-        break;
-    case TGAM_INDUCED_REG:
-        _nTgamInduced++;
-        break;
-            
-  default: throw std::runtime_error("Unknown Tgam state"); break;
-	}
-
-	_nTgam++;
-}
-
-void GrStat::updateTcytStatistics(TcytState state)
-{
-	switch (state)
-	{
-	case TCYT_ACTIVE:
-		_nTcytActive++;
-		break;
-	case TCYT_DOWN_REGULATED:
-		_nTcytDownRegulated++;
-		break;
-	case TCYT_DEAD:
-		_nTcytDead++;
-		break;
-  default: throw std::runtime_error("Unknown Tcyt state"); break;
-	}
-
-	_nTcyt++;
-}
-
-void GrStat::updateTregStatistics(TregState state)
-{
-	switch (state)
-	{
-	case TREG_ACTIVE:
-		_nTregActive++;
-		break;
-	case TREG_DEAD:
-		_nTregDead++;
-		break;
-  default: throw std::runtime_error("Unknown Treg state"); break;
-	}
-
-	_nTreg++;
+  assert(state >= 0 && state < NMAC_STATES);
+  ++_nMacDeact[state];
 }
 
 void GrStat::resetAgentStats()
 {
-	_nMac = _nMacResting = _nMacInfected = 
-		_nMacCInfected = _nMacDead = _nMacActive = 0;
-	
-	_nMacNFkB = _nMacNFkBResting = _nMacNFkBInfected =
-		_nMacNFkBCInfected = _nMacNFkBDead = _nMacNFkBActive = 0;
-	
-	_nMacStat1 = _nMacStat1Resting = _nMacStat1Infected = _nMacStat1CInfected = 
-		_nMacStat1Dead = _nMacStat1Active = 0;
-	
-	_nMacDeact = _nMacDeactResting = _nMacDeactInfected = _nMacDeactCInfected =
-		_nMacDeactDead = _nMacDeactActive = 0;
-
-	_nTgam = _nTgamActive = _nTgamDouble = _nTgamDead = _nTgamDownRegulated = _nTgamInduced = 0;
-	
-	_nTcyt = _nTcytDead = _nTcytDownRegulated = _nTcytActive = 0;
-	
-	_nTreg = _nTregDead = _nTregActive = 0;
-	
+  memset(_nAgents, 0, sizeof(int)*NAGENTS);
+  memset(_nMac, 0, sizeof(int)*NMAC_STATES);
+  memset(_nMacNFkB, 0, sizeof(int)*NMAC_STATES);
+  memset(_nMacStat1, 0, sizeof(int)*NMAC_STATES);
+  memset(_nMacDeact, 0, sizeof(int)*NMAC_STATES);
+  memset(_nTgam, 0, sizeof(int)*NTGAM_STATES);
+  memset(_nTcyt, 0, sizeof(int)*NTCYT_STATES);
+  memset(_nTreg, 0, sizeof(int)*NTREG_STATES);
 
   memset(_nMacApoptosisTNF, 0 , sizeof(int)*NMAC_STATES);
   memset(_intMtbFreq, 0, sizeof(unsigned)*_intMtbFreqSize);
@@ -382,12 +192,9 @@ void GrStat::reset()
 {
 	_totIntMtb = _totExtMtb = _totNonRepExtMtb = _totMacAttractant = _totTNF = _totCCL2 = _totCCL5 = _totCXCL9 = _totIL10 = 0;
 	
-	_nSourceMac = _nSourceTcyt = _nSourceTgam = _nSourceTreg = 0;
+  memset(_nSource, 0, sizeof(int)*NAGENTS);
+  memset(_nSourceActive, 0, sizeof(int)*NAGENTS);
 	
-	_nSourceMacActive = _nSourceTcytActive = _nSourceTgamActive = _nSourceTregActive = 0;
-
-	_nSourceMacCrowded = _nSourceTcytCrowded = _nSourceTgamCrowded = _nSourceTregCrowded = 0;
-
 	_nCaseated = 0;
 
 	_queueTgam = _queueTcyt = _queueTreg = 0;
@@ -407,28 +214,21 @@ void GrStat::serialize(std::ostream& out) const
 
 	Serialization::writeHeader(out, GrStat::_ClassName);
 
-	out << _nMac << std::endl;
-	out << _nMacResting << std::endl;
-	out << _nMacInfected << std::endl;
-	out << _nMacCInfected << std::endl;
-	out << _nMacActive << std::endl;
-	out << _nMacDead << std::endl;
+	out <<_nAgents[MAC];
+  for(size_t i=0;i<NMAC_STATES;i++)
+    out <<_nMac[i];
 
-	out << _nTgam << std::endl;
-	out << _nTgamActive << std::endl;
-	out << _nTgamDownRegulated << std::endl;
-	out << _nTgamDead << std::endl;
-    out << _nTgamDouble << std::endl;
-    out << _nTgamInduced << std::endl;
+	out <<_nAgents[TGAM];
+  for(size_t i=0;i<NTGAM_STATES;i++)
+    out <<_nTgam[i];
 
-	out << _nTcyt << std::endl;
-	out << _nTcytActive << std::endl;
-	out << _nTcytDownRegulated << std::endl;
-	out << _nTcytDead << std::endl;
+	out <<_nAgents[TCYT];
+  for(size_t i=0;i<NTCYT_STATES;i++)
+    out <<_nTcyt[i];
 
-	out << _nTreg << std::endl;
-	out << _nTregActive << std::endl;
-	out << _nTregDead << std::endl;
+	out <<_nAgents[TREG];
+  for(size_t i=0;i<NTREG_STATES;i++)
+    out <<_nTreg[i];
 
 	out << _totExtMtb << std::endl;
 	out << _totNonRepExtMtb << std::endl;
@@ -453,31 +253,18 @@ void GrStat::serialize(std::ostream& out) const
 	out << _nRestingMacActivationTNF << std::endl;
 	out << _nInfMacActivationTNF << std::endl;
 
-	out << _nMacNFkB << std::endl;
-	out << _nMacNFkBResting << std::endl;
-	out << _nMacNFkBInfected << std::endl;
-	out << _nMacNFkBCInfected << std::endl;
-	out << _nMacNFkBActive << std::endl;
-	out << _nMacNFkBDead << std::endl;
+  for(size_t i=0;i<NMAC_STATES;i++)
+    out <<_nMacNFkB[i];
 
-	out << _nSourceMac << std::endl;
-	out << _nSourceTgam << std::endl;
-	out << _nSourceTcyt << std::endl;
-	out << _nSourceTreg << std::endl;
+  for(size_t i=0;i<NAGENTS;i++)
+    out <<_nSource[i];
 
-	out << _nMacStat1 << std::endl;
-	out << _nMacStat1Resting << std::endl;
-	out << _nMacStat1Infected << std::endl;
-	out << _nMacStat1CInfected << std::endl;
-	out << _nMacStat1Active << std::endl;
-	out << _nMacStat1Dead << std::endl;
+  for(size_t i=0;i<NMAC_STATES;i++)
+    out <<_nMacStat1[i];
 
-	out << _nMacDeact << std::endl;
-	out << _nMacDeactResting << std::endl;
-	out << _nMacDeactInfected << std::endl;
-	out << _nMacDeactCInfected << std::endl;
-	out << _nMacDeactActive << std::endl;
-	out << _nMacDeactDead << std::endl;
+  for(size_t i=0;i<NMAC_STATES;i++)
+    out <<_nMacDeact[i];
+
 
 	out << _nBactAct << std::endl;
 	out << _areaTNF << std::endl;
@@ -496,10 +283,10 @@ void GrStat::serialize(std::ostream& out) const
 	out << _fluxTgam << std::endl;
 	out << _fluxTcyt << std::endl;
 	out << _fluxTreg << std::endl;
-	out << _nSourceMacActive << std::endl;
-	out << _nSourceTgamActive << std::endl;
-	out << _nSourceTcytActive << std::endl;
-	out << _nSourceTregActive << std::endl;
+
+  for(size_t i=0;i<NAGENTS;i++)
+    out << _nSourceActive[i] << std::endl;
+
 	out << _MDC << std::endl;
 	out << _N4 << std::endl;
 	out << _TH0 << std::endl;
@@ -527,28 +314,21 @@ void GrStat::deserialize(std::istream& in)
 		exit(1);
 	}
 
-	in >>_nMac;
-	in >>_nMacResting;
-	in >>_nMacInfected;
-	in >>_nMacCInfected;
-	in >>_nMacActive;
-	in >>_nMacDead;
+	in >>_nAgents[MAC];
+  for(size_t i=0;i<NMAC_STATES;i++)
+    in >>_nMac[i];
 
-	in >>_nTgam;
-	in >>_nTgamActive;
-	in >>_nTgamDownRegulated;
-	in >>_nTgamDead;
-    in >>_nTgamDouble;
-    in >>_nTgamInduced;
+	in >>_nAgents[TGAM];
+  for(size_t i=0;i<NTGAM_STATES;i++)
+    in >>_nTgam[i];
 
-	in >>_nTcyt;
-	in >>_nTcytActive;
-	in >>_nTcytDownRegulated;
-	in >>_nTcytDead;
+	in >>_nAgents[TCYT];
+  for(size_t i=0;i<NTCYT_STATES;i++)
+    in >>_nTcyt[i];
 
-	in >>_nTreg;
-	in >>_nTregActive;
-	in >>_nTregDead;
+	in >>_nAgents[TREG];
+  for(size_t i=0;i<NTREG_STATES;i++)
+    in >>_nTreg[i];
 
 	in >>_totExtMtb;
 	in >>_totNonRepExtMtb;
@@ -572,31 +352,17 @@ void GrStat::deserialize(std::istream& in)
 	in >> _nRestingMacActivationTNF;
 	in >> _nInfMacActivationTNF;
 
-	in >>_nMacNFkB;
-	in >>_nMacNFkBResting;
-	in >>_nMacNFkBInfected;
-	in >>_nMacNFkBCInfected;
-	in >>_nMacNFkBActive;
-	in >>_nMacNFkBDead;
+  for(size_t i=0;i<NMAC_STATES;i++)
+    in >>_nMacNFkB[i];
 
-	in >>_nSourceMac;
-	in >>_nSourceTgam;
-	in >>_nSourceTcyt;
-	in >>_nSourceTreg;
+  for(size_t i=0;i<NAGENTS;i++)
+    in >>_nSource[i];
 
-	in >>_nMacStat1;
-	in >>_nMacStat1Resting;
-	in >>_nMacStat1Infected;
-	in >>_nMacStat1CInfected;
-	in >>_nMacStat1Active;
-	in >>_nMacStat1Dead;
+  for(size_t i=0;i<NMAC_STATES;i++)
+    in >>_nMacStat1[i];
 
-	in >>_nMacDeact;
-	in >>_nMacDeactResting;
-	in >>_nMacDeactInfected;
-	in >>_nMacDeactCInfected;
-	in >>_nMacDeactActive;
-	in >>_nMacDeactDead;
+  for(size_t i=0;i<NMAC_STATES;i++)
+    in >>_nMacDeact[i];
 
 	in >>_nBactAct;
 	in >>_areaTNF;
@@ -617,10 +383,10 @@ void GrStat::deserialize(std::istream& in)
 	in >>_fluxTgam;
 	in >>_fluxTcyt;
 	in >>_fluxTreg;
-	in >>_nSourceMacActive;
-	in >>_nSourceTgamActive;
-	in >>_nSourceTcytActive;
-	in >>_nSourceTregActive;
+
+  for(size_t i=0;i<NAGENTS;i++)
+    in >>_nSourceActive[i];
+
 	in >>_MDC;
 	in >>_N4;
 	in >>_TH0;

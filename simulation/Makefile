@@ -1,11 +1,10 @@
 OS := $(shell grep -E 'Ubuntu|Red Hat' /etc/issue)
-DIM := 100
 BOOST_PREFIX := /usr
 
 SVNREV := $(shell svn info | grep "Last Changed Rev:" | cut -d" " -f4)
 CXX := g++
 
-override CXXFLAGS += -DSVN_VERSION=\"$(SVNREV)\" -D__DIM__=$(DIM) -Wall -I$(BOOST_PREFIX)/include -Wno-strict-aliasing
+override CXXFLAGS += -DSVN_VERSION=\"$(SVNREV)\" -Wall -I$(BOOST_PREFIX)/include -Wno-strict-aliasing
 override LDFLAGS += -L$(BOOST_PREFIX)/lib -lm -lboost_program_options -lboost_iostreams -lboost_serialization
 
 all: release
@@ -36,7 +35,7 @@ gpu:	LDFLAGS += -lcudart
 gpu:	SRCS += cudautil.cu grdiffusionftcsswapgpu.cu grsimulationgpu.cu
 gpu:	gr_gpu
 
-SRCS := paramsbase.cpp params.cpp rand.cpp agent.cpp gr.cpp grsimulationgrid.cpp grgrid.cpp gridcell.cpp macrophage.cpp  grstat.cpp grsimulation.cpp onlinestat.cpp grdiffusion.cpp grdiffusionftcs.cpp grdiffusionbtcs.cpp grdiffusionwrongbtcs.cpp grdiffusionftcsswap.cpp ttest.cpp areatest.cpp mtbtest.cpp tcell.cpp tcytotoxic.cpp tgamma.cpp tregulatory.cpp recruitmentbase.cpp recruitmentprob.cpp recruitmentlnode.cpp recruitmentlnodepure.cpp recruitmentlnodeproxy.cpp serialization.cpp tinyxml/tinystr.cpp tinyxml/tinyxml.cpp tinyxml/tinyxmlerror.cpp tinyxml/tinyxmlparser.cpp
+SRCS := paramsbase.cpp params.cpp rand.cpp agent.cpp gr.cpp grsimulationgrid.cpp grgrid.cpp macrophage.cpp  grstat.cpp grsimulation.cpp onlinestat.cpp grdiffusion.cpp grdiffusionbtcs.cpp grdiffusionwrongbtcs.cpp grdiffusionftcsswap.cpp ttest.cpp areatest.cpp mtbtest.cpp tcell.cpp tcytotoxic.cpp tgamma.cpp tregulatory.cpp recruitmentbase.cpp recruitmentprob.cpp recruitmentlnode.cpp recruitmentlnodeproxy.cpp recruitmentlnodepure.cpp serialization.cpp tinyxml/tinystr.cpp tinyxml/tinyxml.cpp tinyxml/tinyxmlerror.cpp tinyxml/tinyxmlparser.cpp
 OBJS := ${SRCS:.cpp=.o}
 
 # If Makefile or gr.h changes, we need to recompile everything -- We can do this here because object files only depend on one file

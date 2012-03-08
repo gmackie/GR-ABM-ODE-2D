@@ -13,7 +13,6 @@
 #define SCALARCELLDENSITYDATASET_H_
 
 #include "scalardataset.h"
-#include "simulation/gridcell.h"
 
 class ScalarCellDensityDataset: public ScalarDataset {
 public:
@@ -41,7 +40,7 @@ inline float ScalarCellDensityDataset::getScalar(const Simulation* pSimulation, 
 	{
 		for (int j = -1; j <= 1; j++)
 		{
-			if (pSimulation->getGrGrid()(MOD_ROW(row + i), MOD_COL(col + j)).isOccupied())
+			if (pSimulation->getGrGrid().isOccupied(moduloDIM(pSimulation->getSize().y, row + i), moduloDIM(pSimulation->getSize().x, col + j)))
 			{
 				mcCount++;
 			}

@@ -10,13 +10,13 @@
 #include "simulation/recruitmentbase.h"
 #include <fstream>
 
-ScalarAgentGrid::ScalarAgentGrid()
-	: ScalarAgentGridBase()
+ScalarAgentGrid::ScalarAgentGrid(size_t _DIM)
+	: ScalarAgentGridBase(_DIM)
 	, _grid(_DIM * _DIM)
 {
-	for (int i = 0; i < _DIM; i++) // row
+	for (size_t i = 0; i < _DIM; i++) // row
 	{
-		for (int j = 0; j < _DIM; j++) // col
+		for (size_t j = 0; j < _DIM; j++) // col
 		{
 			int idx = j + i * _DIM;
 			_grid[idx]._bitMask = 0;
@@ -43,54 +43,56 @@ void ScalarAgentGrid::evaluate(const Simulation* pSimulation)
 	_tcytList = pSimulation->getTcytList();
 	_tregList = pSimulation->getTregList();
 
+  const GrGrid& grid = pSimulation->getGrGrid();
+
 	for (int i = 0; i < _DIM; i++)
 	{
 		for (int j = 0; j < _DIM; j++)
 		{
-			const GridCell& cell = grGrid(i, j);
+			const Pos p(i, j);
 			ScalarAgentItem& item = _grid[i * _DIM + j];
 
 			item._bitMask = 0;
-			item._nKillings = cell.getNrKillings();
-			item._nRecruitments = cell.getNrRecruitments();
-			item._nSecretions = cell.getNrSecretions();
-			item._attractant = cell.getMacAttractant();
-			item._TNF = cell.getTNF();
-			item._CCL2 = cell.getCCL2();
-			item._CCL5 = cell.getCCL5();
-			item._CXCL9 = cell.getCXCL9();
-			item._extMtb = cell.getExtMtb();
+			item._nKillings = grid.nKillings(p);
+			item._nRecruitments = grid.nRecruitments(p);
+			item._nSecretions = grid.nSecretions(p);
+			item._attractant = grid.macAttractant(p);
+			item._TNF = grid.TNF(p);
+			item._CCL2 = grid.CCL2(p);
+			item._CCL5 = grid.CCL5(p);
+			item._CXCL9 = grid.CXCL9(p);
+			item._extMtb = grid.extMTB(p);
 			item._pAgent[0] = NULL;
 			item._pAgent[1] = NULL;
 
-			if (cell.isCaseated())
+			if (grid.isCaseated(p))
 			{
 				item._bitMask |= SET_BIT(_bitCas);
 			}
 
-			if (cell.isSource())
+			if (grid.isSource(p))
 			{
 				item._bitMask |= SET_BIT(_bitSrc);
 
-				if (RecruitmentBase::MacRecruitmentThreshold(&cell))
+				if (RecruitmentBase::MacRecruitmentThreshold(grid, p))
 				{
 					item._bitMask |= SET_BIT(_bitSrcMac);
 				}
-				if (RecruitmentBase::TgamRecruitmentThreshold(&cell))
+				if (RecruitmentBase::TgamRecruitmentThreshold(grid, p))
 				{
 					item._bitMask |= SET_BIT(_bitSrcTgam);
 				}
-				if (RecruitmentBase::TcytRecruitmentThreshold(&cell))
+				if (RecruitmentBase::TcytRecruitmentThreshold(grid, p))
 				{
 					item._bitMask |= SET_BIT(_bitSrcTcyt);
 				}
-				if (RecruitmentBase::TregRecruitmentThreshold(&cell))
+				if (RecruitmentBase::TregRecruitmentThreshold(grid, p))
 				{
 					item._bitMask |= SET_BIT(_bitSrcTreg);
 				}
 			}
 
-			if (cell.getExtMtb() >= 1)
+			if (grid.extMTB(p) >= 1)
 				item._bitMask |= SET_BIT(_bitExtMtb);
 		}
 	}

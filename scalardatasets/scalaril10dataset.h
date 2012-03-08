@@ -29,7 +29,7 @@ inline ScalarIl10Dataset::~ScalarIl10Dataset()
 
 inline float ScalarIl10Dataset::getScalar(const Simulation* pSimulation, int row, int col) const
 {
-	return pSimulation->getGrGrid()(row, col).getIL10();
+	return pSimulation->getGrGrid().il10(row, col);
 }
 
 #endif /* scalarIl10DATASET_H_ */

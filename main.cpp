@@ -18,7 +18,6 @@
 #include "simulation/recruitmentprob.h"
 #include "simulation/recruitmentlnode.h"
 #include "simulation/recruitmentlnodepure.h"
-#include "simulation/recruitmentlnodeproxy.h"
 #include "maininterface.h"
 #include "simulation.h"
 #include "ui_mainwindow.h"
@@ -66,24 +65,14 @@ Snapshot* setupOutput(MainWindow& mainWindow, const std::string& outputDir, bool
 
 int main(int argc, char *argv[])
 {
-<<<<<<< HEAD
-	std::cout << std::endl;
-	printVersion();
-	std::cout << "GRID SIZE: NROWS: " << NROWS << " NCOLS: " << NCOLS << std::endl;
-
-=======
->>>>>>> grid
 	QApplication a(argc, argv);
 
+	bool ode;
 	bool tnfrDynamics;
 	bool nfkbDynamics;
 	int tnfDepletionTimeStep;
-<<<<<<< HEAD
 	unsigned int seed;
-=======
-	unsigned long seed;
   size_t dim;
->>>>>>> grid
 	bool seedSpecified;
 	int diffMethod;
 	std::string inputFileName;
@@ -119,15 +108,9 @@ int main(int argc, char *argv[])
 	desc.add_options()
 		("help,h", "Help message")
 		("input-file,i", po::value<std::string>(&inputFileName), "Input file name")
-<<<<<<< HEAD
-		("seed,s", po::value<unsigned int>(&seed))
-		("recr", po::value<unsigned>()->default_value(0), "recruitment:\n0 - probability\n1 - lymph node ode proxy\n2 - lymph node ode pure")
-		("diffusion,d", po::value<int>(&diffMethod)->default_value(3),
-=======
-		("seed,s", po::value<unsigned long>(&seed))
+		("seed,s", po::value(&seed))
     ("dim,d", po::value(&dim)->default_value(100))
 		("diffusion", po::value<int>(&diffMethod)->default_value(3),
->>>>>>> grid
 				"Diffusion method:\n0 - FTCS\n1 - BTCS (SOR, correct)\n2 - BTCS (SOR, wrong)\n3 - FTCS Grid Swap")
 		("timesteps,t", po::value<int>(&timesteps), "Number of time steps to simulate\nTakes precedence over --days")
 		("days", po::value<int>(&nDays)->default_value(200), "Number of days to simulate")
@@ -155,9 +138,12 @@ int main(int argc, char *argv[])
 		("border", "Draw granuloma border")
 		("load-state,l",  po::value<std::string>(&stateFileName), "File name of saved state to load")
 		("snapshot",  po::value<std::string>(&stateFileName), "Load a saved state, save a graphic snapshot and quit.\nArgument is the saved state to load.")
+		("ode", "Use integrated lymph node ODE for recruitment")
 		("tnfr-dynamics", "Use molecular level TNF/TNFR dynamics in the model")
 		("NFkB-dynamics", "Use molecular level intracellular NFkB dynamics in the model")
 		("tnf-depletion", po::value<int>(&tnfDepletionTimeStep)->default_value(-1), "The time step at which to stop secreting tnf, including by tnfr dynamics. -1: no depletion")
+		("ln-ode", po::value<std::string>(&lymphNodeODE), "Lymph node application")
+		("ln-ode-temp", po::value<std::string>(&lymphNodeTemp), "Lymph node temp file")
 		("quiet,q", "Don't show any visualization windows")
 		("version,v", "Version number");
 
@@ -172,7 +158,7 @@ int main(int argc, char *argv[])
     std::cout << "GRID SIZE: NROWS: " << dim << " NCOLS: " << dim << std::endl;
 		if (vm.count("version"))
 		{
-			// Nothing to do - the version is always printed above.
+			printVersion();
 			return 0;
 		}
 
@@ -192,6 +178,7 @@ int main(int argc, char *argv[])
 		scriptingMode = vm.count("script");
 		outputEnabled = vm.count("output");
 
+		ode = vm.count("ode");
 		tnfrDynamics = vm.count("tnfr-dynamics");
 		nfkbDynamics = vm.count("NFkB-dynamics");
 
@@ -209,11 +196,7 @@ int main(int argc, char *argv[])
 			}
 		}
 
-<<<<<<< HEAD
-		if (!Params::getInstance()->fromXml(inputFileName.c_str()))
-=======
-		if (!Params::getInstance(ode, Pos(dim, dim))->fromXml(inputFileName.c_str()))
->>>>>>> grid
+		if (!Params::getInstance(Pos(dim, dim))->fromXml(inputFileName.c_str()))
 			return 1;
 
 		if (!(0 <= diffMethod && diffMethod < 4))
@@ -325,26 +308,12 @@ int main(int argc, char *argv[])
 	MainWindow w(&itfc, &glWindow, &paramWindow, new StatWidget(), new AgentsWidget(&agentsVisualization));
 
 	/* set recruitment method */
-	RecruitmentBase* pRecr;
-	switch (vm["recr"].as<unsigned>())
-	{
-	case 0:
-	  pRecr = (RecruitmentBase*)new RecruitmentProb();
-	  break;
-	case 1:
-	  pRecr = (RecruitmentBase*)new RecruitmentLnODEProxy();
-	  break;
-	case 2:
-	  pRecr = (RecruitmentBase*)new RecruitmentLnODEPure();
-
-	  break;
-	default:
-	  std::cerr << std::endl <<"Unsupported recruitment method" << std::endl << std::endl;
-	  printUsage(argv[0], desc);
-	  exit(1);
-	}
-
-	itfc.getSimulation().setRecruitment(pRecr);
+	if (ode)
+		itfc.getSimulation().setRecruitment(new RecruitmentLnODEPure());
+	else if (lymphNodeODE == "" && lymphNodeTemp == "")
+		itfc.getSimulation().setRecruitment(new RecruitmentProb());
+	else
+		itfc.getSimulation().setRecruitment(new RecruitmentLnODE(lymphNodeODE, lymphNodeTemp));
 	
 	/* set TNF/TNFR and NFkB dynamics */
 	/* When NFkB is turned on, tnfr dynamics will be turned on autamatically */

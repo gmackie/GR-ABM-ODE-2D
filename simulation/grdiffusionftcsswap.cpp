@@ -34,6 +34,14 @@ static void diffuse(const Scalar* grid, Scalar* newgrid, const Pos& dim, const S
       nc *= (1.0 - degrade * DT);
     }
 }
+static void diffuse_recon(const Scalar* u, const Scalar* v, Scalar* grid) {
+  #define DT (6.0)
+  for(int i=0;i<GETROW(dim);i++)
+    for(int j=0;j<GETCOL(dim);j++)
+    {
+	grid[Indexer] = (u[Indexer::padInd] + v[Indexer])/2;
+    }
+}
 
 void GrDiffusionFTCS_Swap::diffuse(GrSimulationGrid& grSim) const {
 	GrGrid& grid = grSim.getCurrentGrid();
@@ -42,7 +50,7 @@ void GrDiffusionFTCS_Swap::diffuse(GrSimulationGrid& grSim) const {
 {
   #pragma omp section
   {
-    ::diffuse(grid.TNF(), nextGrid.TNF(), grid.getRange(), _PARAM(PARAM_GR_D_TNF) * 6 / (4e-6), _PARAM(PARAM_GR_K_DEG), _cutOffValue);
+    ::diffuse(grid.TNF(), nextGrid.TNF(), grid.getRange(), _PARAM(PARAM_GR_D_TNF) * 6 / (4e-6), _PARAM(PARAM_GR_K_DEG), _cutOffValue);	//u
   }
   #pragma omp section
   {

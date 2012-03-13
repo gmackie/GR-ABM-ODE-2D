@@ -74,7 +74,10 @@ private:
 #define GRID(type, name) \
     std::vector<type> _##name;
 #define PADDED_GRID(type, name) \
-    std::vector<type> _##name;
+    std::vector<type> _##name;	\
+    std::vector<type> _u_##name;	\
+    std::vector<type> _v_##name;	\
+
   GRIDS_DEFS
 #undef GRID
 #undef PADDED_GRID
@@ -125,10 +128,16 @@ public:
 #define PADDED_GRID(type, name) \
   const type& name (const Pos& p) const;  \
   const type& name (int x, int y) const;  \
-        type& name (const Pos& p);  \
-        type& name (int x, int y);  \
+        void set##name (const Pos& p, type v);  \
+        void set##name (int x, int y, type v);  \
+        void inc##name (const Pos& p, type v);  \
+        void inc##name (int x, int y, type v);  \
   const type* name () const;  \
-        type* name ();
+        type* name ();	\
+  const type* u_##name () const;  \
+        type* u_##name ();	\
+  const type* v_##name () const;  \
+        type* v_##name ();
 
   GRIDS_DEFS
 
@@ -195,10 +204,28 @@ inline const std::vector<Pos>& GrGrid::getSources() const
     { return _##name.data(); } \
   inline       type* GrGrid:: name () \
     { return _##name.data(); }  \
-  inline type& GrGrid:: name (const Pos& p) \
-    { return _##name [Indexer::padInd(_dim, p)]; } \
-  inline type& GrGrid:: name (int x, int y)  \
-    { return _##name [Indexer::padInd(_dim, x, y)]; }
+  inline const type* GrGrid::u_##name () const  \
+    { return _u_##name.data(); } \
+  inline       type* GrGrid::u_##name () \
+    { return _u_##name.data(); }  \
+  inline const type* GrGrid::v_##name () const  \
+    { return _v_##name.data(); } \
+  inline       type* GrGrid::v_##name () \
+    { return _v_##name.data(); }  \
+  inline void GrGrid::set##name (const Pos& p, type v) \
+    { set##name(p.x, p.y, v); } \
+  inline void GrGrid::set##name (int x, int y, type v)  \
+    { _u_##name[Indexer::padInd(_dim, x, y)] += v - _##name[Indexer::padInd(_dim, x, y)];					\
+      _v_##name[Indexer::padInd(_dim, x, y)] += v - _##name[Indexer::padInd(_dim, x, y)];					\
+      _##name [Indexer::padInd(_dim, x, y)] = v; \
+    }	\
+  inline void GrGrid::inc##name (const Pos& p, type v) \
+    { set##name(p.x, p.y, v); } \
+  inline void GrGrid::inc##name (int x, int y, type v)  \
+    { _u_##name[Indexer::padInd(_dim, x, y)] += v;					\
+      _v_##name[Indexer::padInd(_dim, x, y)] += v;					\
+      _##name [Indexer::padInd(_dim, x, y)] = v; \
+    }	
 
   GRIDS_DEFS
 

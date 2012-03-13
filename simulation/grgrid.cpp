@@ -17,7 +17,9 @@ const std::string GrGrid::_ClassName = "GrGrid";
 #define GRID(type, name) \
   , _##name (SZ)
 #define PADDED_GRID(type, name) \
-  , _##name(Scalar_SZ)
+  , _##name(Scalar_SZ)	\
+  , _u_##name(Scalar_SZ)	\
+  , _v_##name(Scalar_SZ)	
 GrGrid::GrGrid(const Pos& dim)
   : _dim(dim)
   , _nCaseation(_PARAM(PARAM_GR_NR_KILLINGS_FOR_CASEATION))

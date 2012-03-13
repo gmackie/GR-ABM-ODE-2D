@@ -220,11 +220,11 @@ inline const std::vector<Pos>& GrGrid::getSources() const
       _##name [Indexer::padInd(_dim, x, y)] = v; \
     }	\
   inline void GrGrid::inc##name (const Pos& p, type v) \
-    { set##name(p.x, p.y, v); } \
+    { inc##name(p.x, p.y, v); } \
   inline void GrGrid::inc##name (int x, int y, type v)  \
     { _u_##name[Indexer::padInd(_dim, x, y)] += v;					\
       _v_##name[Indexer::padInd(_dim, x, y)] += v;					\
-      _##name [Indexer::padInd(_dim, x, y)] = v; \
+      _##name [Indexer::padInd(_dim, x, y)] += v; \
     }	
 
   GRIDS_DEFS

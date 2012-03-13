@@ -86,7 +86,7 @@ void Treg::secrete(GrGrid& grid, bool, bool, bool, bool il10rDynamics, bool il10
     _kISynth = _PARAM(PARAM_GR_I_K_SYNTH_TCELL);
     
     if (!il10rDynamics && !il10Depletion) {
-        grid.il10(_pos) += (_PARAM(PARAM_TREG_SEC_RATE_IL10));
+        grid.incil10(_pos, (_PARAM(PARAM_TREG_SEC_RATE_IL10)));
     }
     
 }
@@ -221,8 +221,8 @@ void Treg::solveTNF(GrGrid& grid, double dt)
 	tnf += dsTNF;
 	shedtnfr2 += dshedTNFR2;
 	
-	grid.TNF(_pos) = (Nav * vol * tnf);
-	grid.shedTNFR2(_pos) = (Nav * vol * shedtnfr2);
+	grid.setTNF(_pos, (Nav * vol * tnf));
+	grid.setshedTNFR2(_pos, (Nav * vol * shedtnfr2));
 	if (_mTNF < 0 || _surfTNFR1 < 0 || _surfBoundTNFR1 < 0 || _surfTNFR2 < 0 || _surfBoundTNFR2 < 0 || _mTNFRNA < 0)
 		std::cout << "Error: Negative Value of Species in TNF/TNFR dynamics" << std::endl;
     
@@ -305,9 +305,9 @@ void Treg::solveTNFandIL10(GrGrid& grid, double dt)
     _surfBoundIL10R += dsurfBoundIL10R;
     il10 += dsIL10;
 	
-	grid.TNF(_pos) = (Nav * vol * tnf);
-	grid.shedTNFR2(_pos) = (Nav * vol * shedtnfr2);
-    grid.il10(_pos) = (Nav * vol * il10);
+	grid.setTNF(_pos, (Nav * vol * tnf));
+	grid.setshedTNFR2(_pos, (Nav * vol * shedtnfr2));
+	grid.setil10(_pos, (Nav * vol * il10));
 	
     
 	if (_mTNF < 0 || _surfTNFR1 < 0 || _surfBoundTNFR1 < 0 || _surfTNFR2 < 0 || _surfBoundTNFR2 < 0 || _mTNFRNA < 0)
@@ -342,7 +342,7 @@ void Treg::solveIL10(GrGrid& grid, double dt)
     _surfBoundIL10R += dsurfBoundIL10R;
     il10 += dsIL10;
     
-    grid.il10(_pos) = (Nav * vol * il10);
+    grid.setil10(_pos, (Nav * vol * il10));
     
     if (_surfIL10R < 0 || _surfBoundIL10R < 0)
         std::cout << "Error: Negative value of species in IL10/IL10R dynamics" << std::endl;
@@ -362,7 +362,7 @@ void Treg::solveDegradation(GrGrid& grid, double dt, bool tnfrDynamics, bool il1
         dtnf = -_PARAM(PARAM_GR_K_INT1) * (tnf / (tnf + _PARAM(PARAM_GR_KD1) * Nav * vol)) * _PARAM(PARAM_GR_MEAN_TNFR1_TCELL) * dt * 0.4;
         tnf += dtnf;  
         
-        grid.TNF(_pos) = (tnf);
+        grid.setTNF(_pos, tnf);
     }
     
     if (!il10rDynamics) {
@@ -374,7 +374,7 @@ void Treg::solveDegradation(GrGrid& grid, double dt, bool tnfrDynamics, bool il1
         dil10 = -_PARAM(PARAM_GR_I_K_INT) * (il10 / (il10 + _PARAM(PARAM_GR_I_KD) * Nav * vol)) * _PARAM(PARAM_GR_I_IL10R_TCELL) * dt * _PARAM(PARAM_GR_I_MOD);
         il10 += dil10;  
         
-        grid.il10(_pos) = (il10);
+        grid.setil10(_pos, (il10));
         
     }
     

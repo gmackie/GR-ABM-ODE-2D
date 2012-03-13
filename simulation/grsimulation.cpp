@@ -545,10 +545,10 @@ void GrSimulation::secreteFromCaseations()
 		{
 			if (g.isCaseated(p))
 			{
-				g.CCL2(p) += (0.25 * _PARAM(PARAM_MAC_SEC_RATE_CCL2));
-				g.CCL5(p) += (0.25 * _PARAM(PARAM_MAC_SEC_RATE_CCL5));
-				g.CXCL9(p) += (0.25 * _PARAM(PARAM_MAC_SEC_RATE_CXCL9));
-			    g.macAttractant(p) += (_PARAM(PARAM_GR_SEC_RATE_ATTRACTANT));
+				g.incCCL2(p, (0.25 * _PARAM(PARAM_MAC_SEC_RATE_CCL2)));
+				g.incCCL5(p, (0.25 * _PARAM(PARAM_MAC_SEC_RATE_CCL5)));
+				g.incCXCL9(p,  (0.25 * _PARAM(PARAM_MAC_SEC_RATE_CXCL9)));
+				g.incmacAttractant(p, (_PARAM(PARAM_GR_SEC_RATE_ATTRACTANT)));
 			}
 		}
 	}
@@ -766,7 +766,7 @@ void GrSimulation::adjustTNFDegradation(double dt)
 		{
 			// simulate the effect of TNF internalization by cells in the form of degradation. only for TNF
 			double dtnf;
-			Scalar& tnf = grid.TNF(pos);
+			Scalar tnf = grid.TNF(pos);
 			if (grid.hasAgentType(MAC, pos))
 			{
 				dtnf = -_PARAM(PARAM_GR_K_INT1) * (tnf / (tnf + _PARAM(PARAM_GR_KD1) * 48.16e11)) * 1500 * dt * 0.4;

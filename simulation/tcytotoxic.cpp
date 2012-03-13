@@ -106,10 +106,10 @@ void Tcyt::secrete(GrGrid& grid, bool tnfrDynamics, bool, bool tnfDepletion, boo
        const double il10 = log(((grid.il10(_pos) * MW_IL10 * 1e6)/(Nav * vol))); // converting il10 concentration to log(ng/mL) for use in dose dependence
        const double tnfMOD = (1.0/(1.0 + exp((il10 + _PARAM(PARAM_GR_LINK_LOG_ALPHA))/_PARAM(PARAM_GR_LINK_LOG_BETA)))); // calculate the fraction of inhibition
         
-		grid.TNF(_pos) += (tnfMOD * _PARAM(PARAM_TCYT_SEC_RATE_TNF));
+		grid.incTNF(_pos, (tnfMOD * _PARAM(PARAM_TCYT_SEC_RATE_TNF)));
     }
     if (!il10rDynamics && !il10Depletion) {
-        grid.il10(_pos) += (_PARAM(PARAM_TCYT_SEC_RATE_IL10));
+        grid.setil10(_pos, (_PARAM(PARAM_TCYT_SEC_RATE_IL10)));
     }
     
 }
@@ -291,8 +291,8 @@ void Tcyt::solveTNF(GrGrid& grid, double dt)
 	tnf += dsTNF;
 	shedtnfr2 += dshedTNFR2;
 	
-	grid.TNF(_pos) = (Nav * vol * tnf);
-	grid.shedTNFR2(Nav * vol * shedtnfr2);
+	grid.setTNF(_pos, (Nav * vol * tnf));
+	grid.setshedTNFR2(_pos, Nav * vol * shedtnfr2);
 	if (_mTNF < 0 || _surfTNFR1 < 0 || _surfBoundTNFR1 < 0 || _surfTNFR2 < 0 || _surfBoundTNFR2 < 0 || _mTNFRNA < 0)
 		std::cout << "Error: Negative Value of Species in TNF/TNFR dynamics" << std::endl;
     
@@ -378,9 +378,9 @@ void Tcyt::solveTNFandIL10(GrGrid& grid, double dt)
     _surfBoundIL10R += dsurfBoundIL10R;
     il10 += dsIL10;
 	
-	grid.TNF(_pos) = (Nav * vol * tnf);
-	grid.shedTNFR2(_pos) = (Nav * vol * shedtnfr2);
-    grid.il10(_pos) = (Nav * vol * il10);
+	grid.setTNF(_pos, (Nav * vol * tnf));
+	grid.setshedTNFR2(_pos, (Nav * vol * shedtnfr2));
+	grid.setil10(_pos, (Nav * vol * il10));
 	
     
 	if (_mTNF < 0 || _surfTNFR1 < 0 || _surfBoundTNFR1 < 0 || _surfTNFR2 < 0 || _surfBoundTNFR2 < 0 || _mTNFRNA < 0)
@@ -416,7 +416,7 @@ void Tcyt::solveIL10(GrGrid& grid, double dt)
     _surfBoundIL10R += dsurfBoundIL10R;
     il10 += dsIL10;
     
-    grid.il10(_pos) = (Nav * vol * il10);
+    grid.setil10(_pos, (Nav * vol * il10));
     
     if (_surfIL10R < 0 || _surfBoundIL10R < 0)
         std::cout << "Error: Negative value of species in IL10/IL10R dynamics" << std::endl;
@@ -436,7 +436,7 @@ void Tcyt::solveDegradation(GrGrid& grid, double dt, bool tnfrDynamics, bool il1
             dtnf = -_PARAM(PARAM_GR_K_INT1) * (tnf / (tnf + _PARAM(PARAM_GR_KD1) * Nav * vol)) * _PARAM(PARAM_GR_MEAN_TNFR1_TCELL) * dt * 0.4;
             tnf += dtnf;  
         
-        grid.TNF(_pos) = (tnf);
+        grid.setTNF(_pos, (tnf));
     }
     
     if (!il10rDynamics) {
@@ -448,7 +448,7 @@ void Tcyt::solveDegradation(GrGrid& grid, double dt, bool tnfrDynamics, bool il1
         dil10 = -_PARAM(PARAM_GR_I_K_INT) * (il10 / (il10 + _PARAM(PARAM_GR_I_KD) * Nav * vol)) * _PARAM(PARAM_GR_I_IL10R_TCELL) * dt * _PARAM(PARAM_GR_I_MOD);
         il10 += dil10;  
 
-        grid.il10(_pos) = (il10);
+        grid.setil10(_pos, (il10));
         
     }
     

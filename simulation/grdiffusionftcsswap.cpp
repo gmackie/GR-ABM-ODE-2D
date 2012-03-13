@@ -34,14 +34,14 @@ static void diffuse(const Scalar* grid, Scalar* newgrid, const Pos& dim, const S
       nc *= (1.0 - degrade * DT);
     }
 }
-static void diffuse_recon(const Scalar* u, const Scalar* v, Scalar* grid) {
+/*static void diffuse_recon(const Scalar* u, const Scalar* v, Scalar* grid) {
   #define DT (6.0)
   for(int i=0;i<GETROW(dim);i++)
     for(int j=0;j<GETCOL(dim);j++)
     {
 	grid[Indexer] = (u[Indexer::padInd] + v[Indexer])/2;
     }
-}
+}*/
 
 void GrDiffusionFTCS_Swap::diffuse(GrSimulationGrid& grSim) const {
 	GrGrid& grid = grSim.getCurrentGrid();
@@ -50,7 +50,7 @@ void GrDiffusionFTCS_Swap::diffuse(GrSimulationGrid& grSim) const {
 {
   #pragma omp section
   {
-    ::diffuse(grid.TNF(), nextGrid.TNF(), grid.getRange(), _PARAM(PARAM_GR_D_TNF) * 6 / (4e-6), _PARAM(PARAM_GR_K_DEG), _cutOffValue);	//u
+    ::diffuse(grid.TNF(), nextGrid.TNF(), grid.getRange(), _PARAM(PARAM_GR_D_TNF) * 6 / (4e-6), _PARAM(PARAM_GR_K_DEG), _cutOffValue);
   }
   #pragma omp section
   {
@@ -76,10 +76,10 @@ void GrDiffusionFTCS_Swap::diffuse(GrSimulationGrid& grSim) const {
   Pos p;
   for(p.x = 0; p.x < grid.getRange().x; ++p.x)
     for(p.y = 0; p.y < grid.getRange().y; ++p.y) {
-      nextGrid.shedTNFR2(p) *= (1 - _PARAM(PARAM_GR_KD2) * _PARAM(PARAM_GR_K_ON2) * dt);
-      nextGrid.TNF(p) += (_PARAM(PARAM_GR_KD2) * _PARAM(PARAM_GR_K_ON2) * nextGrid.shedTNFR2(p) * dt);
-      nextGrid.CXCL9(p) = nextGrid.CCL2(p) * ratioCXCL9toCCL2;
-      nextGrid.CCL5(p) = nextGrid.CCL2(p) * ratioCCL5toCCL2;
+      nextGrid.setshedTNFR2(p, nextGrid.shedTNFR2(p) * (1 - _PARAM(PARAM_GR_KD2) * _PARAM(PARAM_GR_K_ON2) * dt));
+      nextGrid.incTNF(p, (_PARAM(PARAM_GR_KD2) * _PARAM(PARAM_GR_K_ON2) * nextGrid.shedTNFR2(p) * dt));
+      nextGrid.setCXCL9(p, nextGrid.CCL2(p) * ratioCXCL9toCCL2);
+      nextGrid.setCCL5(p, nextGrid.CCL2(p) * ratioCCL5toCCL2);
     }
   grSim.swap();
 }

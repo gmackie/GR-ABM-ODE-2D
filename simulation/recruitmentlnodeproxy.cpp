@@ -21,8 +21,6 @@ RecruitmentLnODEProxy::~RecruitmentLnODEProxy() {
 
 void RecruitmentLnODEProxy::solveODE(const int time, const GrStat& statsPrevious, GrStat& stats)
 {
-	int boundaryTime = _PARAM(PARAM_TCELL_LYMPH_PROXY_BOUNDARY_TIME);
-
 	Scalar totMtb = statsPrevious.getTotExtMtb() + statsPrevious.getTotIntMtb();
 	Scalar replicatingMtb =  totMtb - statsPrevious.getTotNonRepExtMtb();
 
@@ -31,7 +29,7 @@ void RecruitmentLnODEProxy::solveODE(const int time, const GrStat& statsPrevious
 	// so we store that in _odeInitialConditions[_idxEffectorT8] and set _odeInitialConditions[_idxEffectorTH1] to 0. Then in RecruitmentLnODE::updateQueue
 	// for this proxy, the T gam flux is based in the single value calculated here.
 	_odeInitialConditions[_idxEffectorTH1] = 0.0;
-	if (time >= 0 && time < boundaryTime)
+	if (time >= 0 && time < _PARAM(PARAM_TCELL_LYMPH_PROXY_NONLINEAR_TIME_START))
 	{
 		if (replicatingMtb > 0.0)
 		{
@@ -48,6 +46,14 @@ void RecruitmentLnODEProxy::solveODE(const int time, const GrStat& statsPrevious
 	{
 		_odeInitialConditions[_idxEffectorT8] = 0.0012 * pow(replicatingMtb, 2) + 2.0676 * replicatingMtb + 144.54;
 		_odeInitialConditions[_idxCTL] = 0.0005 * pow(replicatingMtb, 2) + 0.7956 * replicatingMtb + 55.803;
+
+		if (time >= _PARAM(PARAM_TCELL_LYMPH_PROXY_NONLINEAR_TIME_START) && time <= _PARAM(PARAM_TCELL_LYMPH_PROXY_NONLINEAR_TIME_FULL))
+		{
+			Scalar fluxFactor = _PARAM(PARAM_TCELL_LYMPH_PROXY_NONLINEAR_M) * time + _PARAM(PARAM_TCELL_LYMPH_PROXY_NONLINEAR_B);
+
+			_odeInitialConditions[_idxEffectorT8] *= fluxFactor;
+			_odeInitialConditions[_idxCTL] *= fluxFactor;
+		}
 	}
 
     stats.setTH1lung(_odeInitialConditions[_idxEffectorTH1]);

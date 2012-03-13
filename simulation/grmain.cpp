@@ -455,6 +455,12 @@ int main(int argc, char** argv)
   bool lhs = vm.count("lhs");
 
   bool screenDisplay = !(vm.count("quiet") || vm.count("lhs"));
+
+  // Must be done before making GrSimulation.
+  // Also must be done before creating a lymph ODE recruitment object,
+  // since the base lymph ODE class, RecruitmentLnODE, uses parameters in its constructor.
+  if (!Params::getInstance(pdim)->fromXml(paramFile.c_str()))
+    throw std::runtime_error("Unable to get parameters from file, cannot continue...");
   
   RecruitmentBase* pRecr;
   switch (vm["recr"].as<unsigned>())
@@ -489,9 +495,6 @@ int main(int argc, char** argv)
       printUsage(argv[0], desc);
       exit(1);
   }
-
-  if (!Params::getInstance(pdim)->fromXml(paramFile.c_str())) //Must be done before making GrSimulation
-    throw std::runtime_error("Unable to get parameters from file, cannot continue...");
 
   GrSimulation* pSim = new GrSimulation(pdim);
   assert(pSim != NULL);

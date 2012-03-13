@@ -11,6 +11,8 @@
 #include <fstream>
 #include <stdio.h>
 
+using namespace std;
+
 // For each XML element, its XML element type and text name as it appears in a parameter file.
 // The first element of this array is considered the root XML element and must be present in the parameter file as the root XML element.
 const NodeDescription ParamsBase::_element[NODE_COUNT] = {
@@ -283,6 +285,8 @@ const ParamDescription ParamsBase::_description[_PARAM_COUNT] =
 	{ "initN4",								GR_NODE,	false,	false,	0.0,	0,	"",					"ODE stuff - N4(0)" },
 	{ "initN8",								GR_NODE,	false,	false,	0.0,	0,	"",					"ODE stuff - N8(0)" },
 	{ "sourceDensity",      				GR_NODE,	false,	true,	0.2, 	0,	"",					"Density of vascular sources on the grid"},
+	{ "lymphProxyFluxM",					TCELL_NODE,	false,	true,	0.0,	0,	"",					"M value for calculating flux factor for non-linear calculations for T cell fluxes." },
+	{ "lymphProxyFluxB",					TCELL_NODE,	false,	true,	0.0,	0,	"",					"B value for calculating flux factor for non-linear calculations for T cell fluxes." },
 
 	/* INT */
 	{ "nrSources",							GR_NODE,	true,	true,	0.0,	0,	"",					"Number of vascular sources on the grid" },
@@ -293,7 +297,8 @@ const ParamDescription ParamsBase::_description[_PARAM_COUNT] =
 	{ "initNumber",							MAC_NODE,	true,	true,	0.0,	0,	"",					"Initial number of resting macrophages on the grid" },
 	{ "maxAge",								TCELL_NODE,	true,	false,	0.0,	0,	"#timesteps",		"Maximal T cell age" },
 	{ "timeRecEnabled",						TCELL_NODE,	true,	false,	0.0,	0,	"#timesteps",		"Time after which T cell recruitment is enabled" },
-	{ "lymphProxyBoundaryTime",				TCELL_NODE,	true,	false,	0.0,	0,	"#timesteps",		"Time when T cell lymph ode proxy recruitment switches between early and late calculations for T cell fluxes." },
+	{ "lymphProxyNonlinearStart",			TCELL_NODE,	true,	false,	0.0,	0,	"#timesteps",		"Time when T cell lymph ode proxy recruitment switches from linear to non-linear calculations for T cell fluxes." },
+	{ "lymphProxyNonlinearFull",			TCELL_NODE,	true,	false,	0.0,	0,	"#timesteps",		"Time when T cell lymph ode proxy recruitment switches from partial non-linear to full non-linear calculations for T cell fluxes." },
 	{ "maxTimeReg",							TGAM_NODE,	true,	false,	0.0,	0,	"#timesteps",		"Time span during which a Tgam cell remains down-regulated" },
     { "maxTimeDouble",						TGAM_NODE,	true,	false,	0.0,	0,	"#timesteps",		"Time span during which a Tgam cell remains double producer" },
     { "maxTimeReg",							TCYT_NODE,	true,	false,	0.0,	0,	"#timesteps",		"Time span during which a Tcyt cell remains down-regulated" },
@@ -699,9 +704,17 @@ void ParamsBase::computeParams()
   else
     throw std::runtime_error("Sources not specified in parameter file");
 
-	defineRecruitmentWeight(PARAM_GR_WEIGHT_CCL2_RECRUITMENT, PARAM_MAC_SEC_RATE_CCL2);
-	defineRecruitmentWeight(PARAM_GR_WEIGHT_CCL5_RECRUITMENT, PARAM_MAC_SEC_RATE_CCL5);
-	defineRecruitmentWeight(PARAM_GR_WEIGHT_CXCL9_RECRUITMENT, PARAM_MAC_SEC_RATE_CXCL9);
+  defineRecruitmentWeight(PARAM_GR_WEIGHT_CCL2_RECRUITMENT, PARAM_MAC_SEC_RATE_CCL2);
+  defineRecruitmentWeight(PARAM_GR_WEIGHT_CCL5_RECRUITMENT, PARAM_MAC_SEC_RATE_CCL5);
+  defineRecruitmentWeight(PARAM_GR_WEIGHT_CXCL9_RECRUITMENT, PARAM_MAC_SEC_RATE_CXCL9);
+
+  Scalar fluxFactorTimeDelta = getParam(PARAM_TCELL_LYMPH_PROXY_NONLINEAR_TIME_FULL) -  getParam(PARAM_TCELL_LYMPH_PROXY_NONLINEAR_TIME_START);
+
+  Scalar fluxFactorM = 1.0/fluxFactorTimeDelta;
+  setParam(PARAM_TCELL_LYMPH_PROXY_NONLINEAR_M, fluxFactorM);
+
+  Scalar fluxFactorB = 1.0 - (getParam(PARAM_TCELL_LYMPH_PROXY_NONLINEAR_TIME_FULL)/fluxFactorTimeDelta);
+  setParam(PARAM_TCELL_LYMPH_PROXY_NONLINEAR_B, fluxFactorB);
 }
 
 void ParamsBase::defineRecruitmentWeight(ParamDoubleType recruitmentWeightParam, ParamDoubleType secretionParam)
@@ -727,6 +740,12 @@ bool ParamsBase::checkParams() const
 	if (getParam(PARAM_MAC_THRESHOLD_BURST_CI_INTMTB) <= getParam(PARAM_MAC_THRESHOLD_BECOME_CI_INTMTB))
 	{
 		std::cerr << " nrIntMtbCInf, " << getParam(PARAM_MAC_THRESHOLD_BECOME_CI_INTMTB) << ", is >= nrIntMtbBurstCInf, " << getParam(PARAM_MAC_THRESHOLD_BURST_CI_INTMTB) << std::endl;
+		res = false;
+	}
+
+	if (getParam(PARAM_TCELL_LYMPH_PROXY_NONLINEAR_TIME_FULL) < getParam(PARAM_TCELL_LYMPH_PROXY_NONLINEAR_TIME_START))
+	{
+		std::cerr << " lymphProxyNonlinearFull, " << getParam(PARAM_TCELL_LYMPH_PROXY_NONLINEAR_TIME_FULL) << ", is < lymphProxyNonlinearStart, " << getParam(PARAM_TCELL_LYMPH_PROXY_NONLINEAR_TIME_START) << std::endl;
 		res = false;
 	}
 

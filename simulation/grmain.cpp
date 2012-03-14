@@ -462,6 +462,7 @@ int main(int argc, char** argv)
   if (!Params::getInstance(pdim)->fromXml(paramFile.c_str()))
     throw std::runtime_error("Unable to get parameters from file, cannot continue...");
   
+  // Parameters must be loaded, since since the base lymph ODE class, RecruitmentLnODE, uses parameters in its constructor.
   RecruitmentBase* pRecr;
   switch (vm["recr"].as<unsigned>())
   {

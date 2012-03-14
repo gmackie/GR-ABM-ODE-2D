@@ -18,6 +18,7 @@
 #include "simulation/recruitmentprob.h"
 #include "simulation/recruitmentlnode.h"
 #include "simulation/recruitmentlnodepure.h"
+#include "simulation/recruitmentlnodeproxy.h"
 #include "maininterface.h"
 #include "simulation.h"
 #include "ui_mainwindow.h"
@@ -138,7 +139,7 @@ int main(int argc, char *argv[])
 		("border", "Draw granuloma border")
 		("load-state,l",  po::value<std::string>(&stateFileName), "File name of saved state to load")
 		("snapshot",  po::value<std::string>(&stateFileName), "Load a saved state, save a graphic snapshot and quit.\nArgument is the saved state to load.")
-		("ode", "Use integrated lymph node ODE for recruitment")
+		("recr", po::value<unsigned>()->default_value(0), "recruitment:\n0 - probability\n1 - lymph node ode proxy\n2 - lymph node ode pure")
 		("tnfr-dynamics", "Use molecular level TNF/TNFR dynamics in the model")
 		("NFkB-dynamics", "Use molecular level intracellular NFkB dynamics in the model")
 		("tnf-depletion", po::value<int>(&tnfDepletionTimeStep)->default_value(-1), "The time step at which to stop secreting tnf, including by tnfr dynamics. -1: no depletion")
@@ -155,7 +156,7 @@ int main(int argc, char *argv[])
 		po::store(po::command_line_parser(argc, argv).options(desc).positional(p).run(), vm);
 		po::notify(vm);
 
-    std::cout << "GRID SIZE: NROWS: " << dim << " NCOLS: " << dim << std::endl;
+		std::cout << "GRID SIZE: NROWS: " << dim << " NCOLS: " << dim << std::endl;
 		if (vm.count("version"))
 		{
 			printVersion();
@@ -196,6 +197,9 @@ int main(int argc, char *argv[])
 			}
 		}
 
+		// Must be done before making GrSimulation.
+		// Also must be done before creating a lymph ODE recruitment object,
+		// since the base lymph ODE class, RecruitmentLnODE, uses parameters in its constructor.
 		if (!Params::getInstance(Pos(dim, dim))->fromXml(inputFileName.c_str()))
 			return 1;
 
@@ -207,12 +211,12 @@ int main(int argc, char *argv[])
 
 		if (diffMethod == 1)
 		{
-			std::cerr << "The BTCS diffusion method is not supported in 3D granuloma code." << std::endl;
+			std::cerr << "The BTCS diffusion method is not supported in 2D granuloma code." << std::endl;
 			exit(1);
 		}
 		else if (diffMethod == 2)
 		{
-			std::cerr << "The BTCS Wrong diffusion method is not supported in 3D granuloma code." << std::endl;
+			std::cerr << "The BTCS Wrong diffusion method is not supported in 2D granuloma code." << std::endl;
 			exit(1);
 		}
 
@@ -308,12 +312,24 @@ int main(int argc, char *argv[])
 	MainWindow w(&itfc, &glWindow, &paramWindow, new StatWidget(), new AgentsWidget(&agentsVisualization));
 
 	/* set recruitment method */
-	if (ode)
-		itfc.getSimulation().setRecruitment(new RecruitmentLnODEPure());
-	else if (lymphNodeODE == "" && lymphNodeTemp == "")
+	// Parameters must be loaded, since since the base lymph ODE class, RecruitmentLnODE, uses parameters in its constructor.
+	switch (vm["recr"].as<unsigned>())
+	{
+	case 0:
 		itfc.getSimulation().setRecruitment(new RecruitmentProb());
-	else
-		itfc.getSimulation().setRecruitment(new RecruitmentLnODE(lymphNodeODE, lymphNodeTemp));
+	  break;
+	case 1:
+	  itfc.getSimulation().setRecruitment(new RecruitmentLnODEProxy());
+	  break;
+	case 2:
+		itfc.getSimulation().setRecruitment(new RecruitmentLnODEPure());
+
+	  break;
+	default:
+	  std::cerr << std::endl <<"Unsupported recruitment method" << std::endl << std::endl;
+	  printUsage(argv[0], desc);
+	  exit(1);
+	}
 	
 	/* set TNF/TNFR and NFkB dynamics */
 	/* When NFkB is turned on, tnfr dynamics will be turned on autamatically */

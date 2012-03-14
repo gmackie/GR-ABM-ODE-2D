@@ -41,7 +41,7 @@ private:
 	bool checkParams() const;
 
 public:
-	Lhs(int nSamples, bool ode = false);
+	Lhs(int nSamples, Pos dim);
 	bool init(const char* filename);
 	void performLhs();
 

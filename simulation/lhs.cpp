@@ -123,8 +123,8 @@ namespace po = boost::program_options;
  * (i.e. have an entry in the Params::_description array).
  */
 
-Lhs::Lhs(int nSamples, bool ode)
-	: ParamsBase(ode)
+Lhs::Lhs(int nSamples, Pos dim)
+	: ParamsBase(dim)
 	, _nSamples(nSamples)
 	, _lhsDoubleParam()
 	, _lhsIntParam()
@@ -522,7 +522,7 @@ int main(int argc, char** argv)
 	std::string inputFileName;
 	int nSamples;
 	unsigned long seed;
-	bool ode;
+	int dim;
 
 	/* set seed to current time, in case not specified */
 	time_t curTime;
@@ -534,7 +534,7 @@ int main(int argc, char** argv)
 		("input-file,i", po::value<std::string>(&inputFileName), "Input file name")
 		("seed,s", po::value<unsigned long>(&seed)->default_value((unsigned long) curTime), "Seed")
 		("samples,n", po::value<int>(&nSamples), "Number of samples")
-		("ode", "Use integrated lymph node ODE for recruitment")
+		("dim,d", po::value(&dim)->default_value(100), "Size of simulation grid")
 		("version,v", "Version number");
 
 	try
@@ -557,8 +557,6 @@ int main(int argc, char** argv)
 			return 0;
 		}
 
-		ode = vm.count("ode");
-
 		if (!vm.count("samples"))
 		{
 			std::cerr << "Missing number of samples" << std::endl;
@@ -579,7 +577,7 @@ int main(int argc, char** argv)
 
 	g_Rand.setSeed(seed);
 
-	Lhs lhs(nSamples);
+	Lhs lhs(nSamples, Pos(dim, dim));
 	if (!lhs.init(inputFileName.c_str()))
 	{
 		return 1;

@@ -522,18 +522,19 @@ int main(int argc, char** argv)
     pSim->init();
   }
 
+  if(outputDir[outputDir.size()-1] != '/')
+    outputDir += '/';
+
   // Write the seed to a file, so runs can be repeated, except for lhs runs.
   // This must come after any load of a saved state, so the correct seed is written,
   // since that loads a saved seed.
   if (!lhs)
   {
-    std::ofstream seedStream("seed");
+	std::string seedStreamName = outputDir + "seed";
+    std::ofstream seedStream(seedStreamName.c_str());
     seedStream << g_Rand.getSeed() << std::endl;
     seedStream.close();
   }
-
-  if(outputDir[outputDir.size()-1] != '/')
-    outputDir += '/';
 
   std::vector<oCSVStream*> csvStreams;
   if(vm.count("moi")){

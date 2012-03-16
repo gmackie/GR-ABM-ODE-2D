@@ -144,6 +144,7 @@ bool Lhs::readParam(const TiXmlElement* pElement, const TiXmlAttribute* pAttrib,
 		{
 			range._min = val;
 			range._max = val;
+                        
 		}
 		else
 		{
@@ -194,6 +195,7 @@ bool Lhs::readParam(const TiXmlElement* pElement, const TiXmlAttribute* pAttrib,
 		{
 			range._min = val;
 			range._max = val;
+            
 		}
 		else
 		{
@@ -357,7 +359,7 @@ void Lhs::updateParamDouble(ParamDoubleType param, double val)
  * is how ParamsBase::toXml works.
  *
  */
-void Lhs::performLhs()
+void Lhs::performLhs(bool logscale)
 {
 	const int totalParamCount = PARAM_DOUBLE_COUNT + PARAM_INT_COUNT;
 
@@ -429,6 +431,9 @@ void Lhs::performLhs()
 			// pick a random bin, and remove from the vector of available bins
 			int binNr = g_Rand.getInt(bins[j].size());
 			int k = bins[j][binNr];
+            
+//            std::cout << binNr << "   " << k << std::endl;
+            
 			bins[j].erase(bins[j].begin() + binNr);
 
 			if (j < PARAM_DOUBLE_COUNT)
@@ -439,13 +444,29 @@ void Lhs::performLhs()
 				{
 					// A non-integer variable. Pick a random value between the min and max for the sub-range
 					// for the selected bin.
-					double a = _lhsDoubleParam[j]._min +
-						k * (_lhsDoubleParam[j]._max - _lhsDoubleParam[j]._min) / _nSamples;
+                    // If the log scale option is on then the random value is chosen on a log scale
+                    
+                    
+                    if (logscale) {
+                        double log_min = log10(_lhsDoubleParam[j]._min);
+                        double log_max = log10(_lhsDoubleParam[j]._max);
+                        double a = log_min + k * (log_max - log_min) / _nSamples;
+                        double b =log_min + (k + 1) * (log_max - log_min) / _nSamples;
+                        double convert = pow(10,g_Rand.getReal(a, b));
 
-					double b = _lhsDoubleParam[j]._min +
-						(k + 1) * (_lhsDoubleParam[j]._max - _lhsDoubleParam[j]._min) / _nSamples;
+                        updateParamDouble(param, convert);
+                    }
+                    
+                    
+                    else
+                    {
+                        double a = _lhsDoubleParam[j]._min + k * (_lhsDoubleParam[j]._max - _lhsDoubleParam[j]._min) / _nSamples;
+                        double b = _lhsDoubleParam[j]._min + (k + 1) * (_lhsDoubleParam[j]._max - _lhsDoubleParam[j]._min) / _nSamples;
+                        
+                        updateParamDouble(param, g_Rand.getReal(a,b));
+                        
+                    }
 
-					updateParamDouble(param, g_Rand.getReal(a, b));
 				}
 				else
 				{
@@ -523,6 +544,7 @@ int main(int argc, char** argv)
 	int nSamples;
 	unsigned long seed;
 	int dim;
+    bool _logscale=0;
 
 	/* set seed to current time, in case not specified */
 	time_t curTime;
@@ -535,7 +557,8 @@ int main(int argc, char** argv)
 		("seed,s", po::value<unsigned long>(&seed)->default_value((unsigned long) curTime), "Seed")
 		("samples,n", po::value<int>(&nSamples), "Number of samples")
 		("dim,d", po::value(&dim)->default_value(100), "Size of simulation grid")
-		("version,v", "Version number");
+		("version,v", "Version number")
+        ("log-scale", "Use log scale intervals for double-type parameters");
 
 	try
 	{
@@ -568,6 +591,9 @@ int main(int argc, char** argv)
 			std::cerr << "Missing input file" << std::endl;
 			return 1;
 		}
+        if (vm.count("log-scale")) {
+            _logscale = 1;
+        }
 	}
 	catch (std::exception& e)
 	{
@@ -583,7 +609,7 @@ int main(int argc, char** argv)
 		return 1;
 	}
 
-	lhs.performLhs();
+	lhs.performLhs(_logscale);
 
 	return 0;
 }

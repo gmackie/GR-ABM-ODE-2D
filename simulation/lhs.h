@@ -43,7 +43,7 @@ private:
 public:
 	Lhs(int nSamples, Pos dim);
 	bool init(const char* filename);
-	void performLhs();
+	void performLhs(bool logscale);
 
 };
 

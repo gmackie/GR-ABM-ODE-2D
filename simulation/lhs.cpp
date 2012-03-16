@@ -445,9 +445,16 @@ void Lhs::performLhs(bool logscale)
 					// A non-integer variable. Pick a random value between the min and max for the sub-range
 					// for the selected bin.
                     // If the log scale option is on then the random value is chosen on a log scale
-                    
+        
                     
                     if (logscale) {
+                        
+                        if (_lhsDoubleParam[j]._min <= 0)
+                        {
+                            std::cerr << "Minimum Value of a Paramater is either negative or zero. Log-scale cannot be used in this case " << std::endl;
+                            exit(1);
+                        }
+                        
                         double log_min = log10(_lhsDoubleParam[j]._min);
                         double log_max = log10(_lhsDoubleParam[j]._max);
                         double a = log_min + k * (log_max - log_min) / _nSamples;

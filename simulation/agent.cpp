@@ -11,20 +11,26 @@
 
 const std::string Agent::_ClassName = "Agent";
 
+unsigned long Agent::nextID = 0;
+
 // Needed for deserializing the model state.
 // Avoids the calls to the random number generator in the normal constructor, allowing the random number generator
 // to remain in synch after deserialization.
 Agent::Agent()
-	: _birthTime(-1)
+	: _id(0)
+	, _birthTime(-1)
 	, _deathTime(-1)
+	, _pos(-1, -1)
 {
 }
 
 Agent::Agent(int birthtime, int deathtime, int row, int col)
-	: _birthTime(birthtime)
+	: _id(0)
+	, _birthTime(birthtime)
 	, _deathTime(deathtime)
 	, _pos(row, col)
 {
+	_id = createID();
 }
 
 Agent::~Agent()

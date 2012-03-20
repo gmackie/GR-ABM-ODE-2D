@@ -17,13 +17,20 @@ class Agent
 private:
 	static const std::string _ClassName;
 
+	// A global ID counter for assigning a unique ID to an agent.
+	static unsigned long nextID;
+
 protected:
 	/*
 	 * !!! If the data members change then the serialize and deserialize functions need to be updated !!!
 	 */
+	static unsigned long createID();
+
+	// Unique agent ID.
+	unsigned long _id;
 	int _birthTime;
 	int _deathTime;
-  Pos _pos;
+	Pos _pos;
 	Pos moveAgent(GrGrid& grid, bool ccl2, bool ccl5, bool cxcl9, bool attractant, double bonusFactor);
 	int getDestinationOrdinal(GrGrid& grid, bool ccl2, bool ccl5, bool cxcl9, bool attractant, double bonusFactor);
 	Pos compartmentOrdinalToCoordinates(int ordinal, const Pos& dim) const;
@@ -41,8 +48,9 @@ public:
 	virtual bool isDead() = 0;
 	virtual void print() const = 0;
 	virtual AgentType getAgentType() const = 0;
-  virtual int getState() const = 0;
-  const Pos& getPosition() const;
+	virtual int getState() const = 0;
+	unsigned long getID() const;
+	const Pos& getPosition() const;
 	int getRow() const;
 	int getCol() const;
 	int getBirthTime() const;
@@ -51,6 +59,15 @@ public:
 	virtual void serialize(std::ostream& out) const;
 	virtual void deserialize(std::istream& in);
 };
+
+inline unsigned long Agent::createID()
+{
+	return nextID++;
+}
+
+inline unsigned long Agent::getID() const {
+	return _id;
+}
 
 inline const Pos& Agent::getPosition() const {
   return _pos;

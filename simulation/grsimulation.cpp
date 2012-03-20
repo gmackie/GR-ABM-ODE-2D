@@ -236,8 +236,7 @@ void GrSimulation::init()
 	// Place initial infected macrophages on the grid
 	for (PosVector::const_iterator it = initMacs.begin(); it != initMacs.end(); it++)
 	{
-		Mac* pMac = createMac(it->x, it->y,
-			g_Rand.getInt(-1, -maxMacAge), MAC_INFECTED, false, false);
+		Mac* pMac = createMac(it->x, it->y, g_Rand.getInt(-1, -maxMacAge), MAC_INFECTED, false, false);
 		
 		if (_nfkbDynamics)
 		{

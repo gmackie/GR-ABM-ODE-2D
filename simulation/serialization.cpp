@@ -40,7 +40,17 @@ bool Serialization::readFooter(std::istream& in, std::string className)
 bool Serialization::readHeaderFooter(std::istream& in, std::string className, std::string expectedText, std::string type)
 {
 	std::string readText;
-	in >> readText;
+
+	try
+	{
+		in >> readText;
+	}
+	catch(std::exception& e)
+	{
+		std::cerr << "Caught an exception on reading " << type << " " << expectedText << std::endl;
+		std::cerr<<e.what()<<std::endl;
+	}
+
 	if (readText != expectedText)
 	{
 		std::cerr << "Error deserializing " << className << ". The deserialized " << type << ", '" << readText << "'"

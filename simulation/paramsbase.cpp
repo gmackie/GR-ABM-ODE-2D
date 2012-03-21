@@ -296,8 +296,9 @@ const ParamDescription ParamsBase::_description[_PARAM_COUNT] =
 	{ "maxAge",								TCELL_NODE,	true,	false,	0.0,	0,	"#timesteps",		"Maximal T cell age" },
 	{ "timeRecEnabled",						TCELL_NODE,	true,	false,	0.0,	0,	"#timesteps",		"Time after which T cell recruitment is enabled" },
 	{ "lymphProxyScalingStart",				TCELL_NODE,	true,	false,	0.0,	0,	"#timesteps",		"Time when T cell lymph ode proxy recruitment switches from linear to scaled linear calculations for T cell fluxes." },
-	{ "lymphProxyFactorStart",				TCELL_NODE,	true,	false,	0.0,	0,	"#timesteps",		"Time when T cell lymph ode proxy recruitment switches from scaled linear to linear*factor calculations for T cell fluxes." },
-	{ "lymphProxyFactorEnd",				TCELL_NODE,	true,	false,	0.0,	0,	"#timesteps",		"Time when T cell lymph ode proxy recruitment switches from linear*factor to non-linear calculations for T cell fluxes." },
+	{ "lymphProxyFactorStart",				TCELL_NODE,	true,	false,	0.0,	0,	"#timesteps",		"Time when T cell lymph ode proxy recruitment switches from scaled linear to linear*factor1 calculations for T cell fluxes." },
+	{ "lymphProxyFactorEnd",				TCELL_NODE,	true,	false,	0.0,	0,	"#timesteps",		"Time when T cell lymph ode proxy recruitment switches from linear*factor1 to nonlinear*factor2 calculations for T cell fluxes." },
+	{ "lymphProxyFactorNonlinearEnd",		TCELL_NODE,	true,	false,	0.0,	0,	"#timesteps",		"Time when T cell lymph ode proxy recruitment switches from nonlinear*factor2 to full nonlinear calculations for T cell fluxes." },
 	{ "maxTimeReg",							TGAM_NODE,	true,	false,	0.0,	0,	"#timesteps",		"Time span during which a Tgam cell remains down-regulated" },
     { "maxTimeDouble",						TGAM_NODE,	true,	false,	0.0,	0,	"#timesteps",		"Time span during which a Tgam cell remains double producer" },
     { "maxTimeReg",							TCYT_NODE,	true,	false,	0.0,	0,	"#timesteps",		"Time span during which a Tcyt cell remains down-regulated" },
@@ -756,6 +757,12 @@ bool ParamsBase::checkParams() const
 		res = false;
 	}
 
+	if (getParam(PARAM_TCELL_LYMPH_PROXY_FACTOR_TIME_NONLINEAR_END) < getParam(PARAM_TCELL_LYMPH_PROXY_FACTOR_TIME_END))
+		{
+			std::cerr << " lymphProxyFactorNonlinearEnd, " << getParam(PARAM_TCELL_LYMPH_PROXY_FACTOR_TIME_NONLINEAR_END) <<
+					", is < lymphProxyFactorEnd, " << getParam(PARAM_TCELL_LYMPH_PROXY_FACTOR_TIME_END) << std::endl;
+			res = false;
+		}
 	return res;
 }
 

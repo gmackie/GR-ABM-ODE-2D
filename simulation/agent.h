@@ -31,13 +31,48 @@ protected:
 	int _birthTime;
 	int _deathTime;
 	Pos _pos;
+
+	// TNF associated attributes
+	Scalar _mTNF; // No. of mTNF on the cell membrane
+	Scalar _surfTNFR1; // No. of cell surface TNFR1
+	Scalar _surfTNFR2;
+	Scalar _surfBoundTNFR1; // No. of sTNF-bound cell surface TNFR1
+	Scalar _surfBoundTNFR2;
+	Scalar _intBoundTNFR1; // No. of internalized TNF-bound TNFR1
+	Scalar _intBoundTNFR2;
+    Scalar _mTNFRNA;
+	Scalar _vTNFR1; // Rate of TNFR1 synthesis by cell
+	Scalar _vTNFR2;
+	Scalar _kSynth; // Rate of mTNF synthesis by cell
+	Scalar _kTACE; // Rate of mTNF release from cell by TACE activity
+    Scalar _kmRNA; // Rate of RNA synthesis for mTNF
+
+    // IL10 associated attributes
+    Scalar _surfIL10R; // No. of cell surface IL10R
+    Scalar _vIL10R; // Rate of IL10R synthesis
+    Scalar _surfBoundIL10R; // No. of bound cell surface IL10R
+    Scalar _kISynth;
+
 	Pos moveAgent(GrGrid& grid, bool ccl2, bool ccl5, bool cxcl9, bool attractant, double bonusFactor);
 	int getDestinationOrdinal(GrGrid& grid, bool ccl2, bool ccl5, bool cxcl9, bool attractant, double bonusFactor);
 	Pos compartmentOrdinalToCoordinates(int ordinal, const Pos& dim) const;
 
 public:
 	Agent();
-	Agent(int birthtime, int deathtime, int row, int col);
+	Agent(int birthtime, int deathtime, int row, int col
+			//TNFR Components
+			, Scalar meanTNFR1
+			, Scalar stdTNFR1
+			, Scalar meanTNFR2
+			, Scalar stdTNFR2
+			, Scalar kSynth
+			, Scalar kTACE
+
+			// IL10 components
+			, Scalar iIL10R
+			, Scalar stdIL10R
+		);
+
 	virtual ~Agent();
 	virtual void move(GrGrid& grid) = 0;
 	virtual void secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDepletion, bool il10rDynamics, bool il10Depletion) = 0;
@@ -56,6 +91,7 @@ public:
 	int getBirthTime() const;
 	int getDeathTime() const;
 	bool timeToDie(const int time) const;
+	Scalar getSurfBoundTNFR1() const;
 	virtual void serialize(std::ostream& out) const;
 	virtual void deserialize(std::istream& in);
 };
@@ -96,6 +132,11 @@ inline int Agent::getRow() const
 inline int Agent::getCol() const
 {
 	return _pos.y;
+}
+
+inline double Agent::getSurfBoundTNFR1() const
+{
+	return _surfBoundTNFR1;
 }
 
 #endif /* AGENT_H */

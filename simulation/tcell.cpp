@@ -17,8 +17,20 @@ Tcell::Tcell()
 {
 }
 
-Tcell::Tcell(int birthtime, int row, int col)
-	: Agent(birthtime, birthtime + _PARAM(PARAM_TCELL_AGE), row, col)
+Tcell::Tcell(int birthtime, int row, int col, Scalar kSynth)
+	: Agent(birthtime, birthtime + _PARAM(PARAM_TCELL_AGE), row, col
+			//TNFR Components
+			, (Scalar) _PARAM(PARAM_GR_MEAN_TNFR1_TCELL)
+			, (Scalar) _PARAM(PARAM_GR_STD_TNFR1_TCELL)
+			, (Scalar) _PARAM(PARAM_GR_MEAN_TNFR2_TCELL)
+			, (Scalar) _PARAM(PARAM_GR_STD_TNFR2_TCELL)
+			, kSynth
+			, (Scalar) _PARAM(PARAM_GR_K_TACE_TCELL)
+
+			// IL10 components
+			, (Scalar) _PARAM(PARAM_GR_I_IL10R_TCELL)
+			, (Scalar) _PARAM(PARAM_GR_STD_IL10R_TCELL)
+			)
 {
 }
 

@@ -21,14 +21,72 @@ Agent::Agent()
 	, _birthTime(-1)
 	, _deathTime(-1)
 	, _pos(-1, -1)
+
+	// TNFR components
+	, _mTNF(-1.0)
+	, _surfTNFR1(-1.0)
+	, _surfTNFR2(-1.0)
+	, _surfBoundTNFR1(-1.0)
+	, _surfBoundTNFR2(-1.0)
+	, _intBoundTNFR1(-1.0)
+	, _intBoundTNFR2(-1.0)
+	, _mTNFRNA(-1.0)
+	, _vTNFR1(-1.0)
+	, _vTNFR2(-1.0)
+	, _kSynth(-1.0)
+	, _kTACE(-1.0)
+	, _kmRNA(-1.0)
+
+	// IL10 components
+	, _surfIL10R(-1.0)
+	, _vIL10R(-1.0)
+	, _surfBoundIL10R(-1.0)
+	, _kISynth(-1.0)
+
 {
 }
 
-Agent::Agent(int birthtime, int deathtime, int row, int col)
+Agent::Agent(int birthtime, int deathtime, int row, int col
+
+				//TNFR Components
+				, Scalar meanTNFR1
+				, Scalar stdTNFR1
+				, Scalar meanTNFR2
+				, Scalar stdTNFR2
+				, Scalar kSynth
+				, Scalar kTACE
+
+				// IL10 components
+				, Scalar iIL10R
+				, Scalar stdIL10R
+			)
 	: _id(0)
 	, _birthTime(birthtime)
 	, _deathTime(deathtime)
 	, _pos(row, col)
+
+	// TNFR components
+	, _mTNF(0.0)
+	, _surfTNFR1(g_Rand.getReal(meanTNFR1 - stdTNFR1, meanTNFR1 + stdTNFR1))
+	, _surfTNFR2(g_Rand.getReal(meanTNFR2 - stdTNFR2, meanTNFR2 + stdTNFR2))
+	//	, _surfTNFR1(g_Rand.getLogNormal(meanTNFR1),_PARAM(stdTNFR1)))
+	//	, _surfTNFR2(g_Rand.getLogNormal(meanTNFR2),_PARAM(stdTNFR2)))
+	, _surfBoundTNFR1(0.0)
+	, _surfBoundTNFR2(0.0)
+	, _intBoundTNFR1(0.0)
+	, _intBoundTNFR2(0.0)
+	, _mTNFRNA(0.0)
+	, _vTNFR1(_surfTNFR1 * _PARAM(PARAM_GR_K_T1))
+	, _vTNFR2(_surfTNFR2 * _PARAM(PARAM_GR_K_T2))
+	, _kSynth(kSynth)
+	, _kTACE(kTACE)
+	, _kmRNA(0.0)
+
+	// IL10 components
+	, _surfIL10R(g_Rand.getReal(iIL10R - stdIL10R, iIL10R + stdIL10R))
+	, _vIL10R(_surfIL10R * _PARAM(PARAM_GR_I_K_T))
+	, _surfBoundIL10R(0.0)
+	, _kISynth(0.0)
 {
 	_id = createID();
 }

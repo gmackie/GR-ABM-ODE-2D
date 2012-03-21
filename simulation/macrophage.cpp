@@ -25,26 +25,6 @@ Mac::Mac()
 	, _ICOS(0)
 	, _activationTime(-1)
 	, _deactivationTime(-1)
-	, _mTNF(-1.0)
-	, _surfTNFR1(-1.0)
-	, _surfTNFR2(-1.0)
-	, _surfBoundTNFR1(-1.0)
-	, _surfBoundTNFR2(-1.0)
-	, _intBoundTNFR1(-1.0)
-	, _intBoundTNFR2(-1.0)
-    , _mTNFRNA(-1.0)
-	, _vTNFR1(-1.0)
-	, _vTNFR2(-1.0)
-	, _kSynth(-1.0)
-	, _kTACE(-1.0)
-    , _kmRNA(-1.0)
-
-    // IL10 components
-
-    , _surfIL10R(-1.0)
-    , _vIL10R(-1.0)
-    , _surfBoundIL10R(-1.0)
-    , _kISynth(-1.0)
     
 	// NF-kB signaling pathway components
 	, _IKKKa(-1.0)
@@ -83,7 +63,21 @@ Mac::Mac()
 }
 
 Mac::Mac(int birthtime, int row, int col, MacState state, double intMtb, bool NFkB, bool stat1)
-	: Agent(birthtime, birthtime + _PARAM(PARAM_MAC_AGE), row, col)
+	: Agent(birthtime, birthtime + _PARAM(PARAM_MAC_AGE), row, col
+
+			//TNFR Components
+			, (Scalar) _PARAM(PARAM_GR_MEAN_TNFR1_MAC)
+			, (Scalar) _PARAM(PARAM_GR_STD_TNFR1_MAC)
+			, (Scalar) _PARAM(PARAM_GR_MEAN_TNFR2_MAC)
+			, (Scalar) _PARAM(PARAM_GR_STD_TNFR2_MAC)
+			, 0.0 // kSynth
+			, (Scalar) _PARAM(PARAM_GR_K_TACE_MAC)
+
+			// IL10 components
+			, (Scalar) _PARAM(PARAM_GR_I_IL10R_MAC)
+			, (Scalar) _PARAM(PARAM_GR_STD_IL10R_MAC)
+			)
+
 	, _state(state)
 	, _nextState(state)
 	, _intMtb(intMtb)
@@ -92,28 +86,6 @@ Mac::Mac(int birthtime, int row, int col, MacState state, double intMtb, bool NF
 	, _ICOS(0)
 	, _activationTime(-1)
 	, _deactivationTime(-1)
-	, _mTNF(0.0)
-	, _surfTNFR1(g_Rand.getReal(_PARAM(PARAM_GR_MEAN_TNFR1_MAC)-_PARAM(PARAM_GR_STD_TNFR1_MAC),_PARAM(PARAM_GR_MEAN_TNFR1_MAC)+_PARAM(PARAM_GR_STD_TNFR1_MAC)))
-	, _surfTNFR2(g_Rand.getReal(_PARAM(PARAM_GR_MEAN_TNFR2_MAC)-_PARAM(PARAM_GR_STD_TNFR2_MAC),_PARAM(PARAM_GR_MEAN_TNFR2_MAC)+_PARAM(PARAM_GR_STD_TNFR2_MAC)))
-//	, _surfTNFR1(g_Rand.getLogNormal(_PARAM(PARAM_GR_MEAN_TNFR1_MAC),_PARAM(PARAM_GR_STD_TNFR1_MAC)))
-//	, _surfTNFR2(g_Rand.getLogNormal(_PARAM(PARAM_GR_MEAN_TNFR2_MAC),_PARAM(PARAM_GR_STD_TNFR2_MAC)))
-	, _surfBoundTNFR1(0.0)
-	, _surfBoundTNFR2(0.0)
-	, _intBoundTNFR1(0.0)
-	, _intBoundTNFR2(0.0)
-    , _mTNFRNA(0.0)
-	, _vTNFR1(_surfTNFR1 * _PARAM(PARAM_GR_K_T1))
-	, _vTNFR2(_surfTNFR2 * _PARAM(PARAM_GR_K_T2))
-	, _kSynth(0.0)
-	, _kTACE(_PARAM(PARAM_GR_K_TACE_MAC))
-    , _kmRNA(0.0)
-
-    // IL10 components
-
-    , _surfIL10R(g_Rand.getReal(_PARAM(PARAM_GR_I_IL10R_MAC) - _PARAM(PARAM_GR_STD_IL10R_MAC), _PARAM(PARAM_GR_I_IL10R_MAC) + _PARAM(PARAM_GR_STD_IL10R_MAC)))
-    , _vIL10R(_surfIL10R * _PARAM(PARAM_GR_I_K_T))
-    , _surfBoundIL10R(0.0)
-    , _kISynth(0.0)
 
 	// NF-kB signaling pathway components
 	, _IKKKa(0.0)

@@ -21,27 +21,6 @@ private:
 	 */
 	TregState _state;
 	TregState _nextState;
-	// TNF associated attributes
-	double _mTNF; // No. of mTNF on the cell membrane
-	double _surfTNFR1; // No. of cell surface TNFR1
-	double _surfTNFR2;
-	double _surfBoundTNFR1; // No. of sTNF-bound cell surface TNFR1
-	double _surfBoundTNFR2;
-	double _intBoundTNFR1; // No. of internalized TNF-bound TNFR1
-	double _intBoundTNFR2;
-    double _mTNFRNA;
-	double _vTNFR1; // Rate of TNFR1 synthesis by cell
-	double _vTNFR2;
-	double _kSynth; // Rate of mTNF synthesis by cell
-	double _kTACE; // Rate of mTNF release from cell by TACE activity
-    double _kmRNA; // Rate of RNA synthesis for mTNF
-    
-    // IL10 associated atributes
-    double _surfIL10R; // No. of cell surface IL10R
-    double _vIL10R; // Rate of IL10R synthesis
-    double _surfBoundIL10R; // No. of bound cell surface IL10R
-    double _kISynth;
-	
 	void handleResting(const int time, GrGrid& grid, GrStat& stats);
 
 public:

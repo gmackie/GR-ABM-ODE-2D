@@ -36,7 +36,7 @@ private:
 	 * !!! If the data members change then the serialize and deserialize functions need to be updated !!!
 	 */
 
-  int _nAgents[NAGENTS];
+	int _nAgents[NAGENTS];
 	int _nMac[NMAC_STATES];
 	int _nTgam[NTGAM_STATES];
 	int _nTcyt[NTCYT_STATES];

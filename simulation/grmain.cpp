@@ -349,6 +349,9 @@ int main(int argc, char** argv)
   size_t dim;
   std::string paramFile;
   std::string outputDir;
+
+  int molecularTrackingRadius;
+  std::string molecularTrackingFileName;
 	
 	/*
 	 * Set seed to current time, in case not specified
@@ -400,7 +403,10 @@ int main(int argc, char** argv)
 	("NFkB-dynamics", "Use molecular level intracellular NFkB dynamics in the model")
     ("Treg-induction", "Allow Tregs to be induced from Tgams in the model")
 	("tnf-depletion", po::value<int>()->default_value(-1), "The time step at which to stop secreting tnf, including by tnfr dynamics. -1: no depletion")
-    ("il10-depletion", po::value<int>()->default_value(-1), "The time step at which to stop secreting il10, including by il10r dynamics. -1: no depletion");
+    ("il10-depletion", po::value<int>()->default_value(-1), "The time step at which to stop secreting il10, including by il10r dynamics. -1: no depletion")
+    ("molecular-track-radius", po::value<float>(&molecularTrackingRadius)->default_value(0), "Radius from center of grid of initial cells to track molecular dynamics. 0 means don't track any cells.")
+    ("molecular-track-file", po::value<std::string>(&molecularTrackingFileName), "File name to hold molecular dynamics cell tracking data");
+
 	
   po::options_description lhs_opts("LHS");
   lhs_opts.add_options()

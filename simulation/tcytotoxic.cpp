@@ -20,56 +20,15 @@ Tcyt::Tcyt()
 	, _state(TCYT_DEAD)
 	, _nextState(TCYT_DEAD)
 	, _deactivationTime(-1)
-	, _mTNF(-1.0)
-	, _surfTNFR1(-1.0)
-	, _surfTNFR2(-1.0)
-	, _surfBoundTNFR1(-1.0)
-	, _surfBoundTNFR2(-1.0)
-	, _intBoundTNFR1(-1.0)
-	, _intBoundTNFR2(-1.0)
-    , _mTNFRNA(-1.0)
-	, _vTNFR1(-1.0)
-	, _vTNFR2(-1.0)
-	, _kSynth(-1.0)
-	, _kTACE(-1.0)
-    , _kmRNA(-1.0)
-
-    // IL10 components
-    
-    , _surfIL10R(-1.0)
-    , _vIL10R(-1.0)
-    , _surfBoundIL10R(-1.0)
-    , _kISynth(-1.0)
 {
 }
 
 Tcyt::Tcyt(int birthtime, int row, int col, TcytState state)
-	: Tcell(birthtime, row, col)
+
+	: Tcell(birthtime, row, col, _PARAM(PARAM_GR_K_SYNTH_TCELL)/10)
 	, _state(state)
 	, _nextState(state)
 	, _deactivationTime(-1)
-	, _mTNF(0.0)
-	, _surfTNFR1(g_Rand.getReal(_PARAM(PARAM_GR_MEAN_TNFR1_TCELL)-_PARAM(PARAM_GR_STD_TNFR1_TCELL),_PARAM(PARAM_GR_MEAN_TNFR1_TCELL)+_PARAM(PARAM_GR_STD_TNFR1_TCELL)))
-	, _surfTNFR2(g_Rand.getReal(_PARAM(PARAM_GR_MEAN_TNFR2_TCELL)-_PARAM(PARAM_GR_STD_TNFR2_TCELL),_PARAM(PARAM_GR_MEAN_TNFR2_TCELL)+_PARAM(PARAM_GR_STD_TNFR2_TCELL)))
-//	, _surfTNFR1(g_Rand.getLogNormal(_PARAM(PARAM_GR_MEAN_TNFR1_TCELL),_PARAM(PARAM_GR_STD_TNFR1_TCELL)))
-//	, _surfTNFR2(g_Rand.getLogNormal(_PARAM(PARAM_GR_MEAN_TNFR2_TCELL),_PARAM(PARAM_GR_STD_TNFR2_TCELL)))
-	, _surfBoundTNFR1(0.0)
-	, _surfBoundTNFR2(0.0)
-	, _intBoundTNFR1(0.0)
-	, _intBoundTNFR2(0.0)
-    , _mTNFRNA(0.0)
-	, _vTNFR1(_surfTNFR1 * _PARAM(PARAM_GR_K_T1))
-	, _vTNFR2(_surfTNFR2 * _PARAM(PARAM_GR_K_T2))
-	, _kSynth(_PARAM(PARAM_GR_K_SYNTH_TCELL)/10)
-	, _kTACE(_PARAM(PARAM_GR_K_TACE_TCELL))
-    , _kmRNA(0.0)
-
-    // IL10 components
-    
-    , _surfIL10R(g_Rand.getReal(_PARAM(PARAM_GR_I_IL10R_TCELL) - _PARAM(PARAM_GR_STD_IL10R_TCELL), _PARAM(PARAM_GR_I_IL10R_TCELL) + _PARAM(PARAM_GR_STD_IL10R_TCELL)))
-    , _vIL10R(_surfIL10R * _PARAM(PARAM_GR_I_K_T))
-    , _surfBoundIL10R(0.0)
-    , _kISynth(0.0)
 {
 }
 

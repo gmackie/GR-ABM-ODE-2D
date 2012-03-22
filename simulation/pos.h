@@ -2,6 +2,7 @@
 #define POS_H
 
 #include <boost/property_tree/ptree.hpp>
+#include <cmath>
 
 #define GETROW(p) (p.x)
 #define GETCOL(p) (p.y)
@@ -47,9 +48,18 @@ struct Pos {
         y += p.y;
     }
   }
+
+  double distance(const Pos& p) const
+  {
+	  double deltaX = x - p.x;
+	  double deltaY = y - p.y;
+	  double dist = sqrt(deltaX * deltaX + deltaY * deltaY);
+	  return dist;
+  }
+
 };
 inline std::ostream& operator<<(std::ostream& s, const Pos& p) {
-  return s<<'('<<p.x<<", "<<p.y<<", "<<')';
+  return s<< '(' << p.x << ", " << p.y <<')';
 }
 inline std::istream& operator>>(std::istream& s, Pos& p) {
   unsigned char tmp;

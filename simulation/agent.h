@@ -32,6 +32,8 @@ protected:
 	int _deathTime;
 	Pos _pos;
 
+	bool _trackMolecularDynamics;
+
 	// TNF associated attributes
 	Scalar _mTNF; // No. of mTNF on the cell membrane
 	Scalar _surfTNFR1; // No. of cell surface TNFR1
@@ -78,6 +80,9 @@ public:
 	virtual void secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDepletion, bool il10rDynamics, bool il10Depletion) = 0;
 	virtual void computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tnfrDynamics, bool nfkbDynamics, bool il10rDynamics, bool tgammatransition) = 0;
 	virtual void updateState() = 0;
+
+	virtual void solveTNF (GrGrid& grid, double dt);
+
 	virtual void kill() = 0;
 	virtual void deactivate(const int time) = 0;
 	virtual bool isDead() = 0;
@@ -91,7 +96,31 @@ public:
 	int getBirthTime() const;
 	int getDeathTime() const;
 	bool timeToDie(const int time) const;
+
+	// TNF associated attributes
+	Scalar getMTNF() const;
+	Scalar getSurfTNFR1() const;
+	Scalar getSurfTNFR2() const;
 	Scalar getSurfBoundTNFR1() const;
+	Scalar getSurfBoundTNFR2() const;
+	Scalar getIntBoundTNFR1() const;
+	Scalar getIntBoundTNFR2() const;
+	Scalar getMTNFRNA() const;
+	Scalar getVTNFR1() const;
+	Scalar getVTNFR2() const;
+	Scalar getKSynth() const;
+	Scalar getKTACE() const;
+	Scalar getKmRNA() const;
+
+	// IL10 associated attributes
+	Scalar getSurfIL10R() const;
+	Scalar getVIL10R() const;
+	Scalar getSurfBoundIL10R() const;
+	Scalar getKISynth() const;
+
+
+	bool getTrackMolecularDynamics() const;
+	void setTrackMolecularDynamics(bool trackMolecularDynamics);
 	virtual void serialize(std::ostream& out) const;
 	virtual void deserialize(std::istream& in);
 };
@@ -134,9 +163,104 @@ inline int Agent::getCol() const
 	return _pos.y;
 }
 
-inline double Agent::getSurfBoundTNFR1() const
+// TNF associated attributes
+inline Scalar Agent::getMTNF() const
+{
+	 return _mTNF;
+}
+
+inline Scalar Agent::getSurfTNFR1() const
+{
+	 return _surfTNFR1;
+}
+
+inline Scalar Agent::getSurfTNFR2() const
+{
+	 return _surfTNFR2;
+}
+
+inline Scalar Agent::getSurfBoundTNFR1() const
 {
 	return _surfBoundTNFR1;
+}
+
+inline Scalar Agent::getSurfBoundTNFR2() const
+{
+	 return _surfBoundTNFR2;
+}
+
+inline Scalar Agent::getIntBoundTNFR1() const
+{
+	 return _intBoundTNFR1;
+}
+
+inline Scalar Agent::getIntBoundTNFR2() const
+{
+	 return _intBoundTNFR2;
+}
+
+inline Scalar Agent::getMTNFRNA() const
+{
+	 return _mTNFRNA;
+}
+
+inline Scalar Agent::getVTNFR1() const
+{
+	 return _vTNFR1;
+}
+
+inline Scalar Agent::getVTNFR2() const
+{
+	 return _vTNFR2;
+}
+
+inline Scalar Agent::getKSynth() const
+{
+	 return _kSynth;
+}
+
+inline Scalar Agent::getKTACE() const
+{
+	 return _kTACE;
+}
+
+inline Scalar Agent::getKmRNA() const
+{
+	 return _kmRNA;
+}
+
+// IL10 associated attributes
+inline Scalar Agent::getSurfIL10R() const
+{
+	 return _surfIL10R;
+}
+
+inline Scalar Agent::getVIL10R() const
+{
+	 return _vIL10R;
+}
+
+inline Scalar Agent::getSurfBoundIL10R() const
+{
+	 return _surfBoundIL10R;
+}
+
+inline Scalar Agent::getKISynth() const
+{
+	 return _kISynth;
+}
+
+
+
+
+inline bool Agent::getTrackMolecularDynamics() const
+{
+	return _trackMolecularDynamics;
+}
+
+inline void Agent::setTrackMolecularDynamics(bool trackMolecularDynamics)
+{
+	_trackMolecularDynamics = trackMolecularDynamics;
 }
 
 #endif /* AGENT_H */

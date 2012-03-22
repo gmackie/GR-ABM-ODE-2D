@@ -51,20 +51,31 @@ public:
 };
 template<>
 void oCSVStream::operator<<(const unsigned& data) { (*f)<<data<<','; }
+
 template<>
 void oCSVStream::operator<<(const int& data) { (*f)<<data<<','; }
+
+template<>
+void oCSVStream::operator<<(const long& data) { (*f)<<data<<','; }
+
+template<>
+void oCSVStream::operator<<(const unsigned long& data) { (*f)<<data<<','; }
+
 template<>
 void oCSVStream::operator<<(const float& data) {
   if(!isnan(data)) (*f)<<data<<',';
   else (*f)<<"NaN,";
 }
+
 template<>
 void oCSVStream::operator<<(const double& data) {
   if(!isnan(data)) (*f)<<data<<',';
   else (*f)<<"NaN,";
 }
+
 template<>
 void oCSVStream::operator<<(const char& data) { (*f)<<data<<','; }
+
 //RFC 4180 Standard string handling
 template<>
 void oCSVStream::operator<<(const std::string& data) {
@@ -204,6 +215,73 @@ public:
     oCSVStream::endRow();
   }
 };
+
+class MolecularTrackingStats : public oCSVStream {
+public:
+	MolecularTrackingStats(std::ostream* s) : oCSVStream(s) { outputHeader(); }
+
+	void outputHeader() {
+		write("time");
+		write("cellID");
+
+		// TNF associated attributes
+		write("mTNF"); write("surfTNFR1"); write("surfTNFR2"); write("surfBoundTNFR1"); write("surfBoundTNFR2");
+		write("intBoundTNFR1"); write("intBoundTNFR2"); write("mTNFRNA"); write("vTNFR1"); write("vTNFR2");
+		write("kSynth"); write("kTACE"); write("kmRNA");
+
+		// IL10 associated attributes
+		write("surfIL10R"); write("vIL10R"); write("surfBoundIL10R"); write("kISynth");
+
+		endRow();
+	}
+
+	// Actually save several rows, one for each agent to be tracked.
+	void saveRow(const GrSimulation& sim)
+	{
+		MacList macList = sim.getMacList();
+		for (MacList::iterator it = macList.begin(); it != macList.end(); it++)
+		{
+			if (it->getTrackMolecularDynamics())
+			{
+				saveAgentRow(sim.getTime(), *it);
+			}
+		}
+
+		TgamList tgamList = sim.getTgamList();
+		TcytList tcytList = sim.getTcytList();
+		TregList tregList = sim.getTregList();
+	}
+
+	void saveAgentRow(int time, Agent& agent)
+	{
+		write(time);
+		write(agent.getID());
+
+		// TNF associated attributes
+		write(agent.getMTNF());
+		write(agent.getSurfTNFR1());
+		write(agent.getSurfTNFR2());
+		write(agent.getSurfBoundTNFR1());
+		write(agent.getSurfBoundTNFR2());
+		write(agent.getIntBoundTNFR1());
+		write(agent.getIntBoundTNFR2());
+		write(agent.getMTNFRNA());
+		write(agent.getVTNFR1());
+		write(agent.getVTNFR2());
+		write(agent.getKSynth());
+		write(agent.getKTACE());
+		write(agent.getKmRNA());
+
+		// IL10 associated attributes
+		write(agent.getSurfIL10R());
+		write(agent.getVIL10R());
+		write(agent.getSurfBoundIL10R());
+		write(agent.getKISynth());
+
+		oCSVStream::endRow();
+  }
+};
+
 
 void saveState(const GrSimulation* pSim, int time, std::string dir=std::string("./")){
     int days, hours, minutes;
@@ -345,12 +423,13 @@ int main(int argc, char** argv)
 {
   std::cout << std::endl;
   printVersion();
+
   unsigned long seed;
   size_t dim;
   std::string paramFile;
   std::string outputDir;
 
-  int molecularTrackingRadius;
+  double molecularTrackingRadius;
   std::string molecularTrackingFileName;
 	
 	/*
@@ -404,7 +483,7 @@ int main(int argc, char** argv)
     ("Treg-induction", "Allow Tregs to be induced from Tgams in the model")
 	("tnf-depletion", po::value<int>()->default_value(-1), "The time step at which to stop secreting tnf, including by tnfr dynamics. -1: no depletion")
     ("il10-depletion", po::value<int>()->default_value(-1), "The time step at which to stop secreting il10, including by il10r dynamics. -1: no depletion")
-    ("molecular-track-radius", po::value<float>(&molecularTrackingRadius)->default_value(0), "Radius from center of grid of initial cells to track molecular dynamics. 0 means don't track any cells.")
+    ("molecular-track-radius", po::value<double>(&molecularTrackingRadius)->default_value(0.0), "Radius from center of grid of initial cells to track molecular dynamics. 0 means don't track any cells.")
     ("molecular-track-file", po::value<std::string>(&molecularTrackingFileName), "File name to hold molecular dynamics cell tracking data");
 
 	
@@ -525,7 +604,7 @@ int main(int argc, char** argv)
 
   if (!vm.count("load")){
     g_Rand.setSeed(seed);
-    pSim->init();
+    pSim->init(molecularTrackingRadius);
   }
 
   if(outputDir[outputDir.size()-1] != '/')
@@ -549,11 +628,23 @@ int main(int argc, char** argv)
     ofstream* f = new ofstream(ss.str().c_str());
     csvStreams.push_back(new IntMtbStats(f, *pSim));
   }
+
   if(vm.count("stats")){
     stringstream ss;
     ss<<outputDir<<"seed"<<g_Rand.getSeed()<<".csv";
     ofstream* f = new ofstream(ss.str().c_str());
     csvStreams.push_back(new GeneralStats(f));
+  }
+
+  if(molecularTrackingRadius > 0)
+  {
+	  if (!molecularTrackingFileName.empty())
+	  {
+		stringstream ss;
+		ss << outputDir << molecularTrackingFileName << g_Rand.getSeed() <<".csv";
+		ofstream* f = new ofstream(ss.str().c_str());
+		csvStreams.push_back(new MolecularTrackingStats(f));
+	  }
   }
 
   run(pSim, vm["state-interval"].as<unsigned>(), vm["csv-interval"].as<unsigned>(),

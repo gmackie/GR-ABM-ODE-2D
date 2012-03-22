@@ -224,7 +224,7 @@ void GrSimulation::deserialize(std::istream& in)
 	}
 }
 
-void GrSimulation::init()
+void GrSimulation::init(Scalar molecularTrackingRadius)
 {
 	// initialize the sources
 	_grid.initSources();
@@ -283,6 +283,45 @@ void GrSimulation::init()
 					newMac->solveNFkBODEsEquilibrium(6.00/_PARAM(PARAM_GR_NF_KB_TIME_COEFF));
 			}
 			count--;
+		}
+	}
+
+	initMolecularTracking(molecularTrackingRadius);
+}
+
+void GrSimulation::initMolecularTracking(Scalar molecularTrackingRadius)
+{
+	const Pos center = _grid.getCenter();
+
+	for (MacList::iterator it = _macList.begin(); it != _macList.end(); it++)
+	{
+		if (it->getPosition().distance(center) <= molecularTrackingRadius)
+		{
+			it->setTrackMolecularDynamics(true);
+		}
+	}
+
+	for (TgamList::iterator it = _tgamList.begin(); it != _tgamList.end(); it++)
+	{
+		if (it->getPosition().distance(center) <= molecularTrackingRadius)
+		{
+			it->setTrackMolecularDynamics(true);
+		}
+	}
+
+	for (TcytList::iterator it = _tcytList.begin(); it != _tcytList.end(); it++)
+	{
+		if (it->getPosition().distance(center) <= molecularTrackingRadius)
+		{
+			it->setTrackMolecularDynamics(true);
+		}
+	}
+
+	for (TregList::iterator it = _tregList.begin(); it != _tregList.end(); it++)
+	{
+		if (it->getPosition().distance(center) <= molecularTrackingRadius)
+		{
+			it->setTrackMolecularDynamics(true);
 		}
 	}
 }

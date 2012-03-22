@@ -79,7 +79,6 @@ public:
 	void move(GrGrid& grid);
 	void secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDepletion, bool il10rDynamics, bool il10Depletion);
 	void computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tnfrDynamics, bool nfkbDynamics, bool il10rDynamics, bool);
-	void solveTNF (GrGrid& grid, double dt);
 	void solveNFkBandTNF (GrGrid& grid, double dt);
 	void solveNFkBODEsEquilibrium (double dt);
     void solveTNFandIL10 (GrGrid& grid, GrStat& stats, double dt, double currenttime);

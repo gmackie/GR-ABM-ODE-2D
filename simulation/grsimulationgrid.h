@@ -19,8 +19,9 @@ public:
 	GrSimulationGrid(const Pos& dim);
 	virtual ~GrSimulationGrid();
 
-  const Pos& getRange() const { return getGrid().getRange(); }
-  size_t getSize() const { return getGrid().getSize(); }
+	const Pos& getRange() const { return getGrid().getRange(); }
+	size_t getSize() const { return getGrid().getSize(); }
+	const Pos getCenter() const { return  getGrid().getCenter(); }
 
 	const GrGrid& getCurrentGrid() const;
 	GrGrid& getCurrentGrid();

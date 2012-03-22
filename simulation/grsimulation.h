@@ -55,6 +55,8 @@ private:
     // Once enabled it stays enabled even if the criteria by which it became enabled changes.
     bool _tcellRecruitmentBegun;
 
+	void initMolecularTracking(Scalar molecularTrackingRadius);
+
 	void moveTcells();
 	void moveMacrophages();
 	void updateStates();
@@ -77,7 +79,7 @@ private:
 public:
 	GrSimulation(const Pos& dim);
 	~GrSimulation();
-	void init();
+	void init(Scalar molecularTrackingRadius);
 	void solve();
 	void performT_Test();
 	int getTime() const;

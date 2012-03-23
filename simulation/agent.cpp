@@ -198,6 +198,33 @@ void Agent::solveIL10(GrGrid& grid, double dt)
 
 }
 
+void Agent::solveDegradation(GrGrid& grid, double dt, bool tnfrDynamics, bool il10rDynamics, Scalar meanTNFR1, Scalar iIL10R)
+{
+    double Nav = 6.02e23; // Avagadros #
+    double vol = 8.0e-12; // volume of a cell in L
+
+    if (!tnfrDynamics) {
+
+        // simulate the effect of TNF internalization by cells in the form of degradation. Only for TNF
+        double dtnf;
+        double tnf = grid.TNF(_pos);
+        dtnf = -_PARAM(PARAM_GR_K_INT1) * (tnf / (tnf + _PARAM(PARAM_GR_KD1) * Nav * vol)) * meanTNFR1 * dt * 0.4;
+        grid.incTNF(_pos, dtnf);
+    }
+
+    if (!il10rDynamics) {
+
+        double dil10;
+        double il10 = grid.il10(_pos);
+
+        // simulate the effect of IL10 internalization in the form of degradation. Only for IL10
+        dil10 = -_PARAM(PARAM_GR_I_K_INT) * (il10 / (il10 + _PARAM(PARAM_GR_I_KD) * Nav * vol)) * iIL10R * dt * _PARAM(PARAM_GR_I_MOD);
+        grid.incil10(_pos, dil10);
+
+    }
+
+}
+
 Pos Agent::moveAgent(GrGrid& grid, bool ccl2, bool ccl5, bool cxcl9, bool attractant, double bonusFactor)
 {
 	int DestinationOrdinal = getDestinationOrdinal(grid, ccl2, ccl5, cxcl9, attractant, bonusFactor);

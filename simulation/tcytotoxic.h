@@ -34,7 +34,6 @@ public:
 	void secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDepletion, bool il10rDynamics, bool il10Depletion);
 	void computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tnfrDynamics, bool nfkbDynamics, bool il10rDynamics, bool);
 	void updateState();
-    void solveDegradation (GrGrid& grid, double dt, bool tnfrDynamics, bool il10rDynamics);
 	int getState() const;
 	TcytState getNextState() const;
 	void deactivate(const int time);

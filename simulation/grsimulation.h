@@ -71,7 +71,7 @@ private:
     void updateNFkBandTNFandIL10Dynamics(double dt);
     void updateNFkBandTNFDynamics(double dt);
 	void adjustTNFDegradation(double dt);
-    void adjustFauxDegradation(double dt, bool tnfrDynamics, bool il10rDynamics);
+    void adjustFauxDegradation(double dt);
 	void growExtMtb();
 	void shuffleCells();
 	void checkTCellRecruitmentStart();

@@ -376,7 +376,10 @@ void GrSimulation::solve()
 			if (_il10rDynamics) {
                 updateNFkBandTNFandIL10Dynamics(dt);
             }
-            updateNFkBandTNFDynamics(dt);
+			else
+			{
+				updateNFkBandTNFDynamics(dt);
+			}
 		}
 		else if (_tnfrDynamics && _il10rDynamics)
         {
@@ -395,7 +398,7 @@ void GrSimulation::solve()
         
         else if (!_il10rDynamics || !_tnfrDynamics)
 		{
-			adjustFauxDegradation(dt, _tnfrDynamics, _il10rDynamics);
+			adjustFauxDegradation(dt);
             //adjustTNFDegradation(dt);
 		}
 	}
@@ -823,7 +826,7 @@ void GrSimulation::adjustTNFDegradation(double dt)
 	}
 }
 
-void GrSimulation::adjustFauxDegradation(double dt, bool tnfrDynamics, bool il10rDynamics)
+void GrSimulation::adjustFauxDegradation(double dt)
 {
     
     for (MacList::iterator it = _macList.begin(); it != _macList.end(); it++)

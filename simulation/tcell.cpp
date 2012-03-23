@@ -131,6 +131,18 @@ void Tcell::solveTNFandIL10(GrGrid& grid, GrStat&, double dt, double)
 //    cout << "Debug: Running T cell TNF and IL10 dynamics" << std::endl;
 }
 
+void Tcell::solveDegradation(GrGrid& grid, double dt, bool tnfrDynamics, bool il10rDynamics)
+{
+	//DBG
+//	cout << "Debug: Running T cell degradation"
+//		<<  " _PARAM(PARAM_GR_MEAN_TNFR1_TCELL): " << _PARAM(PARAM_GR_MEAN_TNFR1_TCELL)
+//		<<  " _PARAM(PARAM_GR_I_IL10R_TCELL): " << _PARAM(PARAM_GR_I_IL10R_TCELL)
+//		<< std::endl;
+    // DBG
+
+	Agent::solveDegradation(grid, dt, tnfrDynamics, il10rDynamics, _PARAM(PARAM_GR_MEAN_TNFR1_TCELL), _PARAM(PARAM_GR_I_IL10R_TCELL));
+}
+
 void Tcell::moveTcell(GrGrid& grid, bool ccl2, bool ccl5, bool cxcl9)
 {
 	Pos pos  = Agent::moveAgent(grid, ccl2, ccl5, cxcl9, false, _PARAM(PARAM_TCELL_MOVEMENT_BONUSFACTOR));

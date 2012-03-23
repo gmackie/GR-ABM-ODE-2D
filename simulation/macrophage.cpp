@@ -10,6 +10,8 @@
 #include "grgrid.h"
 #include "serialization.h"
 
+using namespace std;
+
 const std::string Mac::_ClassName = "Mac";
 
 // Needed for deserializing the model state.
@@ -825,7 +827,7 @@ void Mac::solveTNFandIL10(GrGrid& grid, GrStat& stats, double dt, double current
     if (_surfIL10R < 0 || _surfBoundIL10R < 0)
         std::cout << "Error: Negative value of species in IL10/IL10R dynamics" << std::endl;
     
-    //cout << "Debug: Running TNF and IL10 dynamics" << std::endl;
+//    cout << "Debug: Running Mac TNF and IL10 dynamics" << std::endl;
     
 }
 
@@ -1011,39 +1013,6 @@ void Mac::solveTNFandIL10andNFkB(GrGrid& grid, double dt)
 		std::cout << "Error: Negative Value of Species in NFkB dynamics" << std::endl;
     
      //cout << "Debug: Running TNF and IL10 and NFkB dynamics" << std::endl;
-}
-
-
-void Mac::solveIL10(GrGrid& grid, double dt)
-{
-    double density = 1.25e11; // used for conversion of conc. unit (M -> #/cell) based on cell and microcompartment volumes 
-	double Nav = 6.02e23; // Avogadro Number
-	double vol = 8.0e-12; // volume of a cell in liter
-    
-    double il10 = grid.il10(_pos) / (Nav * vol);
-    
-    double dsIL10;
-	double dsurfIL10R;
-	double dsurfBoundIL10R;
-    
-    // IL10 differential equations
-    dsIL10 = (density/Nav) * _kISynth + ((density/Nav) * (_PARAM(PARAM_GR_I_K_OFF) * _surfBoundIL10R - _PARAM(PARAM_GR_I_K_ON) * _surfIL10R * il10)) * dt;
-	dsurfIL10R = (_vIL10R - _PARAM(PARAM_GR_I_K_ON) * _surfIL10R * il10 + _PARAM(PARAM_GR_I_K_OFF) * _surfBoundIL10R - _PARAM(PARAM_GR_I_K_T) * _surfIL10R) * dt;
-	dsurfBoundIL10R = (_PARAM(PARAM_GR_I_K_ON) * _surfIL10R * il10 - _PARAM(PARAM_GR_I_K_OFF) * _surfBoundIL10R - _PARAM(PARAM_GR_I_K_INT) * _surfBoundIL10R) * dt;
-    // end of IL10 differential equations
-    
-    // update il10 variables
-    _surfIL10R += dsurfIL10R;
-    _surfBoundIL10R += dsurfBoundIL10R;
-    il10 += dsIL10;
-    
-    grid.setil10(_pos, (Nav * vol * il10));
-    
-    if (_surfIL10R < 0 || _surfBoundIL10R < 0)
-        std::cout << "Error: Negative value of species in IL10/IL10R dynamics" << std::endl;
-    
-     //cout << "Debug: Running IL10 dynamics" << std::endl;
-    
 }
 
 void Mac::solveDegradation(GrGrid& grid, double dt, bool tnfrDynamics, bool il10rDynamics)

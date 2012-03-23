@@ -166,6 +166,38 @@ void Agent::solveTNF(GrGrid& grid, double dt)
     //cout << "Debug: Running TNF dynamics" << std::endl;
 }
 
+void Agent::solveIL10(GrGrid& grid, double dt)
+{
+    double density = 1.25e11; // used for conversion of conc. unit (M -> #/cell) based on cell and microcompartment volumes
+	double Nav = 6.02e23; // Avogadro Number
+	double vol = 8.0e-12; // volume of a cell in liter
+
+    double il10 = grid.il10(_pos) / (Nav * vol);
+
+    double dsIL10;
+	double dsurfIL10R;
+	double dsurfBoundIL10R;
+
+    // IL10 differential equations
+    dsIL10 = (density/Nav) * _kISynth + ((density/Nav) * (_PARAM(PARAM_GR_I_K_OFF) * _surfBoundIL10R - _PARAM(PARAM_GR_I_K_ON) * _surfIL10R * il10)) * dt;
+	dsurfIL10R = (_vIL10R - _PARAM(PARAM_GR_I_K_ON) * _surfIL10R * il10 + _PARAM(PARAM_GR_I_K_OFF) * _surfBoundIL10R - _PARAM(PARAM_GR_I_K_T) * _surfIL10R) * dt;
+	dsurfBoundIL10R = (_PARAM(PARAM_GR_I_K_ON) * _surfIL10R * il10 - _PARAM(PARAM_GR_I_K_OFF) * _surfBoundIL10R - _PARAM(PARAM_GR_I_K_INT) * _surfBoundIL10R) * dt;
+    // end of IL10 differential equations
+
+    // update il10 variables
+    _surfIL10R += dsurfIL10R;
+    _surfBoundIL10R += dsurfBoundIL10R;
+    il10 += dsIL10;
+
+    grid.setil10(_pos, (Nav * vol * il10));
+
+    if (_surfIL10R < 0 || _surfBoundIL10R < 0)
+        std::cout << "Error: Negative value of species in IL10/IL10R dynamics" << std::endl;
+
+     //cout << "Debug: Running IL10 dynamics" << std::endl;
+
+}
+
 Pos Agent::moveAgent(GrGrid& grid, bool ccl2, bool ccl5, bool cxcl9, bool attractant, double bonusFactor)
 {
 	int DestinationOrdinal = getDestinationOrdinal(grid, ccl2, ccl5, cxcl9, attractant, bonusFactor);

@@ -82,6 +82,8 @@ public:
 	virtual void updateState() = 0;
 
 	virtual void solveTNF (GrGrid& grid, double dt);
+	virtual void solveIL10 (GrGrid& grid, double dt);
+	virtual void solveTNFandIL10(GrGrid& grid, GrStat& stats, double dt, double currenttime) = 0;
 
 	virtual void kill() = 0;
 	virtual void deactivate(const int time) = 0;

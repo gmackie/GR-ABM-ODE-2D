@@ -643,15 +643,15 @@ void GrSimulation::updateTNFandIL10Dynamics(double dt, double currenttime)
 	}
 	for (TgamList::iterator it = _tgamList.begin(); it != _tgamList.end(); it++)
 	{
-		it->solveTNFandIL10(_grid.getGrid(), dt);
+		it->solveTNFandIL10(_grid.getGrid(), _stats, dt, currenttime);
 	}
 	for (TcytList::iterator it = _tcytList.begin(); it != _tcytList.end(); it++)
 	{
-		it->solveTNFandIL10(_grid.getGrid(), dt);
+		it->solveTNFandIL10(_grid.getGrid(), _stats, dt, currenttime);
 	}
 	for (TregList::iterator it = _tregList.begin(); it != _tregList.end(); it++)
 	{
-		it->solveTNFandIL10(_grid.getGrid(), dt);
+		it->solveTNFandIL10(_grid.getGrid(), _stats, dt, currenttime);
 	}
 }
 
@@ -691,15 +691,15 @@ void GrSimulation::updateNFkBandTNFandIL10Dynamics(double dt)
 	}
 	for (TgamList::iterator it = _tgamList.begin(); it != _tgamList.end(); it++)
 	{
-		it->solveTNFandIL10(_grid.getGrid(), dt);
+		it->solveTNFandIL10(_grid.getGrid(), _stats, dt, 0.0);
 	}
 	for (TcytList::iterator it = _tcytList.begin(); it != _tcytList.end(); it++)
 	{
-		it->solveTNFandIL10(_grid.getGrid(), dt);
+		it->solveTNFandIL10(_grid.getGrid(), _stats, dt, 0.0);
 	}
 	for (TregList::iterator it = _tregList.begin(); it != _tregList.end(); it++)
 	{
-		it->solveTNFandIL10(_grid.getGrid(), dt);
+		it->solveTNFandIL10(_grid.getGrid(), _stats, dt, 0.0);
 	}
 }
 

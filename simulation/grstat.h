@@ -123,8 +123,8 @@ private:
 
 public:
 	GrStat();
-  GrStat(const GrStat&);
-  GrStat& operator=(const GrStat&);
+	GrStat(const GrStat&);
+	GrStat& operator=(const GrStat&);
 	~GrStat();
 	size_t getIntMtbFreqSize() const;
 	const unsigned* getIntMtbFreq(size_t& s) const;

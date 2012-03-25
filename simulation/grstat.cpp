@@ -219,21 +219,21 @@ void GrStat::serialize(std::ostream& out) const
 
 	Serialization::writeHeader(out, GrStat::_ClassName);
 
-	out <<_nAgents[MAC];
+	out <<_nAgents[MAC] << std::endl;
   for(size_t i=0;i<NMAC_STATES;i++)
-    out <<_nMac[i];
+    out <<_nMac[i] << std::endl;
 
-	out <<_nAgents[TGAM];
+	out <<_nAgents[TGAM] << std::endl;
   for(size_t i=0;i<NTGAM_STATES;i++)
-    out <<_nTgam[i];
+    out <<_nTgam[i] << std::endl;
 
-	out <<_nAgents[TCYT];
+	out <<_nAgents[TCYT] << std::endl;
   for(size_t i=0;i<NTCYT_STATES;i++)
-    out <<_nTcyt[i];
+    out <<_nTcyt[i] << std::endl;
 
-	out <<_nAgents[TREG];
+	out <<_nAgents[TREG] << std::endl;
   for(size_t i=0;i<NTREG_STATES;i++)
-    out <<_nTreg[i];
+    out <<_nTreg[i] << std::endl;
 
 	out << _totExtMtb << std::endl;
 	out << _totNonRepExtMtb << std::endl;
@@ -259,17 +259,24 @@ void GrStat::serialize(std::ostream& out) const
 	out << _nInfMacActivationTNF << std::endl;
 
   for(size_t i=0;i<NMAC_STATES;i++)
-    out <<_nMacNFkB[i];
+    out <<_nMacNFkB[i] << std::endl;
 
   for(size_t i=0;i<NAGENTS;i++)
-    out <<_nSource[i];
+    out <<_nSource[i] << std::endl;
+
+  for(size_t i=0;i<NAGENTS;i++)
+    out << _nSourceActive[i] << std::endl;
+
+  out << _nSourceMacCrowded << std::endl;
+  out << _nSourceTgamCrowded << std::endl;
+  out << _nSourceTcytCrowded << std::endl;
+  out << _nSourceTregCrowded << std::endl;
 
   for(size_t i=0;i<NMAC_STATES;i++)
-    out <<_nMacStat1[i];
+    out <<_nMacStat1[i] << std::endl;
 
   for(size_t i=0;i<NMAC_STATES;i++)
-    out <<_nMacDeact[i];
-
+    out <<_nMacDeact[i] << std::endl;
 
 	out << _nBactAct << std::endl;
 	out << _areaTNF << std::endl;
@@ -285,12 +292,18 @@ void GrStat::serialize(std::ostream& out) const
 	out << _queueTgam << std::endl;
 	out << _queueTcyt << std::endl;
 	out << _queueTreg << std::endl;
+
+	out << _queueTgamDie << std::endl;
+	out << _queueTcytDie << std::endl;
+	out << _queueTregDie << std::endl;
+
+	out << _recruitedTgam << std::endl;
+	out << _recruitedTcyt << std::endl;
+	out << _recruitedTreg << std::endl;
+
 	out << _fluxTgam << std::endl;
 	out << _fluxTcyt << std::endl;
 	out << _fluxTreg << std::endl;
-
-  for(size_t i=0;i<NAGENTS;i++)
-    out << _nSourceActive[i] << std::endl;
 
 	out << _MDC << std::endl;
 	out << _N4 << std::endl;
@@ -306,6 +319,13 @@ void GrStat::serialize(std::ostream& out) const
 	out << _T8lung << std::endl;
 	out << _TClung << std::endl;
 	out << _nCellTnfInhibit << std::endl;
+
+	out << _intMtbFreqSize << std::endl;
+
+	for (size_t i = 0; i < _intMtbFreqSize; i++)
+	{
+		out << _intMtbFreq[i] << std::endl;
+	}
 
 	Serialization::writeFooter(out, GrStat::_ClassName);
 }
@@ -349,10 +369,11 @@ void GrStat::deserialize(std::istream& in)
     in >>_totkmRNA;
 
 	in >>_nApoptosisFasFasL;
+
   for(unsigned i=0;i<NMAC_STATES;i++)
   	in >>_nMacApoptosisTNF[i];
 	
-  in >> _nTcellApoptosisTNF;
+    in >> _nTcellApoptosisTNF;
 	
 	in >> _nRestingMacActivationTNF;
 	in >> _nInfMacActivationTNF;
@@ -362,6 +383,14 @@ void GrStat::deserialize(std::istream& in)
 
   for(size_t i=0;i<NAGENTS;i++)
     in >>_nSource[i];
+
+  for(size_t i=0;i<NAGENTS;i++)
+    in >>_nSourceActive[i];
+
+  in >> _nSourceMacCrowded;
+  in >> _nSourceTgamCrowded;
+  in >> _nSourceTcytCrowded;
+  in >> _nSourceTregCrowded;
 
   for(size_t i=0;i<NMAC_STATES;i++)
     in >>_nMacStat1[i];
@@ -385,12 +414,18 @@ void GrStat::deserialize(std::istream& in)
 	in >>_queueTgam;
 	in >>_queueTcyt;
 	in >>_queueTreg;
+
+	in >> _queueTgamDie;
+	in >> _queueTcytDie;
+	in >> _queueTregDie;
+
+	in >> _recruitedTgam;
+	in >> _recruitedTcyt;
+	in >> _recruitedTreg;
+
 	in >>_fluxTgam;
 	in >>_fluxTcyt;
 	in >>_fluxTreg;
-
-  for(size_t i=0;i<NAGENTS;i++)
-    in >>_nSourceActive[i];
 
 	in >>_MDC;
 	in >>_N4;
@@ -406,6 +441,13 @@ void GrStat::deserialize(std::istream& in)
 	in >>_T8lung;
 	in >>_TClung;
 	in >> _nCellTnfInhibit;
+
+	in >> _intMtbFreqSize;
+
+	for (size_t i = 0; i < _intMtbFreqSize; i++)
+	{
+		in >> _intMtbFreq[i];
+	}
 
 	if (!Serialization::readFooter(in, GrStat::_ClassName))
 	{

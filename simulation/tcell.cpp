@@ -44,13 +44,10 @@ void Tcell::solveTNFandIL10(GrGrid& grid, GrStat&, double dt, double)
 {
 	double koff1 = _PARAM(PARAM_GR_K_ON1) * _PARAM(PARAM_GR_KD1);
 	double koff2 = _PARAM(PARAM_GR_K_ON2) * _PARAM(PARAM_GR_KD2);
-	double density = 1.25e11; // used for conversion of conc. unit (M -> #/cell) based on cell and microcompartment volumes
-	double Nav = 6.02e23; // Avogadro Number
-	double vol = 8.0e-12; // volume of a cell in liter
 
-	double tnf = grid.TNF(_pos) / (Nav * vol);
-	double shedtnfr2 = grid.shedTNFR2(_pos) / (Nav * vol);
-    double il10 = grid.il10(_pos) / (Nav * vol);
+	double tnf = grid.TNF(_pos) / (NAV * VOL);
+	double shedtnfr2 = grid.shedTNFR2(_pos) / (NAV * VOL);
+    double il10 = grid.il10(_pos) / (NAV * VOL);
 
     double dmTNFRNA;
 	double dmTNF;
@@ -90,12 +87,12 @@ void Tcell::solveTNFandIL10(GrGrid& grid, GrStat&, double dt, double)
 	dsurfBoundTNFR2 = (_PARAM(PARAM_GR_K_ON2) * tnf * _surfTNFR2 - koff2 * _surfBoundTNFR2 - _PARAM(PARAM_GR_K_INT2) * _surfBoundTNFR2 - _PARAM(PARAM_GR_K_SHED) * _surfBoundTNFR2) * dt;
 	dintBoundTNFR1 = (_PARAM(PARAM_GR_K_INT1) * _surfBoundTNFR1 - _PARAM(PARAM_GR_K_DEG1) * _intBoundTNFR1 - _PARAM(PARAM_GR_K_REC1) * _intBoundTNFR1) * dt;
 	dintBoundTNFR2 = (_PARAM(PARAM_GR_K_INT2) * _surfBoundTNFR2 - _PARAM(PARAM_GR_K_DEG2) * _intBoundTNFR2 - _PARAM(PARAM_GR_K_REC2) * _intBoundTNFR2) * dt;
-	dsTNF = ((density/Nav) * (_kTACE * _mTNF - _PARAM(PARAM_GR_K_ON1) * tnf * _surfTNFR1 + koff1 * _surfBoundTNFR1 - _PARAM(PARAM_GR_K_ON2) * tnf * _surfTNFR2 + koff2 * _surfBoundTNFR2)) * dt;
-	dshedTNFR2 = ((density/Nav) * _PARAM(PARAM_GR_K_SHED) * _surfBoundTNFR2) * dt;
+	dsTNF = ((DENSITY/NAV) * (_kTACE * _mTNF - _PARAM(PARAM_GR_K_ON1) * tnf * _surfTNFR1 + koff1 * _surfBoundTNFR1 - _PARAM(PARAM_GR_K_ON2) * tnf * _surfTNFR2 + koff2 * _surfBoundTNFR2)) * dt;
+	dshedTNFR2 = ((DENSITY/NAV) * _PARAM(PARAM_GR_K_SHED) * _surfBoundTNFR2) * dt;
 	// end of TNF differential equations
 
     // IL10 differential equations
-    dsIL10 = (density/Nav) * _kISynth + ((density/Nav) * (_PARAM(PARAM_GR_I_K_OFF) * _surfBoundIL10R - _PARAM(PARAM_GR_I_K_ON) * _surfIL10R * il10)) * dt;
+    dsIL10 = (DENSITY/NAV) * _kISynth + ((DENSITY/NAV) * (_PARAM(PARAM_GR_I_K_OFF) * _surfBoundIL10R - _PARAM(PARAM_GR_I_K_ON) * _surfIL10R * il10)) * dt;
 	dsurfIL10R = (_vIL10R - _PARAM(PARAM_GR_I_K_ON) * _surfIL10R * il10 + _PARAM(PARAM_GR_I_K_OFF) * _surfBoundIL10R - _PARAM(PARAM_GR_I_K_T) * _surfIL10R) * dt;
 	dsurfBoundIL10R = (_PARAM(PARAM_GR_I_K_ON) * _surfIL10R * il10 - _PARAM(PARAM_GR_I_K_OFF) * _surfBoundIL10R - _PARAM(PARAM_GR_I_K_INT) * _surfBoundIL10R) * dt;
     // end of IL10 differential equations
@@ -117,9 +114,9 @@ void Tcell::solveTNFandIL10(GrGrid& grid, GrStat&, double dt, double)
     _surfBoundIL10R += dsurfBoundIL10R;
     il10 += dsIL10;
 
-    grid.setTNF(_pos, (Nav * vol * tnf));
-    grid.setshedTNFR2(_pos, (Nav * vol * shedtnfr2));
-    grid.setil10(_pos, (Nav * vol * il10));
+    grid.setTNF(_pos, (NAV * VOL * tnf));
+    grid.setshedTNFR2(_pos, (NAV * VOL * shedtnfr2));
+    grid.setil10(_pos, (NAV * VOL * il10));
 
 
 	if (_mTNF < 0 || _surfTNFR1 < 0 || _surfBoundTNFR1 < 0 || _surfTNFR2 < 0 || _surfBoundTNFR2 < 0 || _mTNFRNA < 0)
@@ -148,7 +145,7 @@ void Tcell::moveTcell(GrGrid& grid, bool ccl2, bool ccl5, bool cxcl9)
 	Pos pos  = Agent::moveAgent(grid, ccl2, ccl5, cxcl9, false, _PARAM(PARAM_TCELL_MOVEMENT_BONUSFACTOR));
 	
 	// Check whether newCell is not caseated and contains empty slots
-  size_t n = grid.getNumberOfAgents(pos);
+	size_t n = grid.getNumberOfAgents(pos);
 	if (n != 2 && !grid.isCaseated(pos))
 	{
 		// Move with p = 1, if newCell is empty

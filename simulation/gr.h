@@ -53,6 +53,23 @@ typedef double Scalar;
 
 #define PI 3.141592653
 
+// Avogadro's Number
+#define NAV 6.02e23
+
+// used for conversion of conc. unit (M -> #/cell) based on cell and microcompartment volumes
+#define DENSITY 1.25e11
+
+// volume of a grid compartment in cubic meters
+#define VOL 8.0e-12
+
+//ratio of cytoplasmic to nuclear volume
+#define KV 5.0
+
+#define KDEG 4.58e-4
+
+// molecular weight of IL10 in g/mol
+#define MW_IL10 18600
+
 #ifdef _DEBUG
 #define assert_res(a) (assert(a))
 #else

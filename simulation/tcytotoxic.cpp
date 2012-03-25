@@ -55,14 +55,9 @@ void Tcyt::secrete(GrGrid& grid, bool tnfrDynamics, bool, bool tnfDepletion, boo
     _kmRNA = _PARAM(PARAM_GR_K_RNA_TCELL)/10;
     _kISynth = 0.0;
     
-    
-    double Nav = 6.02e23; // Avogadro Number
-    double vol = 8.0e-12; // volume of a cell in liter
-    double MW_IL10 = 18600; // molecular weight of IL10 in g/mol
-    
 	if (!tnfrDynamics && !tnfDepletion)
     {    
-       const double il10 = log(((grid.il10(_pos) * MW_IL10 * 1e6)/(Nav * vol))); // converting il10 concentration to log(ng/mL) for use in dose dependence
+       const double il10 = log(((grid.il10(_pos) * MW_IL10 * 1e6)/(NAV * VOL))); // converting il10 concentration to log(ng/mL) for use in dose dependence
        const double tnfMOD = (1.0/(1.0 + exp((il10 + _PARAM(PARAM_GR_LINK_LOG_ALPHA))/_PARAM(PARAM_GR_LINK_LOG_BETA)))); // calculate the fraction of inhibition
         
 		grid.incTNF(_pos, (tnfMOD * _PARAM(PARAM_TCYT_SEC_RATE_TNF)));

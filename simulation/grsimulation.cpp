@@ -74,12 +74,16 @@ void GrSimulation::serialize(std::ostream& out) const
 	out << _tnfrDynamics << std::endl;
 	out << _nfkbDynamics << std::endl;
     out << _il10rDynamics << std::endl;
+    out << _tgammatransition << std::endl;
 	out << _tnfDepletionTimeStep << std::endl;
     out << _il10DepletionTimeStep << std::endl;
-    out << _tgammatransition <<std::endl;
+    out << _tcellRecruitmentBegun <<std::endl;
 
 	// serialize grid
 	_grid.serialize(out);
+
+	// Serialize the agent class.
+	Agent::classSerialize(out);
 
 	// serialize macs
 	out << _macList.size() << std::endl;
@@ -148,12 +152,16 @@ void GrSimulation::deserialize(std::istream& in)
 	in >> _tnfrDynamics;
 	in >> _nfkbDynamics;
     in >> _il10rDynamics;
+    in >> _tgammatransition;
 	in >> _tnfDepletionTimeStep;
     in >> _il10DepletionTimeStep;
-    in >> _tgammatransition;
+    in >> _tcellRecruitmentBegun;
 
 	// deserialize grid
 	_grid.deserialize(in);
+
+	// Deserialize the agent class.
+	Agent::classDeserialize(in);
 
 	// deserialize macs
 	_macList.clear();

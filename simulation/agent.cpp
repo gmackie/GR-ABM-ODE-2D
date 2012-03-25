@@ -11,7 +11,7 @@
 
 const std::string Agent::_ClassName = "Agent";
 
-unsigned long Agent::nextID = 0;
+unsigned long Agent::_nextID = 0;
 
 // Needed for deserializing the model state.
 // Avoids the calls to the random number generator in the normal constructor, allowing the random number generator
@@ -101,13 +101,10 @@ void Agent::solveTNF(GrGrid& grid, double dt)
 {
 	double koff1 = _PARAM(PARAM_GR_K_ON1) * _PARAM(PARAM_GR_KD1);
 	double koff2 = _PARAM(PARAM_GR_K_ON2) * _PARAM(PARAM_GR_KD2);
-	double density = 1.25e11; // used for conversion of conc. unit (M -> #/cell) based on cell and microcompartment volumes
-	double Nav = 6.02e23; // Avogadro Number
-	double vol = 8.0e-12; // volume of a cell in liter
 
-	double tnf = grid.TNF(_pos) / (Nav * vol);
-	double shedtnfr2 = grid.shedTNFR2(_pos) / (Nav * vol);
-    double il10 = grid.il10(_pos) /(Nav * vol);
+	double tnf = grid.TNF(_pos) / (NAV * VOL);
+	double shedtnfr2 = grid.shedTNFR2(_pos) / (NAV * VOL);
+    double il10 = grid.il10(_pos) /(NAV * VOL);
 
     double dmTNFRNA;
 	double dmTNF;
@@ -144,8 +141,8 @@ void Agent::solveTNF(GrGrid& grid, double dt)
 	dsurfBoundTNFR2 = (_PARAM(PARAM_GR_K_ON2) * tnf * _surfTNFR2 - koff2 * _surfBoundTNFR2 - _PARAM(PARAM_GR_K_INT2) * _surfBoundTNFR2 - _PARAM(PARAM_GR_K_SHED) * _surfBoundTNFR2) * dt;
 	dintBoundTNFR1 = (_PARAM(PARAM_GR_K_INT1) * _surfBoundTNFR1 - _PARAM(PARAM_GR_K_DEG1) * _intBoundTNFR1 - _PARAM(PARAM_GR_K_REC1) * _intBoundTNFR1) * dt;
 	dintBoundTNFR2 = (_PARAM(PARAM_GR_K_INT2) * _surfBoundTNFR2 - _PARAM(PARAM_GR_K_DEG2) * _intBoundTNFR2 - _PARAM(PARAM_GR_K_REC2) * _intBoundTNFR2) * dt;
-	dsTNF = ((density/Nav) * (_kTACE * _mTNF - _PARAM(PARAM_GR_K_ON1) * tnf * _surfTNFR1 + koff1 * _surfBoundTNFR1 - _PARAM(PARAM_GR_K_ON2) * tnf * _surfTNFR2 + koff2 * _surfBoundTNFR2)) * dt;
-	dshedTNFR2 = ((density/Nav) * _PARAM(PARAM_GR_K_SHED) * _surfBoundTNFR2) * dt;
+	dsTNF = ((DENSITY/NAV) * (_kTACE * _mTNF - _PARAM(PARAM_GR_K_ON1) * tnf * _surfTNFR1 + koff1 * _surfBoundTNFR1 - _PARAM(PARAM_GR_K_ON2) * tnf * _surfTNFR2 + koff2 * _surfBoundTNFR2)) * dt;
+	dshedTNFR2 = ((DENSITY/NAV) * _PARAM(PARAM_GR_K_SHED) * _surfBoundTNFR2) * dt;
 
     _mTNFRNA += dmTNFRNA;
 	_mTNF += dmTNF;
@@ -158,8 +155,8 @@ void Agent::solveTNF(GrGrid& grid, double dt)
 	tnf += dsTNF;
 	shedtnfr2 += dshedTNFR2;
 
-	grid.setTNF(_pos, (Nav * vol * tnf));
-	grid.setshedTNFR2(_pos, (Nav * vol * shedtnfr2));
+	grid.setTNF(_pos, (NAV * VOL * tnf));
+	grid.setshedTNFR2(_pos, (NAV * VOL * shedtnfr2));
 	if (_mTNF < 0 || _surfTNFR1 < 0 || _surfBoundTNFR1 < 0 || _surfTNFR2 < 0 || _surfBoundTNFR2 < 0 || _mTNFRNA < 0)
 		std::cout << "Error: Negative Value of Species in TNF/TNFR dynamics" << std::endl;
 
@@ -168,18 +165,14 @@ void Agent::solveTNF(GrGrid& grid, double dt)
 
 void Agent::solveIL10(GrGrid& grid, double dt)
 {
-    double density = 1.25e11; // used for conversion of conc. unit (M -> #/cell) based on cell and microcompartment volumes
-	double Nav = 6.02e23; // Avogadro Number
-	double vol = 8.0e-12; // volume of a cell in liter
-
-    double il10 = grid.il10(_pos) / (Nav * vol);
+    double il10 = grid.il10(_pos) / (NAV * VOL);
 
     double dsIL10;
 	double dsurfIL10R;
 	double dsurfBoundIL10R;
 
     // IL10 differential equations
-    dsIL10 = (density/Nav) * _kISynth + ((density/Nav) * (_PARAM(PARAM_GR_I_K_OFF) * _surfBoundIL10R - _PARAM(PARAM_GR_I_K_ON) * _surfIL10R * il10)) * dt;
+    dsIL10 = (DENSITY/NAV) * _kISynth + ((DENSITY/NAV) * (_PARAM(PARAM_GR_I_K_OFF) * _surfBoundIL10R - _PARAM(PARAM_GR_I_K_ON) * _surfIL10R * il10)) * dt;
 	dsurfIL10R = (_vIL10R - _PARAM(PARAM_GR_I_K_ON) * _surfIL10R * il10 + _PARAM(PARAM_GR_I_K_OFF) * _surfBoundIL10R - _PARAM(PARAM_GR_I_K_T) * _surfIL10R) * dt;
 	dsurfBoundIL10R = (_PARAM(PARAM_GR_I_K_ON) * _surfIL10R * il10 - _PARAM(PARAM_GR_I_K_OFF) * _surfBoundIL10R - _PARAM(PARAM_GR_I_K_INT) * _surfBoundIL10R) * dt;
     // end of IL10 differential equations
@@ -189,7 +182,7 @@ void Agent::solveIL10(GrGrid& grid, double dt)
     _surfBoundIL10R += dsurfBoundIL10R;
     il10 += dsIL10;
 
-    grid.setil10(_pos, (Nav * vol * il10));
+    grid.setil10(_pos, (NAV * VOL * il10));
 
     if (_surfIL10R < 0 || _surfBoundIL10R < 0)
         std::cout << "Error: Negative value of species in IL10/IL10R dynamics" << std::endl;
@@ -200,15 +193,12 @@ void Agent::solveIL10(GrGrid& grid, double dt)
 
 void Agent::solveDegradation(GrGrid& grid, double dt, bool tnfrDynamics, bool il10rDynamics, Scalar meanTNFR1, Scalar iIL10R)
 {
-    double Nav = 6.02e23; // Avagadros #
-    double vol = 8.0e-12; // volume of a cell in L
-
     if (!tnfrDynamics) {
 
         // simulate the effect of TNF internalization by cells in the form of degradation. Only for TNF
         double dtnf;
         double tnf = grid.TNF(_pos);
-        dtnf = -_PARAM(PARAM_GR_K_INT1) * (tnf / (tnf + _PARAM(PARAM_GR_KD1) * Nav * vol)) * meanTNFR1 * dt * 0.4;
+        dtnf = -_PARAM(PARAM_GR_K_INT1) * (tnf / (tnf + _PARAM(PARAM_GR_KD1) * NAV * VOL)) * meanTNFR1 * dt * 0.4;
         grid.incTNF(_pos, dtnf);
     }
 
@@ -218,7 +208,7 @@ void Agent::solveDegradation(GrGrid& grid, double dt, bool tnfrDynamics, bool il
         double il10 = grid.il10(_pos);
 
         // simulate the effect of IL10 internalization in the form of degradation. Only for IL10
-        dil10 = -_PARAM(PARAM_GR_I_K_INT) * (il10 / (il10 + _PARAM(PARAM_GR_I_KD) * Nav * vol)) * iIL10R * dt * _PARAM(PARAM_GR_I_MOD);
+        dil10 = -_PARAM(PARAM_GR_I_K_INT) * (il10 / (il10 + _PARAM(PARAM_GR_I_KD) * NAV * VOL)) * iIL10R * dt * _PARAM(PARAM_GR_I_MOD);
         grid.incil10(_pos, dil10);
 
     }
@@ -326,6 +316,33 @@ Pos Agent::compartmentOrdinalToCoordinates(int ordinal, const Pos& dim) const
 	return Pos(newRow, newCol);
 
 }
+
+
+void Agent::classSerialize(std::ostream& out)
+{
+	assert(out.good());
+	Serialization::writeHeader(out, Agent::_ClassName);
+	out << _nextID << std::endl;
+	Serialization::writeFooter(out, Agent::_ClassName);
+}
+
+void Agent::classDeserialize(std::istream& in)
+{
+	assert(in.good());
+
+	if (!Serialization::readHeader(in, Agent::_ClassName))
+	{
+		exit(1);
+	}
+
+	in >> _nextID;
+
+	if (!Serialization::readFooter(in, Agent::_ClassName))
+	{
+		exit(1);
+	}
+}
+
 
 void Agent::serialize(std::ostream& out) const
 {

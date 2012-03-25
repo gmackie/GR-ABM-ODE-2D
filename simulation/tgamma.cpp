@@ -78,18 +78,14 @@ void Tgam::secrete(GrGrid& grid, bool tnfrDynamics, bool, bool tnfDepletion, boo
     {
         _kISynth = 0;
     }
-    
-    double Nav = 6.02e23; // Avogadro Number
-    double vol = 8.0e-12; // volume of a cell in liter
-    double MW_IL10 = 18600; // molecular weight of IL10 in g/mol
-    
+
     // Need a statement checking to see if cell is in double positive state
     // Then set _kISynth = T cell value
     
     
 	if (!tnfrDynamics && !tnfDepletion)
     {    
-        double il10 = log(((grid.il10(_pos) * MW_IL10 * 1e6)/(Nav * vol))); // converting il10 concentration to log(ng/mL) for use in dose dependence
+        double il10 = log(((grid.il10(_pos) * MW_IL10 * 1e6)/(NAV * VOL))); // converting il10 concentration to log(ng/mL) for use in dose dependence
         double tnfMOD = (1.0/(1.0 + exp((il10 + _PARAM(PARAM_GR_LINK_LOG_ALPHA))/_PARAM(PARAM_GR_LINK_LOG_BETA)))); // calculate the fraction of inhibition
 		grid.incTNF(_pos, (tnfMOD * _PARAM(PARAM_TGAM_SEC_RATE_TNF)));
     }
@@ -97,9 +93,7 @@ void Tgam::secrete(GrGrid& grid, bool tnfrDynamics, bool, bool tnfDepletion, boo
 
 void Tgam::computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tnfrDynamics, bool, bool, bool tgammatransition)
 {
-    
 	double tnfBoundFraction = grid.TNF(_pos) / (grid.TNF(_pos) + _PARAM(PARAM_GR_KD1) * 48.16e11);
-
     
 	// check if it is time to die
 	if (timeToDie(time))

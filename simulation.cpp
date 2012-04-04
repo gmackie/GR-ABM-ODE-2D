@@ -28,7 +28,7 @@ Simulation::Simulation(const Pos& dim)
 	, _timeStepsToSimulate(_TIMESTEPS_TO_SIMULATE) //_DAYS_TO_SIMULATE _TIMESTEPS_TO_SIMULATE
 	, _mtbClearance(true)
 {
-	_gr->init();
+	_gr->init(false); // Molecular tracking not available in gui version of the model.
 	_gr->setAreaThreshold(_AREA_THRESHOLD);
 	update();
 }
@@ -127,5 +127,12 @@ void Simulation::setTnfDepletionTimeStep(int tnfDepletionTimeStep)
 {
 	lock();
 	_gr->setTnfDepletionTimeStep(tnfDepletionTimeStep);
+	unlock();
+}
+
+void Simulation::setIl10DepletionTimeStep(int il10DepletionTimeStep)
+{
+	lock();
+	_gr->setIl10DepletionTimeStep(il10DepletionTimeStep);
 	unlock();
 }

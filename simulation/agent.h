@@ -258,9 +258,6 @@ inline Scalar Agent::getKISynth() const
 	 return _kISynth;
 }
 
-
-
-
 inline bool Agent::getTrackMolecularDynamics() const
 {
 	return _trackMolecularDynamics;

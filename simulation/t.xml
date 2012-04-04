@@ -37,7 +37,7 @@
 	diffusivityChemokines = "5.2e-08"
 	degRateTNF = "0.9905"
 	degRateChemokines = "0.9905"
-    ChemokinekDeg = "1.58e-3"
+    	ChemokinekDeg = "1.58e-3"
 	dAttractant = "0"
 	thresholdApoptosisTNF = "0.0625"
 	kApoptosis = "0.00432456"
@@ -155,7 +155,8 @@
 	dIL10_Treg = "60"
 	>
 	<Mac
-		initNumber = "105"
+		ZinitNumber = "105"
+		initNumber = "0"
 		maxAge = "14400"
 		maxAgeAct = "1440"
 		maxTimeReg = "71"
@@ -180,17 +181,15 @@
 		nrExtMtbUptakeAct = "10"
 		thresholdRec = "0.0227148"
 		probRec = "0.04"
-        thresholdICOS = "1.5"
+        	thresholdICOS = "1.5"
 		/>
 	<Tcell
 		maxAge = "432"
 		timeRecEnabled = "2880"
-		
 		lymphProxyScalingStart = "2880"
 		lymphProxyFactorStart = "5040"
 		lymphProxyFactorEnd = "8640"
-		lymphProxyFactorNonlinearEnd = "10000"
-		lymphProxyMtbThreshold = "0"
+		lymphProxyFactorNonlinearEnd = "10800"
 		mtbRecEnabled = "35"
 		probMoveToMac = "0.015"
 		probMoveToTcell = "0.08"
@@ -198,15 +197,15 @@
 		>
 		<Tgam
 			maxTimeReg = "10"
-            maxTimeDouble = "144"
+            		maxTimeDouble = "144"
 			probApoptosisFasFasL = "0.06"
 			thresholdRec = "0.4"
 			probRec = "0.54"
-            thresholdExtMtb = "0"
-            probAntigenPresentation = "0.90"
-            probTGFB = ".001"
-            probICOS = ".001"
-            probAgDegree = "0.8"
+            		thresholdExtMtb = "0"
+			probAntigenPresentation = "0.90"
+			probTGFB = ".001"
+			probICOS = ".001"
+			probAgDegree = "0.8"
 			/>
 		<Tcyt
 			maxTimeReg = "10"
@@ -218,7 +217,7 @@
 		<Treg
 			thresholdRec = "0.2"
 			probRec = "0.1"
-            probTregDeactivate = "1.0"
+			probTregDeactivate = "1.0"
 			/>
 	</Tcell>
 	<Mtb

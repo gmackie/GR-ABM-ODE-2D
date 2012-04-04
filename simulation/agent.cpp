@@ -317,7 +317,6 @@ Pos Agent::compartmentOrdinalToCoordinates(int ordinal, const Pos& dim) const
 
 }
 
-
 void Agent::classSerialize(std::ostream& out)
 {
 	assert(out.good());
@@ -342,7 +341,6 @@ void Agent::classDeserialize(std::istream& in)
 		exit(1);
 	}
 }
-
 
 void Agent::serialize(std::ostream& out) const
 {

@@ -72,6 +72,7 @@ int main(int argc, char *argv[])
 	bool tnfrDynamics;
 	bool nfkbDynamics;
 	int tnfDepletionTimeStep;
+	int il10DepletionTimeStep;
 	unsigned int seed;
   size_t dim;
 	bool seedSpecified;
@@ -143,6 +144,7 @@ int main(int argc, char *argv[])
 		("tnfr-dynamics", "Use molecular level TNF/TNFR dynamics in the model")
 		("NFkB-dynamics", "Use molecular level intracellular NFkB dynamics in the model")
 		("tnf-depletion", po::value<int>(&tnfDepletionTimeStep)->default_value(-1), "The time step at which to stop secreting tnf, including by tnfr dynamics. -1: no depletion")
+		("il10-depletion", po::value<int>(&il10DepletionTimeStep)->default_value(-1), "The time step at which to stop secreting il10, including by il10r dynamics. -1: no depletion")
 		("ln-ode", po::value<std::string>(&lymphNodeODE), "Lymph node application")
 		("ln-ode-temp", po::value<std::string>(&lymphNodeTemp), "Lymph node temp file")
 		("quiet,q", "Don't show any visualization windows")
@@ -334,10 +336,9 @@ int main(int argc, char *argv[])
 	/* set TNF/TNFR and NFkB dynamics */
 	/* When NFkB is turned on, tnfr dynamics will be turned on autamatically */
 	itfc.getSimulation().setTnfrDynamics(tnfrDynamics || nfkbDynamics);
-	
 	itfc.getSimulation().setNfkbDynamics(nfkbDynamics);
-
 	itfc.getSimulation().setTnfDepletionTimeStep(tnfDepletionTimeStep);
+	itfc.getSimulation().setIl10DepletionTimeStep(il10DepletionTimeStep);
 
 
 	glWindow.resizeGLWidget(resWidth, resHeight);

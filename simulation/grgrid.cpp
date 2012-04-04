@@ -140,19 +140,29 @@ void GrGrid::deserialize(std::istream& in)
   if(GETROW(range) != GETROW(standard) && GETCOL(range) != GETCOL(standard))
     throw std::length_error("Dimension mismatch in deserialization");
 
-	_sources.clear();
+  _sources.clear();
+
   Pos p;
   for(p.x = 0; p.x < _dim.x; p.x++)
     for(p.y = 0; p.y < _dim.y; p.y++)
-      in  >> (Scalar&) TNF(p)          
-          >> (Scalar&) CCL2(p)         
+    {
+      in  >> (Scalar&) TNF(p)
+          >> (Scalar&) CCL2(p)
           >> (Scalar&) macAttractant(p)
-          >> (Scalar&) shedTNFR2(p)    
-          >> (Scalar&) il10(p)    
-          >> (Scalar&) extMTB(p)       
-          >> (int&) nKillings(p)    
+          >> (Scalar&) shedTNFR2(p)
+          >> (Scalar&) il10(p)
+          >> (Scalar&) extMTB(p)
+          >> (int&) nKillings(p)
           >> (int&) nRecruitments(p)
           >> (int&) nSecretions(p)  ;
+
+       // Clear the agents, in case some had been defined during simulation initialization,
+       // for example initial agents defined from a parameter file INIT section.
+       for (size_t i = 0; i < MAX_AGENTS_PER_CELL; i++)
+       {
+    	   agent(p, i) = NULL;
+       }
+     }
 
   int sz = 0;
   in >> sz;

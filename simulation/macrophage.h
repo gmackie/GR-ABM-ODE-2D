@@ -94,7 +94,6 @@ public:
 	MacState getNextState() const;
 	double getIntMtb() const;
 	void setIntMtb(double intMtb);
-	double getSurfBoundTNFR1() const;
 	void kill();
 	void deactivate(const int time);
 	void apoptosis(GrGrid& grid);

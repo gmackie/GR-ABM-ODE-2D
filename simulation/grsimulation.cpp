@@ -16,6 +16,8 @@
 #include "recruitmentprob.h"
 #include "serialization.h"
 
+using namespace std;
+
 const std::string GrSimulation::_ClassName = "GrSimulation";
 
 GrSimulation::GrSimulation(const Pos& dim)
@@ -163,6 +165,12 @@ void GrSimulation::deserialize(std::istream& in)
 	// Deserialize the agent class.
 	Agent::classDeserialize(in);
 
+	// Since the cell lists are cleared here, the grid must not contain
+	// any cell pointers at this point. If it does they are dangling pointers
+	// that will be referenced during cell deserialization, when determining
+	// if the grid compartment for the deserialized cell has room for the
+	// deserialized cell. This will cause undefined (bad) behavior - seg faults, etc.
+
 	// deserialize macs
 	_macList.clear();
 	in >> intVal;
@@ -174,7 +182,12 @@ void GrSimulation::deserialize(std::istream& in)
 
 		// update attributes of dummy mac and add to grid
 		pMac->deserialize(in);
-		assert_res(_grid.getGrid().addAgent(pMac, pMac->getPosition()));
+		bool addedAgent = _grid.getGrid().addAgent(pMac, pMac->getPosition());
+		if (!addedAgent)
+		{
+			cerr << "Error deserializing mac " << i << " at grid position " << pMac->getPosition() << ":addAgent failed."<< endl;
+			exit(1);
+		}
 	}
 
 	// deserialize tgam cells
@@ -188,7 +201,13 @@ void GrSimulation::deserialize(std::istream& in)
 
 		// update attributes of dummy tgam and add to grid
 		pTgam->deserialize(in);
-		assert_res(_grid.getGrid().addAgent(pTgam, pTgam->getPosition()));
+		bool addedAgent = _grid.getGrid().addAgent(pTgam, pTgam->getPosition());
+		if (!addedAgent)
+		{
+			cerr << "Error deserializing tgam " << i << " at grid position " << pTgam->getPosition() << ":addAgent failed."<< endl;
+			exit(1);
+		}
+
 	}
 
 	// deserialize tcyt cells
@@ -202,7 +221,13 @@ void GrSimulation::deserialize(std::istream& in)
 
 		// update attributes of dummy tcyt and add to grid
 		pTcyt->deserialize(in);
-		assert_res(_grid.getGrid().addAgent(pTcyt, pTcyt->getPosition()));
+		bool addedAgent = _grid.getGrid().addAgent(pTcyt, pTcyt->getPosition());
+		if (!addedAgent)
+		{
+			cerr << "Error deserializing tcyt " << i << " at grid position " << pTcyt->getPosition() << ":addAgent failed."<< endl;
+			exit(1);
+		}
+
 	}
 
 	// deserialize treg cells
@@ -216,7 +241,13 @@ void GrSimulation::deserialize(std::istream& in)
 
 		// update attributes of dummy mac and add to grid
 		pTreg->deserialize(in);
-		assert_res(_grid.getGrid().addAgent(pTreg, pTreg->getPosition()));
+		bool addedAgent = _grid.getGrid().addAgent(pTreg, pTreg->getPosition());
+		if (!addedAgent)
+		{
+			cerr << "Error deserializing treg " << i << " at grid position " << pTreg->getPosition() << ":addAgent failed."<< endl;
+			exit(1);
+		}
+
 	}
 
 	// deserialize statistics

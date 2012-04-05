@@ -240,7 +240,9 @@ int GrGrid::hasTcell(const Pos& p) const {
 int GrGrid::hasAgentType(AgentType TYPE, int s, const Pos& p) const {
   int sum = 0;
   for(unsigned i=0;i<MAX_AGENTS_PER_CELL;i++)
+  {
     if(agent(p,i) && agent(p,i)->getAgentType() == TYPE && agent(p,i)->getState() == s) sum++;
+  }
   return sum;
 }
 
@@ -264,6 +266,30 @@ bool GrGrid::addAgent(Agent* a) {
   return addAgent(a, a->getPosition());
 }
 
+bool GrGrid::addAgent(Agent* a, const Pos& p, int index)
+{
+  assert(a);
+  if(isCaseated(p)) return false;
+  if(a->getAgentType() == MAC && hasAgentType(MAC, p)) return false;
+
+  if(!agent(p, index))
+  {
+    agent(p, index) = a;
+    return true;
+  }
+  return false;
+}
+
+bool GrGrid::addAgent(Agent* a, int index)
+{
+  return addAgent(a, a->getPosition(), index);
+}
+
+bool GrGrid::addAgent(Agent* a, int i, int j, int index)
+{
+  return addAgent(a, Pos(i, j), index);
+}
+
 bool GrGrid::removeAgent(const Agent* a) {
   const Pos& p = a->getPosition();
   for(unsigned i=0;i<MAX_AGENTS_PER_CELL;i++)
@@ -272,4 +298,20 @@ bool GrGrid::removeAgent(const Agent* a) {
       return true;
     }
   return false;
+}
+
+int GrGrid::agentIndex (const Agent* pAgent) const
+{
+        assert(pAgent);
+
+        for(size_t i = 0 ; i < MAX_AGENTS_PER_CELL; i++)
+        {
+                const Agent* pGridAgent = agent(pAgent->getPosition(), i);
+                if (pGridAgent == pAgent)
+                {
+                        return i;
+                }
+        }
+
+        return -1;
 }

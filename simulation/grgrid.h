@@ -83,8 +83,8 @@ private:
 #undef PADDED_GRID
 
 public:
-	GrGrid(const Pos& dim);
-	~GrGrid();
+  GrGrid(const Pos& dim);
+  ~GrGrid();
 
   bool inRange(const Pos& pos) const;
   bool inRange(int row, int col) const;
@@ -92,11 +92,11 @@ public:
   int getSize() const { return _dim.x*_dim.y; }
   const Pos getCenter() const { return _dim / 2; }
 
-	const PosVector& getSources() const;
-	void initSources();
-	void shuffleSources();
-	void serialize(std::ostream& out) const;
-	void deserialize(std::istream& in);
+  const PosVector& getSources() const;
+  void initSources();
+  void shuffleSources();
+  void serialize(std::ostream& out) const;
+  void deserialize(std::istream& in);
   bool isSource(const Pos& p) const;
 
   int getOccupiedNeighborCount(int row, int col) const;
@@ -115,6 +115,10 @@ public:
   bool addAgent(Agent* a, const Pos& p);
   bool addAgent(Agent* a);
   bool addAgent(Agent* a, int row, int col);
+  bool addAgent(Agent* a, const Pos& p, int index);
+  bool addAgent(Agent* a, int index);
+  bool addAgent(Agent* a, int row, int col, int index);
+  int agentIndex (const Agent* pAgent) const;
   bool removeAgent(const Agent* a);
   inline int mod_row(int row) const { return (row + _dim.x) % _dim.x; }
   inline int mod_col(int col) const { return (col + _dim.y) % _dim.y; }

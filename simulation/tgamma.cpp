@@ -51,7 +51,7 @@ void Tgam::move(GrGrid& grid)
 	Tcell::moveTcell(grid, true, true, true);
 }
 
-void Tgam::secrete(GrGrid& grid, bool tnfrDynamics, bool, bool tnfDepletion, bool il10rDynamics, bool il10Depletion)
+void Tgam::secrete(GrGrid& grid, bool tnfrDynamics, bool, bool tnfDepletion, bool il10rDynamics, bool il10Depletion, int mdt)
 {
 	if (_deactivationTime != -1)
 	{
@@ -67,11 +67,18 @@ void Tgam::secrete(GrGrid& grid, bool tnfrDynamics, bool, bool tnfDepletion, boo
     
     if (_state == TGAM_ACTIVE_DOUBLE) {
         _kISynth = 0.5 * _PARAM(PARAM_GR_I_K_SYNTH_TCELL);
+        
+        if (!il10rDynamics && !il10Depletion) {
+            grid.incil10(_pos, (0.5 * _PARAM(PARAM_TREG_SEC_RATE_IL10) * mdt));
+        }
     }
     
     else if (_state == TGAM_INDUCED_REG)
     {
         _kISynth = _PARAM(PARAM_GR_I_K_SYNTH_TCELL);
+        if (!il10rDynamics && !il10Depletion) {
+            grid.incil10(_pos, (_PARAM(PARAM_TREG_SEC_RATE_IL10) * mdt));
+        }
     }
     
     else
@@ -87,7 +94,7 @@ void Tgam::secrete(GrGrid& grid, bool tnfrDynamics, bool, bool tnfDepletion, boo
     {    
         double il10 = log(((grid.il10(_pos) * MW_IL10 * 1e6)/(NAV * VOL))); // converting il10 concentration to log(ng/mL) for use in dose dependence
         double tnfMOD = (1.0/(1.0 + exp((il10 + _PARAM(PARAM_GR_LINK_LOG_ALPHA))/_PARAM(PARAM_GR_LINK_LOG_BETA)))); // calculate the fraction of inhibition
-		grid.incTNF(_pos, (tnfMOD * _PARAM(PARAM_TGAM_SEC_RATE_TNF)));
+		grid.incTNF(_pos, (tnfMOD * _PARAM(PARAM_TGAM_SEC_RATE_TNF) * mdt));
     }
 }
 

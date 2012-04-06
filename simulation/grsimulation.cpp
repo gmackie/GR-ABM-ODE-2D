@@ -10,7 +10,9 @@
 #include "grdiffusion.h"
 #include "grdiffusionbtcs.h"
 #include "grdiffusionwrongbtcs.h"
+#include "grdiffusionadeswap.h"
 #include "grdiffusionftcsswap.h"
+#include "grdiffusionadeswap.h"
 #include "areatest.h"
 #include "mtbtest.h"
 #include "recruitmentprob.h"
@@ -460,47 +462,57 @@ void GrSimulation::solve()
 		_il10rDynamics = false;
 	}
     
-	// calculate diffusion every 10 minutes
-	// dt = 6s, solve for 10 minutes = 100 * 6 seconds
-	double dt = 6;
-	for (int t = 0; t < 100; t++) 
+    // Calculate Diffusion and Molecular events for a 10 min timestep
+    // Agent time step is 600 s (10 min)
+	
+    int Adt = 600; // Agent Time Step (s)
+    int Ddt = _PARAM(PARAM_GR_DT_DIFFUSION); // Diffusion Time Step
+    int Mdt = _PARAM(PARAM_GR_DT_MOLECULAR); // Molecular Time Step
+    
+    int NumMolecularPerDiffusion = Ddt/Mdt; // Number of molecular iterations per diffusion iterations
+    int NumDiffusionPerAgent = Adt/Ddt; // Number of diffusion iterations per agent itaeration
+    
+	for (int DiffStep = 0; DiffStep < NumDiffusionPerAgent; DiffStep++) 
 	{
-		secreteFromMacrophages(tnfDepletion, il10Depletion);
-		secreteFromTcells(tnfDepletion, il10Depletion);
-		secreteFromCaseations();
 		_pDiffusion->diffuse(_grid);
-
-        if (_nfkbDynamics)
+    for (int MolStep = 0; MolStep < NumMolecularPerDiffusion; MolStep++)
 		{
-			if (_il10rDynamics) {
-                updateNFkBandTNFandIL10Dynamics(dt);
-            }
-			else
+			secreteFromMacrophages(tnfDepletion, il10Depletion, Mdt);
+			secreteFromTcells(tnfDepletion, il10Depletion, Mdt);
+			secreteFromCaseations(Mdt);
+	
+      if (_nfkbDynamics)
 			{
-				updateNFkBandTNFDynamics(dt);
+				if (_il10rDynamics) {
+	                updateNFkBandTNFandIL10Dynamics(Mdt);
+	            }
+				else
+				{
+					updateNFkBandTNFDynamics(Mdt);
+				}
+			}
+			else if (_tnfrDynamics && _il10rDynamics)
+	        {
+	            updateTNFandIL10Dynamics(Mdt, DiffStep);
+    	    }
+	        
+	        else if (_tnfrDynamics && !_il10rDynamics)
+			{
+				updateTNFDynamics(Mdt);
+			}
+		
+        	else if (_il10rDynamics && !_tnfrDynamics)
+	        {
+    	        updateIL10Dynamics(Mdt);
+	        }
+        
+    	    else if (!_il10rDynamics || !_tnfrDynamics)
+			{
+				adjustFauxDegradation(Mdt);
+	            //adjustTNFDegradation(Mdt);
 			}
 		}
-		else if (_tnfrDynamics && _il10rDynamics)
-        {
-            updateTNFandIL10Dynamics(dt, t);
-        }
-        
-        else if (_tnfrDynamics && !_il10rDynamics)
-		{
-			updateTNFDynamics(dt);
-		}
-		
-        else if (_il10rDynamics && !_tnfrDynamics)
-        {
-            updateIL10Dynamics(dt);
-        }
-        
-        else if (!_il10rDynamics || !_tnfrDynamics)
-		{
-			adjustFauxDegradation(dt);
-            //adjustTNFDegradation(dt);
-		}
-	}
+  }
 	
 	// move macrophages
 	moveMacrophages();
@@ -649,31 +661,31 @@ void GrSimulation::computeNextStates()
 	} 
 }
 
-void GrSimulation::secreteFromMacrophages(bool tnfDepletion, bool il10Depletion)
+void GrSimulation::secreteFromMacrophages(bool tnfDepletion, bool il10Depletion, int mdt)
 {
 	for (MacList::iterator it = _macList.begin(); it != _macList.end(); it++)
 	{
-		it->secrete(_grid.getGrid(), _tnfrDynamics, _nfkbDynamics, tnfDepletion, _il10rDynamics, il10Depletion);
+		it->secrete(_grid.getGrid(), _tnfrDynamics, _nfkbDynamics, tnfDepletion, _il10rDynamics, il10Depletion, mdt);
 	}
 }
 
-void GrSimulation::secreteFromTcells(bool tnfDepletion, bool il10Depletion)
+void GrSimulation::secreteFromTcells(bool tnfDepletion, bool il10Depletion, int mdt)
 {
 	for (TgamList::iterator it = _tgamList.begin(); it != _tgamList.end(); it++)
 	{
-		it->secrete(_grid.getGrid(), _tnfrDynamics, _nfkbDynamics, tnfDepletion, _il10rDynamics, il10Depletion);
+		it->secrete(_grid.getGrid(), _tnfrDynamics, _nfkbDynamics, tnfDepletion, _il10rDynamics, il10Depletion, mdt);
 	}
 	for (TcytList::iterator it = _tcytList.begin(); it != _tcytList.end(); it++)
 	{
-		it->secrete(_grid.getGrid(), _tnfrDynamics, _nfkbDynamics, tnfDepletion, _il10rDynamics, il10Depletion);
+		it->secrete(_grid.getGrid(), _tnfrDynamics, _nfkbDynamics, tnfDepletion, _il10rDynamics, il10Depletion, mdt);
 	}
     for (TregList::iterator it = _tregList.begin(); it != _tregList.end(); it++)
 	{
-		it->secrete(_grid.getGrid(), _tnfrDynamics, _nfkbDynamics, tnfDepletion, _il10rDynamics, il10Depletion);
+		it->secrete(_grid.getGrid(), _tnfrDynamics, _nfkbDynamics, tnfDepletion, _il10rDynamics, il10Depletion, mdt);
 	}
 }
 
-void GrSimulation::secreteFromCaseations()
+void GrSimulation::secreteFromCaseations(int mdt)
 {
 	// secrete chemokines from caseated compartments only if infection is not cleared
   Pos p;
@@ -987,6 +999,10 @@ void GrSimulation::setDiffusionMethod(DiffusionMethod method)
 		case DIFF_REC_EQ_SWAP:
 			_pDiffusion = new GrDiffusionFTCS_Swap();
 			break;
+        case DIFF_ADE_SWAP:
+            _pDiffusion = new GrDiffusionADE_Swap();
+            break;
+                
 		}
 	}
 }

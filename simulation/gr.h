@@ -109,7 +109,7 @@ typedef std::vector<Treg*> TregPtrVector;
 typedef std::pair<double, Pos> ThresholdPosPair;
 typedef std::list<ThresholdPosPair> ThresholdPosList;
 
-typedef enum {DIFF_REC_EQ = 0, DIFF_SOR_CORRECT = 1, DIFF_SOR_WRONG = 2, DIFF_REC_EQ_SWAP = 3} DiffusionMethod;
+typedef enum {DIFF_REC_EQ = 0, DIFF_SOR_CORRECT = 1, DIFF_SOR_WRONG = 2, DIFF_REC_EQ_SWAP = 3, DIFF_ADE_SWAP = 4} DiffusionMethod;
 typedef enum {OUTCOME_AREA = 0, OUTCOME_MTB = 1, OUTCOME_NONE = 2} OutcomeMethod;
 
 typedef enum {MAC, TGAM, TCYT, TREG, NAGENTS} AgentType;

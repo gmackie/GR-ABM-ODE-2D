@@ -287,7 +287,9 @@ const ParamDescription ParamsBase::_description[_PARAM_COUNT] =
 	{ "sourceDensity",      				GR_NODE,	false,	true,	0.2, 	0,	"",					"Density of vascular sources on the grid"},
 
 	/* INT */
-	{ "nrSources",							GR_NODE,	true,	true,	0.0,	0,	"",					"Number of vascular sources on the grid" },
+    { "timestepDiffusion",					GR_NODE,	false,	true,	0.0,	6,	"s",                "Time step for solving the diffusion module" },
+    { "timestepMolecular",					GR_NODE,	false,	true,	0.0,	6,	"s",                "Time step for solving the molecular scale receptor ligand dynamics" },
+    { "nrSources",							GR_NODE,	true,	true,	0.0,	0,	"",					"Number of vascular sources on the grid" },
 	{ "nrKillingsCaseation",				GR_NODE,	true,	false,	0.0,	0,	"",					"Number of killings for a compartment to become caseated" },
 	{ "NFkBTimeCoefficient",				GR_NODE,	true,	false,	0.0,	0,	"-",				"number of NF-kB time-steps within a single diffusion time-step" },
 	{ "maxAge",								MAC_NODE,	true,	false,	0.0,	0,	"#timesteps",		"Maximal macrophage age" },

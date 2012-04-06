@@ -1,4 +1,6 @@
 <GR
+  timestepDiffusion = "60"
+  timestepMolecular = "6"
 	muMDC_LN = "0.3"
 	initN4 = "100000"
 	initN8 = "84000"

@@ -62,9 +62,9 @@ private:
 	void updateStates();
 	void updateT_Test();
 	void computeNextStates();
-	void secreteFromMacrophages(bool tnfDepletion, bool il10Depletion);
-	void secreteFromTcells(bool tnfDepletion, bool il10Depletion);
-	void secreteFromCaseations();
+	void secreteFromMacrophages(bool tnfDepletion, bool il10Depletion, int mdt);
+	void secreteFromTcells(bool tnfDepletion, bool il10Depletion, int mdt);
+	void secreteFromCaseations(int mdt);
     void updateTNFDynamics(double dt);
     void updateIL10Dynamics(double dt);
     void updateTNFandIL10Dynamics(double dt, double currenttime);

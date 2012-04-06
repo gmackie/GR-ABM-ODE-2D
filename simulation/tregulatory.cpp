@@ -40,13 +40,13 @@ void Treg::move(GrGrid& grid)
 	Tcell::moveTcell(grid, false, true, false);
 }
 
-void Treg::secrete(GrGrid& grid, bool, bool, bool, bool il10rDynamics, bool il10Depletion)
+void Treg::secrete(GrGrid& grid, bool, bool, bool, bool il10rDynamics, bool il10Depletion, int mdt)
 {
     
     _kISynth = _PARAM(PARAM_GR_I_K_SYNTH_TCELL);
     
     if (!il10rDynamics && !il10Depletion) {
-        grid.incil10(_pos, (_PARAM(PARAM_TREG_SEC_RATE_IL10)));
+        grid.incil10(_pos, (_PARAM(PARAM_TREG_SEC_RATE_IL10) * mdt));
     }
     
 }

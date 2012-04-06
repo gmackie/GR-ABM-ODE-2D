@@ -113,7 +113,7 @@ int main(int argc, char *argv[])
 		("seed,s", po::value(&seed))
     ("dim,d", po::value(&dim)->default_value(100))
 		("diffusion", po::value<int>(&diffMethod)->default_value(3),
-				"Diffusion method:\n0 - FTCS\n1 - BTCS (SOR, correct)\n2 - BTCS (SOR, wrong)\n3 - FTCS Grid Swap")
+     "Diffusion method:\n0 - FTCS\n1 - BTCS (SOR, correct)\n2 - BTCS (SOR, wrong)\n3 - FTCS Grid Swap\n4 - ADE Grid Swap")
 		("timesteps,t", po::value<int>(&timesteps), "Number of time steps to simulate\nTakes precedence over --days")
 		("days", po::value<int>(&nDays)->default_value(200), "Number of days to simulate")
 		("script,c", "Scripting mode")
@@ -205,22 +205,22 @@ int main(int argc, char *argv[])
 		if (!Params::getInstance(Pos(dim, dim))->fromXml(inputFileName.c_str()))
 			return 1;
 
-		if (!(0 <= diffMethod && diffMethod < 4))
-		{
-			printUsage(argv[0], desc);
-			return 1;
-		}
-
-		if (diffMethod == 1)
-		{
-			std::cerr << "The BTCS diffusion method is not supported in 2D granuloma code." << std::endl;
-			exit(1);
-		}
-		else if (diffMethod == 2)
-		{
-			std::cerr << "The BTCS Wrong diffusion method is not supported in 2D granuloma code." << std::endl;
-			exit(1);
-		}
+    switch (vm["diffusion"].as<int>())
+    {
+      case 0:
+        diffMethod = DIFF_REC_EQ;
+        break;
+      case 3:
+        diffMethod = DIFF_REC_EQ_SWAP;
+        break;
+      case 4:
+        diffMethod = DIFF_ADE_SWAP;
+        break;
+      default:
+        std::cerr<<"Unsupported Diffusion method"<<std::endl;
+        printUsage(argv[0], desc);
+        exit(1);
+    }
 
 		if (csvInterval < 0 || pngInterval < 0)
 		{

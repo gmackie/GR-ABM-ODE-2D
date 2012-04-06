@@ -140,7 +140,7 @@ void Mac::move(GrGrid& grid)
 	}
 }
 
-void Mac::secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDepletion, bool il10rDynamics, bool il10Depletion)
+void Mac::secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDepletion, bool il10rDynamics, bool il10Depletion, int mdt)
 {
 	if (_deactivationTime != -1)
 	{

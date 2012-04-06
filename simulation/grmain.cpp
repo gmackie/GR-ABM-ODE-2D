@@ -471,7 +471,7 @@ int main(int argc, char** argv)
 	("state-interval", po::value<unsigned>()->default_value(0), "State save interval (10 min timesteps)")
 	("recr", po::value<unsigned>()->default_value(0), "recruitment:\n0 - probability\n1 - lymph node ode proxy\n2 - lymph node ode pure")
 	("diffusion", po::value<unsigned>()->default_value(3),
-	 "Diffusion method:\n0 - FTCS\n1 - BTCS (SOR, correct)\n2 - BTCS (SOR, wrong)\n3 - FTCS Grid Swap")
+	 "Diffusion method:\n0 - FTCS\n1 - BTCS (SOR, correct)\n2 - BTCS (SOR, wrong)\n3 - FTCS Grid Swap\n4 - ADE Grid Swap")
 	("area-tnf-threshold", po::value<float>()->default_value(0.5),"Threshold for granuloma area defined by TNF, in the range [0.0, 1.0]\n")
 	("area-cell-density-threshold", po::value<float>()->default_value(0.5),"Threshold for granuloma area defined by cell density, in the range [0.0, 1.0]");
 
@@ -575,6 +575,9 @@ int main(int argc, char** argv)
       break;
     case 3:
       diffMethodEnum = DIFF_REC_EQ_SWAP;
+      break;
+    case 4:
+      diffMethodEnum = DIFF_ADE_SWAP;
       break;
     default:
       std::cerr<<"Unsupported Diffusion method"<<std::endl;

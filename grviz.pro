@@ -10,6 +10,7 @@ HEADERS += scalardatasets/scalartotmtbdataset.h \
     simulation/serialization.h \
     simulation/params.h \
     simulation/paramsbase.h \
+    simulation/grdiffusionadeswap.h \
     simulation/grdiffusionftcsswap.h \
     simulation/grsimulationgrid.h \
     simulation/tinyxml/tinyxml.h \
@@ -92,6 +93,7 @@ HEADERS += scalardatasets/scalartotmtbdataset.h \
 SOURCES += simulation/serialization.cpp \
     simulation/params.cpp \
     simulation/paramsbase.cpp \
+    simulation/grdiffusionadeswap.cpp \
     simulation/grdiffusionftcsswap.cpp \
     simulation/grsimulationgrid.cpp \
     simulation/tinyxml/tinyxmlparser.cpp \

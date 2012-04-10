@@ -171,7 +171,7 @@ void Mac::secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDe
             _kISynth = _PARAM(PARAM_GR_I_K_SYNTH_MAC_INF);
             
             if (!il10rDynamics && !il10Depletion) {
-                grid.incil10(_pos, _PARAM(PARAM_MAC_SEC_RATE_IL10));
+                grid.incil10(_pos, _PARAM(PARAM_MAC_SEC_RATE_IL10) * mdt);
             }
             
 		}
@@ -184,7 +184,7 @@ void Mac::secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDe
             _kISynth = _PARAM(PARAM_GR_I_K_SYNTH_MAC_ACT);
             
             if (!il10rDynamics && !il10Depletion) {
-                grid.incil10(_pos,  0.5 * _PARAM(PARAM_MAC_SEC_RATE_IL10));
+                grid.incil10(_pos,  0.5 * _PARAM(PARAM_MAC_SEC_RATE_IL10) * mdt);
             }
             
 		}
@@ -197,7 +197,7 @@ void Mac::secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDe
             _kISynth = 2.0 * _PARAM(PARAM_GR_I_K_SYNTH_MAC_INF);
             
             if (!il10rDynamics && !il10Depletion) {
-                grid.incil10(_pos, 2.0 * _PARAM(PARAM_MAC_SEC_RATE_IL10));
+                grid.incil10(_pos, 2.0 * _PARAM(PARAM_MAC_SEC_RATE_IL10) * mdt);
             }
         }
 	}
@@ -209,9 +209,9 @@ void Mac::secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDe
 		if (_state == MAC_RESTING) {
             
             if (_NFkB) {
-                grid.incCCL2(_pos, (0.5 * _PARAM(PARAM_MAC_SEC_RATE_CCL2)));
-                grid.incCCL5(_pos, (0.5 * _PARAM(PARAM_MAC_SEC_RATE_CCL5)));
-                grid.incCXCL9(_pos,  (0.5 * _PARAM(PARAM_MAC_SEC_RATE_CXCL9)));
+                grid.incCCL2(_pos, (0.5 * _PARAM(PARAM_MAC_SEC_RATE_CCL2) * mdt));
+				grid.incCCL5(_pos, (0.5 * _PARAM(PARAM_MAC_SEC_RATE_CCL5) * mdt));
+				grid.incCXCL9(_pos,  (0.5 * _PARAM(PARAM_MAC_SEC_RATE_CXCL9) * mdt));
 				_kSynth = 0.5 * _PARAM(PARAM_GR_K_SYNTH_MAC);
                 _kmRNA = 0.5 * _PARAM(PARAM_GR_K_RNA_MAC);
                 _kISynth = 0.0;
@@ -223,7 +223,7 @@ void Mac::secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDe
                     //std::cout << "LOG OF IL10: " << il10 << std::endl;
                     double tnfMOD = (1.0/(1.0 + exp((il10 + _PARAM(PARAM_GR_LINK_LOG_ALPHA))/_PARAM(PARAM_GR_LINK_LOG_BETA)))); // calculate the fraction of inhibition
                     //std::cout << "tnfMOD: " << tnfMOD << std::endl;
-		    grid.incTNF(_pos, (tnfMOD * 0.5 * _PARAM(PARAM_MAC_SEC_RATE_TNF)));
+		    grid.incTNF(_pos, (tnfMOD * 0.5 * _PARAM(PARAM_MAC_SEC_RATE_TNF) * mdt));
                 }
                 
                 ++grid.nSecretions(_pos);
@@ -238,10 +238,10 @@ void Mac::secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDe
         else if (_state == MAC_INFECTED) {
             
             if (_NFkB) {
-                grid.incCCL2(_pos, (_PARAM(PARAM_MAC_SEC_RATE_CCL2)));
-                grid.incCCL5(_pos, (_PARAM(PARAM_MAC_SEC_RATE_CCL5)));
-                grid.incCXCL9(_pos,  (_PARAM(PARAM_MAC_SEC_RATE_CXCL9)));
-                _kSynth = _PARAM(PARAM_GR_K_SYNTH_MAC);
+                grid.incCCL2(_pos, (_PARAM(PARAM_MAC_SEC_RATE_CCL2) * mdt));
+		grid.incCCL5(_pos, (_PARAM(PARAM_MAC_SEC_RATE_CCL5) * mdt));
+		grid.incCXCL9(_pos,  (_PARAM(PARAM_MAC_SEC_RATE_CXCL9) * mdt));
+		_kSynth = _PARAM(PARAM_GR_K_SYNTH_MAC);
                 _kmRNA = _PARAM(PARAM_GR_K_RNA_MAC);
                 _kISynth = _PARAM(PARAM_GR_I_K_SYNTH_MAC_INF);
                 
@@ -250,11 +250,11 @@ void Mac::secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDe
                     double il10 = log(((grid.il10(_pos) * MW_IL10 * 1e6)/(NAV * VOL))); // converting il10 concentration to log(ng/mL) for use in dose dependence
                     //std::cout << "LOG OF IL10: " << il10 << std::endl;
                     double tnfMOD = (1.0/(1.0 + exp((il10 + _PARAM(PARAM_GR_LINK_LOG_ALPHA))/_PARAM(PARAM_GR_LINK_LOG_BETA)))); // calculate the fraction of inhibition
-                    grid.incTNF(_pos, (tnfMOD * _PARAM(PARAM_MAC_SEC_RATE_TNF)));
+		    grid.incTNF(_pos, (tnfMOD * _PARAM(PARAM_MAC_SEC_RATE_TNF) * mdt));
                     //cout << "Debug: IL10 inhibition from MAC_INFECTED" << std::endl;
                 }
                 if (!il10rDynamics && !il10Depletion) {
-                    grid.incil10(_pos, (_PARAM(PARAM_MAC_SEC_RATE_IL10)));
+                    grid.incil10(_pos, (_PARAM(PARAM_MAC_SEC_RATE_IL10) * mdt));
                     //cout << "Debug: Secrete from MAC_INFECTED" << std::endl;
                 }
                 
@@ -263,9 +263,9 @@ void Mac::secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDe
             
             else
             {
-                grid.incCCL2(_pos, (0.5 * _PARAM(PARAM_MAC_SEC_RATE_CCL2)));
-                grid.incCCL5(_pos, (0.5 * _PARAM(PARAM_MAC_SEC_RATE_CCL5)));
-                grid.incCXCL9(_pos,  (0.5 * _PARAM(PARAM_MAC_SEC_RATE_CXCL9)));
+                grid.incCCL2(_pos, (0.5 * _PARAM(PARAM_MAC_SEC_RATE_CCL2) * mdt));
+                grid.incCCL5(_pos, (0.5 * _PARAM(PARAM_MAC_SEC_RATE_CCL5) * mdt));
+                grid.incCXCL9(_pos,  (0.5 * _PARAM(PARAM_MAC_SEC_RATE_CXCL9) * mdt));
                 _kSynth = 0.5 * _PARAM(PARAM_GR_K_SYNTH_MAC);
                 _kmRNA = 0.5 * _PARAM(PARAM_GR_K_RNA_MAC);
                 _kISynth = _PARAM(PARAM_GR_I_K_SYNTH_MAC_INF);
@@ -275,12 +275,12 @@ void Mac::secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDe
                     double il10 = log(((grid.il10(_pos) * MW_IL10 * 1e6)/(NAV * VOL))); // converting il10 concentration to log(ng/mL) for use in dose dependence
                     //std::cout << "LOG OF IL10: " << il10 << std::endl;
                     double tnfMOD = (1.0/(1.0 + exp((il10 + _PARAM(PARAM_GR_LINK_LOG_ALPHA))/_PARAM(PARAM_GR_LINK_LOG_BETA)))); // calculate the fraction of inhibition
-		    grid.incTNF(_pos,(tnfMOD * _PARAM(PARAM_MAC_SEC_RATE_TNF)));
+		    grid.incTNF(_pos,(tnfMOD * _PARAM(PARAM_MAC_SEC_RATE_TNF) * mdt));
                     //cout << "Debug: IL10 inhibition from MAC_INFECTED" << std::endl;
                     //std::cout << "tnfMOD: " << tnfMOD << std::endl;
                 }
                 if (!il10rDynamics && !il10Depletion) {
-                    grid.incil10(_pos, (_PARAM(PARAM_MAC_SEC_RATE_IL10)));
+                    grid.incil10(_pos, (_PARAM(PARAM_MAC_SEC_RATE_IL10) * mdt));
                     //cout << "Debug: Secrete from MAC_INFECTED" << std::endl;
                 }
                 
@@ -290,9 +290,9 @@ void Mac::secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDe
         else if (_state == MAC_CINFECTED) {
             
             if (_NFkB) {
-                grid.incCCL2(_pos, (_PARAM(PARAM_MAC_SEC_RATE_CCL2)));
-		grid.incCCL5(_pos, (_PARAM(PARAM_MAC_SEC_RATE_CCL5)));
-		grid.incCXCL9(_pos,  (_PARAM(PARAM_MAC_SEC_RATE_CXCL9)));
+                grid.incCCL2(_pos, (_PARAM(PARAM_MAC_SEC_RATE_CCL2) * mdt));
+		grid.incCCL5(_pos, (_PARAM(PARAM_MAC_SEC_RATE_CCL5) * mdt));
+		grid.incCXCL9(_pos,  (_PARAM(PARAM_MAC_SEC_RATE_CXCL9) * mdt));
 				_kSynth = _PARAM(PARAM_GR_K_SYNTH_MAC);
                 _kmRNA = _PARAM(PARAM_GR_K_RNA_MAC);
                 _kISynth = 2.0 * _PARAM(PARAM_GR_I_K_SYNTH_MAC_INF);
@@ -301,10 +301,10 @@ void Mac::secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDe
                 {    
                     double il10 = log(((grid.il10(_pos) * MW_IL10 * 1e6)/(NAV * VOL))); // converting il10 concentration to log(ng/mL) for use in dose dependence
                     double tnfMOD = (1.0/(1.0 + exp((il10 + _PARAM(PARAM_GR_LINK_LOG_ALPHA))/_PARAM(PARAM_GR_LINK_LOG_BETA)))); // calculate the fraction of inhibition
-		    grid.incTNF(_pos, (tnfMOD * _PARAM(PARAM_MAC_SEC_RATE_TNF)));
+		    grid.incTNF(_pos, (tnfMOD * _PARAM(PARAM_MAC_SEC_RATE_TNF) * mdt));
                 }
                 if (!il10rDynamics && !il10Depletion) {
-                    grid.incil10(_pos, (2.0 * _PARAM(PARAM_MAC_SEC_RATE_IL10)));
+                    grid.incil10(_pos, (2.0 * _PARAM(PARAM_MAC_SEC_RATE_IL10) * mdt));
                 }
                 
                 ++grid.nSecretions(_pos);
@@ -313,9 +313,9 @@ void Mac::secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDe
         else if (_state == MAC_ACTIVE) {
             
             if (_NFkB) {
-                grid.incCCL2(_pos, (_PARAM(PARAM_MAC_SEC_RATE_CCL2)));
-		grid.incCCL5(_pos, (_PARAM(PARAM_MAC_SEC_RATE_CCL5)));
-		grid.incCXCL9(_pos,  (_PARAM(PARAM_MAC_SEC_RATE_CXCL9)));
+                grid.incCCL2(_pos, (_PARAM(PARAM_MAC_SEC_RATE_CCL2) * mdt));
+		grid.incCCL5(_pos, (_PARAM(PARAM_MAC_SEC_RATE_CCL5) * mdt));
+		grid.incCXCL9(_pos,  (_PARAM(PARAM_MAC_SEC_RATE_CXCL9) * mdt));
 		_kSynth = _PARAM(PARAM_GR_K_SYNTH_MAC);
                 _kmRNA = _PARAM(PARAM_GR_K_RNA_MAC);
                 _kISynth = _PARAM(PARAM_GR_I_K_SYNTH_MAC_ACT);
@@ -324,7 +324,7 @@ void Mac::secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDe
                 {    
                     double il10 = log(((grid.il10(_pos) * MW_IL10 * 1e6)/(NAV * VOL))); // converting il10 concentration to log(ng/mL) for use in dose dependence
                     double tnfMOD = (1.0/(1.0 + exp((il10 + _PARAM(PARAM_GR_LINK_LOG_ALPHA))/_PARAM(PARAM_GR_LINK_LOG_BETA)))); // calculate the fraction of inhibition
-		    grid.incTNF(_pos, (tnfMOD * _PARAM(PARAM_MAC_SEC_RATE_TNF)));
+		    grid.incTNF(_pos, (tnfMOD * _PARAM(PARAM_MAC_SEC_RATE_TNF) * mdt));
                 }
                 if (!il10rDynamics && !il10Depletion) {
                     //grid.il10(_pos) += (0.0);

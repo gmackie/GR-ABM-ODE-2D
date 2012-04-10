@@ -1004,7 +1004,7 @@ void GrSimulation::setDiffusionMethod(DiffusionMethod method)
         break;
                 
 		}
-    if(method != DIFF_ADE_SWAP && _PARAM(PARAM_GR_DT_DIFFUSION) < 12) {
+    if(method != DIFF_ADE_SWAP && _PARAM(PARAM_GR_DT_DIFFUSION) > 12) {
       throw std::runtime_error("*** ERROR: This diffusion method is unstable for timesteps greater than 12 seconds");
     }
 	}

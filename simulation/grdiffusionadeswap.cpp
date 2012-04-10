@@ -133,7 +133,7 @@ static void diffuse_avg_ratio(Scalar* newgrid_u, Scalar* newgrid_v, Scalar* newg
         for(int j=0;j<GETCOL(dim);j++)
         {
             Scalar _u  = newgrid_u[Indexer::padInd(dim, i,j)];
-            Scalar _v  = newgrid_v[Indexer::padInd(dim, i,j)];
+            Scalar _v  = newgrid_v[Indexer::padInd(dim, dim.x - i - 1, dim.y - j - 1)];
             
             Scalar& newconc = newgridccl2[Indexer::padInd(dim,i,j)];
 

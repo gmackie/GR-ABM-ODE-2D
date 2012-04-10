@@ -994,16 +994,19 @@ void GrSimulation::setDiffusionMethod(DiffusionMethod method)
 		case DIFF_SOR_WRONG:
 			_pDiffusion = new GrDiffusionWrongBTCS();
 			break;
-    	case DIFF_REC_EQ:
-      		std::clog<<"Warning: DIFF_REC_EQ disabled, defaulting to DIFF_REC_EQ_SWAP"<<std::endl;
+    case DIFF_REC_EQ:
+        std::clog<<"Warning: DIFF_REC_EQ disabled, defaulting to DIFF_REC_EQ_SWAP"<<std::endl;
 		case DIFF_REC_EQ_SWAP:
 			_pDiffusion = new GrDiffusionFTCS_Swap();
 			break;
-        case DIFF_ADE_SWAP:
-            _pDiffusion = new GrDiffusionADE_Swap();
-            break;
+    case DIFF_ADE_SWAP:
+        _pDiffusion = new GrDiffusionADE_Swap();
+        break;
                 
 		}
+    if(method != DIFF_ADE_SWAP && _PARAM(PARAM_GR_DT_DIFFUSION) < 12) {
+      throw std::runtime_error("*** ERROR: This diffusion method is unstable for timesteps greater than 12 seconds");
+    }
 	}
 }
 

@@ -46,7 +46,7 @@ private:
 	bool _nfkbDynamics;
     bool _il10rDynamics;
     bool _tgammatransition;
-
+    
 	// Inhibits tnf secretion if true and if not using tnfr dynamics.
 	int _tnfDepletionTimeStep;
     int _il10DepletionTimeStep;
@@ -55,6 +55,8 @@ private:
     // Once enabled it stays enabled even if the criteria by which it became enabled changes.
     bool _tcellRecruitmentBegun;
 
+    int _vectorlength; // Used for setting the valarray size for the RK4 Method
+    
 	void initMolecularTracking(Scalar molecularTrackingRadius);
 
 	void moveTcells();
@@ -127,6 +129,7 @@ public:
 	Treg* createTreg(int row, int col, int birthtime, TregState state);
 
 	static void convertSimTime(const int time, int& rDays, int& rHours, int& rMinutes);
+    void initVecLength();
 };
 
 inline bool GrSimulation::getTCellRecruitmentBegun()
@@ -379,5 +382,35 @@ inline void GrSimulation::checkTCellRecruitmentStart()
 	}
 }
 
+inline void GrSimulation::initVecLength()
+{
+    if (_nfkbDynamics)
+    {
+        if (_il10rDynamics) 
+        {
+            _vectorlength = 38; // Number of differential equations for TNF, IL10, and NFKB
+        }
+        
+        else
+        {
+            _vectorlength = 35; // Number of differential equations for TNF and NFKB
+        }
+    }
+    
+    else if (_tnfrDynamics && _il10rDynamics)
+    {
+        _vectorlength = 13; // Number of differential equations for TNF and IL10
+    }
+    
+    else if (_tnfrDynamics && !_il10rDynamics)
+    {
+        _vectorlength = 10; // Number of differential equations for TNF
+    }
+    
+    else if (_il10rDynamics && !_tnfrDynamics)
+    {
+        _vectorlength = 3; // Number of differential equations for IL10
+    }
+}
 
 #endif /* GRSIMULATION_H */

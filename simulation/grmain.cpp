@@ -337,11 +337,39 @@ bool shouldStop(int time, GrSimulation* pSim)
 	return false;
 }
 
+
+void timestepSync()
+{
+    // Checks to see if the timesteps specified will work with a 10 minutes agent timestep
+    if (((1440 * 60)/TIME_STEPS_PER_DAY) % _PARAM(PARAM_GR_DT_DIFFUSION) != 0 || ((1440 * 60)/TIME_STEPS_PER_DAY) % _PARAM(PARAM_GR_DT_MOLECULAR) != 0 || _PARAM(PARAM_GR_DT_DIFFUSION) % _PARAM(PARAM_GR_DT_MOLECULAR) != 0)
+    {
+        std::cerr << "\nUnsupported Time Step:\n--Diffusion/Molecular time step must be able to sync with the 10 min agent time step\n--Diffusion time step divided by molecular time step must be an interger\n--Redefine the timesteps in the parameter file\n" << std::endl;
+        exit(1);
+    }
+    // Check the diffusion time step and see if it is larger than the heuristic for level of accuracy
+    if (_PARAM(PARAM_GR_DT_DIFFUSION) >= (2.0/(_PARAM(PARAM_GR_D_TNF) * ((1/pow(20e-4,2)) + (1/pow(20e-4,2)))))) 
+    {
+        std::cerr << "\nWarning:\n--The diffusion time step is higher than its approximate accuracy limit\n--Any time step higher than ~60 seconds will be a stable but more inaccurate solution\n" << std::endl;
+            exit(1);
+        
+    }
+    // Verify that the molecular time step is small than the diffusion time step and smaller than the approximate stability limit
+    if (_PARAM(PARAM_GR_DT_MOLECULAR) > 30 || _PARAM(PARAM_GR_DT_MOLECULAR) > _PARAM(PARAM_GR_DT_DIFFUSION)) 
+    {
+        std::cerr << "\nUnsupported Molecular Time Step:\n--The solution is unstable at time steps greater than 30s\n--The molecular time step must be smaller than the diffusion time step\nRedefine the time step in the parameter file\n" << std::endl;
+        exit(1);
+    }  
+}
+
+
 void run(GrSimulation* pSim, int stateInterval, int csvInterval, bool screenDisplay, int timeToSimulate, std::string outputDir, std::vector<oCSVStream*> csvStreams, bool lhs)
 {
   if(screenDisplay)
   	cout << endl << "--seed " << g_Rand.getSeed() << endl;
   csvInterval = csvInterval < 1 ? 1 : csvInterval;
+  
+  timestepSync();
+
   for (int time = 0; time <= timeToSimulate; time += 1)
   {
     //if (!lhs) fprintf(stderr, "Done: %3.2f%%\r", 100.0*(time / float(timeToSimulate)));

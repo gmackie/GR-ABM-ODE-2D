@@ -43,9 +43,13 @@ GrSimulation::GrSimulation(const Pos& dim)
 	, _tnfDepletionTimeStep(-1)
     , _il10DepletionTimeStep(-1)
 	, _tcellRecruitmentBegun(false)
+    , _vectorlength(0)
 {
 	for (int i = 0; i < NOUTCOMES; i++)
+    {
 		_pTTest[i] = NULL;
+    }
+
 }
 
 GrSimulation::~GrSimulation()
@@ -82,6 +86,7 @@ void GrSimulation::serialize(std::ostream& out) const
 	out << _tnfDepletionTimeStep << std::endl;
     out << _il10DepletionTimeStep << std::endl;
     out << _tcellRecruitmentBegun <<std::endl;
+    out << _vectorlength << std::endl;
 
 	// serialize grid
 	_grid.serialize(out);
@@ -204,6 +209,7 @@ void GrSimulation::deserialize(std::istream& in)
 	in >> _tnfDepletionTimeStep;
     in >> _il10DepletionTimeStep;
     in >> _tcellRecruitmentBegun;
+    in >> _vectorlength;
 
 	// deserialize grid
 	_grid.deserialize(in);
@@ -388,6 +394,8 @@ void GrSimulation::init(Scalar molecularTrackingRadius)
 	}
 
 	initMolecularTracking(molecularTrackingRadius);
+    initVecLength(); // Used to initialize the valarray length for solving ODEs using RK4
+    
 }
 
 void GrSimulation::initMolecularTracking(Scalar molecularTrackingRadius)

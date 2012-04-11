@@ -21,6 +21,7 @@
 #include <utility>
 #include "rand.h"
 #include "pos.h"
+#include <valarray>
 
 #ifndef SVN_VERSION
 #define GR_VERSION "12022010"

@@ -17,7 +17,7 @@ unsigned long Agent::_nextID = 0;
 // Avoids the calls to the random number generator in the normal constructor, allowing the random number generator
 // to remain in synch after deserialization.
 Agent::Agent()
-	: _id(0)
+    : _id(0)
 	, _birthTime(-1)
 	, _deathTime(-1)
 	, _pos(-1, -1)
@@ -43,6 +43,12 @@ Agent::Agent()
 	, _vIL10R(-1.0)
 	, _surfBoundIL10R(-1.0)
 	, _kISynth(-1.0)
+    , _initvector(0)
+    , _k1vector(0)
+    , _k2vector(0)
+    , _k3vector(0)
+    , _k4vector(0)
+    , _switchvector(0)
 
 {
 }
@@ -61,7 +67,7 @@ Agent::Agent(int birthtime, int deathtime, int row, int col
 				, Scalar iIL10R
 				, Scalar stdIL10R
 			)
-	: _id(0)
+    : _id(0)
 	, _birthTime(birthtime)
 	, _deathTime(deathtime)
 	, _pos(row, col)
@@ -89,6 +95,13 @@ Agent::Agent(int birthtime, int deathtime, int row, int col
 	, _vIL10R(_surfIL10R * _PARAM(PARAM_GR_I_K_T))
 	, _surfBoundIL10R(0.0)
 	, _kISynth(0.0)
+    , _initvector(0.0, 13)
+    , _k1vector(0.0, 13)
+    , _k2vector(0.0, 13)
+    , _k3vector(0.0, 13)
+    , _k4vector(0.0, 13)
+    , _switchvector(0.0, 13)
+
 {
 	_id = createID();
 }
@@ -465,6 +478,15 @@ void Agent::serialize(std::ostream& out) const
     out << _vIL10R << std::endl;
     out << _surfBoundIL10R << std::endl;
     out << _kISynth << std::endl;
+    
+    for (int jj = 0; jj < (int)_initvector.size(); jj++) {
+        out << _initvector[jj] << std::endl;
+        out << _k1vector[jj] << std::endl;
+        out << _k2vector[jj] << std::endl;
+        out << _k3vector[jj] << std::endl;
+        out << _k4vector[jj] << std::endl;
+        out << _switchvector[jj] << std::endl;
+    }
 
 	Serialization::writeFooter(out, Agent::_ClassName);
 }
@@ -506,6 +528,16 @@ void Agent::deserialize(std::istream& in)
     in >> _surfBoundIL10R;
     in >> _kISynth;
 
+    
+    for (int kk = 0; kk < (int)_initvector.size(); kk++) {
+        in >> _initvector[kk];
+        in >> _k1vector[kk];
+        in >> _k2vector[kk];
+        in >> _k3vector[kk];
+        in >> _k4vector[kk];
+        in >> _switchvector[kk];
+    }
+    
 	if (!Serialization::readFooter(in, Agent::_ClassName))
 	{
 		exit(1);

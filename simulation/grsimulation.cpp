@@ -43,7 +43,6 @@ GrSimulation::GrSimulation(const Pos& dim)
 	, _tnfDepletionTimeStep(-1)
     , _il10DepletionTimeStep(-1)
 	, _tcellRecruitmentBegun(false)
-    , _vectorlength(0)
     , _numMolecularPerDiffusion(0)
     , _numDiffusionPerAgent(0)
 {
@@ -91,7 +90,6 @@ void GrSimulation::serialize(std::ostream& out) const
 	out << _tnfDepletionTimeStep << std::endl;
     out << _il10DepletionTimeStep << std::endl;
     out << _tcellRecruitmentBegun <<std::endl;
-    out << _vectorlength << std::endl;
     out << _numMolecularPerDiffusion << std::endl;
     out << _numDiffusionPerAgent << std::endl;
 
@@ -216,7 +214,6 @@ void GrSimulation::deserialize(std::istream& in)
 	in >> _tnfDepletionTimeStep;
     in >> _il10DepletionTimeStep;
     in >> _tcellRecruitmentBegun;
-    in >> _vectorlength;
     in >> _numMolecularPerDiffusion;
     in >> _numDiffusionPerAgent;
 

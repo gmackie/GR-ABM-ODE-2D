@@ -18,6 +18,7 @@
 #include "ttest.h"
 #include "grdiffusion.h"
 #include "recruitmentbase.h"
+#include "params.h"
 
 class GrSimulation
 {
@@ -54,8 +55,6 @@ private:
     // Whether or not TCell recruitment has been enabled.
     // Once enabled it stays enabled even if the criteria by which it became enabled changes.
     bool _tcellRecruitmentBegun;
-
-    int _vectorlength; // Used for setting the valarray size for the RK4 Method
     
     int _numMolecularPerDiffusion;
     int _numDiffusionPerAgent;
@@ -388,33 +387,38 @@ inline void GrSimulation::checkTCellRecruitmentStart()
 
 inline void GrSimulation::initVecLength()
 {
+    
+    int vectorlength;
+    
     if (_nfkbDynamics)
     {
         if (_il10rDynamics) 
         {
-            _vectorlength = 38; // Number of differential equations for TNF, IL10, and NFKB
+            vectorlength = 38; // Number of differential equations for TNF, IL10, and NFKB
         }
         
         else
         {
-            _vectorlength = 35; // Number of differential equations for TNF and NFKB
+            vectorlength = 35; // Number of differential equations for TNF and NFKB
         }
     }
     
     else if (_tnfrDynamics && _il10rDynamics)
     {
-        _vectorlength = 13; // Number of differential equations for TNF and IL10
+        vectorlength = 13; // Number of differential equations for TNF and IL10
     }
     
     else if (_tnfrDynamics && !_il10rDynamics)
     {
-        _vectorlength = 10; // Number of differential equations for TNF
+        vectorlength = 10; // Number of differential equations for TNF
     }
     
     else if (_il10rDynamics && !_tnfrDynamics)
     {
-        _vectorlength = 3; // Number of differential equations for IL10
+        vectorlength = 3; // Number of differential equations for IL10
     }
+    
+    Params::getInstance()->setParam(PARAM_GR_ODE_VALARRAY_LENGTH, vectorlength);
 }
 
 inline void GrSimulation::timestepSync()

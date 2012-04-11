@@ -315,6 +315,7 @@ const ParamDescription ParamsBase::_description[_PARAM_COUNT] =
 	{ "areaCellDensityStoppingThreshold2",	GR_NODE,	false,	true,	0.0,	0,	"um^2",				"Stop simulation if area by cell density above this threshold and simulation is at the time step specified by areaCellDensityStopppingTimeStep"},
 	{ "areaCellDensityStopppingTimeStep",	GR_NODE,	true,	true,	0.0,	0,	"",					"Time step at which to check areaCellDensityStoppingThreshold" },
 	{ "areaCellDensityStopppingTimeStep2",	GR_NODE,	true,	true,	0.0,	0,	"",					"Time step at which to check areaCellDensityStoppingThreshold" },
+    { "valarrayLength",                     GR_NODE,    false,  true,   0.0,    0,  "",                 "Makes a default parameter for the valarray length for the RK4 solver - this will be written over by the program options" },
 };
 
 ParamsBase::ParamsBase(const Pos& dim)

@@ -12,6 +12,8 @@
 #include "grstat.h"
 #include <string>
 
+using std::valarray;
+
 class Agent
 {
 private:
@@ -24,8 +26,9 @@ protected:
 	/*
 	 * !!! If the data members change then the serialize and deserialize functions need to be updated !!!
 	 */
-	static unsigned long createID();
-
+    
+    static unsigned long createID();
+    
 	// Unique agent ID.
 	unsigned long _id;
 	int _birthTime;
@@ -55,6 +58,13 @@ protected:
     Scalar _surfBoundIL10R; // No. of bound cell surface IL10R
     Scalar _kISynth;
 
+    valarray<double> _initvector;
+    valarray<double> _k1vector;
+    valarray<double> _k2vector;
+    valarray<double> _k3vector;
+    valarray<double> _k4vector;
+    valarray<double> _switchvector;
+    
 	Pos moveAgent(GrGrid& grid, bool ccl2, bool ccl5, bool cxcl9, bool attractant, double bonusFactor);
 	int getDestinationOrdinal(GrGrid& grid, bool ccl2, bool ccl5, bool cxcl9, bool attractant, double bonusFactor);
 	Pos compartmentOrdinalToCoordinates(int ordinal, const Pos& dim) const;

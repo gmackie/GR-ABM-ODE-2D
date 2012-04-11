@@ -24,8 +24,6 @@ public:
 	static bool isTcell(const Agent* pAgent);
 	virtual void serialize(std::ostream& out) const;
 	virtual void deserialize(std::istream& in);
-
-	virtual void solveTNFandIL10(GrGrid& grid, GrStat& stats, double dt, double currenttime);
 	virtual void solveDegradation (GrGrid& grid, double dt, bool tnfrDynamics, bool il10rDynamics);
 
 };

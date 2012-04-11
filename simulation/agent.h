@@ -87,7 +87,7 @@ public:
 
 	virtual void solveTNF (GrGrid& grid, double dt);
 	virtual void solveIL10 (GrGrid& grid, double dt);
-	virtual void solveTNFandIL10(GrGrid& grid, GrStat& stats, double dt, double currenttime) = 0;
+	virtual void solveTNFandIL10(GrGrid& grid, double dt);
 	virtual void solveDegradation (GrGrid& grid, double dt, bool tnfrDynamics, bool il10rDynamics) = 0;
 	virtual void solveDegradation (GrGrid& grid, double dt, bool tnfrDynamics, bool il10rDynamics, Scalar meanTNFR1, Scalar iIL10R);
 

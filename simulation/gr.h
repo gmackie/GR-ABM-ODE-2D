@@ -70,6 +70,15 @@ typedef double Scalar;
 // molecular weight of IL10 in g/mol
 #define MW_IL10 18600
 
+// Number of seconds in a day
+#define SECONDS_PER_DAY 86400
+
+// Approximate limit for numerical accuracy solving the ODEs
+#define MOLECULAR_ACCURACY 30
+
+// Time step of agent movement in seconds
+#define AGENT_TIME_STEP 600
+
 #ifdef _DEBUG
 #define assert_res(a) (assert(a))
 #else

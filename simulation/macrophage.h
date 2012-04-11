@@ -81,7 +81,6 @@ public:
 	void computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tnfrDynamics, bool nfkbDynamics, bool il10rDynamics, bool);
 	void solveNFkBandTNF (GrGrid& grid, double dt);
 	void solveNFkBODEsEquilibrium (double dt);
-    void solveTNFandIL10 (GrGrid& grid, GrStat& stats, double dt, double currenttime);
     void solveTNFandIL10andNFkB (GrGrid& grid, double dt);
     virtual void solveDegradation (GrGrid& grid, double dt, bool tnfrDynamics, bool il10rDynamics);
 	void updateState();

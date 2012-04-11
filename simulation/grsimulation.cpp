@@ -44,12 +44,17 @@ GrSimulation::GrSimulation(const Pos& dim)
     , _il10DepletionTimeStep(-1)
 	, _tcellRecruitmentBegun(false)
     , _vectorlength(0)
+    , _numMolecularPerDiffusion(0)
+    , _numDiffusionPerAgent(0)
 {
 	for (int i = 0; i < NOUTCOMES; i++)
     {
 		_pTTest[i] = NULL;
     }
 
+    _numMolecularPerDiffusion = _PARAM(PARAM_GR_DT_DIFFUSION)/_PARAM(PARAM_GR_DT_MOLECULAR); // Number of molecular iterations per diffusion iteration
+    _numDiffusionPerAgent = (AGENT_TIME_STEP / _PARAM(PARAM_GR_DT_DIFFUSION)); // Number of diffusion iterations per agent iteration
+    
 }
 
 GrSimulation::~GrSimulation()
@@ -87,6 +92,8 @@ void GrSimulation::serialize(std::ostream& out) const
     out << _il10DepletionTimeStep << std::endl;
     out << _tcellRecruitmentBegun <<std::endl;
     out << _vectorlength << std::endl;
+    out << _numMolecularPerDiffusion << std::endl;
+    out << _numDiffusionPerAgent << std::endl;
 
 	// serialize grid
 	_grid.serialize(out);
@@ -210,6 +217,8 @@ void GrSimulation::deserialize(std::istream& in)
     in >> _il10DepletionTimeStep;
     in >> _tcellRecruitmentBegun;
     in >> _vectorlength;
+    in >> _numMolecularPerDiffusion;
+    in >> _numDiffusionPerAgent;
 
 	// deserialize grid
 	_grid.deserialize(in);
@@ -333,7 +342,10 @@ void GrSimulation::deserialize(std::istream& in)
 
 void GrSimulation::init(Scalar molecularTrackingRadius)
 {
-	// initialize the sources
+	// Before initializing anything check to see if the time step criteria are met
+    timestepSync();
+    
+    // initialize the sources
 	_grid.initSources();
 
 	PosVector initMacs = Params::getInstance()->getInitialMacs();
@@ -473,54 +485,48 @@ void GrSimulation::solve()
     // Calculate Diffusion and Molecular events for a 10 min timestep
     // Agent time step is 600 s (10 min)
 	
-    int Adt = 600; // Agent Time Step (s)
-    int Ddt = _PARAM(PARAM_GR_DT_DIFFUSION); // Diffusion Time Step
-    int Mdt = _PARAM(PARAM_GR_DT_MOLECULAR); // Molecular Time Step
-    
-    int NumMolecularPerDiffusion = Ddt/Mdt; // Number of molecular iterations per diffusion iterations
-    int NumDiffusionPerAgent = Adt/Ddt; // Number of diffusion iterations per agent itaeration
-    
-	for (int DiffStep = 0; DiffStep < NumDiffusionPerAgent; DiffStep++) 
+	for (int DiffStep = 0; DiffStep < _numDiffusionPerAgent; DiffStep++) 
 	{
 		_pDiffusion->diffuse(_grid);
-    for (int MolStep = 0; MolStep < NumMolecularPerDiffusion; MolStep++)
-		{
-			secreteFromMacrophages(tnfDepletion, il10Depletion, Mdt);
-			secreteFromTcells(tnfDepletion, il10Depletion, Mdt);
-			secreteFromCaseations(Mdt);
-	
-      if (_nfkbDynamics)
-			{
-				if (_il10rDynamics) {
-	                updateNFkBandTNFandIL10Dynamics(Mdt);
-	            }
-				else
-				{
-					updateNFkBandTNFDynamics(Mdt);
-				}
-			}
-			else if (_tnfrDynamics && _il10rDynamics)
-	        {
-	            updateTNFandIL10Dynamics(Mdt, DiffStep);
-    	    }
-	        
-	        else if (_tnfrDynamics && !_il10rDynamics)
-			{
-				updateTNFDynamics(Mdt);
-			}
-		
-        	else if (_il10rDynamics && !_tnfrDynamics)
-	        {
-    	        updateIL10Dynamics(Mdt);
-	        }
         
-    	    else if (!_il10rDynamics || !_tnfrDynamics)
-			{
-				adjustFauxDegradation(Mdt);
-	            //adjustTNFDegradation(Mdt);
-			}
+        for (int MolStep = 0; MolStep < _numMolecularPerDiffusion; MolStep++)
+            {
+                    secreteFromMacrophages(tnfDepletion, il10Depletion, _PARAM(PARAM_GR_DT_MOLECULAR));
+                    secreteFromTcells(tnfDepletion, il10Depletion, _PARAM(PARAM_GR_DT_MOLECULAR));
+                    secreteFromCaseations(_PARAM(PARAM_GR_DT_MOLECULAR));
+            
+                if (_nfkbDynamics)
+                {
+                    if (_il10rDynamics) {
+                        updateNFkBandTNFandIL10Dynamics(_PARAM(PARAM_GR_DT_MOLECULAR));
+                    }
+                    else
+                    {
+                        updateNFkBandTNFDynamics(_PARAM(PARAM_GR_DT_MOLECULAR));
+                    }
+                }
+                else if (_tnfrDynamics && _il10rDynamics)
+                {
+                    updateTNFandIL10Dynamics(_PARAM(PARAM_GR_DT_MOLECULAR));
+                }
+                
+                else if (_tnfrDynamics && !_il10rDynamics)
+                {
+                    updateTNFDynamics(_PARAM(PARAM_GR_DT_MOLECULAR));
+                }
+            
+                else if (_il10rDynamics && !_tnfrDynamics)
+                {
+                    updateIL10Dynamics(_PARAM(PARAM_GR_DT_MOLECULAR));
+                }
+            
+                else if (!_il10rDynamics || !_tnfrDynamics)
+                {
+                    adjustFauxDegradation(_PARAM(PARAM_GR_DT_MOLECULAR));
+                    //adjustTNFDegradation(_PARAM(PARAM_GR_DT_MOLECULAR));
+                }
 		}
-  }
+    }
 	
 	// move macrophages
 	moveMacrophages();
@@ -757,23 +763,23 @@ void GrSimulation::updateIL10Dynamics(double dt)
 
 
 
-void GrSimulation::updateTNFandIL10Dynamics(double dt, double currenttime)
+void GrSimulation::updateTNFandIL10Dynamics(double dt)
 {
 	for (MacList::iterator it = _macList.begin(); it != _macList.end(); it++)
 	{
-		it->solveTNFandIL10(_grid.getGrid(), _stats, dt, currenttime);
+		it->solveTNFandIL10(_grid.getGrid(), dt);
 	}
 	for (TgamList::iterator it = _tgamList.begin(); it != _tgamList.end(); it++)
 	{
-		it->solveTNFandIL10(_grid.getGrid(), _stats, dt, currenttime);
+		it->solveTNFandIL10(_grid.getGrid(), dt);
 	}
 	for (TcytList::iterator it = _tcytList.begin(); it != _tcytList.end(); it++)
 	{
-		it->solveTNFandIL10(_grid.getGrid(), _stats, dt, currenttime);
+		it->solveTNFandIL10(_grid.getGrid(), dt);
 	}
 	for (TregList::iterator it = _tregList.begin(); it != _tregList.end(); it++)
 	{
-		it->solveTNFandIL10(_grid.getGrid(), _stats, dt, currenttime);
+		it->solveTNFandIL10(_grid.getGrid(), dt);
 	}
 }
 
@@ -813,15 +819,15 @@ void GrSimulation::updateNFkBandTNFandIL10Dynamics(double dt)
 	}
 	for (TgamList::iterator it = _tgamList.begin(); it != _tgamList.end(); it++)
 	{
-		it->solveTNFandIL10(_grid.getGrid(), _stats, dt, 0.0);
+		it->solveTNFandIL10(_grid.getGrid(), dt);
 	}
 	for (TcytList::iterator it = _tcytList.begin(); it != _tcytList.end(); it++)
 	{
-		it->solveTNFandIL10(_grid.getGrid(), _stats, dt, 0.0);
+		it->solveTNFandIL10(_grid.getGrid(), dt);
 	}
 	for (TregList::iterator it = _tregList.begin(); it != _tregList.end(); it++)
 	{
-		it->solveTNFandIL10(_grid.getGrid(), _stats, dt, 0.0);
+		it->solveTNFandIL10(_grid.getGrid(), dt);
 	}
 }
 

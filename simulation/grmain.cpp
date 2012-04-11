@@ -223,6 +223,9 @@ public:
 	void outputHeader() {
 		write("time");
 		write("cellID");
+		write("cellType");
+
+		write("intMtb"); // 0 for T cells
 
 		// TNF associated attributes
 		write("mTNF"); write("surfTNFR1"); write("surfTNFR2"); write("surfBoundTNFR1"); write("surfBoundTNFR2");
@@ -238,6 +241,7 @@ public:
 	// Actually save several rows, one for each agent to be tracked.
 	void saveRow(const GrSimulation& sim)
 	{
+
 		MacList macList = sim.getMacList();
 		for (MacList::iterator it = macList.begin(); it != macList.end(); it++)
 		{
@@ -247,15 +251,27 @@ public:
 			}
 		}
 
-		TgamList tgamList = sim.getTgamList();
-		TcytList tcytList = sim.getTcytList();
-		TregList tregList = sim.getTregList();
+		// Don't track T cells for now.
+		//TgamList tgamList = sim.getTgamList();
+		//TcytList tcytList = sim.getTcytList();
+		//TregList tregList = sim.getTregList();
 	}
 
 	void saveAgentRow(int time, Agent& agent)
 	{
 		write(time);
 		write(agent.getID());
+		write((int) agent.getAgentType());
+
+		if (agent.getAgentType() == MAC)
+		{
+			Mac& m = dynamic_cast<Mac&>(agent);
+			write(m.getIntMtb());
+		}
+		else
+		{
+			write(0.0);
+		}
 
 		// TNF associated attributes
 		write(agent.getMTNF());

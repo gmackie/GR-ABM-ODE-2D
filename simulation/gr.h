@@ -60,7 +60,7 @@ typedef double Scalar;
 // used for conversion of conc. unit (M -> #/cell) based on cell and microcompartment volumes
 #define DENSITY 1.25e11
 
-// volume of a grid compartment in cubic meters
+// volume of a grid compartment in L
 #define VOL 8.0e-12
 
 //ratio of cytoplasmic to nuclear volume

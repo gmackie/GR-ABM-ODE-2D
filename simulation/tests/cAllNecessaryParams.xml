@@ -1,6 +1,6 @@
 <GR
-  timestepDiffusion = "60"
-  timestepMolecular = "6"
+	timestepDiffusion = "60"
+	timestepMolecular = "6"
 	muMDC_LN = "0.3"
 	initN4 = "100000"
 	initN8 = "84000"
@@ -39,7 +39,7 @@
 	diffusivityChemokines = "5.2e-08"
 	degRateTNF = "0.9905"
 	degRateChemokines = "0.9905"
-    ChemokinekDeg = "1.58e-3"
+	ChemokinekDeg = "1.58e-3"
 	dAttractant = "0"
 	thresholdApoptosisTNF = "0.0625"
 	kApoptosis = "0.00432456"
@@ -69,7 +69,7 @@
 	kRec2 = "1.8e-05"
 	kT1 = "0.00038"
 	kT2 = "0.00038"
-    kDeg = "4.58e-4"
+	kDeg = "4.58e-4"
 	kDeg1 = "5e-05"
 	kDeg2 = "5e-05"
 	meanTNFR1Mac = "1500"
@@ -137,7 +137,7 @@
 	IkOff = "0.00026"
 	IkT = "0.00016"
 	IkInt = "0.0005"
-    Ikdeg = "2e-5"
+	Ikdeg = "2e-5"
 	meanIL10RMac = "1500"
 	stdIL10RMac = "350"
 	meanIL10RTcell = "400"
@@ -182,33 +182,34 @@
 		nrExtMtbUptakeAct = "10"
 		thresholdRec = "0.0227148"
 		probRec = "0.04"
-        thresholdICOS = "1.5"
+		thresholdICOS = "1.5"
 		/>
 	<Tcell
 		maxAge = "432"
 		timeRecEnabled = "2880"
-		
+		mtbRecEnabled = "35"
+
+		lymphProxyMtbThreshold = "50"
 		lymphProxyScalingStart = "2880"
 		lymphProxyFactorStart = "5040"
 		lymphProxyFactorEnd = "8640"
-		lymphProxyFactorNonlinearEnd = "10000"
-		lymphProxyMtbThreshold = "0"
-		mtbRecEnabled = "35"
+		lymphProxyFactorNonlinearEnd = "12960"
+
 		probMoveToMac = "0.015"
-		probMoveToTcell = "0.08"
+		iprobMoveToTcell = "0.08"
 		probRec = "0.15"
 		>
 		<Tgam
 			maxTimeReg = "10"
-            maxTimeDouble = "144"
+			maxTimeDouble = "144"
 			probApoptosisFasFasL = "0.06"
 			thresholdRec = "0.4"
 			probRec = "0.54"
-            thresholdExtMtb = "0"
-            probAntigenPresentation = "0.90"
-            probTGFB = ".001"
-            probICOS = ".001"
-            probAgDegree = "0.8"
+			thresholdExtMtb = "0"
+			probAntigenPresentation = "0.90"
+			probTGFB = ".001"
+			probICOS = ".001"
+i			probAgDegree = "0.8"
 			/>
 		<Tcyt
 			maxTimeReg = "10"
@@ -220,7 +221,7 @@
 		<Treg
 			thresholdRec = "0.2"
 			probRec = "0.1"
-            probTregDeactivate = "1.0"
+			probTregDeactivate = "1.0"
 			/>
 	</Tcell>
 	<Mtb

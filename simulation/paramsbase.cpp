@@ -721,11 +721,14 @@ void ParamsBase::computeParams()
   //setParam(PARAM_TCELL_LYMPH_PROXY_NONLINEAR_B, fluxFactorB);
 }
 
+// NOTE: THE _SEC_RATE_CCL and the _SEC_RATE_TNF should both be multiplied by the MOLECULAR_DT but since these terms will cancel
+// in the division they are not used to keep the error of the floating point division down.
+
 void ParamsBase::defineRecruitmentWeight(ParamDoubleType recruitmentWeightParam, ParamDoubleType secretionParam)
 {
 	if (!_paramsRead[recruitmentWeightParam])
 	{
-		setParam(recruitmentWeightParam, getParam(PARAM_MAC_SEC_RATE_TNF) / getParam(secretionParam));
+		setParam(recruitmentWeightParam, (getParam(PARAM_MAC_SEC_RATE_TNF)) / (getParam(secretionParam)));
 	}
 }
 

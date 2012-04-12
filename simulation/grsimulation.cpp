@@ -708,10 +708,10 @@ void GrSimulation::secreteFromCaseations(int mdt)
 		{
 			if (g.isCaseated(p))
 			{
-				g.incCCL2(p, (0.25 * _PARAM(PARAM_MAC_SEC_RATE_CCL2)));
-				g.incCCL5(p, (0.25 * _PARAM(PARAM_MAC_SEC_RATE_CCL5)));
-				g.incCXCL9(p,  (0.25 * _PARAM(PARAM_MAC_SEC_RATE_CXCL9)));
-				g.incmacAttractant(p, (_PARAM(PARAM_GR_SEC_RATE_ATTRACTANT)));
+				g.incCCL2(p, (0.25 * _PARAM(PARAM_MAC_SEC_RATE_CCL2) * mdt));
+				g.incCCL5(p, (0.25 * _PARAM(PARAM_MAC_SEC_RATE_CCL5) * mdt));
+				g.incCXCL9(p,  (0.25 * _PARAM(PARAM_MAC_SEC_RATE_CXCL9) * mdt));
+				g.incmacAttractant(p, (_PARAM(PARAM_GR_SEC_RATE_ATTRACTANT) * mdt));
 			}
 		}
 	}

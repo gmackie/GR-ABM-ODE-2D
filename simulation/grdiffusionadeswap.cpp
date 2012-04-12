@@ -142,6 +142,10 @@ static void diffuse_avg(Scalar* __restrict__ newgrid_u, Scalar* __restrict__ new
 // It takes in extra grids for CCL5 and CXCL9 since they are ratios of CCL2
 static void diffuse_avg_ratio(Scalar* newgrid_u, Scalar* newgrid_v, Scalar* newgridccl2, Scalar* newgridccl5, Scalar* newgridcxcl9, const Pos& dim)
 {
+    
+    // NOTE: THE _SEC_RATE_CCL should both be multiplied by the MOLECULAR_DT but since these terms will cancel
+    // in the division they are not used to keep the error of the floating point division down.
+    
     const Scalar ratioCCL5toCCL2 = _PARAM(PARAM_MAC_SEC_RATE_CCL5) / _PARAM(PARAM_MAC_SEC_RATE_CCL2);
 	const Scalar ratioCXCL9toCCL2 = _PARAM(PARAM_MAC_SEC_RATE_CXCL9) / _PARAM(PARAM_MAC_SEC_RATE_CCL2);
     

@@ -196,7 +196,7 @@
 		lymphProxyFactorNonlinearEnd = "12960"
 
 		probMoveToMac = "0.015"
-		iprobMoveToTcell = "0.08"
+		probMoveToTcell = "0.08"
 		probRec = "0.15"
 		>
 		<Tgam
@@ -209,7 +209,7 @@
 			probAntigenPresentation = "0.90"
 			probTGFB = ".001"
 			probICOS = ".001"
-i			probAgDegree = "0.8"
+			probAgDegree = "0.8"
 			/>
 		<Tcyt
 			maxTimeReg = "10"

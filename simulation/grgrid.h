@@ -71,16 +71,18 @@ private:
   int _nCaseation;
   std::vector<Pos> _sources;
   std::vector<Agent*> _agents;
-#define GRID(type, name) \
+
+  #define GRID(type, name) \
     std::vector<type> _##name;
-#define PADDED_GRID(type, name) \
+
+  #define PADDED_GRID(type, name) \
     std::vector<type> _##name;	\
     std::vector<type> _u_##name;	\
     std::vector<type> _v_##name;	\
 
   GRIDS_DEFS
-#undef GRID
-#undef PADDED_GRID
+  #undef GRID
+  #undef PADDED_GRID
 
 public:
   GrGrid(const Pos& dim);

@@ -619,6 +619,7 @@ int main(int argc, char** argv)
     if(!in)
       throw std::runtime_error("Failed to open saved state file");
     pSim->deserialize(in);
+    pSim->initMolecularTracking(molecularTrackingRadius);
   }
 
   buildSim(pSim, diffMethodEnum, pRecr, vm.count("tnfr-dynamics"), vm.count("il10r-dynamics"), vm.count("NFkB-dynamics"),

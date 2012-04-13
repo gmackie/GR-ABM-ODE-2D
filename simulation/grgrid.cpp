@@ -9,6 +9,8 @@
 #include "serialization.h"
 #include "agent.h"
 
+using namespace std;
+
 const std::string GrGrid::_ClassName = "GrGrid";
 
 
@@ -19,7 +21,8 @@ const std::string GrGrid::_ClassName = "GrGrid";
 #define PADDED_GRID(type, name) \
   , _##name(Scalar_SZ)	\
   , _u_##name(Scalar_SZ)	\
-  , _v_##name(Scalar_SZ)	
+  , _v_##name(Scalar_SZ)
+
 GrGrid::GrGrid(const Pos& dim)
   : _dim(dim)
   , _nCaseation(_PARAM(PARAM_GR_NR_KILLINGS_FOR_CASEATION))
@@ -100,38 +103,42 @@ void GrGrid::serialize(std::ostream& out) const
 
 	Serialization::writeHeader(out, GrGrid::_ClassName);
 
-  out << getRange() << std::endl;
+	out << getRange() << endl;
 
-  Pos p;
+	out << _nCaseation << endl;
+
+	Pos p;
 	for (p.x = 0; p.x < _dim.x; p.x++)
 	{
 		for (p.y = 0; p.y < _dim.y; p.y++)
 		{
-        out << TNF(p)              << ' '
-            << CCL2(p)             << ' '
-            << macAttractant(p)    << ' '
-            << shedTNFR2(p)        << ' '
-            << il10(p)             << ' '
-            << extMTB(p)           << ' '
-            << nKillings(p)        << ' '
-            << nRecruitments(p)    << ' '
-            << nSecretions(p)      << ' ';
+			out << nKillings(p) << endl;
+			out << nRecruitments(p) << endl;
+			out << nSecretions(p) << endl;
+			out << macAttractant(p) << endl;
+			out << TNF(p) << endl;
+			out << CCL2(p) << endl; // CCL5, CSCL9 values are based on CCL2 values.
+			out << shedTNFR2(p) << endl;
+			out << il10(p) << endl;
+			out << extMTB(p) << endl;
 		}
-    out << std::endl;
+		out << std::endl;
 	}
 
-  out <<_sources.size()<<std::endl;
-  for(std::vector<Pos>::const_iterator v= _sources.begin(); v!=_sources.end(); v++)
-    out<<*v<<' ';
+	out <<_sources.size()<<std::endl;
+	for(std::vector<Pos>::const_iterator v= _sources.begin(); v!=_sources.end(); v++)
+	{
+		out << *v << endl;
+	}
 
 	Serialization::writeFooter(out, GrGrid::_ClassName);
 }
 
 void GrGrid::deserialize(std::istream& in)
 {
-	assert(in.good());
+  assert(in.good());
 
-	Serialization::readHeader(in, GrGrid::_ClassName);
+  Serialization::readHeader(in, GrGrid::_ClassName);
 
   Pos range;
   const Pos& standard = getRange();
@@ -140,28 +147,31 @@ void GrGrid::deserialize(std::istream& in)
   if(GETROW(range) != GETROW(standard) && GETCOL(range) != GETCOL(standard))
     throw std::length_error("Dimension mismatch in deserialization");
 
+  in >> _nCaseation;
+
   _sources.clear();
 
   Pos p;
   for(p.x = 0; p.x < _dim.x; p.x++)
     for(p.y = 0; p.y < _dim.y; p.y++)
     {
-      in  >> (Scalar&) TNF(p)
-          >> (Scalar&) CCL2(p)
-          >> (Scalar&) macAttractant(p)
-          >> (Scalar&) shedTNFR2(p)
-          >> (Scalar&) il10(p)
-          >> (Scalar&) extMTB(p)
-          >> (int&) nKillings(p)
-          >> (int&) nRecruitments(p)
-          >> (int&) nSecretions(p)  ;
 
-       // Clear the agents, in case some had been defined during simulation initialization,
-       // for example initial agents defined from a parameter file INIT section.
-       for (size_t i = 0; i < MAX_AGENTS_PER_CELL; i++)
-       {
-    	   agent(p, i) = NULL;
-       }
+		in >> (int&) nKillings(p);
+		in >> (int&) nRecruitments(p);
+		in >> (int&) nSecretions(p);
+		in >> (Scalar&) macAttractant(p);
+		in >> (Scalar&) TNF(p);
+		in >> (Scalar&) CCL2(p);  // CCL5, CSCL9 values are based on CCL2 values.
+		in >> (Scalar&) shedTNFR2(p);
+		in >> (Scalar&) il10(p);
+		in >> (Scalar&) extMTB(p);
+
+        // Clear the agents, in case some had been defined during simulation initialization,
+        // for example initial agents defined from a parameter file INIT section.
+        for (size_t i = 0; i < MAX_AGENTS_PER_CELL; i++)
+        {
+        	agent(p, i) = NULL;
+        }
      }
 
   int sz = 0;
@@ -171,7 +181,7 @@ void GrGrid::deserialize(std::istream& in)
     _sources.push_back(p);
   }
 
-	Serialization::readFooter(in, GrGrid::_ClassName);
+  Serialization::readFooter(in, GrGrid::_ClassName);
 }
 
 bool GrGrid::incKillings(const Pos& p) {

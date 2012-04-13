@@ -58,8 +58,6 @@ private:
     
     int _numMolecularPerDiffusion;
     int _numDiffusionPerAgent;
-    
-	void initMolecularTracking(Scalar molecularTrackingRadius);
 
 	void moveTcells();
 	void moveMacrophages();
@@ -84,6 +82,7 @@ public:
 	GrSimulation(const Pos& dim);
 	~GrSimulation();
 	void init(Scalar molecularTrackingRadius);
+	void initMolecularTracking(Scalar molecularTrackingRadius);
 	void solve();
 	void performT_Test();
 	int getTime() const;

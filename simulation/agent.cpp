@@ -9,6 +9,8 @@
 #include "grgrid.h"
 #include "serialization.h"
 
+using namespace std;
+
 const std::string Agent::_ClassName = "Agent";
 
 unsigned long Agent::_nextID = 0;
@@ -44,10 +46,10 @@ Agent::Agent()
 	, _surfBoundIL10R(-1.0)
 	, _kISynth(-1.0)
     , _initvector(0)
-    , _k1vector(0)
-    , _k2vector(0)
-    , _k3vector(0)
-    , _k4vector(0)
+    , _k1vector(0.0, 13)
+    , _k2vector(0.0, 13)
+    , _k3vector(0.0, 13)
+    , _k4vector(0.0, 13)
     , _switchvector(0)
 
 {
@@ -479,7 +481,8 @@ void Agent::serialize(std::ostream& out) const
     out << _surfBoundIL10R << std::endl;
     out << _kISynth << std::endl;
     
-    for (int jj = 0; jj < (int)_initvector.size(); jj++) {
+    out << _initvector.size() << endl;
+    for (size_t jj = 0; jj < _initvector.size(); jj++) {
         out << _initvector[jj] << std::endl;
         out << _k1vector[jj] << std::endl;
         out << _k2vector[jj] << std::endl;
@@ -528,8 +531,17 @@ void Agent::deserialize(std::istream& in)
     in >> _surfBoundIL10R;
     in >> _kISynth;
 
-    
-    for (int kk = 0; kk < (int)_initvector.size(); kk++) {
+    size_t vectorSize;
+    in >> vectorSize;
+
+    _initvector.resize(vectorSize, 0.0);
+    _k1vector.resize(vectorSize, 0.0);
+    _k2vector.resize(vectorSize, 0.0);
+    _k3vector.resize(vectorSize, 0.0);
+    _k4vector.resize(vectorSize, 0.0);
+    _switchvector.resize(vectorSize, 0.0);
+
+    for (size_t kk = 0; kk < vectorSize; kk++) {
         in >> _initvector[kk];
         in >> _k1vector[kk];
         in >> _k2vector[kk];

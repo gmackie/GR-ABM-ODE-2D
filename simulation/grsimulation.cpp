@@ -407,8 +407,20 @@ void GrSimulation::init(Scalar molecularTrackingRadius)
     
 }
 
+// Mark each cell within the molecular tracking radius to be tracked.
+// Clear a cell's tracking status otherwise, so that the cells to track for a loaded
+// state doesn't include those that were marked to be tracked when the state was saved.
+// This allows defining the cells to be tracked based on the simulation state at the
+// time the saved state was loaded, rather than based in part on the simulation state
+// at time 0, when the simulation was initialized, and which would be carried forward to
+// the saved and then loaded state.
 void GrSimulation::initMolecularTracking(Scalar molecularTrackingRadius)
 {
+	if (molecularTrackingRadius == 0.0)
+	{
+		return;
+	}
+
 	const Pos center = _grid.getCenter();
 
 	for (MacList::iterator it = _macList.begin(); it != _macList.end(); it++)
@@ -417,6 +429,11 @@ void GrSimulation::initMolecularTracking(Scalar molecularTrackingRadius)
 		{
 			it->setTrackMolecularDynamics(true);
 		}
+		else
+		{
+			it->setTrackMolecularDynamics(false);
+		}
+
 	}
 
 	for (TgamList::iterator it = _tgamList.begin(); it != _tgamList.end(); it++)
@@ -424,6 +441,10 @@ void GrSimulation::initMolecularTracking(Scalar molecularTrackingRadius)
 		if (it->getPosition().distance(center) <= molecularTrackingRadius)
 		{
 			it->setTrackMolecularDynamics(true);
+		}
+		else
+		{
+			it->setTrackMolecularDynamics(false);
 		}
 	}
 
@@ -433,6 +454,10 @@ void GrSimulation::initMolecularTracking(Scalar molecularTrackingRadius)
 		{
 			it->setTrackMolecularDynamics(true);
 		}
+		else
+		{
+			it->setTrackMolecularDynamics(false);
+		}
 	}
 
 	for (TregList::iterator it = _tregList.begin(); it != _tregList.end(); it++)
@@ -440,6 +465,10 @@ void GrSimulation::initMolecularTracking(Scalar molecularTrackingRadius)
 		if (it->getPosition().distance(center) <= molecularTrackingRadius)
 		{
 			it->setTrackMolecularDynamics(true);
+		}
+		else
+		{
+			it->setTrackMolecularDynamics(false);
 		}
 	}
 }

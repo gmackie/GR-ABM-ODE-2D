@@ -342,6 +342,11 @@ void GrSimulation::init(Scalar molecularTrackingRadius)
 	// Before initializing anything check to see if the time step criteria are met
     timestepSync();
     
+    // Used to initialize the valarray length for solving ODEs using RK4
+    // Must be run before any agents are created so they have the correct
+    // valarray length
+    setODEsize();
+
     // initialize the sources
 	_grid.initSources();
 
@@ -403,7 +408,6 @@ void GrSimulation::init(Scalar molecularTrackingRadius)
 	}
 
 	initMolecularTracking(molecularTrackingRadius);
-    initVecLength(); // Used to initialize the valarray length for solving ODEs using RK4
     
 }
 

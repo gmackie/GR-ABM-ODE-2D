@@ -11,6 +11,8 @@
 
 using namespace std;
 
+int Tcell::_tcellodeSize = 0;
+
 // Needed for deserializing the model state.
 // Avoids the calls to the random number generator in the normal constructor, allowing the random number generator
 // to remain in synch after deserialization.
@@ -32,6 +34,7 @@ Tcell::Tcell(int birthtime, int row, int col, Scalar kSynth)
 			// IL10 components
 			, (Scalar) _PARAM(PARAM_GR_I_IL10R_TCELL)
 			, (Scalar) _PARAM(PARAM_GR_STD_IL10R_TCELL)
+            , _tcellodeSize
 			)
 {
 }
@@ -69,7 +72,7 @@ void Tcell::moveTcell(GrGrid& grid, bool ccl2, bool ccl5, bool cxcl9)
 		{
 			assert_res(grid.removeAgent(this));
 			grid.addAgent(this, pos);
-      _pos = pos;
+            _pos = pos;
 		}
 	}
 }
@@ -77,9 +80,13 @@ void Tcell::moveTcell(GrGrid& grid, bool ccl2, bool ccl5, bool cxcl9)
 void Tcell::serialize(std::ostream& out) const
 {
 	Agent::serialize(out);
+    
+    out << _tcellodeSize << std::endl;
 }
 
 void Tcell::deserialize(std::istream& in)
 {
 	Agent::deserialize(in);
+    
+    in >> _tcellodeSize;
 }

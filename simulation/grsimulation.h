@@ -130,7 +130,9 @@ public:
 	Treg* createTreg(int row, int col, int birthtime, TregState state);
 
 	static void convertSimTime(const int time, int& rDays, int& rHours, int& rMinutes);
-    void initVecLength();
+    void setODEsize();
+    void macODEsize();
+    void tcellODEsize();
     void timestepSync();
 };
 
@@ -384,21 +386,26 @@ inline void GrSimulation::checkTCellRecruitmentStart()
 	}
 }
 
-inline void GrSimulation::initVecLength()
+inline void GrSimulation::setODEsize()
 {
-    
-    int vectorlength;
+    macODEsize();
+    tcellODEsize();
+}
+
+inline void GrSimulation::macODEsize()
+{
+    int vectorlength = 0;
     
     if (_nfkbDynamics)
     {
         if (_il10rDynamics) 
         {
-            vectorlength = 38; // Number of differential equations for TNF, IL10, and NFKB
+            vectorlength = 41; // Number of differential equations for TNF, IL10, and NFKB
         }
         
         else
         {
-            vectorlength = 35; // Number of differential equations for TNF and NFKB
+            vectorlength = 38; // Number of differential equations for TNF and NFKB
         }
     }
     
@@ -417,7 +424,31 @@ inline void GrSimulation::initVecLength()
         vectorlength = 3; // Number of differential equations for IL10
     }
     
-    Params::getInstance()->setParam(PARAM_GR_ODE_VALARRAY_LENGTH, vectorlength);
+    Mac::setMacOdeSize(vectorlength);
+    
+}
+
+
+inline void GrSimulation::tcellODEsize()
+{
+    int vectorlength = 0;
+    
+    if (_tnfrDynamics && _il10rDynamics)
+    {
+        vectorlength = 13; // Number of differential equations for TNF and IL10
+    }
+    
+    else if (_tnfrDynamics && !_il10rDynamics)
+    {
+        vectorlength = 10; // Number of differential equations for TNF
+    }
+    
+    else if (_il10rDynamics && !_tnfrDynamics)
+    {
+        vectorlength = 3; // Number of differential equations for IL10
+    }
+    
+    Tcell::setTcellOdeSize(vectorlength);
 }
 
 inline void GrSimulation::timestepSync()

@@ -57,6 +57,40 @@ protected:
     Scalar _vIL10R; // Rate of IL10R synthesis
     Scalar _surfBoundIL10R; // No. of bound cell surface IL10R
     Scalar _kISynth;
+    Scalar _meanIL10R;
+    
+	// NF-kB signaling pathway components
+	Scalar _IKKKa; // (IKKK in active state)
+	Scalar _IKKn; // (IKK in neutral state)
+	Scalar _IKKa; // (IKK in the active state)
+	Scalar _IKKi; // (IKK in inactive state)
+	Scalar _IkBp; // (Phospho-IkB)
+	Scalar _NFkB_IkBp; // %NFkB|IkBp
+	Scalar _NFkBc; // cytoplasmic NFkB
+	Scalar _NFkBn; // nucluar NFkB
+	Scalar _A20;
+	Scalar _A20t; // A20 transcript
+	Scalar _IkB;
+	Scalar _IkBn; // nucluar IkB
+	Scalar _IkBt; // IkB trancript
+	Scalar _NFkB_IkB;
+	Scalar _NFkB_IkBn;
+	Scalar _GA20; // (The state of A20)
+	Scalar _GIkB; // (The state of IkB)
+	Scalar _GR; // (The state of reporter genes)
+	Scalar _c1rrChemTNF; // NF-kB independent rate of TNF/chemokine mRNA synthesis  
+	Scalar _c1rChem;
+	Scalar _c1rTNF;
+	Scalar _chemt; // generic chemokine transcript
+	Scalar _chem; // intracellular generic chemokine protein
+	Scalar _TNFt; // TNF transcript
+	Scalar _TNF; // intracellular TNF 
+	Scalar _ACTt; // transcript of macrophage activating molecules
+	Scalar _ACT; // mac-activation molecules
+	Scalar _normalizedACT;
+	Scalar _IAPt; // transcript of IAP (inhibitor of apoptosis)
+	Scalar _IAP; 
+	Scalar _normalizedIAP;
 
     valarray<double> _initvector;
     valarray<double> _k1vector;
@@ -83,6 +117,7 @@ public:
 			// IL10 components
 			, Scalar iIL10R
 			, Scalar stdIL10R
+            , int odesize
 		);
 
 	virtual ~Agent();
@@ -98,6 +133,23 @@ public:
 	virtual void solveTNF (GrGrid& grid, double dt);
 	virtual void solveIL10 (GrGrid& grid, double dt);
 	virtual void solveTNFandIL10(GrGrid& grid, double dt);
+    virtual void solveNFkBandTNF (GrGrid& grid, double dt);
+    virtual void solveTNFandIL10andNFkB (GrGrid& grid, double dt);
+    
+    
+    virtual void solveNFkBODEsEquilibrium (double dt);
+
+    virtual void derivativeTNF(const valarray<double>& vecread, valarray<double>& vecwrite, double dt, GrGrid& grid);
+    virtual void derivativeIL10(const valarray<double>& vecread, valarray<double>& vecwrite, double dt, GrGrid& grid);
+    virtual void derivativeTNFandIL10(const valarray<double>& vecread, valarray<double>& vecwrite, double dt, GrGrid& grid);
+    virtual void derivativeTNFandNFKB(const valarray<double>& vecread, valarray<double>& vecwrite, double dt, GrGrid& grid);
+    virtual void derivativeTNFandIL10andNFKB(const valarray<double>& vecread, valarray<double>& vecwrite, double dt, GrGrid& grid);
+
+    
+    
+    virtual void writeValarrayFromMembers(GrGrid& grid, valarray<double>& inputVector);
+    virtual void writeMembersFromValarray(GrGrid& grid, const valarray<double>& inputVector);
+    
 	virtual void solveDegradation (GrGrid& grid, double dt, bool tnfrDynamics, bool il10rDynamics) = 0;
 	virtual void solveDegradation (GrGrid& grid, double dt, bool tnfrDynamics, bool il10rDynamics, Scalar meanTNFR1, Scalar iIL10R);
 

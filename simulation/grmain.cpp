@@ -224,6 +224,7 @@ public:
 		write("time");
 		write("cellID");
 		write("cellType");
+		write("cellState");
 
 		write("intMtb"); // 0 for T cells
 
@@ -262,6 +263,7 @@ public:
 		write(time);
 		write(agent.getID());
 		write((int) agent.getAgentType());
+		write((int) agent.getState());
 
 		if (agent.getAgentType() == MAC)
 		{
@@ -270,6 +272,7 @@ public:
 		}
 		else
 		{
+			write(0);
 			write(0.0);
 		}
 

@@ -261,10 +261,10 @@ void Agent::writeValarrayFromMembers(GrGrid& grid, valarray<double>& inputVector
             inputVector[30] = _TNFt; 
             inputVector[31] = _TNF; 
             inputVector[32] = _ACTt; 
-            inputVector[33] = _ACT; 
-            inputVector[34] = _normalizedACT; 
-            inputVector[35] = _IAPt; 
-            inputVector[36] = _IAP; 
+            inputVector[33] = _ACT;
+            inputVector[34] = _IAPt; 
+            inputVector[35] = _IAP; 
+            inputVector[36] = _normalizedACT; 
             inputVector[37] = _normalizedIAP;
             
             if (vectorsize == 41) 
@@ -357,9 +357,9 @@ void Agent::writeMembersFromValarray(GrGrid& grid, const valarray<double>& input
             _TNF = inputVector[31];
             _ACTt = inputVector[32];
             _ACT = inputVector[33];
-            _normalizedACT = inputVector[34];
-            _IAPt = inputVector[35];
-            _IAP = inputVector[36];
+            _IAPt = inputVector[34];
+            _IAP = inputVector[35];
+            _normalizedACT = inputVector[36];
             _normalizedIAP = inputVector[37];
             
             grid.incCCL2(_pos, (_PARAM(PARAM_GR_e3Chem) * inputVector[29] * _PARAM(PARAM_GR_DT_MOLECULAR)));
@@ -379,30 +379,9 @@ void Agent::writeMembersFromValarray(GrGrid& grid, const valarray<double>& input
     }
 }
 
-
-
-
-
-
-
-void Agent::derivativeTNFandIL10(const valarray<double>& vecread, valarray<double>& vecwrite, double dt, GrGrid& grid)
-{
-    
-}
-
-void Agent::derivativeTNFandNFKB(const valarray<double>& vecread, valarray<double>& vecwrite, double dt, GrGrid& grid)
-{
-    
-}
-
-void Agent::derivativeTNFandIL10andNFKB(const valarray<double>& vecread, valarray<double>& vecwrite, double dt, GrGrid& grid)
-{
-    
-}
-
 void Agent::derivativeTNF(const valarray<double>& vecread, valarray<double>& vecwrite, double dt, GrGrid& grid)
 {
-    assert(vecread.size()==10);
+    assert(vecread.size() == 10); // Make sure the valarray length is set correctly
     
     double koff1 = _PARAM(PARAM_GR_K_ON1) * _PARAM(PARAM_GR_KD1);
 	double koff2 = _PARAM(PARAM_GR_K_ON2) * _PARAM(PARAM_GR_KD2);
@@ -512,6 +491,9 @@ void Agent::solveTNF(GrGrid& grid, double dt)
 
 void Agent::derivativeIL10(const valarray<double>& vecread, valarray<double>& vecwrite, double dt, GrGrid& grid)
 {
+    
+    assert(vecread.size() == 3); // Make sure the valarray length is set correctly
+    
     // IL10 Ordinary Differential Equations
     // sIL10
     vecwrite[0] = (((DENSITY/NAV) * _kISynth) + ((DENSITY/NAV) * (_PARAM(PARAM_GR_I_K_OFF) * vecread[2] - _PARAM(PARAM_GR_I_K_ON) * vecread[1] * vecread[0]))) * dt;
@@ -519,6 +501,7 @@ void Agent::derivativeIL10(const valarray<double>& vecread, valarray<double>& ve
     vecwrite[1] = (_vIL10R - _PARAM(PARAM_GR_I_K_ON) * vecread[1] * vecread[0] + _PARAM(PARAM_GR_I_K_OFF) * vecread[2] - _PARAM(PARAM_GR_I_K_T) * vecread[1]) * dt;
     // surfBoundIL10R
     vecwrite[2] = (_PARAM(PARAM_GR_I_K_ON) * vecread[1] * vecread[0] - _PARAM(PARAM_GR_I_K_OFF) * vecread[2] - _PARAM(PARAM_GR_I_K_INT) * vecread[2]) * dt;
+    
 }
 
 void Agent::solveIL10(GrGrid& grid, double dt)
@@ -547,6 +530,57 @@ void Agent::solveIL10(GrGrid& grid, double dt)
 
      //cout << "Debug: Running IL10 dynamics" << std::endl;
 
+}
+
+void Agent::derivativeTNFandIL10(const valarray<double>& vecread, valarray<double>& vecwrite, double dt, GrGrid& grid)
+{
+    assert(vecread.size() == 13); // Make sure the valarray length is set correctly
+    
+    double koff1 = _PARAM(PARAM_GR_K_ON1) * _PARAM(PARAM_GR_KD1);
+	double koff2 = _PARAM(PARAM_GR_K_ON2) * _PARAM(PARAM_GR_KD2);
+    double IkmRNA;
+    
+    // solving for TNF parameters that depend on IL10
+    
+    if (_kmRNA > 0)
+    {
+        IkmRNA = _kmRNA * ((_kSynth/_kmRNA) + ((1.0 - (_kSynth/_kmRNA))/(1.0 + pow(2.7183, ((vecread[12] - _PARAM(PARAM_GR_LINK_RNA_GAMMA))/_PARAM(PARAM_GR_LINK_RNA_DELTA))))));
+    }
+    else
+    {
+        IkmRNA = 0.0;
+    }
+    
+    // TNF Ordinary Differential Equations
+    // mTNFRNA
+    vecwrite[0] = (IkmRNA - _PARAM(PARAM_GR_K_TRANS) * vecread[0]) * dt;
+    // mTNF
+    vecwrite[1] = (_PARAM(PARAM_GR_K_TRANS) * vecread[0] - _kTACE * vecread[1]) * dt;
+    // surfTNFR1
+    vecwrite[2] = (_vTNFR1 - _PARAM(PARAM_GR_K_ON1) * vecread[8] * vecread[2] + koff1 * vecread[4] - _PARAM(PARAM_GR_K_T1) * vecread[2] + _PARAM(PARAM_GR_K_REC1) * vecread[6]) * dt;
+    // surfTNFR2
+    vecwrite[3] = (_vTNFR2 - _PARAM(PARAM_GR_K_ON2) * vecread[8] * vecread[3] + koff2 * vecread[5] - _PARAM(PARAM_GR_K_T2) * vecread[3] + _PARAM(PARAM_GR_K_REC2) * vecread[7]) * dt;
+    // surfBoundTNFR1
+    vecwrite[4] = (_PARAM(PARAM_GR_K_ON1) * vecread[8] * vecread[2] - koff1 * vecread[4] - _PARAM(PARAM_GR_K_INT1) * vecread[4]) * dt;
+    // surfBoundTNFR2
+    vecwrite[5] = (_PARAM(PARAM_GR_K_ON2) * vecread[8] * vecread[3] - koff2 * vecread[5] - _PARAM(PARAM_GR_K_INT2) * vecread[5] - _PARAM(PARAM_GR_K_SHED) * vecread[5]) * dt;
+    // intBoundTNFR1 
+    vecwrite[6] = (_PARAM(PARAM_GR_K_INT1) * vecread[4] - _PARAM(PARAM_GR_K_DEG1) * vecread[6] - _PARAM(PARAM_GR_K_REC1) * vecread[6]) * dt;
+    // intBoundTNFR2
+    vecwrite[7] = (_PARAM(PARAM_GR_K_INT2) * vecread[5] - _PARAM(PARAM_GR_K_DEG2) * vecread[7] - _PARAM(PARAM_GR_K_REC2) * vecread[7]) * dt;
+    // sTNF
+    vecwrite[8] = ((DENSITY/NAV) * (_kTACE * vecread[1] - _PARAM(PARAM_GR_K_ON1) * vecread[8] * vecread[2] + koff1 * vecread[4] - _PARAM(PARAM_GR_K_ON2) * vecread[8] * vecread[3] + koff2 * vecread[5])) * dt;
+    // shedTNFR2
+    vecwrite[9] = ((DENSITY/NAV) * _PARAM(PARAM_GR_K_SHED) * vecread[5]) * dt;
+    
+    // IL10 Ordinary Differential Equations
+    // sIL10
+    vecwrite[10] = (((DENSITY/NAV) * _kISynth) + ((DENSITY/NAV) * (_PARAM(PARAM_GR_I_K_OFF) * vecread[12] - _PARAM(PARAM_GR_I_K_ON) * vecread[11] * vecread[10]))) * dt;
+    // surfIL10R
+    vecwrite[11] = (_vIL10R - _PARAM(PARAM_GR_I_K_ON) * vecread[11] * vecread[10] + _PARAM(PARAM_GR_I_K_OFF) * vecread[12] - _PARAM(PARAM_GR_I_K_T) * vecread[11]) * dt;
+    // surfBoundIL10R
+    vecwrite[12] = (_PARAM(PARAM_GR_I_K_ON) * vecread[11] * vecread[10] - _PARAM(PARAM_GR_I_K_OFF) * vecread[12] - _PARAM(PARAM_GR_I_K_INT) * vecread[12]) * dt;
+    
 }
 
 void Agent::solveTNFandIL10(GrGrid& grid, double dt)
@@ -634,6 +668,76 @@ void Agent::solveTNFandIL10(GrGrid& grid, double dt)
     
     if (_surfIL10R < 0 || _surfBoundIL10R < 0)
         std::cout << "Error: Negative value of species in IL10/IL10R dynamics" << std::endl;
+    
+}
+
+void Agent::derivativeTNFandNFKB(const valarray<double>& vecread, valarray<double>& vecwrite, double dt, GrGrid& grid)
+{
+    assert(vecread.size() == 38);
+    
+    double koff1 = _PARAM(PARAM_GR_K_ON1) * _PARAM(PARAM_GR_KD1);
+	double koff2 = _PARAM(PARAM_GR_K_ON2) * _PARAM(PARAM_GR_KD2);
+    double il10 = grid.il10(_pos) /(NAV * VOL);
+    double eqsurfBoundIL10R;
+    double IkmRNA;
+    
+    // modulate TNF parameters based on equilibrium IL10 receptor equations since the il10 molecular equations are not active
+    eqsurfBoundIL10R = (il10 * _surfIL10R) / (_PARAM(PARAM_GR_I_KD) + il10);
+    
+    if (_kmRNA > 0) {
+        IkmRNA = _kmRNA * ((_kSynth/_kmRNA)+ ((1.0 - (_kSynth/_kmRNA))/(1.0 + pow(2.7183, ((eqsurfBoundIL10R - _PARAM(PARAM_GR_LINK_RNA_GAMMA))/_PARAM(PARAM_GR_LINK_RNA_DELTA))))));
+    }
+    else
+    {
+        IkmRNA = 0.0;
+    }
+    
+    // end of equilibrium calculations
+    
+    
+    // CURRENTLY NOT LINKED WITH IL10 SINCE NFKB DYNAMICS HAVE NOT BEEN LOOKED AT
+    
+    // TNF Ordinary Differential Equations
+    
+    vecwrite[0] = 0 * dt; // CURRENTLY NOT LINKED WITH IL10 SINCE NFKB DYNAMICS HAVE NOT BEEN LOOKED AT
+	vecwrite[1] = (_PARAM(PARAM_GR_e3TNF)*_TNF - _kTACE * vecread[1]) * dt;
+	vecwrite[2] = (_vTNFR1 - _PARAM(PARAM_GR_K_ON1) * vecread[8] * vecread[2] + (koff1+KDEG) * vecread[4] - _PARAM(PARAM_GR_K_T1) * vecread[2] + _PARAM(PARAM_GR_K_REC1) * vecread[6]) * dt;
+	vecwrite[3] = (_vTNFR2 - _PARAM(PARAM_GR_K_ON2) * vecread[8] * vecread[3] + (koff2+KDEG) * vecread[5] - _PARAM(PARAM_GR_K_T2) * vecread[3] + _PARAM(PARAM_GR_K_REC2) * vecread[7]) * dt;
+	vecwrite[4] = (_PARAM(PARAM_GR_K_ON1) * vecread[8] * vecread[2] - (koff1+KDEG) * vecread[4] - _PARAM(PARAM_GR_K_INT1) * vecread[4]) * dt;
+	vecwrite[5] = (_PARAM(PARAM_GR_K_ON2) * vecread[8] * vecread[3] - (koff2+KDEG) * vecread[5] - _PARAM(PARAM_GR_K_INT2) * vecread[5] - _PARAM(PARAM_GR_K_SHED) * vecread[5]) * dt;    
+	vecwrite[6] = (_PARAM(PARAM_GR_K_INT1) * vecread[4] - _PARAM(PARAM_GR_K_DEG1) * vecread[6] - _PARAM(PARAM_GR_K_REC1) * vecread[6]) * dt;    
+	vecwrite[7] = (_PARAM(PARAM_GR_K_INT2) * vecread[5] - _PARAM(PARAM_GR_K_DEG2) * vecread[7] - _PARAM(PARAM_GR_K_REC2) * vecread[7]) * dt;    
+	vecwrite[8] = ((DENSITY/NAV) * (_kTACE * vecread[1] - _PARAM(PARAM_GR_K_ON1) * vecread[8] * vecread[2] + koff1 * vecread[4] - _PARAM(PARAM_GR_K_ON2) * vecread[8] * vecread[3] + koff2 * vecread[5])) * dt;
+	vecwrite[9] = ((DENSITY/NAV) * _PARAM(PARAM_GR_K_SHED) * vecread[5]) * dt;
+	// NF-kB dynamics model equations
+	vecwrite[10] = (_PARAM(PARAM_GR_ka)*vecread[4]*(_PARAM(PARAM_GR_KN)-vecread[10])*_PARAM(PARAM_GR_kA20)/(_PARAM(PARAM_GR_kA20)+vecread[18])-_PARAM(PARAM_GR_ki)*vecread[10]) * dt;
+	vecwrite[11] = (_PARAM(PARAM_GR_k4)*(_PARAM(PARAM_GR_KNN)-vecread[11]-vecread[12]-vecread[13])-_PARAM(PARAM_GR_k1)*pow(vecread[10],2.0)*vecread[11]) * dt;
+	vecwrite[12] = (_PARAM(PARAM_GR_k1)*pow(vecread[10],2.0)*vecread[11]-_PARAM(PARAM_GR_k3)*vecread[12]*(_PARAM(PARAM_GR_k2)+vecread[18])/_PARAM(PARAM_GR_k2)) * dt;
+	vecwrite[13] = (_PARAM(PARAM_GR_k3)*vecread[12]*(_PARAM(PARAM_GR_k2)+vecread[18])/_PARAM(PARAM_GR_k2)-_PARAM(PARAM_GR_k4)*vecread[13]) * dt;
+	vecwrite[14] = (_PARAM(PARAM_GR_a2)*vecread[12]*vecread[20]-_PARAM(PARAM_GR_tp)*vecread[14]) * dt;
+	vecwrite[15] = (_PARAM(PARAM_GR_a3)*vecread[12]*vecread[23]-_PARAM(PARAM_GR_tp)*vecread[15]) * dt;
+	vecwrite[16] = (_PARAM(PARAM_GR_c6a)*vecread[23]-_PARAM(PARAM_GR_a1)*vecread[16]*vecread[20]+_PARAM(PARAM_GR_tp)*vecread[15]-_PARAM(PARAM_GR_i1)*vecread[16]) * dt;
+	vecwrite[17] = (_PARAM(PARAM_GR_i1)*vecread[16]-_PARAM(PARAM_GR_a1)*KV*vecread[21]*vecread[17]) * dt;
+	vecwrite[18] = (_PARAM(PARAM_GR_c4)*vecread[19]-_PARAM(PARAM_GR_c5)*vecread[18]) * dt;
+	vecwrite[19] = (_PARAM(PARAM_GR_c1)*vecread[25]-_PARAM(PARAM_GR_c3)*vecread[19]) * dt;
+	vecwrite[20] = (-_PARAM(PARAM_GR_a2)*vecread[12]*vecread[20]-_PARAM(PARAM_GR_a1)*vecread[20]*vecread[16]+_PARAM(PARAM_GR_c4)*vecread[22]-_PARAM(PARAM_GR_c5a)*vecread[20]-_PARAM(PARAM_GR_i1a)*vecread[20]+_PARAM(PARAM_GR_e1a)*vecread[21]) * dt;
+	vecwrite[21] = (-_PARAM(PARAM_GR_a1)*KV*vecread[21]*vecread[17]+_PARAM(PARAM_GR_i1a)*vecread[20]-_PARAM(PARAM_GR_e1a)*vecread[21]) * dt;
+	vecwrite[22] = (_PARAM(PARAM_GR_c1)*vecread[26]-_PARAM(PARAM_GR_c3)*vecread[22]) * dt;
+	vecwrite[23] = (_PARAM(PARAM_GR_a1)*vecread[20]*vecread[16]-_PARAM(PARAM_GR_c6a)*vecread[23]-_PARAM(PARAM_GR_a3)*vecread[12]*vecread[23]+_PARAM(PARAM_GR_e2a)*vecread[24]) * dt;
+	vecwrite[24] = (_PARAM(PARAM_GR_a1)*KV*vecread[21]*vecread[17]-_PARAM(PARAM_GR_e2a)*vecread[24]) * dt;
+	vecwrite[25] = (_PARAM(PARAM_GR_q1)*vecread[17]*(2-vecread[25])-_PARAM(PARAM_GR_q2)*vecread[21]*vecread[25]) * dt;
+	vecwrite[26] = (_PARAM(PARAM_GR_q1)*vecread[17]*(2-vecread[26])-_PARAM(PARAM_GR_q2)*vecread[21]*vecread[26]) * dt;
+	vecwrite[27] = (_PARAM(PARAM_GR_q1r)*vecread[17]*(2-vecread[27])-(_PARAM(PARAM_GR_q2rr)+_PARAM(PARAM_GR_q2r)*vecread[21])*vecread[27]) * dt;
+	vecwrite[28] = (_c1rrChemTNF+_c1rChem*vecread[27]-_PARAM(PARAM_GR_c3rChem)*vecread[28]) * dt;    
+	vecwrite[29] = (_PARAM(PARAM_GR_c4Chem)*vecread[28]-_PARAM(PARAM_GR_c5Chem)*vecread[29]-_PARAM(PARAM_GR_e3Chem)*vecread[29]) * dt;    
+	vecwrite[30] = (_c1rrChemTNF+_c1rTNF*vecread[27]-_PARAM(PARAM_GR_c3rTNF)*vecread[30]) * dt;    
+	vecwrite[31] = (_PARAM(PARAM_GR_c4TNF)*vecread[30]-_PARAM(PARAM_GR_c5TNF)*vecread[31]-_PARAM(PARAM_GR_e3TNF)*vecread[31]) * dt;    
+	vecwrite[32] = (_PARAM(PARAM_GR_c1rrACT)+_PARAM(PARAM_GR_c1r)*vecread[27]-_PARAM(PARAM_GR_c3rACT)*vecread[32]) * dt;
+	vecwrite[33] = (_PARAM(PARAM_GR_c4ACT)*vecread[32]-_PARAM(PARAM_GR_c5ACT)*vecread[33]) * dt;
+	vecwrite[34] = (_PARAM(PARAM_GR_c1rrIAP)+_PARAM(PARAM_GR_c1r)*vecread[27]-_PARAM(PARAM_GR_c3rIAP)*vecread[34]) * dt;
+	vecwrite[35] = (_PARAM(PARAM_GR_c4IAP)*vecread[34]-_PARAM(PARAM_GR_c5IAP)*vecread[35]) * dt;
+    vecwrite[36] = vecread[33]*_PARAM(PARAM_GR_c3rACT);
+	vecwrite[37] = vecread[35]*_PARAM(PARAM_GR_c3rIAP);
     
 }
 
@@ -799,6 +903,77 @@ void Agent::solveNFkBandTNF(GrGrid& grid, double dt)
 		std::cout << "Error: Negative Value of Species in NFkB dynamics" << std::endl;
     
     //cout << "Debug: Running TNF and NFkB dynamics" << std::endl;
+}
+
+void Agent::derivativeTNFandIL10andNFKB(const valarray<double>& vecread, valarray<double>& vecwrite, double dt, GrGrid& grid)
+{
+    assert(vecread.size() == 41); // Make sure the valarray length is set correctly
+    
+    double koff1 = _PARAM(PARAM_GR_K_ON1) * _PARAM(PARAM_GR_KD1);
+	double koff2 = _PARAM(PARAM_GR_K_ON2) * _PARAM(PARAM_GR_KD2);
+    double IkmRNA;
+    
+    // solving for TNF parameters that depend on IL10
+    
+    if (_kmRNA > 0)
+    {
+        IkmRNA = _kmRNA * ((_kSynth/_kmRNA) + ((1.0 - (_kSynth/_kmRNA))/(1.0 + pow(2.7183, ((vecread[12] - _PARAM(PARAM_GR_LINK_RNA_GAMMA))/_PARAM(PARAM_GR_LINK_RNA_DELTA))))));
+    }
+    else
+    {
+        IkmRNA = 0.0;
+    }
+    
+    // TNF Ordinary Differential Equations
+    
+    vecwrite[0] = 0 * dt; // CURRENTLY NOT LINKED WITH IL10 SINCE NFKB DYNAMICS HAVE NOT BEEN LOOKED AT
+	vecwrite[1] = (_PARAM(PARAM_GR_e3TNF)*_TNF - _kTACE * vecread[1]) * dt;
+	vecwrite[2] = (_vTNFR1 - _PARAM(PARAM_GR_K_ON1) * vecread[8] * vecread[2] + (koff1+KDEG) * vecread[4] - _PARAM(PARAM_GR_K_T1) * vecread[2] + _PARAM(PARAM_GR_K_REC1) * vecread[6]) * dt;
+	vecwrite[3] = (_vTNFR2 - _PARAM(PARAM_GR_K_ON2) * vecread[8] * vecread[3] + (koff2+KDEG) * vecread[5] - _PARAM(PARAM_GR_K_T2) * vecread[3] + _PARAM(PARAM_GR_K_REC2) * vecread[7]) * dt;
+	vecwrite[4] = (_PARAM(PARAM_GR_K_ON1) * vecread[8] * vecread[2] - (koff1+KDEG) * vecread[4] - _PARAM(PARAM_GR_K_INT1) * vecread[4]) * dt;
+	vecwrite[5] = (_PARAM(PARAM_GR_K_ON2) * vecread[8] * vecread[3] - (koff2+KDEG) * vecread[5] - _PARAM(PARAM_GR_K_INT2) * vecread[5] - _PARAM(PARAM_GR_K_SHED) * vecread[5]) * dt;    
+	vecwrite[6] = (_PARAM(PARAM_GR_K_INT1) * vecread[4] - _PARAM(PARAM_GR_K_DEG1) * vecread[6] - _PARAM(PARAM_GR_K_REC1) * vecread[6]) * dt;    
+	vecwrite[7] = (_PARAM(PARAM_GR_K_INT2) * vecread[5] - _PARAM(PARAM_GR_K_DEG2) * vecread[7] - _PARAM(PARAM_GR_K_REC2) * vecread[7]) * dt;    
+	vecwrite[8] = ((DENSITY/NAV) * (_kTACE * vecread[1] - _PARAM(PARAM_GR_K_ON1) * vecread[8] * vecread[2] + koff1 * vecread[4] - _PARAM(PARAM_GR_K_ON2) * vecread[8] * vecread[3] + koff2 * vecread[5])) * dt;
+	vecwrite[9] = ((DENSITY/NAV) * _PARAM(PARAM_GR_K_SHED) * vecread[5]) * dt;
+	// NF-kB dynamics model equations
+	vecwrite[10] = (_PARAM(PARAM_GR_ka)*vecread[4]*(_PARAM(PARAM_GR_KN)-vecread[10])*_PARAM(PARAM_GR_kA20)/(_PARAM(PARAM_GR_kA20)+vecread[18])-_PARAM(PARAM_GR_ki)*vecread[10]) * dt;
+	vecwrite[11] = (_PARAM(PARAM_GR_k4)*(_PARAM(PARAM_GR_KNN)-vecread[11]-vecread[12]-vecread[13])-_PARAM(PARAM_GR_k1)*pow(vecread[10],2.0)*vecread[11]) * dt;
+	vecwrite[12] = (_PARAM(PARAM_GR_k1)*pow(vecread[10],2.0)*vecread[11]-_PARAM(PARAM_GR_k3)*vecread[12]*(_PARAM(PARAM_GR_k2)+vecread[18])/_PARAM(PARAM_GR_k2)) * dt;
+	vecwrite[13] = (_PARAM(PARAM_GR_k3)*vecread[12]*(_PARAM(PARAM_GR_k2)+vecread[18])/_PARAM(PARAM_GR_k2)-_PARAM(PARAM_GR_k4)*vecread[13]) * dt;
+	vecwrite[14] = (_PARAM(PARAM_GR_a2)*vecread[12]*vecread[20]-_PARAM(PARAM_GR_tp)*vecread[14]) * dt;
+	vecwrite[15] = (_PARAM(PARAM_GR_a3)*vecread[12]*vecread[23]-_PARAM(PARAM_GR_tp)*vecread[15]) * dt;
+	vecwrite[16] = (_PARAM(PARAM_GR_c6a)*vecread[23]-_PARAM(PARAM_GR_a1)*vecread[16]*vecread[20]+_PARAM(PARAM_GR_tp)*vecread[15]-_PARAM(PARAM_GR_i1)*vecread[16]) * dt;
+	vecwrite[17] = (_PARAM(PARAM_GR_i1)*vecread[16]-_PARAM(PARAM_GR_a1)*KV*vecread[21]*vecread[17]) * dt;
+	vecwrite[18] = (_PARAM(PARAM_GR_c4)*vecread[19]-_PARAM(PARAM_GR_c5)*vecread[18]) * dt;
+	vecwrite[19] = (_PARAM(PARAM_GR_c1)*vecread[25]-_PARAM(PARAM_GR_c3)*vecread[19]) * dt;
+	vecwrite[20] = (-_PARAM(PARAM_GR_a2)*vecread[12]*vecread[20]-_PARAM(PARAM_GR_a1)*vecread[20]*vecread[16]+_PARAM(PARAM_GR_c4)*vecread[22]-_PARAM(PARAM_GR_c5a)*vecread[20]-_PARAM(PARAM_GR_i1a)*vecread[20]+_PARAM(PARAM_GR_e1a)*vecread[21]) * dt;
+	vecwrite[21] = (-_PARAM(PARAM_GR_a1)*KV*vecread[21]*vecread[17]+_PARAM(PARAM_GR_i1a)*vecread[20]-_PARAM(PARAM_GR_e1a)*vecread[21]) * dt;
+	vecwrite[22] = (_PARAM(PARAM_GR_c1)*vecread[26]-_PARAM(PARAM_GR_c3)*vecread[22]) * dt;
+	vecwrite[23] = (_PARAM(PARAM_GR_a1)*vecread[20]*vecread[16]-_PARAM(PARAM_GR_c6a)*vecread[23]-_PARAM(PARAM_GR_a3)*vecread[12]*vecread[23]+_PARAM(PARAM_GR_e2a)*vecread[24]) * dt;
+	vecwrite[24] = (_PARAM(PARAM_GR_a1)*KV*vecread[21]*vecread[17]-_PARAM(PARAM_GR_e2a)*vecread[24]) * dt;
+	vecwrite[25] = (_PARAM(PARAM_GR_q1)*vecread[17]*(2-vecread[25])-_PARAM(PARAM_GR_q2)*vecread[21]*vecread[25]) * dt;
+	vecwrite[26] = (_PARAM(PARAM_GR_q1)*vecread[17]*(2-vecread[26])-_PARAM(PARAM_GR_q2)*vecread[21]*vecread[26]) * dt;
+	vecwrite[27] = (_PARAM(PARAM_GR_q1r)*vecread[17]*(2-vecread[27])-(_PARAM(PARAM_GR_q2rr)+_PARAM(PARAM_GR_q2r)*vecread[21])*vecread[27]) * dt;
+	vecwrite[28] = (_c1rrChemTNF+_c1rChem*vecread[27]-_PARAM(PARAM_GR_c3rChem)*vecread[28]) * dt;    
+	vecwrite[29] = (_PARAM(PARAM_GR_c4Chem)*vecread[28]-_PARAM(PARAM_GR_c5Chem)*vecread[29]-_PARAM(PARAM_GR_e3Chem)*vecread[29]) * dt;    
+	vecwrite[30] = (_c1rrChemTNF+_c1rTNF*vecread[27]-_PARAM(PARAM_GR_c3rTNF)*vecread[30]) * dt;    
+	vecwrite[31] = (_PARAM(PARAM_GR_c4TNF)*vecread[30]-_PARAM(PARAM_GR_c5TNF)*vecread[31]-_PARAM(PARAM_GR_e3TNF)*vecread[31]) * dt;    
+	vecwrite[32] = (_PARAM(PARAM_GR_c1rrACT)+_PARAM(PARAM_GR_c1r)*vecread[27]-_PARAM(PARAM_GR_c3rACT)*vecread[32]) * dt;
+	vecwrite[33] = (_PARAM(PARAM_GR_c4ACT)*vecread[32]-_PARAM(PARAM_GR_c5ACT)*vecread[33]) * dt;
+	vecwrite[34] = (_PARAM(PARAM_GR_c1rrIAP)+_PARAM(PARAM_GR_c1r)*vecread[27]-_PARAM(PARAM_GR_c3rIAP)*vecread[34]) * dt;
+	vecwrite[35] = (_PARAM(PARAM_GR_c4IAP)*vecread[34]-_PARAM(PARAM_GR_c5IAP)*vecread[35]) * dt;
+    vecwrite[36] = vecread[33]*_PARAM(PARAM_GR_c3rACT);
+	vecwrite[37] = vecread[35]*_PARAM(PARAM_GR_c3rIAP);
+    
+    // IL10 Ordinary Differential Equations
+    // sIL10
+    vecwrite[38] = (((DENSITY/NAV) * _kISynth) + ((DENSITY/NAV) * (_PARAM(PARAM_GR_I_K_OFF) * vecread[40] - _PARAM(PARAM_GR_I_K_ON) * vecread[39] * vecread[38]))) * dt;
+    // surfIL10R
+    vecwrite[39] = (_vIL10R - _PARAM(PARAM_GR_I_K_ON) * vecread[39] * vecread[38] + _PARAM(PARAM_GR_I_K_OFF) * vecread[40] - _PARAM(PARAM_GR_I_K_T) * vecread[39]) * dt;
+    // surfBoundIL10R
+    vecwrite[40] = (_PARAM(PARAM_GR_I_K_ON) * vecread[39] * vecread[38] - _PARAM(PARAM_GR_I_K_OFF) * vecread[40] - _PARAM(PARAM_GR_I_K_INT) * vecread[40]) * dt;
+    
 }
 
 void Agent::solveTNFandIL10andNFkB(GrGrid& grid, double dt)

@@ -384,7 +384,7 @@ void run(GrSimulation* pSim, int stateInterval, int csvInterval, bool screenDisp
     }
   }
 }
-void buildSim(GrSimulation* pSim, DiffusionMethod diffMethod, RecruitmentBase* pRecr, bool tnfrDynamics, bool il10rDynamics,
+void buildSim(GrSimulation* pSim, DiffusionMethod diffMethod, RecruitmentBase* pRecr, int odeMethod , bool tnfrDynamics, bool il10rDynamics,
               bool nfkbDynamics, int tnfDepletionTimeStep, int il10DepletionTimeStep, bool tgammatransition, float areaTNFThreshold, float areaCellDensityThreshold) {
   
 	pSim->setTnfrDynamics(tnfrDynamics || nfkbDynamics); // when NFkB is turned on, tnfr dynamics will be on automatically.
@@ -430,6 +430,7 @@ void buildSim(GrSimulation* pSim, DiffusionMethod diffMethod, RecruitmentBase* p
     pSim->setIl10DepletionTimeStep(il10DepletionTimeStep);
 	pSim->setRecruitment(pRecr);
 	pSim->setDiffusionMethod(diffMethod);
+    pSim->setODESolverMethod(odeMethod);
 	
 	//	Set area thresholds if specified on the command line.
 	if (areaTNFThreshold >= 0)
@@ -492,6 +493,8 @@ int main(int argc, char** argv)
 	("recr", po::value<unsigned>()->default_value(0), "recruitment:\n0 - probability\n1 - lymph node ode proxy\n2 - lymph node ode pure")
 	("diffusion", po::value<unsigned>()->default_value(4),
 	 "Diffusion method:\n0 - FTCS\n1 - BTCS (SOR, correct)\n2 - BTCS (SOR, wrong)\n3 - FTCS Grid Swap\n4 - ADE Grid Swap")
+    ("odesolver", po::value<int>()->default_value(0),
+     "ODE Solver Method:\n0 - Forward Euler\n1 - Runge-Kutta 4th Order\n2 - Runge-Kutta 2nd Order\n3 - Euler Predictor-Corrector")
 	("area-tnf-threshold", po::value<float>()->default_value(0.5),"Threshold for granuloma area defined by TNF, in the range [0.0, 1.0]\n")
 	("area-cell-density-threshold", po::value<float>()->default_value(0.5),"Threshold for granuloma area defined by cell density, in the range [0.0, 1.0]");
 
@@ -579,7 +582,6 @@ int main(int argc, char** argv)
       break;
     case 2:
       pRecr = (RecruitmentBase*)new RecruitmentLnODEPure();
-
       break;
     default:
       std::cerr << std::endl <<"Unsupported recruitment method" << std::endl << std::endl;
@@ -604,7 +606,14 @@ int main(int argc, char** argv)
       printUsage(argv[0], desc);
       exit(1);
   }
-
+ 
+  if (vm["odesolver"].as<int>() != 0 && vm["odesolver"].as<int>() != 1 && vm["odesolver"].as<int>() !=2 && vm["odesolver"].as<int>() !=3) 
+  {
+      std::cerr<<"Unsupported ODE method"<<std::endl;
+      printUsage(argv[0], desc);
+      exit(1);
+  }
+    
   GrSimulation* pSim = new GrSimulation(pdim);
   assert(pSim != NULL);
   if(vm.count("load")) {
@@ -622,7 +631,7 @@ int main(int argc, char** argv)
     pSim->initMolecularTracking(molecularTrackingRadius);
   }
 
-  buildSim(pSim, diffMethodEnum, pRecr, vm.count("tnfr-dynamics"), vm.count("il10r-dynamics"), vm.count("NFkB-dynamics"),
+  buildSim(pSim, diffMethodEnum, pRecr, vm["odesolver"].as<int>(), vm.count("tnfr-dynamics"), vm.count("il10r-dynamics"), vm.count("NFkB-dynamics"),
            vm["tnf-depletion"].as<int>(), vm["il10-depletion"].as<int>(),vm.count("Treg-induction"), vm["area-tnf-threshold"].as<float>(),
               vm["area-cell-density-threshold"].as<float>());
 

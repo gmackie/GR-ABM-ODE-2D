@@ -40,6 +40,7 @@ GrSimulation::GrSimulation(const Pos& dim)
 	, _nfkbDynamics(false)
     , _il10rDynamics(false)
     , _tgammatransition(false)
+    , _odeSolver(-1)
 	, _tnfDepletionTimeStep(-1)
     , _il10DepletionTimeStep(-1)
 	, _tcellRecruitmentBegun(false)
@@ -53,7 +54,6 @@ GrSimulation::GrSimulation(const Pos& dim)
 
     _numMolecularPerDiffusion = _PARAM(PARAM_GR_DT_DIFFUSION)/_PARAM(PARAM_GR_DT_MOLECULAR); // Number of molecular iterations per diffusion iteration
     _numDiffusionPerAgent = (AGENT_TIME_STEP / _PARAM(PARAM_GR_DT_DIFFUSION)); // Number of diffusion iterations per agent iteration
-    
 }
 
 GrSimulation::~GrSimulation()
@@ -87,6 +87,7 @@ void GrSimulation::serialize(std::ostream& out) const
 	out << _nfkbDynamics << std::endl;
     out << _il10rDynamics << std::endl;
     out << _tgammatransition << std::endl;
+    out << _odeSolver << std::endl;
 	out << _tnfDepletionTimeStep << std::endl;
     out << _il10DepletionTimeStep << std::endl;
     out << _tcellRecruitmentBegun <<std::endl;
@@ -211,6 +212,7 @@ void GrSimulation::deserialize(std::istream& in)
 	in >> _nfkbDynamics;
     in >> _il10rDynamics;
     in >> _tgammatransition;
+    in >> _odeSolver;
 	in >> _tnfDepletionTimeStep;
     in >> _il10DepletionTimeStep;
     in >> _tcellRecruitmentBegun;
@@ -525,30 +527,50 @@ void GrSimulation::solve()
                     secreteFromTcells(tnfDepletion, il10Depletion, _PARAM(PARAM_GR_DT_MOLECULAR));
                     secreteFromCaseations(_PARAM(PARAM_GR_DT_MOLECULAR));
             
-                if (_nfkbDynamics)
-                {
-                    if (_il10rDynamics) {
-                        updateNFkBandTNFandIL10Dynamics(_PARAM(PARAM_GR_DT_MOLECULAR));
+                if (_nfkbDynamics || _tnfrDynamics || _il10rDynamics) {
+                    switch (_odeSolver) {
+                        case 0:
+                            updateMolecularScaleFE(_PARAM(PARAM_GR_DT_MOLECULAR));
+                            break;
+                        case 1:
+                            updateMolecularScaleRK4(_PARAM(PARAM_GR_DT_MOLECULAR));
+                            break;
+                        case 2:
+                            updateMolecularScaleRK2(_PARAM(PARAM_GR_DT_MOLECULAR));
+                            break;
+                        case 3:
+                            updateMolecularScaleEPC(_PARAM(PARAM_GR_DT_MOLECULAR));
+                            break;
+                        default:
+                            std::cerr<<"Error: Solver Switch Value Unsupported"<<std::endl;
+                            exit(1);
+                            break;
                     }
-                    else
-                    {
-                        updateNFkBandTNFDynamics(_PARAM(PARAM_GR_DT_MOLECULAR));
-                    }
                 }
-                else if (_tnfrDynamics && _il10rDynamics)
-                {
-                    updateTNFandIL10Dynamics(_PARAM(PARAM_GR_DT_MOLECULAR));
-                }
-                
-                else if (_tnfrDynamics && !_il10rDynamics)
-                {
-                    updateTNFDynamics(_PARAM(PARAM_GR_DT_MOLECULAR));
-                }
-            
-                else if (_il10rDynamics && !_tnfrDynamics)
-                {
-                    updateIL10Dynamics(_PARAM(PARAM_GR_DT_MOLECULAR));
-                }
+//                if (_nfkbDynamics)
+//                {
+//                    if (_il10rDynamics) {
+//                        updateNFkBandTNFandIL10Dynamics(_PARAM(PARAM_GR_DT_MOLECULAR));
+//                    }
+//                    else
+//                    {
+//                        updateNFkBandTNFDynamics(_PARAM(PARAM_GR_DT_MOLECULAR));
+//                    }
+//                }
+//                else if (_tnfrDynamics && _il10rDynamics)
+//                {
+//                    updateTNFandIL10Dynamics(_PARAM(PARAM_GR_DT_MOLECULAR));
+//                }
+//                
+//                else if (_tnfrDynamics && !_il10rDynamics)
+//                {
+//                    updateTNFDynamics(_PARAM(PARAM_GR_DT_MOLECULAR));
+//                }
+//            
+//                else if (_il10rDynamics && !_tnfrDynamics)
+//                {
+//                    updateIL10Dynamics(_PARAM(PARAM_GR_DT_MOLECULAR));
+//                }
             
                 else if (!_il10rDynamics || !_tnfrDynamics)
                 {
@@ -747,6 +769,87 @@ void GrSimulation::secreteFromCaseations(int mdt)
 				g.incmacAttractant(p, (_PARAM(PARAM_GR_SEC_RATE_ATTRACTANT) * mdt));
 			}
 		}
+	}
+}
+
+
+void GrSimulation::updateMolecularScaleRK4(double dt)
+{
+    for (MacList::iterator it = _macList.begin(); it != _macList.end(); it++)
+	{
+        it->solveMolecularScaleRK4(_grid.getGrid(), dt, _nfkbDynamics, _tnfrDynamics, _il10rDynamics);
+	}
+	for (TgamList::iterator it = _tgamList.begin(); it != _tgamList.end(); it++)
+	{
+        it->solveMolecularScaleRK4(_grid.getGrid(), dt, _nfkbDynamics, _tnfrDynamics, _il10rDynamics);
+	}
+	for (TcytList::iterator it = _tcytList.begin(); it != _tcytList.end(); it++)
+	{
+        it->solveMolecularScaleRK4(_grid.getGrid(), dt, _nfkbDynamics, _tnfrDynamics, _il10rDynamics);
+	}
+	for (TregList::iterator it = _tregList.begin(); it != _tregList.end(); it++)
+	{
+        it->solveMolecularScaleRK4(_grid.getGrid(), dt, _nfkbDynamics, _tnfrDynamics, _il10rDynamics);
+	}
+}
+
+void GrSimulation::updateMolecularScaleRK2(double dt)
+{
+    for (MacList::iterator it = _macList.begin(); it != _macList.end(); it++)
+	{
+        it->solveMolecularScaleRK2(_grid.getGrid(), dt, _nfkbDynamics, _tnfrDynamics, _il10rDynamics);
+	}
+	for (TgamList::iterator it = _tgamList.begin(); it != _tgamList.end(); it++)
+	{
+        it->solveMolecularScaleRK2(_grid.getGrid(), dt, _nfkbDynamics, _tnfrDynamics, _il10rDynamics);
+	}
+	for (TcytList::iterator it = _tcytList.begin(); it != _tcytList.end(); it++)
+	{
+        it->solveMolecularScaleRK2(_grid.getGrid(), dt, _nfkbDynamics, _tnfrDynamics, _il10rDynamics);
+	}
+	for (TregList::iterator it = _tregList.begin(); it != _tregList.end(); it++)
+	{
+        it->solveMolecularScaleRK2(_grid.getGrid(), dt, _nfkbDynamics, _tnfrDynamics, _il10rDynamics);
+	}
+}
+
+void GrSimulation::updateMolecularScaleFE(double dt)
+{
+    for (MacList::iterator it = _macList.begin(); it != _macList.end(); it++)
+	{
+        it->solveMolecularScaleFE(_grid.getGrid(), dt, _nfkbDynamics, _tnfrDynamics, _il10rDynamics);
+	}
+	for (TgamList::iterator it = _tgamList.begin(); it != _tgamList.end(); it++)
+	{
+        it->solveMolecularScaleFE(_grid.getGrid(), dt, _nfkbDynamics, _tnfrDynamics, _il10rDynamics);
+	}
+	for (TcytList::iterator it = _tcytList.begin(); it != _tcytList.end(); it++)
+	{
+        it->solveMolecularScaleFE(_grid.getGrid(), dt, _nfkbDynamics, _tnfrDynamics, _il10rDynamics);
+	}
+	for (TregList::iterator it = _tregList.begin(); it != _tregList.end(); it++)
+	{
+        it->solveMolecularScaleFE(_grid.getGrid(), dt, _nfkbDynamics, _tnfrDynamics, _il10rDynamics);
+	}
+}
+
+void GrSimulation::updateMolecularScaleEPC(double dt)
+{
+    for (MacList::iterator it = _macList.begin(); it != _macList.end(); it++)
+	{
+        it->solveMolecularScaleFE(_grid.getGrid(), dt, _nfkbDynamics, _tnfrDynamics, _il10rDynamics);
+	}
+	for (TgamList::iterator it = _tgamList.begin(); it != _tgamList.end(); it++)
+	{
+        it->solveMolecularScaleFE(_grid.getGrid(), dt, _nfkbDynamics, _tnfrDynamics, _il10rDynamics);
+	}
+	for (TcytList::iterator it = _tcytList.begin(); it != _tcytList.end(); it++)
+	{
+        it->solveMolecularScaleFE(_grid.getGrid(), dt, _nfkbDynamics, _tnfrDynamics, _il10rDynamics);
+	}
+	for (TregList::iterator it = _tregList.begin(); it != _tregList.end(); it++)
+	{
+        it->solveMolecularScaleFE(_grid.getGrid(), dt, _nfkbDynamics, _tnfrDynamics, _il10rDynamics);
 	}
 }
 

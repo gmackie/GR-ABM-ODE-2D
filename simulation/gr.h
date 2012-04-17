@@ -75,7 +75,7 @@ typedef double Scalar;
 #define SECONDS_PER_DAY 86400
 
 // Approximate limit for numerical accuracy solving the ODEs
-#define MOLECULAR_ACCURACY 30
+#define MOLECULAR_ACCURACY 30.0
 
 // Time step of agent movement in seconds
 #define AGENT_TIME_STEP 600

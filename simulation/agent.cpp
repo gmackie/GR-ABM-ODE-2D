@@ -185,6 +185,239 @@ Agent::~Agent()
 {
 }
 
+void Agent::solveMolecularScaleFE(GrGrid& grid, double dt, bool nfkbDynamics, bool tnfrDynamics, bool il10rDynamics)
+{
+    switch (_initvector.size()) 
+    {
+        case 3:
+            assert(il10rDynamics); // Verify the options are correct
+            solveForwardEuler(grid, dt, &Agent::derivativeIL10);
+            break;
+        case 10:
+            assert(tnfrDynamics); // Verify the options are correct
+            solveForwardEuler(grid, dt, &Agent::derivativeTNF);
+            break;
+        case 13:
+            assert(tnfrDynamics && il10rDynamics); // Verify the options are correct
+            solveForwardEuler(grid, dt, &Agent::derivativeTNFandIL10);
+            break;
+        case 38:
+            assert(tnfrDynamics && nfkbDynamics); // Verify the options are correct
+            solveForwardEuler(grid, dt, &Agent::derivativeTNFandNFKB);
+            break;
+        case 41:
+            assert(tnfrDynamics && nfkbDynamics && il10rDynamics); // Verify the options are correct
+            solveForwardEuler(grid, dt, &Agent::derivativeTNFandIL10andNFKB);
+            break;
+        default:
+            std::cerr<<"Error: ODE options and valarray size do not match"<<std::endl;
+            exit(1);
+            break;
+    }
+}
+
+void Agent::solveMolecularScaleEPC(GrGrid& grid, double dt, bool nfkbDynamics, bool tnfrDynamics, bool il10rDynamics)
+{
+    switch (_initvector.size()) 
+    {
+        case 3:
+            assert(il10rDynamics); // Verify the options are correct
+            solveEulerPC(grid, dt, &Agent::derivativeIL10);
+            break;
+        case 10:
+            assert(tnfrDynamics); // Verify the options are correct
+            solveEulerPC(grid, dt, &Agent::derivativeTNF);
+            break;
+        case 13:
+            assert(tnfrDynamics && il10rDynamics); // Verify the options are correct
+            solveEulerPC(grid, dt, &Agent::derivativeTNFandIL10);
+            break;
+        case 38:
+            assert(tnfrDynamics && nfkbDynamics); // Verify the options are correct
+            solveEulerPC(grid, dt, &Agent::derivativeTNFandNFKB);
+            break;
+        case 41:
+            assert(tnfrDynamics && nfkbDynamics && il10rDynamics); // Verify the options are correct
+            solveEulerPC(grid, dt, &Agent::derivativeTNFandIL10andNFKB);
+            break;
+        default:
+            std::cerr<<"Error: ODE options and valarray size do not match"<<std::endl;
+            exit(1);
+            break;
+    }
+}
+
+void Agent::solveMolecularScaleRK4(GrGrid& grid, double dt, bool nfkbDynamics, bool tnfrDynamics, bool il10rDynamics)
+{
+    switch (_initvector.size()) 
+    {
+        case 3:
+            assert(il10rDynamics); // Verify the options are correct
+            solveRK4(grid, dt, &Agent::derivativeIL10);
+            break;
+        case 10:
+            assert(tnfrDynamics); // Verify the options are correct
+            solveRK4(grid, dt, &Agent::derivativeTNF);
+            break;
+        case 13:
+            assert(tnfrDynamics && il10rDynamics); // Verify the options are correct
+            solveRK4(grid, dt, &Agent::derivativeTNFandIL10);
+            break;
+        case 38:
+            assert(tnfrDynamics && nfkbDynamics); // Verify the options are correct
+            solveRK4(grid, dt, &Agent::derivativeTNFandNFKB);
+            break;
+        case 41:
+            assert(tnfrDynamics && nfkbDynamics && il10rDynamics); // Verify the options are correct
+            solveRK4(grid, dt, &Agent::derivativeTNFandIL10andNFKB);
+            break;
+        default:
+            std::cerr<<"Error: ODE options and valarray size do not match"<<std::endl;
+            exit(1);
+            break;
+    }
+}
+
+void Agent::solveMolecularScaleRK2(GrGrid& grid, double dt, bool nfkbDynamics, bool tnfrDynamics, bool il10rDynamics)
+{
+    switch (_initvector.size()) 
+    {
+        case 3:
+            assert(il10rDynamics); // Verify the options are correct
+            solveRK2(grid, dt, &Agent::derivativeIL10);
+            break;
+        case 10:
+            assert(tnfrDynamics); // Verify the options are correct
+            solveRK2(grid, dt, &Agent::derivativeTNF);
+            break;
+        case 13:
+            assert(tnfrDynamics && il10rDynamics); // Verify the options are correct
+            solveRK2(grid, dt, &Agent::derivativeTNFandIL10);
+            break;
+        case 38:
+            assert(tnfrDynamics && nfkbDynamics); // Verify the options are correct
+            solveRK2(grid, dt, &Agent::derivativeTNFandNFKB);
+            break;
+        case 41:
+            assert(tnfrDynamics && nfkbDynamics && il10rDynamics); // Verify the options are correct
+            solveRK2(grid, dt, &Agent::derivativeTNFandIL10andNFKB);
+            break;
+        default:
+            std::cerr<<"Error: ODE options and valarray size do not match"<<std::endl;
+            exit(1);
+            break;
+    }
+}
+
+void Agent::solveRK4(GrGrid& grid, double dt, void(Agent::*derivativeType)(const valarray<double>& vecread, valarray<double>& vecwrite, double dt, GrGrid& grid))
+{
+    // This is a generalized function that carries out the RK4 numerical method
+    // The third input to the solveRK4 function is a function pointer allowing the method
+    // to be applicable to any derivative function in valarray form
+    
+    // Initialize _initvector
+    writeValarrayFromMembers(grid, _initvector);
+    
+    // Evaluate K1
+    (this->*derivativeType)(_initvector, _k1vector, dt, grid);
+    
+    // Divide K1 in half and add it to the initial vector. Store these values in _switchvector
+    _switchvector = (_initvector + (_k1vector * 0.5));  
+    
+    // Evaluate K2 based on _switchvector
+    (this->*derivativeType)(_switchvector, _k2vector, dt, grid);
+    
+    // Divide K2 in half and add it to the initial vector. Store these values in _switchvector
+    _switchvector = (_initvector + (_k2vector * 0.5));
+    
+    // Evaluate K3 based on _switchvector
+    (this->*derivativeType)(_switchvector, _k3vector, dt, grid);
+    
+    // Add K3 to the initial vector. Store these values in _switchvector
+    _switchvector = (_k3vector + _initvector);
+    
+    // Evaluate K4 based on _switchvector
+    (this->*derivativeType)(_switchvector, _k4vector, dt, grid);
+    
+    // Determine the next time point using the RK4 Standard Formula
+    _switchvector = (_initvector + ((1.0/6.0) * (_k1vector + (_k2vector * 2.0) + (_k3vector * 2.0) + _k4vector)));
+  
+    // Write members from _switchvector
+    writeMembersFromValarray(grid, _switchvector);
+}
+
+
+void Agent::solveRK2(GrGrid& grid, double dt, void(Agent::*derivativeType)(const valarray<double>& vecread, valarray<double>& vecwrite, double dt, GrGrid& grid))
+{
+    // This is a generalized function that carries out the RK2 numerical method
+    // The third input to the solveRK2 function is a function pointer allowing the method
+    // to be applicable to any derivative function in valarray form
+    
+    // Initialize _initvector
+    writeValarrayFromMembers(grid, _initvector);
+    
+    // Evaluate K1
+    (this->*derivativeType)(_initvector, _k1vector, dt, grid);
+    
+    // Divide K1 in half and add it to the initial vector. Store these values in _switchvector
+    _switchvector = (_initvector + (_k1vector * 0.5));  
+    
+    // Evaluate K2 based on _switchvector
+    (this->*derivativeType)(_switchvector, _k2vector, dt, grid);
+    
+    // Determine the next time point using the RK2 Standard Formula
+    _switchvector = (_initvector + _k2vector);
+    
+    // Write members from _switchvector
+    writeMembersFromValarray(grid, _switchvector);
+}
+
+
+void Agent::solveEulerPC(GrGrid& grid, double dt, void(Agent::*derivativeType)(const valarray<double>& vecread, valarray<double>& vecwrite, double dt, GrGrid& grid))
+{
+    // This is a generalized function that carries out the Euler Predictor Corrector numerical method
+    // The third input to the solveEulerPC function is a function pointer allowing the method
+    // to be applicable to any derivative function in valarray form
+    
+    // Initialize _initvector
+    writeValarrayFromMembers(grid, _initvector);
+    
+    // Evaluate K1
+    (this->*derivativeType)(_initvector, _k1vector, dt, grid);
+    
+    // Add K1 to the initial vector. Store these values in _switchvector
+    _switchvector = (_initvector + _k1vector);  
+    
+    // Evaluate K2 based on _switchvector
+    (this->*derivativeType)(_switchvector, _k2vector, dt, grid);
+
+    // Determine the next time point using the EulerPC Standard Formula
+    _switchvector = (_initvector + ((1.0/2.0) * (_k1vector + _k2vector)));
+    
+    // Write members from _switchvector
+    writeMembersFromValarray(grid, _switchvector);
+}
+
+void Agent::solveForwardEuler(GrGrid& grid, double dt, void(Agent::*derivativeType)(const valarray<double>& vecread, valarray<double>& vecwrite, double dt, GrGrid& grid))
+{
+    // This is a generalized function that carries out the Forward Euler numerical method
+    // The third input to the solveForwardEuler function is a function pointer allowing the method
+    // to be applicable to any derivative function in valarray form
+    
+    // Initialize _initvector
+    writeValarrayFromMembers(grid, _initvector);
+    
+    // Evaluate K1
+    (this->*derivativeType)(_initvector, _k1vector, dt, grid);
+    
+    // Compute Forward Euler Formula
+    _switchvector = (_initvector + _k1vector);  
+    
+    // Write members from _k1vector
+    writeMembersFromValarray(grid, _switchvector);
+}
+
+
 
 void Agent::writeValarrayFromMembers(GrGrid& grid, valarray<double>& inputVector)
 {
@@ -420,7 +653,6 @@ void Agent::derivativeTNF(const valarray<double>& vecread, valarray<double>& vec
     vecwrite[8] = ((DENSITY/NAV) * (_kTACE * vecread[1] - _PARAM(PARAM_GR_K_ON1) * vecread[8] * vecread[2] + koff1 * vecread[4] - _PARAM(PARAM_GR_K_ON2) * vecread[8] * vecread[3] + koff2 * vecread[5])) * dt;
     // shedTNFR2
     vecwrite[9] = ((DENSITY/NAV) * _PARAM(PARAM_GR_K_SHED) * vecread[5]) * dt;
-    
 }
 
 void Agent::solveTNF(GrGrid& grid, double dt)
@@ -513,7 +745,7 @@ void Agent::solveIL10(GrGrid& grid, double dt)
 	double dsurfBoundIL10R;
 
     // IL10 differential equations
-    dsIL10 = (DENSITY/NAV) * _kISynth + ((DENSITY/NAV) * (_PARAM(PARAM_GR_I_K_OFF) * _surfBoundIL10R - _PARAM(PARAM_GR_I_K_ON) * _surfIL10R * il10)) * dt;
+    dsIL10 = ((DENSITY/NAV) * _kISynth + ((DENSITY/NAV) * (_PARAM(PARAM_GR_I_K_OFF) * _surfBoundIL10R - _PARAM(PARAM_GR_I_K_ON) * _surfIL10R * il10))) * dt;
 	dsurfIL10R = (_vIL10R - _PARAM(PARAM_GR_I_K_ON) * _surfIL10R * il10 + _PARAM(PARAM_GR_I_K_OFF) * _surfBoundIL10R - _PARAM(PARAM_GR_I_K_T) * _surfIL10R) * dt;
 	dsurfBoundIL10R = (_PARAM(PARAM_GR_I_K_ON) * _surfIL10R * il10 - _PARAM(PARAM_GR_I_K_OFF) * _surfBoundIL10R - _PARAM(PARAM_GR_I_K_INT) * _surfBoundIL10R) * dt;
     // end of IL10 differential equations
@@ -1083,7 +1315,7 @@ void Agent::solveTNFandIL10andNFkB(GrGrid& grid, double dt)
 	dIAP = (_PARAM(PARAM_GR_c4IAP)*_IAPt-_PARAM(PARAM_GR_c5IAP)*_IAP) * dt;
 	
     // IL10 differential equations
-    dsIL10 = (DENSITY/NAV) * _kISynth + ((DENSITY/NAV) * (_PARAM(PARAM_GR_I_K_OFF) * _surfBoundIL10R - _PARAM(PARAM_GR_I_K_ON) * _surfIL10R * il10)) * dt;
+    dsIL10 = ((DENSITY/NAV) * _kISynth + ((DENSITY/NAV) * (_PARAM(PARAM_GR_I_K_OFF) * _surfBoundIL10R - _PARAM(PARAM_GR_I_K_ON) * _surfIL10R * il10))) * dt;
 	dsurfIL10R = (_vIL10R - _PARAM(PARAM_GR_I_K_ON) * _surfIL10R * il10 + _PARAM(PARAM_GR_I_K_OFF) * _surfBoundIL10R - _PARAM(PARAM_GR_I_K_T) * _surfIL10R) * dt;
 	dsurfBoundIL10R = (_PARAM(PARAM_GR_I_K_ON) * _surfIL10R * il10 - _PARAM(PARAM_GR_I_K_OFF) * _surfBoundIL10R - _PARAM(PARAM_GR_I_K_INT) * _surfBoundIL10R) * dt;
     // end of IL10 differential equations

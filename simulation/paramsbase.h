@@ -37,6 +37,8 @@ struct NodeDescription
 
 // These are used as indices into the _doubleParam array and the _description array.
 typedef enum {
+    PARAM_GR_DT_DIFFUSION,
+    PARAM_GR_DT_MOLECULAR,
 	PARAM_GR_D_TNF,
 	PARAM_GR_D_SHED_TNFR2,
 	PARAM_GR_D_CHEMOKINES,
@@ -261,8 +263,6 @@ typedef enum {
 // These are used as indices into the _intParam array.
 // These enum values + PARAM_DOUBLE_COUNT are used as indices into the _description array.
 typedef enum {
-	PARAM_GR_DT_DIFFUSION,
-    PARAM_GR_DT_MOLECULAR,
     PARAM_GR_NR_SOURCES,
 	PARAM_GR_NR_KILLINGS_FOR_CASEATION,
 	PARAM_GR_NF_KB_TIME_COEFF,

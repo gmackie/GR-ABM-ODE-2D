@@ -67,7 +67,9 @@ const ParamDescription ParamsBase::_description[_PARAM_COUNT] =
 {
 	// 														     use	  default
 	// Name									XmlElement	probPos	Default	double	int	  unit				description
-	{ "diffusivityTNF",						GR_NODE,	false,	false,	0.0,	0,	"cm^2/s",			"TNF diffusivity" },
+    { "timestepDiffusion",					GR_NODE,	false,	true,	6.0,	0,	"s",                "Time step for solving the diffusion module" },
+    { "timestepMolecular",					GR_NODE,	false,	true,	6.0,	0,	"s",                "Time step for solving the molecular scale receptor ligand dynamics" },
+    { "diffusivityTNF",						GR_NODE,	false,	false,	0.0,	0,	"cm^2/s",			"TNF diffusivity" },
 	{ "diffusivityShedTNFR2",				GR_NODE,	false,	false,	0.0,	0,	"cm^2/s",			"Shed sTNF/TNFR2 comples diffusivity" },
 	{ "diffusivityChemokines",				GR_NODE,	false,	false,	0.0,	0,	"cm^2/s",			"Chemokine diffusivity" },
 	{ "diffusivityIL10",					GR_NODE,	false,	false,	0.0,	0,	"cm^2/s",			"IL10 diffusivity" },	
@@ -287,8 +289,6 @@ const ParamDescription ParamsBase::_description[_PARAM_COUNT] =
 	{ "sourceDensity",      				GR_NODE,	false,	true,	0.2, 	0,	"",					"Density of vascular sources on the grid"},
 
 	/* INT */
-    { "timestepDiffusion",					GR_NODE,	false,	true,	0.0,	6,	"s",                "Time step for solving the diffusion module" },
-    { "timestepMolecular",					GR_NODE,	false,	true,	0.0,	6,	"s",                "Time step for solving the molecular scale receptor ligand dynamics" },
     { "nrSources",							GR_NODE,	true,	true,	0.0,	0,	"",					"Number of vascular sources on the grid" },
 	{ "nrKillingsCaseation",				GR_NODE,	true,	false,	0.0,	0,	"",					"Number of killings for a compartment to become caseated" },
 	{ "NFkBTimeCoefficient",				GR_NODE,	true,	false,	0.0,	0,	"-",				"number of NF-kB time-steps within a single diffusion time-step" },

@@ -36,6 +36,7 @@ public:
 	void kill();
 	void deactivate(const int time);
 	bool isDead();
+	bool isDeadNext();
 	static bool isTreg(const Agent* pAgent);
 	static bool isTreg(const Agent* pAgent, TregState state);
 	void print() const;
@@ -80,6 +81,11 @@ inline bool Treg::isTreg(const Agent* pAgent, TregState state)
 inline bool Treg::isDead()
 {
 	return _state == TREG_DEAD;
+}
+
+inline bool Treg::isDeadNext()
+{
+	return _nextState == TREG_DEAD;
 }
 
 #endif /* TREGULATORY_H */

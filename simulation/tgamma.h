@@ -46,6 +46,7 @@ public:
 	void deactivate(const int time);
 	void kill();
 	bool isDead();
+	bool isDeadNext();
 	int getDeactivationTime() const;
 	static bool isTgam(const Agent* pAgent);
 	static bool isTgam(const Agent* pAgent, TgamState state);
@@ -98,4 +99,8 @@ inline bool Tgam::isDead()
 	return _state == TGAM_DEAD;
 }
 
+inline bool Tgam::isDeadNext()
+{
+	return _nextState == TGAM_DEAD;
+}
 #endif /* TGAMMA_H */

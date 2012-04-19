@@ -357,8 +357,8 @@ void Tgam::deactivate(const int time)
     }
     else
     {
-	_nextState = _state = TGAM_DOWN_REGULATED;
-	_deactivationTime = time;
+    	_nextState = _state = TGAM_DOWN_REGULATED;
+    	_deactivationTime = time;
     }
 }
 

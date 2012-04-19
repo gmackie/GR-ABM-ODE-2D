@@ -118,7 +118,7 @@ namespace po = boost::program_options;
  *
  * Then function Lhs:performLhs is called which uses the range arrays to generate the specified
  * regular parameter files. Function Params::toXml is called for each parameter file to be written.
- * Params::toXml only writes parameters to the generated parameter file that had a range explicitly
+ * Params::toXml only writes parameters to the generated parameter file that had a value explicitly
  * specified in the LHS parameter file and that are known to the Params class as defined parameters
  * (i.e. have an entry in the Params::_description array).
  */
@@ -551,7 +551,7 @@ int main(int argc, char** argv)
 	int nSamples;
 	unsigned long seed;
 	int dim;
-    bool _logscale=0;
+	bool logscale = false;
 
 	/* set seed to current time, in case not specified */
 	time_t curTime;
@@ -616,7 +616,7 @@ int main(int argc, char** argv)
 		return 1;
 	}
 
-	lhs.performLhs(_logscale);
+	lhs.performLhs(logscale);
 
 	return 0;
 }

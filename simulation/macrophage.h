@@ -61,6 +61,7 @@ public:
 	void deactivate(const int time);
 	void apoptosis(GrGrid& grid);
 	bool isDead();
+	bool isDeadNext();
 	static bool isMac(const Agent* pAgent);
 	static bool isMac(const Agent* pAgent, MacState state);
 	void print() const;
@@ -154,6 +155,11 @@ inline bool Mac::isMac(const Agent* pAgent, MacState state)
 inline bool Mac::isDead()
 {
 	return _state == MAC_DEAD;
+}
+
+inline bool Mac::isDeadNext()
+{
+	return _nextState == MAC_DEAD;
 }
 
 inline double Mac::getNFkBn() const

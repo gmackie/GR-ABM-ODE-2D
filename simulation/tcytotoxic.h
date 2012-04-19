@@ -39,6 +39,7 @@ public:
 	void deactivate(const int time);
 	void kill();
 	bool isDead();
+	bool isDeadNext();
 	int getDeactivationTime() const;
 	static bool isTcyt(const Agent* pAgent);
 	static bool isTcyt(const Agent* pAgent, TcytState state);
@@ -89,6 +90,11 @@ inline bool Tcyt::isTcyt(const Agent* pAgent, TcytState state)
 inline bool Tcyt::isDead()
 {
 	return _state == TCYT_DEAD;
+}
+
+inline bool Tcyt::isDeadNext()
+{
+	return _nextState == TCYT_DEAD;
 }
 
 #endif /* TCYTOTOXIC_H */

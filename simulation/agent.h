@@ -164,6 +164,7 @@ public:
 	virtual void kill() = 0;
 	virtual void deactivate(const int time) = 0;
 	virtual bool isDead() = 0;
+	virtual bool isDeadNext() = 0;
 	virtual void print() const = 0;
 	virtual AgentType getAgentType() const = 0;
 	virtual int getState() const = 0;

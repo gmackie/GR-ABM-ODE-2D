@@ -9,7 +9,9 @@
 #include "grgrid.h"
 #include "serialization.h"
 
-const std::string Treg::_ClassName = "Treg";
+using namespace std;
+
+const string Treg::_ClassName = "Treg";
 
 
 // Needed for deserializing the model state.
@@ -94,24 +96,34 @@ void Treg::computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tn
 	}
 }
 
+// Don't deactivate an agent that is already dead, either now or for the next time step -
+// died of old age, apoptosis, etc.
+// Otherwise its state and next state are set to deactivated, which essentially resurrects it.
+// This is bad in general. It can also cause a problem if the resurrected agent is in a caseated
+// compartment and the agent is serialized to a saved simulation state. If the saved state is
+// loaded then the agent will be deserialized and added to a cell list, but it will fail to be
+// added to its grid compartment because an agent can't be added to a caseated compartment.
+// This will leave the simulation in an inconsistent state.
 void Treg::handleResting(const int time, GrGrid& grid, GrStat&)
 {
 	for (int i = -1; i <= 1; i++)
 	{
 		for (int j = -1; j <= 1; j++)
 		{
-      Pos p(grid.mod_row(_pos.x+i), grid.mod_col(_pos.y+j));
-			Agent* pAgent0 = grid.agent(p, 0);
-			Agent* pAgent1 = grid.agent(p, 1);
+			Pos p(grid.mod_row(_pos.x+i), grid.mod_col(_pos.y+j));
 
-			if (pAgent0 && g_Rand.getReal() <= _PARAM(PARAM_TREG_PROB_DOWN_REGULATE))
-			{
-				pAgent0->deactivate(time);
-			}
-			else if (pAgent1 && g_Rand.getReal() <= _PARAM(PARAM_TREG_PROB_DOWN_REGULATE))
-			{
-				pAgent1->deactivate(time);
-			}
+			  for(unsigned k=0; k<GrGrid::MAX_AGENTS_PER_CELL; k++)
+			  {
+				  Agent* pAgent = grid.agent(p, k);
+				  if(pAgent && !pAgent->isDead() && !pAgent->isDeadNext())
+				  {
+					  Scalar coinFlip = g_Rand.getReal();
+					  if (coinFlip  <= _PARAM(PARAM_TREG_PROB_DEACTIVATE))
+					  {
+						  grid.agent(p, k)->deactivate(time);
+					  }
+				  }
+			  }
 		}
 	}
 }

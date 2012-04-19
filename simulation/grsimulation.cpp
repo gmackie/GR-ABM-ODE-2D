@@ -106,12 +106,13 @@ void GrSimulation::serialize(std::ostream& out) const
 	{
 		int agentIndex = getGrid().agentIndex(&(*it));
 
-		if (agentIndex < 0)
+		if (agentIndex < 0 || agentIndex >= (int) GrGrid::MAX_AGENTS_PER_CELL)
 		{
 			cerr << "Mac serialization error, invalid agentIndex: " << agentIndex
 				 << " Mac address: " << &(*it)
 				 << " Mac position: " << it->getPosition()
 				 << endl;
+			exit(1);
 		}
 
 		out << getGrid().agentIndex(&(*it)) << endl;
@@ -124,12 +125,13 @@ void GrSimulation::serialize(std::ostream& out) const
 	{
 		int agentIndex = getGrid().agentIndex(&(*it));
 
-		if (agentIndex < 0)
+		if (agentIndex < 0 || agentIndex >= (int) GrGrid::MAX_AGENTS_PER_CELL)
 		{
 			cerr << "Tgam serialization error, invalid agentIndex: " << agentIndex
 				 << " Tgam address: " << &(*it)
 				 << " Tgam position: " << it->getPosition()
 				 << endl;
+			exit(1);
 		}
 
 		out << getGrid().agentIndex(&(*it)) << endl;
@@ -142,12 +144,13 @@ void GrSimulation::serialize(std::ostream& out) const
 	{
 		int agentIndex = getGrid().agentIndex(&(*it));
 
-		if (agentIndex < 0)
+		if (agentIndex < 0 || agentIndex >= (int) GrGrid::MAX_AGENTS_PER_CELL)
 		{
 			cerr << "Tcyt serialization error, invalid agentIndex: " << agentIndex
 				 << " Tcyt address: " << &(*it)
 				 << " Tcyt position: " << it->getPosition()
 				 << endl;
+			exit(1);
 		}
 
 		out << getGrid().agentIndex(&(*it)) << endl;
@@ -160,12 +163,13 @@ void GrSimulation::serialize(std::ostream& out) const
 	{
 		int agentIndex = getGrid().agentIndex(&(*it));
 
-		if (agentIndex < 0)
+		if (agentIndex < 0 || agentIndex >= (int) GrGrid::MAX_AGENTS_PER_CELL)
 		{
 			cerr << "Treg serialization error, invalid agentIndex: " << agentIndex
 				 << " Treg address: " << &(*it)
 				 << " Treg position: " << it->getPosition()
 				 << endl;
+			exit(1);
 		}
 
 		out << getGrid().agentIndex(&(*it)) << endl;
@@ -247,10 +251,16 @@ void GrSimulation::deserialize(std::istream& in)
 		// update attributes of dummy mac and add to grid
 		pMac->deserialize(in);
 
+		if (index < 0 || index >= (int) GrGrid::MAX_AGENTS_PER_CELL)
+		{
+			cerr << "Error deserializing mac " << i << " at grid position " << pMac->getPosition() << ": invalid grid agent array index " << index << endl;
+			exit(1);
+		}
+
 		bool addedAgent = _grid.getGrid().addAgent(pMac, index);
 		if (!addedAgent)
 		{
-			cerr << "Error deserializing mac " << i << " at grid position " << pMac->getPosition() << ":addAgent failed."<< endl;
+			cerr << "Error deserializing mac " << i << " at grid position " << pMac->getPosition() << ": addAgent failed."<< endl;
 			exit(1);
 		}
 	}
@@ -268,12 +278,18 @@ void GrSimulation::deserialize(std::istream& in)
 		_tgamList.push_back(Tgam());
 		Tgam* pTgam = &_tgamList.back();
 
+		if (index < 0 || index >= (int) GrGrid::MAX_AGENTS_PER_CELL)
+		{
+			cerr << "Error deserializing tgam " << i << " at grid position " << pTgam->getPosition() << ": invalid grid agent array index " << index << endl;
+			exit(1);
+		}
+
 		// update attributes of dummy tgam and add to grid
 		pTgam->deserialize(in);
 		bool addedAgent = _grid.getGrid().addAgent(pTgam, index);
 		if (!addedAgent)
 		{
-			cerr << "Error deserializing tgam " << i << " at grid position " << pTgam->getPosition() << ":addAgent failed."<< endl;
+			cerr << "Error deserializing tgam " << i << " at grid position " << pTgam->getPosition() << ": addAgent failed."<< endl;
 			exit(1);
 		}
 	}
@@ -291,12 +307,18 @@ void GrSimulation::deserialize(std::istream& in)
 		_tcytList.push_back(Tcyt());
 		Tcyt* pTcyt = &_tcytList.back();
 
+		if (index < 0 || index >= (int) GrGrid::MAX_AGENTS_PER_CELL)
+		{
+			cerr << "Error deserializing tcyt " << i << " at grid position " << pTcyt->getPosition() << ": invalid grid agent array index " << index << endl;
+			exit(1);
+		}
+
 		// update attributes of dummy tcyt and add to grid
 		pTcyt->deserialize(in);
 		bool addedAgent = _grid.getGrid().addAgent(pTcyt, index);
 		if (!addedAgent)
 		{
-			cerr << "Error deserializing tcyt " << i << " at grid position " << pTcyt->getPosition() << ":addAgent failed."<< endl;
+			cerr << "Error deserializing tcyt " << i << " at grid position " << pTcyt->getPosition() << ": addAgent failed."<< endl;
 			exit(1);
 		}
 
@@ -314,6 +336,12 @@ void GrSimulation::deserialize(std::istream& in)
 		// create a dummy treg cell
 		_tregList.push_back(Treg());
 		Treg* pTreg = &_tregList.back();
+
+		if (index < 0 || index >= (int) GrGrid::MAX_AGENTS_PER_CELL)
+		{
+			cerr << "Error deserializing treg " << i << " at grid position " << pTreg->getPosition() << ": invalid grid agent array index " << index << endl;
+			exit(1);
+		}
 
 		// update attributes of dummy mac and add to grid
 		pTreg->deserialize(in);
@@ -410,7 +438,6 @@ void GrSimulation::init(Scalar molecularTrackingRadius)
 	}
 
 	initMolecularTracking(molecularTrackingRadius);
-    
 }
 
 // Mark each cell within the molecular tracking radius to be tracked.

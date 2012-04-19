@@ -166,6 +166,7 @@
 	>
 	<Mac
 		initNumber = "105"
+		initDensity = "0.0105"
 		maxAge = "14400"
 		maxAgeAct = "1440"
 		maxTimeReg = "71"

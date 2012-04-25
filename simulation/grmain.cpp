@@ -112,20 +112,20 @@ public:
     {
       namespace ba = boost::accumulators;
       const GrStat::Stat* v = stat.getIntMtbStats(sz);
-      if(ba::extract::count(v[MAC_INFECTED]) > 0){
-        write(ba::extract::max(v[MAC_INFECTED]));
-        write(ba::extract::min(v[MAC_INFECTED]));
-        write(ba::extract::mean(v[MAC_INFECTED]));
-        write(ba::extract::median(v[MAC_INFECTED]));
-        write(sqrt(ba::extract::variance(v[MAC_INFECTED])));
+      if(ba::extract::count(v[Mac::MAC_INFECTED]) > 0){
+        write(ba::extract::max(v[Mac::MAC_INFECTED]));
+        write(ba::extract::min(v[Mac::MAC_INFECTED]));
+        write(ba::extract::mean(v[Mac::MAC_INFECTED]));
+        write(ba::extract::median(v[Mac::MAC_INFECTED]));
+        write(sqrt(ba::extract::variance(v[Mac::MAC_INFECTED])));
       }
       else { write(0.0/0.0); write(0.0/0.0); write(0.0/0.0); write(0.0/0.0); write(0.0/0.0); }
-      if(ba::extract::count(v[MAC_CINFECTED]) > 0) {
-        write(ba::extract::max(v[MAC_CINFECTED]));
-        write(ba::extract::min(v[MAC_CINFECTED]));
-        write(ba::extract::mean(v[MAC_CINFECTED]));
-        write(ba::extract::median(v[MAC_INFECTED]));
-        write(sqrt(ba::extract::variance(v[MAC_CINFECTED])));
+      if(ba::extract::count(v[Mac::MAC_CINFECTED]) > 0) {
+        write(ba::extract::max(v[Mac::MAC_CINFECTED]));
+        write(ba::extract::min(v[Mac::MAC_CINFECTED]));
+        write(ba::extract::mean(v[Mac::MAC_CINFECTED]));
+        write(ba::extract::median(v[Mac::MAC_INFECTED]));
+        write(sqrt(ba::extract::variance(v[Mac::MAC_CINFECTED])));
       }
       else { write(0.0/0.0); write(0.0/0.0); write(0.0/0.0); write(0.0/0.0); write(0.0/0.0); }
     }
@@ -190,17 +190,17 @@ public:
     write(stats.getNrCaseated());
 
     int startState = 1; // Skip the dead state: apoptosis doesn't occur for an already dead mac.
-    static int totMacApoptosisTNF[NMAC_STATES] = {0}; //Just temporary for Mohammed Fallahi
+    static int totMacApoptosisTNF[Mac::NSTATES] = {0}; //Just temporary for Mohammed Fallahi
     int sumMacApoptosisTNF = 0;
 
     //
-    for(int i=startState;i<NMAC_STATES;i++){    //Keep a running sum of deaths
-      totMacApoptosisTNF[i]+=(stats.getNrMacApoptosisTNF((MacState)i));
+    for(int i=startState;i<Mac::NSTATES;i++){    //Keep a running sum of deaths
+      totMacApoptosisTNF[i]+=(stats.getNrMacApoptosisTNF((Mac::State)i));
       sumMacApoptosisTNF+=totMacApoptosisTNF[i];
     }
 
     write(sumMacApoptosisTNF);
-    for(int i=startState;i<NMAC_STATES;i++)
+    for(int i=startState;i<Mac::NSTATES;i++)
       write(totMacApoptosisTNF[i]);
 
     write(stats.getNrTcellApoptosisTNF());

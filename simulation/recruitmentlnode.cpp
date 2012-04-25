@@ -305,15 +305,15 @@ void RecruitmentLnODE::recruitTcells(GrSimulation& sim, GrStat& stats,
 			switch (tcell._type)
 			{
 			case TCELL_TYPE_CYT:
-				sim.createTcyt(p->x, p->y, tcell._birthtime, TCYT_ACTIVE);
+				sim.createTcyt(p->x, p->y, tcell._birthtime, Tcyt::TCYT_ACTIVE);
 				stats.incNrTcytRecruited();
 				break;
 			case TCELL_TYPE_GAM:
-				sim.createTgam(p->x, p->y, tcell._birthtime, TGAM_ACTIVE);
+				sim.createTgam(p->x, p->y, tcell._birthtime, Tgam::TGAM_ACTIVE);
 				stats.incNrTgamRecruited();
 				break;
 			case TCELL_TYPE_REG:
-				sim.createTreg(p->x, p->y, tcell._birthtime, TREG_ACTIVE);
+				sim.createTreg(p->x, p->y, tcell._birthtime, Treg::TREG_ACTIVE);
 				stats.incNrTregRecruited();
 				break;
 			default:
@@ -361,7 +361,7 @@ void RecruitmentLnODE::recruitMac(GrSimulation& sim, const Pos& p)
 	if (sim.getStats().getNrOfMac() < _PARAM(PARAM_MAC_INIT_NUMBER))
 	{
 		Mac* newMac = sim.createMac(p.x, p.y,
-			sim.getTime() - g_Rand.getInt(_PARAM(PARAM_MAC_AGE)), MAC_RESTING, false, false);
+			sim.getTime() - g_Rand.getInt(_PARAM(PARAM_MAC_AGE)), Mac::MAC_RESTING, false, false);
 		if (sim.getNfkbDynamics())
 		{
 			// initialize NF-kB signaling from steady-state
@@ -377,7 +377,7 @@ void RecruitmentLnODE::recruitMac(GrSimulation& sim, const Pos& p)
 		{
 			sim.getGrid().nRecruitments(p)++;
   		Mac* newMac = sim.createMac(p.x, p.y,
-				sim.getTime() - g_Rand.getInt(_PARAM(PARAM_MAC_AGE)), MAC_RESTING, false, false);
+				sim.getTime() - g_Rand.getInt(_PARAM(PARAM_MAC_AGE)), Mac::MAC_RESTING, false, false);
 			if (sim.getNfkbDynamics())
 			{
 				// initialize NF-kB signaling from steady-state

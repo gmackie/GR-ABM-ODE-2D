@@ -13,14 +13,16 @@
 
 class Tgam : public Tcell
 {
+public:
+enum State {TGAM_DEAD, TGAM_ACTIVE, TGAM_DOWN_REGULATED,TGAM_ACTIVE_DOUBLE, TGAM_INDUCED_REG, NSTATES};
 private:
 	static const std::string _ClassName;
 
 	/*
 	 * !!! If the data members change then the serialize and deserialize functions need to be updated !!!
 	 */
-	TgamState _state;
-	TgamState _nextState;
+	Tgam::State _state;
+	Tgam::State _nextState;
 	int _deactivationTime;
     int _transitionTime;
     
@@ -35,21 +37,21 @@ private:
 
 public:
 	Tgam();
-	Tgam(int birthtime, int row, int col, TgamState state);
+	Tgam(int birthtime, int row, int col, Tgam::State state);
 	~Tgam();
 	void move(GrGrid& grid);
 	void secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDepletion, bool il10rDynamics, bool il10Depletion, int mdt);
 	void computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tnfrDynamics, bool nfkbDynamics, bool il10rDynamics, bool tgmmatransition);
 	void updateState();
 	int getState() const;
-	TgamState getNextState() const;
+	Tgam::State getNextState() const;
 	void deactivate(const int time);
 	void kill();
 	bool isDead();
 	bool isDeadNext();
 	int getDeactivationTime() const;
 	static bool isTgam(const Agent* pAgent);
-	static bool isTgam(const Agent* pAgent, TgamState state);
+	static bool isTgam(const Agent* pAgent, Tgam::State state);
 	void print() const;
 	void serialize(std::ostream& out) const;
 	void deserialize(std::istream& in);
@@ -71,7 +73,7 @@ inline int Tgam::getState() const
 	return _state;
 }
 
-inline TgamState Tgam::getNextState() const
+inline Tgam::State Tgam::getNextState() const
 {
 	return _nextState;
 }
@@ -81,7 +83,7 @@ inline bool Tgam::isTgam(const Agent* pAgent)
 	return pAgent && pAgent->getAgentType() == TGAM;
 }
 
-inline bool Tgam::isTgam(const Agent* pAgent, TgamState state)
+inline bool Tgam::isTgam(const Agent* pAgent, Tgam::State state)
 {
 	if (!isTgam(pAgent))
 	{

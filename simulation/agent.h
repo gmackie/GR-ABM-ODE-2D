@@ -9,7 +9,6 @@
 #define AGENT_H
 
 #include "gr.h"
-#include "grstat.h"
 #include <string>
 
 using std::valarray;

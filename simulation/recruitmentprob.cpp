@@ -77,7 +77,7 @@ void RecruitmentProb::recruitMac(GrSimulation& sim, const Pos& pSource)
 	if (sim.getStats().getNrOfMac() < _PARAM(PARAM_MAC_INIT_NUMBER))
 	{
 		Mac* newMac = sim.createMac(pSource.x, pSource.y,
-			sim.getTime() - g_Rand.getInt(_PARAM(PARAM_MAC_AGE)), MAC_RESTING, false, false);
+			sim.getTime() - g_Rand.getInt(_PARAM(PARAM_MAC_AGE)), Mac::MAC_RESTING, false, false);
 		if (sim.getNfkbDynamics())
 		{
 			// initialize NF-kB signaling from steady-state
@@ -93,7 +93,7 @@ void RecruitmentProb::recruitMac(GrSimulation& sim, const Pos& pSource)
 		{
       ++grid.nRecruitments(pSource);
 			Mac* newMac = sim.createMac(pSource.x, pSource.y,
-				sim.getTime() - g_Rand.getInt(_PARAM(PARAM_MAC_AGE)), MAC_RESTING, false, false);
+				sim.getTime() - g_Rand.getInt(_PARAM(PARAM_MAC_AGE)), Mac::MAC_RESTING, false, false);
 			if (sim.getNfkbDynamics())
 			{
 				// initialize NF-kB signaling from steady-state
@@ -123,7 +123,7 @@ void RecruitmentProb::recruitTcell(GrSimulation& sim, const Pos& pSource)
 			{
 				++grid.nRecruitments(pSource);
 				sim.createTgam(pSource.x, pSource.y,
-					sim.getTime() - g_Rand.getInt(_PARAM(PARAM_TCELL_AGE), 1), TGAM_ACTIVE);
+					sim.getTime() - g_Rand.getInt(_PARAM(PARAM_TCELL_AGE), 1), Tgam::TGAM_ACTIVE);
 			}
 		}
 		else if (r < (_PARAM(PARAM_TGAM_PROB_RECRUITMENT) + _PARAM(PARAM_TCYT_PROB_RECRUITMENT)))
@@ -133,7 +133,7 @@ void RecruitmentProb::recruitTcell(GrSimulation& sim, const Pos& pSource)
 			{
 				++grid.nRecruitments(pSource);
 				sim.createTcyt(pSource.x, pSource.y,
-					sim.getTime() - g_Rand.getInt(_PARAM(PARAM_TCELL_AGE), 1), TCYT_ACTIVE);
+					sim.getTime() - g_Rand.getInt(_PARAM(PARAM_TCELL_AGE), 1), Tcyt::TCYT_ACTIVE);
 			}
 		}
 		else
@@ -143,7 +143,7 @@ void RecruitmentProb::recruitTcell(GrSimulation& sim, const Pos& pSource)
 			{
 				++grid.nRecruitments(pSource);
 				sim.createTreg(pSource.x, pSource.y,
-					sim.getTime() - g_Rand.getInt(_PARAM(PARAM_TCELL_AGE), 1), TREG_ACTIVE);
+					sim.getTime() - g_Rand.getInt(_PARAM(PARAM_TCELL_AGE), 1), Treg::TREG_ACTIVE);
 			}
 		}
 	}

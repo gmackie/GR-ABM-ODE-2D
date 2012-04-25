@@ -7,6 +7,7 @@
 
 
 #include "tcell.h"
+#include "grstat.h"
 #include "grgrid.h"
 
 using namespace std;

@@ -7,6 +7,7 @@
 
 #include "tregulatory.h"
 #include "grgrid.h"
+#include "grstat.h"
 #include "serialization.h"
 
 using namespace std;
@@ -24,7 +25,7 @@ Treg::Treg()
 {
 }
 
-Treg::Treg(int birthtime, int row, int col, TregState state)
+Treg::Treg(int birthtime, int row, int col, Treg::State state)
 
 	: Tcell(birthtime, row, col, 0.0 /* kSynth */)
 	, _state(state)
@@ -185,10 +186,10 @@ void Treg::deserialize(std::istream& in)
 	Tcell::deserialize(in);
 
 	in >> intVal;
-	_state = (TregState) intVal;
+	_state = (Treg::State) intVal;
 
 	in >> intVal;
-	_nextState = (TregState) intVal;
+	_nextState = (Treg::State) intVal;
 
 	if (!Serialization::readFooter(in, Treg::_ClassName))
 	{

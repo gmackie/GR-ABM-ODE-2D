@@ -3,6 +3,7 @@
 
 #include <boost/property_tree/ptree.hpp>
 #include <cmath>
+#include <vector>
 
 #define GETROW(p) (p.x)
 #define GETCOL(p) (p.y)

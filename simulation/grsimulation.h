@@ -135,10 +135,10 @@ public:
 	void serialize(std::ostream& out) const;
 	void deserialize(std::istream& in);
 	void setRecruitment	(RecruitmentBase* pRecruitment);
-	Mac* createMac(int row, int col, int birthtime, MacState state, bool NFkB, bool stat1);
-	Tgam* createTgam(int row, int col, int birthtime, TgamState state);
-	Tcyt* createTcyt(int row, int col, int birthtime, TcytState state);
-	Treg* createTreg(int row, int col, int birthtime, TregState state);
+	Mac* createMac(int row, int col, int birthtime, Mac::State state, bool NFkB, bool stat1);
+	Tgam* createTgam(int row, int col, int birthtime, Tgam::State state);
+	Tcyt* createTcyt(int row, int col, int birthtime, Tcyt::State state);
+	Treg* createTreg(int row, int col, int birthtime, Treg::State state);
 
 	static void convertSimTime(const int time, int& rDays, int& rHours, int& rMinutes);
     void setODEsize();
@@ -339,7 +339,7 @@ inline GrStat& GrSimulation::getStatsPrevious()
 	return _statsPrevious;
 }
 
-inline Mac* GrSimulation::createMac(int row, int col, int birthtime, MacState state, bool NFkB, bool stat1)
+inline Mac* GrSimulation::createMac(int row, int col, int birthtime, Mac::State state, bool NFkB, bool stat1)
 {
 	_macList.push_back(Mac(birthtime, row, col, state, 0, NFkB, stat1));
 	Mac* pMac = &_macList.back();
@@ -350,7 +350,7 @@ inline Mac* GrSimulation::createMac(int row, int col, int birthtime, MacState st
 	return pMac;
 }
 
-inline Tgam* GrSimulation::createTgam(int row, int col, int birthtime, TgamState state)
+inline Tgam* GrSimulation::createTgam(int row, int col, int birthtime, Tgam::State state)
 {
 	_tgamList.push_back(Tgam(birthtime, row, col, state));
 	Tgam* pTgam = &_tgamList.back();
@@ -361,7 +361,7 @@ inline Tgam* GrSimulation::createTgam(int row, int col, int birthtime, TgamState
 	return pTgam;
 }
 
-inline Tcyt* GrSimulation::createTcyt(int row, int col, int birthtime, TcytState state)
+inline Tcyt* GrSimulation::createTcyt(int row, int col, int birthtime, Tcyt::State state)
 {
 	_tcytList.push_back(Tcyt(birthtime, row, col, state));
 	Tcyt* pTcyt = &_tcytList.back();
@@ -372,7 +372,7 @@ inline Tcyt* GrSimulation::createTcyt(int row, int col, int birthtime, TcytState
 	return pTcyt;
 }
 
-inline Treg* GrSimulation::createTreg(int row, int col, int birthtime, TregState state)
+inline Treg* GrSimulation::createTreg(int row, int col, int birthtime, Treg::State state)
 {
 	_tregList.push_back(Treg(birthtime, row, col, state));
 	Treg* pTreg = &_tregList.back();

@@ -8,6 +8,7 @@
 #include "tcytotoxic.h"
 #include "macrophage.h"
 #include "grgrid.h"
+#include "grstat.h"
 #include "serialization.h"
 
 const std::string Tcyt::_ClassName = "Tcyt";
@@ -23,7 +24,7 @@ Tcyt::Tcyt()
 {
 }
 
-Tcyt::Tcyt(int birthtime, int row, int col, TcytState state)
+Tcyt::Tcyt(int birthtime, int row, int col, Tcyt::State state)
 
 	: Tcell(birthtime, row, col, _PARAM(PARAM_GR_K_SYNTH_TCELL)/10)
 	, _state(state)
@@ -122,14 +123,14 @@ void Tcyt::handleActive(const int, GrGrid& grid, GrStat&)
 		assert(pMac);
 
 		// If the mac died on this time step ignore it.
-		if (pMac->getNextState() == MAC_DEAD)
+		if (pMac->getNextState() == Mac::MAC_DEAD)
 		{
 			return;
 		}
 
 		if (g_Rand.getReal() < _PARAM(PARAM_TCYT_PROB_KILL_MAC))
 		{
-			if (pMac->getState() == MAC_INFECTED)
+			if (pMac->getState() == Mac::MAC_INFECTED)
 			{
 				pMac->setIntMtb(0);
 				pMac->kill();
@@ -138,7 +139,7 @@ void Tcyt::handleActive(const int, GrGrid& grid, GrStat&)
 				if (!grid.incKillings(_pos))
 					_nextState = TCYT_ACTIVE;
 			}
-			else if (pMac->getState() == MAC_CINFECTED)
+			else if (pMac->getState() == Mac::MAC_CINFECTED)
 			{
 				double r = g_Rand.getReal();
 				if (r < _PARAM(PARAM_TCYT_PROB_KILL_MAC_CLEANLY))
@@ -243,10 +244,10 @@ void Tcyt::deserialize(std::istream& in)
 	Tcell::deserialize(in);
 
 	in >> intVal;
-	_state = (TcytState) intVal;
+	_state = (Tcyt::State) intVal;
 
 	in >> intVal;
-	_nextState = (TcytState) intVal;
+	_nextState = (Tcyt::State) intVal;
 
 	in >> _deactivationTime;
 

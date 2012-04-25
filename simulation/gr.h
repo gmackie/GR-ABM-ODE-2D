@@ -21,20 +21,14 @@
 #include <utility>
 #include "rand.h"
 #include "pos.h"
+#include "params.h"
 #include <valarray>
+#include <boost/mpl/vector.hpp>
 
 #ifndef SVN_VERSION
 #define GR_VERSION "12022010"
 #else
 #define GR_VERSION "r" SVN_VERSION
-#endif
-
-#if defined(USE_FLOAT)
-typedef float Scalar;
-#define Scalar_PRECISION (FLT_DIG+2)
-#else
-typedef double Scalar;
-#define Scalar_PRECISION (DBL_DIG+2)
 #endif
 
 //#ifndef __DIM__
@@ -97,7 +91,7 @@ class Tcyt;
 class Treg;
 class Agent;
 class RecruitmentBase;
-class GrStats;
+class GrStat;
 
 // typedefs
 typedef std::list<Mac> MacList;
@@ -123,11 +117,9 @@ typedef enum {DIFF_REC_EQ = 0, DIFF_SOR_CORRECT = 1, DIFF_SOR_WRONG = 2, DIFF_RE
 typedef enum {OUTCOME_AREA = 0, OUTCOME_MTB = 1, OUTCOME_NONE = 2} OutcomeMethod;
 
 typedef enum {MAC, TGAM, TCYT, TREG, NAGENTS} AgentType;
+typedef boost::mpl::vector<Mac, Tgam, Tcyt, Treg> AgentTypes;
+
 enum TcellType {TCELL_TYPE_CYT, TCELL_TYPE_REG, TCELL_TYPE_GAM, TCELL_TYPE_COUNT};
-typedef enum {MAC_DEAD, MAC_RESTING, MAC_INFECTED, MAC_CINFECTED, MAC_ACTIVE, NMAC_STATES} MacState;
-typedef enum {TGAM_DEAD, TGAM_ACTIVE, TGAM_DOWN_REGULATED,TGAM_ACTIVE_DOUBLE, TGAM_INDUCED_REG, NTGAM_STATES} TgamState;
-typedef enum {TCYT_DEAD, TCYT_ACTIVE, TCYT_DOWN_REGULATED, NTCYT_STATES} TcytState;
-typedef enum {TREG_DEAD, TREG_ACTIVE, NTREG_STATES} TregState;
 typedef int State;
 
 unsigned int createTimeSeed();

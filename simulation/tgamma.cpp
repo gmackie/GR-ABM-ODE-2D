@@ -8,6 +8,7 @@
 #include "tgamma.h"
 #include "macrophage.h"
 #include "grgrid.h"
+#include "grstat.h"
 #include "serialization.h"
 
 const std::string Tgam::_ClassName = "Tgam";
@@ -28,7 +29,7 @@ Tgam::Tgam()
 {
 }
 
-Tgam::Tgam(int birthtime, int row, int col, TgamState state)
+Tgam::Tgam(int birthtime, int row, int col, Tgam::State state)
 
 	: Tcell(birthtime, row, col, _PARAM(PARAM_GR_K_SYNTH_TCELL))
 	, _state(state)
@@ -160,7 +161,7 @@ void Tgam::handleActive(const int time, GrGrid& grid, GrStat& stats, bool tgamma
 			if (!pMac) pMac = dynamic_cast<Mac*>(grid.agent(_pos, 1));
 
 			// If the mac died on this time step ignore it.
-			if (pMac->getNextState() == MAC_DEAD)
+			if (pMac->getNextState() == Mac::MAC_DEAD)
 			{
 				return;
 			}
@@ -168,7 +169,7 @@ void Tgam::handleActive(const int time, GrGrid& grid, GrStat& stats, bool tgamma
 
 			// Fas/FasL induced apoptosis with probability
 			if (pMac &&
-				(pMac->getState() == MAC_INFECTED || pMac->getState() == MAC_CINFECTED) &&
+				(pMac->getState() == Mac::MAC_INFECTED || pMac->getState() == Mac::MAC_CINFECTED) &&
 				g_Rand.getReal() < _PARAM(PARAM_TGAM_PROB_APOPTOSIS_FAS_FASL))
 			{
 				stats.incApoptosisFasFasL();
@@ -181,7 +182,7 @@ void Tgam::handleActive(const int time, GrGrid& grid, GrStat& stats, bool tgamma
 
             
             // If mac does not die then check for Tgam10 conditions - Macs
-            if (pMac && (pMac->getState() == MAC_INFECTED || pMac->getState() == MAC_CINFECTED))
+            if (pMac && (pMac->getState() == Mac::MAC_INFECTED || pMac->getState() == Mac::MAC_CINFECTED))
             {
                 
                 if (pMac && pMac->getICOS())
@@ -197,12 +198,12 @@ void Tgam::handleActive(const int time, GrGrid& grid, GrStat& stats, bool tgamma
                 }
                 
             }
-        	if (pMac && ((pMac->getState() == MAC_RESTING && pMac->getNFkB()) || (pMac->getState() == MAC_RESTING && pMac->getICOS()) || (pMac->getState() == MAC_ACTIVE)) && grid.extMTB(_pos) > _PARAM(PARAM_TGAM_THRESHOLD_EXT_MTB))
+        	if (pMac && ((pMac->getState() == Mac::MAC_RESTING && pMac->getNFkB()) || (pMac->getState() == Mac::MAC_RESTING && pMac->getICOS()) || (pMac->getState() == Mac::MAC_ACTIVE)) && grid.extMTB(_pos) > _PARAM(PARAM_TGAM_THRESHOLD_EXT_MTB))
         	{
          	   _nAntigenStim ++;
 //         	   cout << "Antigen Stim" << std::endl;
        		 }
-        	if (pMac && ((pMac->getState() == MAC_RESTING && pMac->getICOS()) || (pMac->getState() == MAC_ACTIVE && pMac->getICOS())))
+        	if (pMac && ((pMac->getState() == Mac::MAC_RESTING && pMac->getICOS()) || (pMac->getState() == Mac::MAC_ACTIVE && pMac->getICOS())))
        	 {
 	            _nICOS ++;
 // 	           cout << "ICOS" << std::endl;
@@ -264,7 +265,7 @@ void Tgam::handleActive(const int time, GrGrid& grid, GrStat& stats, bool tgamma
             if (!pMac) pMac = dynamic_cast<Mac*>(grid.agent(_pos, 1));
             
             // If the mac died on this time step ignore it.
-            if (pMac->getNextState() == MAC_DEAD)
+            if (pMac->getNextState() == Mac::MAC_DEAD)
             {
                 return;
             }
@@ -273,7 +274,7 @@ void Tgam::handleActive(const int time, GrGrid& grid, GrStat& stats, bool tgamma
             
             // Fas/FasL induced apoptosis with probability
             if (pMac &&
-                (pMac->getState() == MAC_INFECTED || pMac->getState() == MAC_CINFECTED) &&
+                (pMac->getState() == Mac::MAC_INFECTED || pMac->getState() == Mac::MAC_CINFECTED) &&
                 g_Rand.getReal() < _PARAM(PARAM_TGAM_PROB_APOPTOSIS_FAS_FASL))
             {
                 stats.incApoptosisFasFasL();
@@ -318,7 +319,7 @@ void Tgam::handleActiveDouble(const int time, GrGrid& grid, GrStat& stats)
 		if (!pMac) pMac = dynamic_cast<Mac*>(grid.agent(_pos, 1));
         
 		// If the mac died on this time step ignore it.
-		if (pMac->getNextState() == MAC_DEAD)
+		if (pMac->getNextState() == Mac::MAC_DEAD)
 		{
 			return;
 		}
@@ -327,7 +328,7 @@ void Tgam::handleActiveDouble(const int time, GrGrid& grid, GrStat& stats)
         
 		// Fas/FasL induced apoptosis with probability
 		if (pMac &&
-			(pMac->getState() == MAC_INFECTED || pMac->getState() == MAC_CINFECTED) &&
+			(pMac->getState() == Mac::MAC_INFECTED || pMac->getState() == Mac::MAC_CINFECTED) &&
 			g_Rand.getReal() < _PARAM(PARAM_TGAM_PROB_APOPTOSIS_FAS_FASL))
 		{
 			stats.incApoptosisFasFasL();
@@ -429,10 +430,10 @@ void Tgam::deserialize(std::istream& in)
 	Tcell::deserialize(in);
 
 	in >> intVal;
-	_state = (TgamState) intVal;
+	_state = (Tgam::State) intVal;
 
 	in >> intVal;
-	_nextState = (TgamState) intVal;
+	_nextState = (Tgam::State) intVal;
 
 	in >> _deactivationTime;
     in >> _transitionTime;

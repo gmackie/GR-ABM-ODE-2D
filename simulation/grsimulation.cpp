@@ -387,7 +387,7 @@ void GrSimulation::init(Scalar molecularTrackingRadius)
 	// Place initial infected macrophages on the grid
 	for (PosVector::const_iterator it = initMacs.begin(); it != initMacs.end(); it++)
 	{
-		Mac* pMac = createMac(it->x, it->y, g_Rand.getInt(-1, -maxMacAge), MAC_INFECTED, false, false);
+		Mac* pMac = createMac(it->x, it->y, g_Rand.getInt(-1, -maxMacAge), Mac::MAC_INFECTED, false, false);
 		
 		if (_nfkbDynamics)
 		{
@@ -426,7 +426,7 @@ void GrSimulation::init(Scalar molecularTrackingRadius)
 		int col = g_Rand.getInt(_grid.getRange().y);
 		if (!_grid.getGrid().hasAgentType(MAC, Pos(row, col)))
 		{
-			Mac* newMac = createMac(row, col, g_Rand.getInt(-1, -maxMacAge), MAC_RESTING, false, false);
+			Mac* newMac = createMac(row, col, g_Rand.getInt(-1, -maxMacAge), Mac::MAC_RESTING, false, false);
 			if (_nfkbDynamics)
 			{
 				// initialize NF-kB signaling from steady-state (12 hours equilibrium)
@@ -660,13 +660,13 @@ void GrSimulation::updateStates()
 			_stats.incTotIntMtb(mac.getIntMtb());
 
 		if (mac.getNFkB())
-			_stats.updateMacNFkBStatistics((MacState)mac.getState());
+			_stats.updateMacNFkBStatistics((Mac::State)mac.getState());
 
 		if (mac.getStat1())
-			_stats.updateMacStat1Statistics((MacState)mac.getState());
+			_stats.updateMacStat1Statistics((Mac::State)mac.getState());
 
 		if (mac.isDeactivated())
-			_stats.updateMacDeactStatistics((MacState)mac.getState());
+			_stats.updateMacDeactStatistics((Mac::State)mac.getState());
 
 		if (mac.isDead())
 		{
@@ -1002,17 +1002,17 @@ void GrSimulation::moveMacrophages()
 	for (MacList::iterator it = _macList.begin(); it != _macList.end(); it++)
 	{
 		// move resting macrophages
-		if (_time % timeResting == 0 && it->getState() == MAC_RESTING)
+		if (_time % timeResting == 0 && it->getState() == Mac::MAC_RESTING)
 		{
 			it->move(_grid.getGrid());
 		}
 		// move active macrophages
-		else if (_time % timeActive == 0 && it->getState() == MAC_ACTIVE)
+		else if (_time % timeActive == 0 && it->getState() == Mac::MAC_ACTIVE)
 		{
 			it->move(_grid.getGrid());
 		}
 		// move infected macrophages
-		else if (_time % timeInfected == 0 && it->getState() == MAC_INFECTED)
+		else if (_time % timeInfected == 0 && it->getState() == Mac::MAC_INFECTED)
 		{
 			it->move(_grid.getGrid());
 		}

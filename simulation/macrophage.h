@@ -10,19 +10,22 @@
 
 #include "gr.h"
 #include "agent.h"
+#include "tgamma.h"
 
 using namespace std;
 
 class Mac : public Agent
 {
+public:
+  enum State {MAC_DEAD, MAC_RESTING, MAC_INFECTED, MAC_CINFECTED, MAC_ACTIVE, NSTATES};
 private:
 	static const std::string _ClassName;
     static int _macodeSize;
 	/*
 	 * !!! If the data members change then the serialize and deserialize functions need to be updated !!!
 	 */
-	MacState _state;
-	MacState _nextState;
+	State _state;
+	State _nextState;
 	double _intMtb;
 	bool _NFkB;
 	bool _stat1;
@@ -34,14 +37,14 @@ private:
 	void handleInfected(const int time, GrGrid& grid, GrStat& stats, bool nfkbDynamics);
 	void handleChronicallyInfected(const int time, GrGrid& grid, GrStat& stats);
 	void handleActivated(const int time, GrGrid& grid, GrStat& stats);
-	int getCountTgam(TgamState state, const GrGrid& grid) const;
+	int getCountTgam(Tgam::State state, const GrGrid& grid) const;
 	double getExtMtbInMoore(const GrGrid& grid) const;
 
 public:
 	static double getIntMtbGrowthRate(const int time);
 
 	Mac();
-	Mac(int birthtime, int row, int col, MacState state, double intMtb, bool NFkB, bool stat1);
+	Mac(int birthtime, int row, int col, Mac::State state, double intMtb, bool NFkB, bool stat1);
 	~Mac();
 	void move(GrGrid& grid);
 	void secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDepletion, bool il10rDynamics, bool il10Depletion, int mdt);
@@ -54,7 +57,7 @@ public:
 	bool getStat1() const;
 	bool getICOS() const;
 	int getState() const;
-	MacState getNextState() const;
+	Mac::State getNextState() const;
 	double getIntMtb() const;
 	void setIntMtb(double intMtb);
 	void kill();
@@ -63,7 +66,7 @@ public:
 	bool isDead();
 	bool isDeadNext();
 	static bool isMac(const Agent* pAgent);
-	static bool isMac(const Agent* pAgent, MacState state);
+	static bool isMac(const Agent* pAgent, Mac::State state);
 	void print() const;
 	void serialize(std::ostream& out) const;
 	void deserialize(std::istream& in);
@@ -119,7 +122,7 @@ inline int Mac::getState() const
 	return (int)_state;
 }
 
-inline MacState Mac::getNextState() const
+inline Mac::State Mac::getNextState() const
 {
 	return _nextState;
 }
@@ -139,7 +142,7 @@ inline bool Mac::isMac(const Agent* pAgent)
 	return pAgent && pAgent->getAgentType() == MAC;
 }
 
-inline bool Mac::isMac(const Agent* pAgent, MacState state)
+inline bool Mac::isMac(const Agent* pAgent, Mac::State state)
 {
 	if (!isMac(pAgent))
 	{
@@ -154,12 +157,12 @@ inline bool Mac::isMac(const Agent* pAgent, MacState state)
 
 inline bool Mac::isDead()
 {
-	return _state == MAC_DEAD;
+	return _state == Mac::MAC_DEAD;
 }
 
 inline bool Mac::isDeadNext()
 {
-	return _nextState == MAC_DEAD;
+	return _nextState == Mac::MAC_DEAD;
 }
 
 inline double Mac::getNFkBn() const

@@ -99,7 +99,7 @@ GrStat::GrStat(const GrStat& o)
   memcpy(this, &o, sizeof(GrStat)); //Copy the field values
   _intMtbFreq = new unsigned[_intMtbFreqSize];
   memcpy(_intMtbFreq, o._intMtbFreq, sizeof(unsigned)*_intMtbFreqSize);
-  for(int i=0;i<NMAC_STATES;i++)
+  for(int i=0;i<Mac::NSTATES;i++)
     _macIntMtbStats[i] = o._macIntMtbStats[i];
 }
 GrStat& GrStat::operator=(const GrStat& o)
@@ -107,7 +107,7 @@ GrStat& GrStat::operator=(const GrStat& o)
   memcpy(this, &o, sizeof(GrStat)); //Copy the field values
   _intMtbFreq = new unsigned[_intMtbFreqSize];
   memcpy(_intMtbFreq, o._intMtbFreq, sizeof(unsigned)*_intMtbFreqSize);
-  for(int i=0;i<NMAC_STATES;i++)
+  for(int i=0;i<Mac::NSTATES;i++)
     _macIntMtbStats[i] = o._macIntMtbStats[i];
   return *this;
 }
@@ -129,7 +129,7 @@ void GrStat::updateAgentStatistics(Agent* a)
       Mac* pMac = static_cast<Mac*>(a);
       assert(pMac != NULL);
       _macIntMtbStats[pMac->getState()](pMac->getIntMtb());
-      if(pMac->getState() == MAC_INFECTED || pMac->getState() == MAC_CINFECTED){
+      if(pMac->getState() == Mac::MAC_INFECTED || pMac->getState() == Mac::MAC_CINFECTED){
 
     	// This can happen if  _PARAM(PARAM_MAC_THRESHOLD_BURST_CI_INTMTB) < _PARAM(PARAM_MAC_THRESHOLD_BECOME_CI_INTMTB)
     	// or if the intMtb growth rate is high enough for intMtb for a mac > both PARAM(PARAM_MAC_THRESHOLD_BECOME_CI_INTMTB)
@@ -158,38 +158,38 @@ void GrStat::updateAgentStatistics(Agent* a)
   }
 }
 
-void GrStat::updateMacNFkBStatistics(MacState state)
+void GrStat::updateMacNFkBStatistics(Mac::State state)
 {
-  assert(state >= 0 && state < NMAC_STATES);
+  assert(state >= 0 && state < Mac::NSTATES);
   ++_nMacNFkB[state];
 }
 
-void GrStat::updateMacStat1Statistics(MacState state)
+void GrStat::updateMacStat1Statistics(Mac::State state)
 {
-  assert(state >= 0 && state < NMAC_STATES);
+  assert(state >= 0 && state < Mac::NSTATES);
   ++_nMacStat1[state];
 }
 
-void GrStat::updateMacDeactStatistics(MacState state)
+void GrStat::updateMacDeactStatistics(Mac::State state)
 {
-  assert(state >= 0 && state < NMAC_STATES);
+  assert(state >= 0 && state < Mac::NSTATES);
   ++_nMacDeact[state];
 }
 
 void GrStat::resetAgentStats()
 {
   memset(_nAgents, 0, sizeof(int)*NAGENTS);
-  memset(_nMac, 0, sizeof(int)*NMAC_STATES);
-  memset(_nMacNFkB, 0, sizeof(int)*NMAC_STATES);
-  memset(_nMacStat1, 0, sizeof(int)*NMAC_STATES);
-  memset(_nMacDeact, 0, sizeof(int)*NMAC_STATES);
-  memset(_nTgam, 0, sizeof(int)*NTGAM_STATES);
-  memset(_nTcyt, 0, sizeof(int)*NTCYT_STATES);
-  memset(_nTreg, 0, sizeof(int)*NTREG_STATES);
+  memset(_nMac, 0, sizeof(int)*Mac::NSTATES);
+  memset(_nMacNFkB, 0, sizeof(int)*Mac::NSTATES);
+  memset(_nMacStat1, 0, sizeof(int)*Mac::NSTATES);
+  memset(_nMacDeact, 0, sizeof(int)*Mac::NSTATES);
+  memset(_nTgam, 0, sizeof(int)*Tgam::NSTATES);
+  memset(_nTcyt, 0, sizeof(int)*Tcyt::NSTATES);
+  memset(_nTreg, 0, sizeof(int)*Treg::NSTATES);
 
-  memset(_nMacApoptosisTNF, 0 , sizeof(int)*NMAC_STATES);
+  memset(_nMacApoptosisTNF, 0 , sizeof(int)*Mac::NSTATES);
   memset(_intMtbFreq, 0, sizeof(unsigned)*_intMtbFreqSize);
-  for(int i=0;i<NMAC_STATES;i++)
+  for(int i=0;i<Mac::NSTATES;i++)
     _macIntMtbStats[i] = Stat();
 }
 
@@ -220,19 +220,19 @@ void GrStat::serialize(std::ostream& out) const
 	Serialization::writeHeader(out, GrStat::_ClassName);
 
 	out <<_nAgents[MAC] << std::endl;
-  for(size_t i=0;i<NMAC_STATES;i++)
+  for(size_t i=0;i<Mac::NSTATES;i++)
     out <<_nMac[i] << std::endl;
 
 	out <<_nAgents[TGAM] << std::endl;
-  for(size_t i=0;i<NTGAM_STATES;i++)
+  for(size_t i=0;i<Tgam::NSTATES;i++)
     out <<_nTgam[i] << std::endl;
 
 	out <<_nAgents[TCYT] << std::endl;
-  for(size_t i=0;i<NTCYT_STATES;i++)
+  for(size_t i=0;i<Tcyt::NSTATES;i++)
     out <<_nTcyt[i] << std::endl;
 
 	out <<_nAgents[TREG] << std::endl;
-  for(size_t i=0;i<NTREG_STATES;i++)
+  for(size_t i=0;i<Treg::NSTATES;i++)
     out <<_nTreg[i] << std::endl;
 
 	out << _totExtMtb << std::endl;
@@ -250,7 +250,7 @@ void GrStat::serialize(std::ostream& out) const
 
 	out << _nApoptosisFasFasL << std::endl;
 	
-  for(unsigned i=0;i<NMAC_STATES;i++)
+  for(unsigned i=0;i<Mac::NSTATES;i++)
   	out << _nMacApoptosisTNF[i] << std::endl;
 
 	out << _nTcellApoptosisTNF << std::endl;
@@ -258,7 +258,7 @@ void GrStat::serialize(std::ostream& out) const
 	out << _nRestingMacActivationTNF << std::endl;
 	out << _nInfMacActivationTNF << std::endl;
 
-  for(size_t i=0;i<NMAC_STATES;i++)
+  for(size_t i=0;i<Mac::NSTATES;i++)
     out <<_nMacNFkB[i] << std::endl;
 
   for(size_t i=0;i<NAGENTS;i++)
@@ -272,10 +272,10 @@ void GrStat::serialize(std::ostream& out) const
   out << _nSourceTcytCrowded << std::endl;
   out << _nSourceTregCrowded << std::endl;
 
-  for(size_t i=0;i<NMAC_STATES;i++)
+  for(size_t i=0;i<Mac::NSTATES;i++)
     out <<_nMacStat1[i] << std::endl;
 
-  for(size_t i=0;i<NMAC_STATES;i++)
+  for(size_t i=0;i<Mac::NSTATES;i++)
     out <<_nMacDeact[i] << std::endl;
 
 	out << _nBactAct << std::endl;
@@ -340,19 +340,19 @@ void GrStat::deserialize(std::istream& in)
 	}
 
 	in >>_nAgents[MAC];
-  for(size_t i=0;i<NMAC_STATES;i++)
+  for(size_t i=0;i<Mac::NSTATES;i++)
     in >>_nMac[i];
 
 	in >>_nAgents[TGAM];
-  for(size_t i=0;i<NTGAM_STATES;i++)
+  for(size_t i=0;i<Tgam::NSTATES;i++)
     in >>_nTgam[i];
 
 	in >>_nAgents[TCYT];
-  for(size_t i=0;i<NTCYT_STATES;i++)
+  for(size_t i=0;i<Tcyt::NSTATES;i++)
     in >>_nTcyt[i];
 
 	in >>_nAgents[TREG];
-  for(size_t i=0;i<NTREG_STATES;i++)
+  for(size_t i=0;i<Treg::NSTATES;i++)
     in >>_nTreg[i];
 
 	in >>_totExtMtb;
@@ -370,7 +370,7 @@ void GrStat::deserialize(std::istream& in)
 
 	in >>_nApoptosisFasFasL;
 
-  for(unsigned i=0;i<NMAC_STATES;i++)
+  for(unsigned i=0;i<Mac::NSTATES;i++)
   	in >>_nMacApoptosisTNF[i];
 	
     in >> _nTcellApoptosisTNF;
@@ -378,7 +378,7 @@ void GrStat::deserialize(std::istream& in)
 	in >> _nRestingMacActivationTNF;
 	in >> _nInfMacActivationTNF;
 
-  for(size_t i=0;i<NMAC_STATES;i++)
+  for(size_t i=0;i<Mac::NSTATES;i++)
     in >>_nMacNFkB[i];
 
   for(size_t i=0;i<NAGENTS;i++)
@@ -392,10 +392,10 @@ void GrStat::deserialize(std::istream& in)
   in >> _nSourceTcytCrowded;
   in >> _nSourceTregCrowded;
 
-  for(size_t i=0;i<NMAC_STATES;i++)
+  for(size_t i=0;i<Mac::NSTATES;i++)
     in >>_nMacStat1[i];
 
-  for(size_t i=0;i<NMAC_STATES;i++)
+  for(size_t i=0;i<Mac::NSTATES;i++)
     in >>_nMacDeact[i];
 
 	in >>_nBactAct;

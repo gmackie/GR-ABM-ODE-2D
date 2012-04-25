@@ -21,6 +21,11 @@
 #include <algorithm>
 #include <numeric>
 #include <sstream>
+#include "agent.h"
+#include "macrophage.h"
+#include "tcytotoxic.h"
+#include "tgamma.h"
+#include "tregulatory.h"
 
 
 typedef enum {	GR_CONTAINMENT, GR_CONTAINMENT_INCONSISTENT, GR_CLEARANCE,
@@ -37,10 +42,10 @@ private:
 	 */
 
 	int _nAgents[NAGENTS];
-	int _nMac[NMAC_STATES];
-	int _nTgam[NTGAM_STATES];
-	int _nTcyt[NTCYT_STATES];
-	int _nTreg[NTREG_STATES];
+	int _nMac[Mac::NSTATES];
+	int _nTgam[Tgam::NSTATES];
+	int _nTcyt[Tcyt::NSTATES];
+	int _nTreg[Treg::NSTATES];
 
 	Scalar _totExtMtb;			// Replicating and non-replicating bacteria: all ExtMtb in all compartments
 	Scalar _totNonRepExtMtb;	// Non-replicating bacteria: in caseated compartments.
@@ -57,13 +62,13 @@ private:
     Scalar _totkmRNA;
 
 	int _nApoptosisFasFasL;
-	int _nMacApoptosisTNF[NMAC_STATES];
+	int _nMacApoptosisTNF[Mac::NSTATES];
 	int _nTcellApoptosisTNF;
 	
 	int _nRestingMacActivationTNF;
 	int _nInfMacActivationTNF;
 
-	int _nMacNFkB[NMAC_STATES];
+	int _nMacNFkB[Mac::NSTATES];
 
 	int _nSource[NAGENTS];
 	int _nSourceActive[NAGENTS];
@@ -73,8 +78,8 @@ private:
 	int _nSourceTcytCrowded;
 	int _nSourceTregCrowded;
 
-	int _nMacStat1[NMAC_STATES];
-	int _nMacDeact[NMAC_STATES];
+	int _nMacStat1[Mac::NSTATES];
+	int _nMacDeact[Mac::NSTATES];
 
 	int _nBactAct;
 	int _areaTNF;
@@ -119,7 +124,7 @@ private:
 public:
   typedef ba::accumulator_set<Scalar, ba::stats< ba::features< ba::tag::variance, ba::tag::min, ba::tag::max, ba::tag::median > > > Stat;
 private:
-  Stat _macIntMtbStats[NMAC_STATES];
+  Stat _macIntMtbStats[Mac::NSTATES];
 
 public:
 	GrStat();
@@ -179,9 +184,9 @@ public:
     Scalar getTotkmRNA() const;
 	void updateAgentStatistics(Agent* a);
 public:
-	void updateMacNFkBStatistics(MacState state);
-	void updateMacStat1Statistics(MacState state);
-	void updateMacDeactStatistics(MacState state);
+	void updateMacNFkBStatistics(Mac::State state);
+	void updateMacStat1Statistics(Mac::State state);
+	void updateMacDeactStatistics(Mac::State state);
 	void resetAgentStats();
 	void reset();
 	void incTotExtMtb(Scalar dExtMtb);
@@ -197,12 +202,12 @@ public:
     void incTotkmRNA(Scalar dkmRNA);
 	int getNrApoptosisFasFasL() const;
 	int getNrMacApoptosisTNF() const;
-	int getNrMacApoptosisTNF(MacState s) const;
+	int getNrMacApoptosisTNF(Mac::State s) const;
 	int getNrTcellApoptosisTNF() const;
 	int getNrRestingMacActivationTNF() const;
 	int getNrInfMacActivationTNF() const;
 	void incApoptosisFasFasL();
-	void incMacApoptosisTNF(MacState s);
+	void incMacApoptosisTNF(Mac::State s);
 	void incTcellApoptosisTNF();
 	void incRestingMacActivationTNF();
 	void incInfMacActivationTNF();
@@ -315,7 +320,7 @@ inline const unsigned* GrStat::getIntMtbFreq(size_t& s) const {
   return _intMtbFreq;
 }
 inline const GrStat::Stat* GrStat::getIntMtbStats(size_t &s) const {
-  s = size_t(NMAC_STATES);
+  s = size_t(Mac::NSTATES);
   return _macIntMtbStats;
 }
 inline void GrStat::setN4(Scalar val)
@@ -767,9 +772,9 @@ inline int GrStat::getNrApoptosisFasFasL() const
 
 inline int GrStat::getNrMacApoptosisTNF() const
 {
-  return std::accumulate(_nMacApoptosisTNF, _nMacApoptosisTNF+NMAC_STATES, 0);
+  return std::accumulate(_nMacApoptosisTNF, _nMacApoptosisTNF+Mac::NSTATES, 0);
 }
-inline int GrStat::getNrMacApoptosisTNF(MacState s) const
+inline int GrStat::getNrMacApoptosisTNF(Mac::State s) const
 {
   return _nMacApoptosisTNF[s];
 }
@@ -794,7 +799,7 @@ inline void GrStat::incApoptosisFasFasL()
 	_nApoptosisFasFasL++;
 }
 
-inline void GrStat::incMacApoptosisTNF(MacState s)
+inline void GrStat::incMacApoptosisTNF(Mac::State s)
 {
 	_nMacApoptosisTNF[s]++;
 }
@@ -926,27 +931,27 @@ inline Scalar GrStat::getTotIntMtb() const
 
 inline int GrStat::getNrOfMacResting() const
 {
-	return _nMac[MAC_RESTING];
+	return _nMac[Mac::MAC_RESTING];
 }
 
 inline int GrStat::getNrOfMacInfected() const
 {
-	return _nMac[MAC_INFECTED];
+	return _nMac[Mac::MAC_INFECTED];
 }
 
 inline int GrStat::getNrOfMacCInfected() const
 {
-	return _nMac[MAC_CINFECTED];
+	return _nMac[Mac::MAC_CINFECTED];
 }
 
 inline int GrStat::getNrOfMacActive() const
 {
-	return _nMac[MAC_ACTIVE];
+	return _nMac[Mac::MAC_ACTIVE];
 }
 
 inline int GrStat::getNrOfMacDead() const
 {
-	return _nMac[MAC_DEAD];
+	return _nMac[Mac::MAC_DEAD];
 }
 
 inline int GrStat::getNrOfMac() const
@@ -956,47 +961,47 @@ inline int GrStat::getNrOfMac() const
 
 inline int GrStat::getNrOfMacNFkBResting() const
 {
-	return _nMacNFkB[MAC_RESTING];
+	return _nMacNFkB[Mac::MAC_RESTING];
 }
 
 inline int GrStat::getNrOfMacNFkBInfected() const
 {
-	return _nMacNFkB[MAC_INFECTED];
+	return _nMacNFkB[Mac::MAC_INFECTED];
 }
 
 inline int GrStat::getNrOfMacNFkBCInfected() const
 {
-	return _nMacNFkB[MAC_CINFECTED];
+	return _nMacNFkB[Mac::MAC_CINFECTED];
 }
 
 inline int GrStat::getNrOfMacNFkBActive() const
 {
-	return _nMacNFkB[MAC_ACTIVE];
+	return _nMacNFkB[Mac::MAC_ACTIVE];
 }
 
 inline int GrStat::getNrOfMacNFkBDead() const
 {
-	return _nMacNFkB[MAC_DEAD];
+	return _nMacNFkB[Mac::MAC_DEAD];
 }
 
 inline int GrStat::getNrOfMacNFkB() const
 {
-	return std::accumulate(_nMacNFkB, _nMacNFkB+NMAC_STATES, 0);
+	return std::accumulate(_nMacNFkB, _nMacNFkB+Mac::NSTATES, 0);
 }
 
 inline int GrStat::getNrOfTgamActive() const
 {
-	return _nTgam[TGAM_ACTIVE];
+	return _nTgam[Tgam::TGAM_ACTIVE];
 }
 
 inline int GrStat::getNrOfTgamDead() const
 {
-	return _nTgam[TGAM_DEAD];
+	return _nTgam[Tgam::TGAM_DEAD];
 }
 
 inline int GrStat::getNrOfTgamDownRegulated() const
 {
-	return _nTgam[TGAM_DOWN_REGULATED];
+	return _nTgam[Tgam::TGAM_DOWN_REGULATED];
 }
 
 inline int GrStat::getNrOfTgam() const
@@ -1006,27 +1011,27 @@ inline int GrStat::getNrOfTgam() const
 
 inline int GrStat::getNrOfTgamDouble() const
 {
-    return _nTgam[TGAM_ACTIVE_DOUBLE];
+    return _nTgam[Tgam::TGAM_ACTIVE_DOUBLE];
 }
 
 inline int GrStat::getNrOfTgamInduced() const
 {
-    return _nTgam[TGAM_INDUCED_REG];
+    return _nTgam[Tgam::TGAM_INDUCED_REG];
 }
 
 inline int GrStat::getNrOfTcytDead() const
 {
-	return _nTcyt[TCYT_DEAD];
+	return _nTcyt[Tcyt::TCYT_DEAD];
 }
 
 inline int GrStat::getNrOfTcytActive() const
 {
-	return _nTcyt[TCYT_ACTIVE];
+	return _nTcyt[Tcyt::TCYT_ACTIVE];
 }
 
 inline int GrStat::getNrOfTcytDownRegulated() const
 {
-	return _nTcyt[TCYT_DOWN_REGULATED];
+	return _nTcyt[Tcyt::TCYT_DOWN_REGULATED];
 }
 
 inline int GrStat::getNrOfTcyt() const
@@ -1036,12 +1041,12 @@ inline int GrStat::getNrOfTcyt() const
 
 inline int GrStat::getNrOfTregDead() const
 {
-	return _nTreg[TREG_DEAD];
+	return _nTreg[Treg::TREG_DEAD];
 }
 
 inline int GrStat::getNrOfTregActive() const
 {
-	return _nTreg[TREG_ACTIVE];
+	return _nTreg[Treg::TREG_ACTIVE];
 }
 
 inline int GrStat::getNrOfTreg() const
@@ -1051,62 +1056,62 @@ inline int GrStat::getNrOfTreg() const
 
 inline int GrStat::getNrOfMacStat1Resting() const
 {
-	return _nMacStat1[MAC_RESTING];
+	return _nMacStat1[Mac::MAC_RESTING];
 }
 
 inline int GrStat::getNrOfMacStat1Infected() const
 {
-	return _nMacStat1[MAC_INFECTED];
+	return _nMacStat1[Mac::MAC_INFECTED];
 }
 
 inline int GrStat::getNrOfMacStat1CInfected() const
 {
-	return _nMacStat1[MAC_CINFECTED];
+	return _nMacStat1[Mac::MAC_CINFECTED];
 }
 
 inline int GrStat::getNrOfMacStat1Active() const
 {
-	return _nMacStat1[MAC_ACTIVE];
+	return _nMacStat1[Mac::MAC_ACTIVE];
 }
 
 inline int GrStat::getNrOfMacStat1Dead() const
 {
-	return _nMacStat1[MAC_DEAD];
+	return _nMacStat1[Mac::MAC_DEAD];
 }
 
 inline int GrStat::getNrOfMacStat1() const
 {
-	return std::accumulate(_nMacStat1,_nMacStat1+NMAC_STATES,0);
+	return std::accumulate(_nMacStat1,_nMacStat1+Mac::NSTATES,0);
 }
 
 inline int GrStat::getNrOfMacDeactResting() const
 {
-	return _nMacDeact[MAC_RESTING];
+	return _nMacDeact[Mac::MAC_RESTING];
 }
 
 inline int GrStat::getNrOfMacDeactInfected() const
 {
-	return _nMacDeact[MAC_INFECTED];
+	return _nMacDeact[Mac::MAC_INFECTED];
 }
 
 inline int GrStat::getNrOfMacDeactCInfected() const
 {
-	return _nMacDeact[MAC_CINFECTED];
+	return _nMacDeact[Mac::MAC_CINFECTED];
 }
 
 inline int GrStat::getNrOfMacDeactActive() const
 {
-	return _nMacDeact[MAC_ACTIVE];
+	return _nMacDeact[Mac::MAC_ACTIVE];
 }
 
 inline int GrStat::getNrOfMacDeactDead() const
 {
-	return _nMacDeact[MAC_DEAD];
+	return _nMacDeact[Mac::MAC_DEAD];
 }
 
 inline int GrStat::getNrOfMacDeact() const
 {
-	return std::accumulate(_nMacDeact,_nMacDeact+NMAC_STATES,0);
+	return std::accumulate(_nMacDeact,_nMacDeact+Mac::NSTATES,0);
 }
 
 inline int GrStat::getNrOfCellsInhibited() const

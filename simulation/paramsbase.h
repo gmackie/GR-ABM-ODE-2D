@@ -13,7 +13,8 @@
 #endif //TIXML_USE_STL
 
 #include "tinyxml/tinyxml.h"
-#include "gr.h"
+#include "pos.h"
+#include "scalar.h"
 
 typedef enum {
 	  NULL_NODE = -1

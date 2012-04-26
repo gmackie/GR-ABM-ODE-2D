@@ -201,7 +201,3 @@ release {
     DEFINES += NDEBUG
     OBJECTS_DIR = release
 }
-
-# This is for g++ code only.  Use this if you are compiling the executable for ONE MACHINE only
-# DO NOT move the generated executable to another machine with this option on
-!win32:QMAKE_CXXFLAGS_RELEASE += "-march=native"

@@ -156,7 +156,8 @@ void GLWindow::updateSelectedCellStats()
 
 QString GLWindow::getAgentStr(const Agent* pAgent)
 {
-	QString res;
+  if(!pAgent) return "";
+	QString res(QString::number(pAgent->getID())+" ");
 
 	if (Mac::isMac(pAgent))
 	{
@@ -164,17 +165,17 @@ QString GLWindow::getAgentStr(const Agent* pAgent)
 		switch (pMac->getState())
 		{
 		case Mac::MAC_RESTING:
-			res = "Mr";
+			res += "Mr";
 			break;
 		case Mac::MAC_INFECTED:
-			res = "Mi";
+			res += "Mi";
 			break;
 		case Mac::MAC_CINFECTED:
-			res = "Mci";
+			res += "Mci";
 			break;
 		case Mac::MAC_ACTIVE:
 		{
-			res = "Ma";
+			res += "Ma";
 
 			int days, hours, minutes;
 			GrSimulation::convertSimTime(pMac->getActivationTime(), days, hours, minutes);
@@ -214,10 +215,10 @@ QString GLWindow::getAgentStr(const Agent* pAgent)
 		switch (pTgam->getState())
 		{
 		case Tgam::TGAM_ACTIVE:
-			res = "Tg,a";
+			res += "Tg,a";
 			break;
 		case Tgam::TGAM_DOWN_REGULATED:
-			res = "Tg,reg";
+			res += "Tg,reg";
 			break;
 		case Tgam::TGAM_DEAD:
 			return res;
@@ -229,10 +230,10 @@ QString GLWindow::getAgentStr(const Agent* pAgent)
 		switch (pTcyt->getState())
 		{
 		case Tcyt::TCYT_ACTIVE:
-			res = "Tc";
+			res += "Tc";
 			break;
 		case Tcyt::TCYT_DOWN_REGULATED:
-			res = "Tc,reg";
+			res += "Tc,reg";
 			break;
 		case Tcyt::TCYT_DEAD:
 			return res;
@@ -244,7 +245,7 @@ QString GLWindow::getAgentStr(const Agent* pAgent)
 		switch (pTreg->getState())
 		{
 		case Treg::TREG_ACTIVE:
-			res = "Tr";
+			res += "Tr";
 			break;
 		case Treg::TREG_DEAD:
 			return res;

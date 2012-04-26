@@ -9,7 +9,7 @@
 #define AREATEST_H_
 
 #include "onlinestat.h"
-#include "grstat.h"
+#include "stat.h"
 #include "ttest.h"
 
 class AreaTest : public TTest
@@ -17,8 +17,8 @@ class AreaTest : public TTest
 public:
 	AreaTest(double alpha, int testPeriod, int samplePeriod);
 	~AreaTest();
-	void update(const int time, const int index, GrStat& stats);
-	void evaluate(const int index, GrStat& stats, double degressOfFreedom);
+	void update(const int time, const int index, Stats& stats);
+	void evaluate(const int index, Stats& stats, double degressOfFreedom);
 	OutcomeMethod getMethod() const;
 };
 

@@ -9,7 +9,7 @@
 #define TTEST_H_
 
 #include "onlinestat.h"
-#include "grstat.h"
+#include "stat.h"
 
 /* This class provides functionality
  * for performing Welch's Student-t test */
@@ -23,7 +23,7 @@ protected:
 	int _samplePeriod;
 	std::string _methodName;
 
-	void update(const int time, const int index, GrStat& stats, double value);
+	void update(const int time, const int index, Stats& stats, double value);
 	double degreesOfFreedom() const;
 	double tStat() const;
 	// returns p-value; H_1 : \mu_1 != \mu_2
@@ -32,13 +32,13 @@ protected:
 	double oneSidedLess(double v) const;
 	// returns p-value; H_1 : \mu_1 > \mu_2
 	double oneSidedMore(double v) const;
-	virtual void evaluate(const int index, GrStat& stats, double degressOfFreedom) = 0;
+	virtual void evaluate(const int index, Stats& stats, double degressOfFreedom) = 0;
 
 public:
 	TTest(double alpha, int testPeriod, int samplePeriod, std::string methodName);
 	virtual ~TTest();
-	virtual void update(const int time, const int index, GrStat& stats) = 0;
-	void perform(const int index, GrStat& stats);
+	virtual void update(const int time, const int index, Stats& stats) = 0;
+	void perform(const int index, Stats& stats);
 	virtual OutcomeMethod getMethod() const = 0;
 	std::string getMethodName() const;
 	void setAlpha(double alpha);

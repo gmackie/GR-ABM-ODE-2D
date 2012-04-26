@@ -12,7 +12,7 @@ class StatWidget : public QWidget
 public:
     StatWidget(QWidget* pParent = 0);
     ~StatWidget();
-    void updateLabels(const GrStat& stats);
+    void updateLabels(const Stat& stats);
 
 private:
     Ui::StatWidgetClass _ui;

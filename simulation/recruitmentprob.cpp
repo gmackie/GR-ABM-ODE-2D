@@ -6,7 +6,7 @@
  */
 
 #include "recruitmentprob.h"
-#include "grstat.h"
+#include "stat.h"
 
 RecruitmentProb::RecruitmentProb()
 {
@@ -21,7 +21,7 @@ void RecruitmentProb::recruit(GrSimulation& sim)
 	//const int timeTcellRecEnabled = _PARAM(PARAM_TCELL_TIME_RECRUITMENT_ENABLED);
   GrGrid& grid = sim.getGrid();
 	const std::vector<Pos>& sources = grid.getSources();
-	GrStat& stats = sim.getStats();
+	Stats& stats = sim.getStats();
 
 	for (PosVector::const_iterator it = sources.begin();
 		it != sources.end();
@@ -35,13 +35,13 @@ void RecruitmentProb::recruit(GrSimulation& sim)
 
 		// update stats
 		if (MacRecruitmentThreshold(grid, pSource))
-			stats.incNrSourcesMac();
+			++stats.getNrSources<Mac>();
 		if (TgamRecruitmentThreshold(grid, pSource))
-			stats.incNrSourcesTgam();
+			++stats.getNrSources<Tgam>();
 		if (TcytRecruitmentThreshold(grid, pSource))
-			stats.incNrSourcesTcyt();
+			++stats.getNrSources<Tcyt>();
 		if (TregRecruitmentThreshold(grid, pSource))
-			stats.incNrSourcesTreg();
+			++stats.getNrSources<Treg>();
 
 		// Randomly choose the order of mac and T cell recruitment, so there isn't a bias in favor of one type of cell.
 		if (g_Rand.getReal() < 0.5)
@@ -74,7 +74,7 @@ void RecruitmentProb::recruitMac(GrSimulation& sim, const Pos& pSource)
 
 	// if the number of macrophages on the grid is less than _INITIAL_NUMBER_OF_MACROPHAGES,
 	// recruit a resting macrophage
-	if (sim.getStats().getNrOfMac() < _PARAM(PARAM_MAC_INIT_NUMBER))
+	if (sim.getStats().getNrOfMacs() < _PARAM(PARAM_MAC_INIT_NUMBER))
 	{
 		Mac* newMac = sim.createMac(pSource.x, pSource.y,
 			sim.getTime() - g_Rand.getInt(_PARAM(PARAM_MAC_AGE)), Mac::MAC_RESTING, false, false);

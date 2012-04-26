@@ -17,7 +17,7 @@ using namespace std;
 class Mac : public Agent
 {
 public:
-  enum State {MAC_DEAD, MAC_RESTING, MAC_INFECTED, MAC_CINFECTED, MAC_ACTIVE, NSTATES};
+  enum State {MAC_RESTING, MAC_INFECTED, MAC_CINFECTED, MAC_ACTIVE, MAC_DEAD, NSTATES};
 private:
 	static const std::string _ClassName;
     static int _macodeSize;
@@ -33,10 +33,10 @@ private:
 	int _activationTime;
 	int _deactivationTime;
 	
-	void handleResting(const int time, GrGrid& grid, GrStat& stats, bool nfkbDynamics);
-	void handleInfected(const int time, GrGrid& grid, GrStat& stats, bool nfkbDynamics);
-	void handleChronicallyInfected(const int time, GrGrid& grid, GrStat& stats);
-	void handleActivated(const int time, GrGrid& grid, GrStat& stats);
+	void handleResting(const int time, GrGrid& grid, Stats& stats, bool nfkbDynamics);
+	void handleInfected(const int time, GrGrid& grid, Stats& stats, bool nfkbDynamics);
+	void handleChronicallyInfected(const int time, GrGrid& grid, Stats& stats);
+	void handleActivated(const int time, GrGrid& grid, Stats& stats);
 	int getCountTgam(Tgam::State state, const GrGrid& grid) const;
 	double getExtMtbInMoore(const GrGrid& grid) const;
 
@@ -48,9 +48,10 @@ public:
 	~Mac();
 	void move(GrGrid& grid);
 	void secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDepletion, bool il10rDynamics, bool il10Depletion, int mdt);
-	void computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tnfrDynamics, bool nfkbDynamics, bool il10rDynamics, bool);
+	void computeNextState(const int time, GrGrid& grid, Stats& stats, bool tnfrDynamics, bool nfkbDynamics, bool il10rDynamics, bool);
     virtual void solveDegradation (GrGrid& grid, double dt, bool tnfrDynamics, bool il10rDynamics);
 	void updateState();
+  void updateStatistics(Stats& s) const;
 	int getActivationTime() const;
 	void setNFkB(bool value);
 	bool getNFkB() const;
@@ -63,7 +64,7 @@ public:
 	void kill();
 	void deactivate(const int time);
 	void apoptosis(GrGrid& grid);
-	bool isDead();
+	bool isDead() const;
 	bool isDeadNext();
 	static bool isMac(const Agent* pAgent);
 	static bool isMac(const Agent* pAgent, Mac::State state);
@@ -155,7 +156,7 @@ inline bool Mac::isMac(const Agent* pAgent, Mac::State state)
 	}
 }
 
-inline bool Mac::isDead()
+inline bool Mac::isDead() const
 {
 	return _state == Mac::MAC_DEAD;
 }

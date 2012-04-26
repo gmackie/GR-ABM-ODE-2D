@@ -14,7 +14,7 @@
 class Tgam : public Tcell
 {
 public:
-enum State {TGAM_DEAD, TGAM_ACTIVE, TGAM_DOWN_REGULATED,TGAM_ACTIVE_DOUBLE, TGAM_INDUCED_REG, NSTATES};
+  enum State {TGAM_ACTIVE, TGAM_DOWN_REGULATED, TGAM_ACTIVE_DOUBLE, TGAM_INDUCED_REG, TGAM_DEAD, NSTATES};
 private:
 	static const std::string _ClassName;
 
@@ -30,10 +30,10 @@ private:
     int _nDownRegulated; // Number of downregulations
     int _nICOS; // Number of ICOS stimulations
 	
-	void handleActive(const int time, GrGrid& grid, GrStat& stats, bool tgammatransition);
-	void handleDownRegulated(const int time, GrGrid& grid, GrStat& stats);
-    void handleActiveDouble(const int time, GrGrid& grid, GrStat& stats);
-    void handleInducedReg(const int time, GrGrid& grid, GrStat& stats);
+	void handleActive(const int time, GrGrid& grid, Stats& stats, bool tgammatransition);
+	void handleDownRegulated(const int time, GrGrid& grid, Stats& stats);
+    void handleActiveDouble(const int time, GrGrid& grid, Stats& stats);
+    void handleInducedReg(const int time, GrGrid& grid, Stats& stats);
 
 public:
 	Tgam();
@@ -41,13 +41,14 @@ public:
 	~Tgam();
 	void move(GrGrid& grid);
 	void secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDepletion, bool il10rDynamics, bool il10Depletion, int mdt);
-	void computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tnfrDynamics, bool nfkbDynamics, bool il10rDynamics, bool tgmmatransition);
+	void computeNextState(const int time, GrGrid& grid, Stats& stats, bool tnfrDynamics, bool nfkbDynamics, bool il10rDynamics, bool tgmmatransition);
 	void updateState();
+  void updateStatistics(Stats& s) const;
 	int getState() const;
 	Tgam::State getNextState() const;
 	void deactivate(const int time);
 	void kill();
-	bool isDead();
+	bool isDead() const;
 	bool isDeadNext();
 	int getDeactivationTime() const;
 	static bool isTgam(const Agent* pAgent);
@@ -96,7 +97,7 @@ inline bool Tgam::isTgam(const Agent* pAgent, Tgam::State state)
 	}
 }
 
-inline bool Tgam::isDead()
+inline bool Tgam::isDead() const
 {
 	return _state == TGAM_DEAD;
 }

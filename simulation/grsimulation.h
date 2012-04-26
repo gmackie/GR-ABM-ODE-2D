@@ -10,7 +10,7 @@
 
 #include "gr.h"
 #include "grsimulationgrid.h"
-#include "grstat.h"
+#include "stat.h"
 #include "macrophage.h"
 #include "tgamma.h"
 #include "tcytotoxic.h"
@@ -37,8 +37,8 @@ private:
 	TcytList _tcytList;
 	TregList _tregList;
 
-	GrStat _statsPrevious; // The stats at the start of a time step - from the end of the previous time step.
-	GrStat _stats;
+	Stats _statsPrevious; // The stats at the start of a time step - from the end of the previous time step.
+	Stats _stats;
 
 	double _areaThreshold;
 	double _areaThresholdCellDensity;
@@ -96,11 +96,11 @@ public:
 	void performT_Test();
 	int getTime() const;
 
-	const GrStat& getStats() const;
-	GrStat& getStats();
+	const Stats& getStats() const;
+	Stats& getStats();
 
-	const GrStat& getStatsPrevious() const;
-	GrStat& getStatsPrevious();
+	const Stats& getStatsPrevious() const;
+	Stats& getStatsPrevious();
 
 	const GrGrid& getGrid() const;
 	GrGrid& getGrid();
@@ -319,22 +319,22 @@ inline GrGrid& GrSimulation::getGrid()
 	return _grid.getGrid();
 }
 
-inline const GrStat& GrSimulation::getStats() const
+inline const Stats& GrSimulation::getStats() const
 {
 	return _stats;
 }
 
-inline GrStat& GrSimulation::getStats()
+inline Stats& GrSimulation::getStats()
 {
 	return _stats;
 }
 
-inline const GrStat& GrSimulation::getStatsPrevious() const
+inline const Stats& GrSimulation::getStatsPrevious() const
 {
 	return _statsPrevious;
 }
 
-inline GrStat& GrSimulation::getStatsPrevious()
+inline Stats& GrSimulation::getStatsPrevious()
 {
 	return _statsPrevious;
 }

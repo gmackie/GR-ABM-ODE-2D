@@ -83,7 +83,7 @@ double TTest::oneSidedMore(double v) const
 	return cdf(complement(dist, tStat()));
 }
 
-void TTest::perform(const int index, GrStat& stats)
+void TTest::perform(const int index, Stats& stats)
 {
 
 	// This can happen when we do one last t-test at the end of
@@ -103,7 +103,7 @@ void TTest::perform(const int index, GrStat& stats)
 	// If no bacteria it always clearance, regardless of the type of t-test used.
 	if (stats.getTotExtMtb() + stats.getTotIntMtb() == 0)
 	{
-		stats.setGrStatus(index, GR_CLEARANCE);
+		stats.setStatus(index, GR_CLEARANCE);
 		return;
 	}
 
@@ -115,7 +115,7 @@ void TTest::perform(const int index, GrStat& stats)
 	_stat2.reset();
 }
 
-void TTest::update(const int time, const int index, GrStat& stats, double value)
+void TTest::update(const int time, const int index, Stats& stats, double value)
 {
 	if (time % _samplePeriod == 0)
 	{

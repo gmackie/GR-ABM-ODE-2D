@@ -8,7 +8,7 @@
 #include "gr.h"
 #include "params.h"
 #include "grsimulation.h"
-#include "grstat.h"
+#include "stat.h"
 #include "rand.h"
 #include <sys/time.h>
 #include <boost/program_options.hpp>
@@ -90,8 +90,7 @@ public:
   IntMtbStats(std::ostream* s, GrSimulation& sim) : oCSVStream(s) { outputHeader(sim); }
   void outputHeader(const GrSimulation& sim) {
     write("time");
-    size_t sz;
-    sim.getStats().getIntMtbFreq(sz);
+    size_t sz = sim.getStats().getIntMtbFreq().size();
     for(unsigned i=0;i<sz;i++){
       stringstream ss;
       ss<<(i+1);
@@ -102,32 +101,32 @@ public:
     endRow();
   }
   void saveRow(const GrSimulation& sim) {
-    const GrStat& stat = sim.getStats();
+    const Stats& stat = sim.getStats();
     write(sim.getTime());
-    size_t sz;
     {
-      const unsigned* v = stat.getIntMtbFreq(sz);
-      for(unsigned i=0;i<sz;i++) write(v[i]);
+      const std::vector<unsigned>& v = stat.getIntMtbFreq();
+      for(unsigned i=0;i<v.size();i++) write(v[i]);
     }
     {
       namespace ba = boost::accumulators;
-      const GrStat::Stat* v = stat.getIntMtbStats(sz);
-      if(ba::extract::count(v[Mac::MAC_INFECTED]) > 0){
-        write(ba::extract::max(v[Mac::MAC_INFECTED]));
-        write(ba::extract::min(v[Mac::MAC_INFECTED]));
-        write(ba::extract::mean(v[Mac::MAC_INFECTED]));
-        write(ba::extract::median(v[Mac::MAC_INFECTED]));
-        write(sqrt(ba::extract::variance(v[Mac::MAC_INFECTED])));
+      const Stats::Stat& vi = stat.getMacIntMtbStats(Mac::MAC_INFECTED);
+      if(ba::extract::count(vi) > 0){
+        write(ba::extract::max(vi));
+        write(ba::extract::min(vi));
+        write(ba::extract::mean(vi));
+        write(ba::extract::median(vi));
+        write(sqrt(ba::extract::variance(vi)));
       }
-      else { write(0.0/0.0); write(0.0/0.0); write(0.0/0.0); write(0.0/0.0); write(0.0/0.0); }
-      if(ba::extract::count(v[Mac::MAC_CINFECTED]) > 0) {
-        write(ba::extract::max(v[Mac::MAC_CINFECTED]));
-        write(ba::extract::min(v[Mac::MAC_CINFECTED]));
-        write(ba::extract::mean(v[Mac::MAC_CINFECTED]));
-        write(ba::extract::median(v[Mac::MAC_INFECTED]));
-        write(sqrt(ba::extract::variance(v[Mac::MAC_CINFECTED])));
+      else { write(NAN); write(NAN); write(NAN); write(NAN); write(NAN); }
+      const Stats::Stat& vic = stat.getMacIntMtbStats(Mac::MAC_INFECTED);
+      if(ba::extract::count(vic) > 0) {
+        write(ba::extract::max(vic));
+        write(ba::extract::min(vic));
+        write(ba::extract::mean(vic));
+        write(ba::extract::median(vic));
+        write(sqrt(ba::extract::variance(vic)));
       }
-      else { write(0.0/0.0); write(0.0/0.0); write(0.0/0.0); write(0.0/0.0); write(0.0/0.0); }
+      else { write(NAN); write(NAN); write(NAN); write(NAN); write(NAN); }
     }
     endRow();
   }
@@ -164,13 +163,22 @@ public:
 
   }
   void saveRow(const GrSimulation& sim) {
-    const GrStat& stats = sim.getStats();
+    const Stats& stats = sim.getStats();
 
     write(sim.getTime());
-    write(stats.getNrOfMac()); write(stats.getNrOfMacResting()); write(stats.getNrOfMacInfected()); write(stats.getNrOfMacCInfected()); write(stats.getNrOfMacActive()); write(stats.getNrOfMacDead());
-    write(stats.getNrOfTgam()); write(stats.getNrOfTgamActive()); write(stats.getNrOfTgamDouble()); write(stats.getNrOfTgamDownRegulated()); write(stats.getNrOfTgamDead());
-    write(stats.getNrOfTcyt()); write(stats.getNrOfTcytActive()); write(stats.getNrOfTcytDownRegulated()); write(stats.getNrOfTcytDead());
-    write(stats.getNrOfTreg()); write(stats.getNrOfTregActive()); write(stats.getNrOfTregDead());
+
+    write(stats.getNrOfMacs());
+    for(size_t i=0;i<Mac::NSTATES;i++)
+      write(stats.getNrOfMacs(Mac::State(i)));
+    write(stats.getNrOfTgams());
+    for(size_t i=0;i<Tgam::NSTATES;i++)
+      write(stats.getNrOfTgams(Tgam::State(i)));
+    write(stats.getNrOfTcyts());
+    for(size_t i=0;i<Tcyt::NSTATES;i++)
+      write(stats.getNrOfTcyts(Tcyt::State(i)));
+    write(stats.getNrOfTregs());
+    for(size_t i=0;i<Treg::NSTATES;i++)
+      write(stats.getNrOfTregs(Treg::State(i)));
 
     Scalar repExtMtb = stats.getTotExtMtb() - stats.getTotNonRepExtMtb();
     write(stats.getTotIntMtb()); write(stats.getTotExtMtb()); write(repExtMtb); write(stats.getTotNonRepExtMtb()); write((stats.getTotIntMtb() + stats.getTotExtMtb()));
@@ -184,9 +192,15 @@ public:
     write(stats.getT80()); write(stats.getT8()); write(stats.getTC());  write(stats.getTH0lung()); write(stats.getTH1lung());
     write(stats.getT80lung()); write(stats.getT8lung()); write(stats.getTClung());
 
-    write(stats.getNrSourcesMac()); write(stats.getNrSourcesTgam());  write(stats.getNrSourcesTcyt()); write(stats.getNrSourcesTreg());
-    write(stats.getNrSourcesActiveMac()); write(stats.getNrSourcesActiveTgam());  write(stats.getNrSourcesActiveTcyt()); write(stats.getNrSourcesActiveTreg());
-    write(stats.getNrSourcesCrowdedMac()); write(stats.getNrSourcesCrowdedTgam());  write(stats.getNrSourcesCrowdedTcyt()); write(stats.getNrSourcesCrowdedTreg());
+    write(stats.getTotNrSources());
+    for(size_t i=0;i<NAGENTS;i++)
+      write(stats.getNrSources((AgentType)i));
+    write(stats.getTotNrSourcesActive());
+    for(size_t i=0;i<NAGENTS;i++)
+      write(stats.getNrSourcesActive((AgentType)i));
+    write(stats.getTotNrSourcesCrowded());
+    for(size_t i=0;i<NAGENTS;i++)
+      write(stats.getNrSourcesCrowded((AgentType)i));
     write(stats.getNrCaseated());
 
     int startState = 1; // Skip the dead state: apoptosis doesn't occur for an already dead mac.
@@ -195,7 +209,7 @@ public:
 
     //
     for(int i=startState;i<Mac::NSTATES;i++){    //Keep a running sum of deaths
-      totMacApoptosisTNF[i]+=(stats.getNrMacApoptosisTNF((Mac::State)i));
+      totMacApoptosisTNF[i]+=(stats.getMacApoptosisTNF((Mac::State)i));
       sumMacApoptosisTNF+=totMacApoptosisTNF[i];
     }
 
@@ -203,14 +217,17 @@ public:
     for(int i=startState;i<Mac::NSTATES;i++)
       write(totMacApoptosisTNF[i]);
 
-    write(stats.getNrTcellApoptosisTNF());
-    write(stats.getNrRestingMacActivationTNF());
-    write(stats.getNrInfMacActivationTNF());
-	write(stats.getNrOfCellsInhibited()/100);
+    write(stats.getTcellApoptosisTNF());
+    write(stats.getRestingMacActivationTNF());
+    write(stats.getInfMacActivationTNF());
+	write(stats.getNrOfCellsTnfInhibited()/100);
 
-	write(stats.getNrTgamQueued()); write(stats.getNrTcytQueued()); write(stats.getNrTregQueued());
-	write(stats.getNrTgamQueuedDie()); write(stats.getNrTcytQueuedDie()); write(stats.getNrTregQueuedDie());
-	write(stats.getNrTgamRecruited()); write(stats.getNrTcytRecruited()); write(stats.getNrTregRecruited());
+    for(size_t i=TGAM;i<NAGENTS;i++)
+      write(stats.getNrQueued((AgentType)i));
+    for(size_t i=TGAM;i<NAGENTS;i++)
+      write(stats.getNrQueuedDie((AgentType)i));
+    for(size_t i=TGAM;i<NAGENTS;i++)
+      write(stats.getNrRecruited((AgentType)i));
 
     oCSVStream::endRow();
   }
@@ -319,19 +336,36 @@ void saveState(const GrSimulation* pSim, int time, std::string dir=std::string("
 }
 
 void printStats(const GrSimulation* pSim) {
-  const GrStat& stats = pSim->getStats();
+  const Stats& stats = pSim->getStats();
   size_t sz = pSim->getGrid().getSize();
   printf("%-7d ", pSim->getTime());
-  printf("%3d - (%d,%d,%d,%d,%d) ", stats.getNrOfMac(), stats.getNrOfMacResting(), stats.getNrOfMacInfected(), stats.getNrOfMacCInfected(), stats.getNrOfMacActive(), stats.getNrOfMacDead());
-  printf("%3d - (%d,%d,%d,%d,%d) ", stats.getNrOfTgam(), stats.getNrOfTgamActive(), stats.getNrOfTgamDouble(), stats.getNrOfTgamInduced(), stats.getNrOfTgamDownRegulated(), stats.getNrOfTgamDead());
-  printf("%3d - (%d,%d,%d) ", stats.getNrOfTcyt(), stats.getNrOfTcytActive(), stats.getNrOfTcytDownRegulated(), stats.getNrOfTcytDead());
-  printf("%3d - (%d,%d) ", stats.getNrOfTreg(), stats.getNrOfTregActive(), stats.getNrOfTregDead());
+  size_t i=0;
+  printf("%3d - (", stats.getNrOfMacs());
+  for(i=0;i<Mac::NSTATES-1;i++)
+    printf("%d,", stats.getNrOfMacs(Mac::State(i)));
+  printf("%d) ", stats.getNrOfMacs(Mac::State(i)));
+  printf("%3d - (", stats.getNrOfTgams());
+  for(i=0;i<Tgam::NSTATES-1;i++)
+    printf("%d,", stats.getNrOfTgams(Tgam::State(i)));
+  printf("%d) ", stats.getNrOfTgams(Tgam::State(i)));
+  printf("%3d - (", stats.getNrOfTcyts());
+  for(i=0;i<Tcyt::NSTATES-1;i++)
+    printf("%d,", stats.getNrOfTcyts(Tcyt::State(i)));
+  printf("%d) ", stats.getNrOfTcyts(Tcyt::State(i)));
+  printf("%3d - (", stats.getNrOfTregs());
+  for(i=0;i<Treg::NSTATES-1;i++)
+    printf("%d,", stats.getNrOfTregs(Treg::State(i)));
+  printf("%d) ", stats.getNrOfTregs(Treg::State(i)));
+
   printf("(%.5f, %.5f) ", stats.getTotExtMtb(), stats.getTotIntMtb());
   #define INV_SZ (1.0 / sz)
   printf("(%11.5f,%11.5f,%11.5f,%11.5f,%11.5f) ", stats.getTotTNF()*INV_SZ, stats.getTotIL10()*INV_SZ, stats.getTotCCL2()*INV_SZ, stats.getTotCCL5()*INV_SZ, stats.getTotCXCL9()*INV_SZ);
-  printf("(%d,%d,%d,%d) ", stats.getNrSourcesMac(), stats.getNrSourcesTgam(), stats.getNrSourcesTcyt(), stats.getNrSourcesTreg());
+  printf("(");
+  for(i=0;i<NAGENTS-1;i++)
+    printf("%d,", stats.getNrSources((AgentType)i));
+  printf("%d) ", stats.getNrSources((AgentType)i));
   printf("(%d, %.5f) ", stats.getNrCaseated(), stats.getTotNonRepExtMtb());
-  printf("(%d)\n", stats.getNrOfCellsInhibited()/100);
+  printf("(%d)\n", stats.getNrOfCellsTnfInhibited()/100);
 }
 
 // Stopping criteria.
@@ -340,7 +374,7 @@ void printStats(const GrSimulation* pSim) {
 // so old parameter files without these parameters will work without stopping prematurely.
 bool shouldStop(int time, GrSimulation* pSim)
 {
-	const GrStat& stats = pSim->getStats();
+	const Stats& stats = pSim->getStats();
 	Scalar totMtb = stats.getTotExtMtb() + stats.getTotIntMtb();
 	int areaCellDensity = stats.getAreaCellDensity();
 

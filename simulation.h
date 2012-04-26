@@ -29,7 +29,7 @@ private:
 	TgamList _tgamList;
 	TcytList _tcytList;
 	TregList _tregList;
-	GrStat _stats;
+	Stats _stats;
 	int _timeStepsToSimulate;
 	bool _mtbClearance;
 	double _areaThreshold;
@@ -71,7 +71,7 @@ public:
 
 	/* The following methods are NOT thread-safe, first a lock must be obtained */
 	const GrGrid& getGrGrid() const;
-	const GrStat& getStats() const;
+	const Stats& getStats() const;
 	const MacList& getMacList() const;
 	const TgamList& getTgamList() const;
 	const TcytList& getTcytList() const;
@@ -220,7 +220,7 @@ inline OutcomeMethod Simulation::getOutcomeMethod(int index) const
 	return res;
 }
 
-inline const GrStat& Simulation::getStats() const
+inline const Stats& Simulation::getStats() const
 {
 	return _stats;
 }

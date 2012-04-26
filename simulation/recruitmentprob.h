@@ -10,7 +10,7 @@
 
 #include "gr.h"
 #include "grgrid.h"
-#include "grstat.h"
+#include "stat.h"
 #include "recruitmentbase.h"
 
 class RecruitmentProb : public RecruitmentBase

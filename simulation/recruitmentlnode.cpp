@@ -50,7 +50,7 @@ void RecruitmentLnODE::init()
 	}
 }
 
-void RecruitmentLnODE::solveODE(const int, const GrStat&, GrStat&)
+void RecruitmentLnODE::solveODE(const int, const Stats&, Stats&)
 {
 	std::string cmd = _odeApp;
 	cmd += " '[";
@@ -80,7 +80,7 @@ void RecruitmentLnODE::solveODE(const int, const GrStat&, GrStat&)
 	inFile.close();
 }
 
-void RecruitmentLnODE::updateQueue(const int time, GrStat& stats)
+void RecruitmentLnODE::updateQueue(const int time, Stats& stats)
 {
 	// Compute the fluxes
 	double tcellFlux[TCELL_TYPE_COUNT];
@@ -116,14 +116,14 @@ void RecruitmentLnODE::updateQueue(const int time, GrStat& stats)
 	}
 
 	// Update the statistics
-	stats.setFluxTgam(tcellFlux[TCELL_TYPE_GAM]);
-	stats.setFluxTcyt(tcellFlux[TCELL_TYPE_CYT]);
-	stats.setFluxTreg(tcellFlux[TCELL_TYPE_REG]);
+	stats.setFlux<Tgam>(tcellFlux[TCELL_TYPE_GAM]);
+	stats.setFlux<Tcyt>(tcellFlux[TCELL_TYPE_CYT]);
+	stats.setFlux<Treg>(tcellFlux[TCELL_TYPE_REG]);
 
 	// update stats
-	stats.setNrTgamQueued(_tcellQueueCount[TCELL_TYPE_GAM]);
-	stats.setNrTcytQueued(_tcellQueueCount[TCELL_TYPE_CYT]);
-	stats.setNrTregQueued(_tcellQueueCount[TCELL_TYPE_REG]);
+	stats.setNrQueued<Tgam>(_tcellQueueCount[TCELL_TYPE_GAM]);
+	stats.setNrQueued<Tcyt>(_tcellQueueCount[TCELL_TYPE_CYT]);
+	stats.setNrQueued<Treg>(_tcellQueueCount[TCELL_TYPE_REG]);
 
 	/*for (int i = 0; i < TCELL_TYPE_COUNT; i++)
 	{
@@ -150,9 +150,9 @@ void RecruitmentLnODE::updateQueue(const int time, GrStat& stats)
 bool compare_tcell_pos(ThresholdPosPair first, ThresholdPosPair second) {
       return first.first < second.first;    //Keep deterministic by not sorting on pointers
 }
-void RecruitmentLnODE::updateInitialConditions(GrStat& stats)
+void RecruitmentLnODE::updateInitialConditions(Stats& stats)
 {
-	int newMiMci = stats.getNrOfMacInfected() + stats.getNrOfMacCInfected();
+	int newMiMci = stats.getNrOfMacs(Mac::MAC_INFECTED) + stats.getNrOfMacs(Mac::MAC_CINFECTED);
 	int delta = newMiMci - _prevMiMci;
 
 	// update MDC, if the delta > 0
@@ -168,7 +168,7 @@ void RecruitmentLnODE::updateInitialConditions(GrStat& stats)
 	stats.setMDC(_odeInitialConditions[_idxMDC]);
 }
 
-void RecruitmentLnODE::recruitMacsGetTcellSources(GrSimulation& sim, GrStat& stats,
+void RecruitmentLnODE::recruitMacsGetTcellSources(GrSimulation& sim, Stats& stats,
 	ThresholdPosList tcellSources[TCELL_TYPE_COUNT])
 {
   GrGrid& grid = sim.getGrid();
@@ -187,15 +187,15 @@ void RecruitmentLnODE::recruitMacsGetTcellSources(GrSimulation& sim, GrStat& sta
 
 		if (MacRecruitmentThreshold(grid, *it, threshold))
 		{
-			stats.incNrSourcesMac();
+			++stats.getNrSources<Mac>();
 
 			if (grid.getNumberOfAgents(*it) < 2 && !grid.hasAgentType(MAC, *it))
 			{
-				stats.incNrSourcesActiveMac();
+				++stats.getNrSourcesActive<Mac>();
 			}
 			else
 			{
-				stats.incNrSourcesCrowdedMac();
+				++stats.getNrSourcesCrowded<Mac>();
 			}
 		}
 
@@ -205,46 +205,46 @@ void RecruitmentLnODE::recruitMacsGetTcellSources(GrSimulation& sim, GrStat& sta
 
 		if (TgamRecruitmentThreshold(grid, *it, threshold))
 		{
-			stats.incNrSourcesTgam();
+			++stats.getNrSources<Tgam>();
 
 			if (grid.getNumberOfAgents(*it) < 2)
 			{
-				stats.incNrSourcesActiveTgam();
+				++stats.getNrSourcesActive<Tgam>();
 				tcellSources[TCELL_TYPE_GAM].push_back(std::make_pair(threshold, *it));
 			}
 			else
 			{
-				stats.incNrSourcesCrowdedTgam();
+				++stats.getNrSourcesCrowded<Tgam>();
 			}
 		}
 
 		if (TcytRecruitmentThreshold(grid, *it, threshold))
 		{
-			stats.incNrSourcesTcyt();
+			++stats.getNrSources<Tcyt>();
 
 			if (grid.getNumberOfAgents(*it) < 2)
 			{
-				stats.incNrSourcesActiveTcyt();
+				++stats.getNrSourcesActive<Tcyt>();
 				tcellSources[TCELL_TYPE_CYT].push_back(std::make_pair(threshold, *it));
 			}
 			else
 			{
-				stats.incNrSourcesCrowdedTcyt();
+				++stats.getNrSourcesCrowded<Tcyt>();
 			}
 		}
 
 		if (TregRecruitmentThreshold(grid, *it, threshold))
 		{
-			stats.incNrSourcesTreg();
+			++stats.getNrSources<Treg>();
 
 			if (grid.getNumberOfAgents(*it) < 2)
 			{
-				stats.incNrSourcesActiveTreg();
+				++stats.getNrSourcesActive<Treg>();
 				tcellSources[TCELL_TYPE_REG].push_back(std::make_pair(threshold, *it));
 			}
 			else
 			{
-				stats.incNrSourcesCrowdedTreg();
+				++stats.getNrSourcesCrowded<Treg>();
 			}
 		}
 	}
@@ -259,7 +259,7 @@ void RecruitmentLnODE::recruitMacsGetTcellSources(GrSimulation& sim, GrStat& sta
 	}
 }
 
-void RecruitmentLnODE::recruitTcells(GrSimulation& sim, GrStat& stats,
+void RecruitmentLnODE::recruitTcells(GrSimulation& sim, Stats& stats,
 		ThresholdPosList tcellSources[TCELL_TYPE_COUNT])
 {
 	std::vector<TcellTypePair> newTcellQueue;
@@ -275,7 +275,7 @@ void RecruitmentLnODE::recruitTcells(GrSimulation& sim, GrStat& stats,
 		// check whether the T cell has died while in the queue
 		if (tcell._birthtime + _PARAM(PARAM_TCELL_AGE) < sim.getTime())
 		{
-			stats.incNrQueuedDie(tcell._type);
+			++stats.getNrQueuedDie((AgentType)(tcell._type + MAC));
 			continue;
 		}
 
@@ -306,15 +306,15 @@ void RecruitmentLnODE::recruitTcells(GrSimulation& sim, GrStat& stats,
 			{
 			case TCELL_TYPE_CYT:
 				sim.createTcyt(p->x, p->y, tcell._birthtime, Tcyt::TCYT_ACTIVE);
-				stats.incNrTcytRecruited();
+				++stats.getNrRecruited<Tcyt>();
 				break;
 			case TCELL_TYPE_GAM:
 				sim.createTgam(p->x, p->y, tcell._birthtime, Tgam::TGAM_ACTIVE);
-				stats.incNrTgamRecruited();
+				++stats.getNrRecruited<Tgam>();
 				break;
 			case TCELL_TYPE_REG:
 				sim.createTreg(p->x, p->y, tcell._birthtime, Treg::TREG_ACTIVE);
-				stats.incNrTregRecruited();
+				++stats.getNrRecruited<Treg>();
 				break;
 			default:
 				assert(false);
@@ -330,8 +330,8 @@ void RecruitmentLnODE::recruitTcells(GrSimulation& sim, GrStat& stats,
 void RecruitmentLnODE::recruit(GrSimulation& sim)
 {
 	/* Solve the ODE */
-	const GrStat& statsPrevious = sim.getStatsPrevious();
-	GrStat& stats = sim.getStats();
+	const Stats& statsPrevious = sim.getStatsPrevious();
+	Stats& stats = sim.getStats();
 
 	// update initial conditions (MDC)
 	updateInitialConditions(stats);
@@ -358,7 +358,7 @@ void RecruitmentLnODE::recruitMac(GrSimulation& sim, const Pos& p)
 
 	// if the number of macrophages on the grid is less than _INITIAL_NUMBER_OF_MACROPHAGES,
 	// recruit a resting macrophage
-	if (sim.getStats().getNrOfMac() < _PARAM(PARAM_MAC_INIT_NUMBER))
+	if (sim.getStats().getNrOfMacs() < _PARAM(PARAM_MAC_INIT_NUMBER))
 	{
 		Mac* newMac = sim.createMac(p.x, p.y,
 			sim.getTime() - g_Rand.getInt(_PARAM(PARAM_MAC_AGE)), Mac::MAC_RESTING, false, false);

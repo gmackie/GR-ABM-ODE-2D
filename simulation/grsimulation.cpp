@@ -355,8 +355,8 @@ void GrSimulation::deserialize(std::istream& in)
 	}
 
 	// deserialize statistics
-	_statsPrevious.deserialize(in);
-	_stats.deserialize(in);
+	_statsPrevious.serialize(in);
+	_stats.serialize(in);
 
 	// deserialize random number generator
 	g_Rand.deserialize(in);
@@ -397,16 +397,16 @@ void GrSimulation::init(Scalar molecularTrackingRadius)
 		}
 
 		pMac->setIntMtb(1);
-		_statsPrevious.incTotIntMtb(1);
-		_stats.incTotIntMtb(1);
+		++_statsPrevious.getTotIntMtb();
+		++_stats.getTotIntMtb();
 	}
 
 	// Place initial extracellular bacteria on the grid
 	for (PosVector::const_iterator it = initExtMtb.begin(); it != initExtMtb.end(); it++)
 	{
 		_grid.getGrid().extMTB(*it) += 1;
-		_statsPrevious.incTotExtMtb(1);
-		_stats.incTotExtMtb(1);
+		++_statsPrevious.getTotExtMtb();
+		++_stats.getTotExtMtb();
 	}
 
 	// Add a fixed number (PARAM_MAC_INIT_NUMBER) of resting
@@ -655,18 +655,6 @@ void GrSimulation::updateStates()
 		Mac& mac = *it;
 		mac.updateState();
 		_stats.updateAgentStatistics(&mac);
-
-		if (!mac.isDead())
-			_stats.incTotIntMtb(mac.getIntMtb());
-
-		if (mac.getNFkB())
-			_stats.updateMacNFkBStatistics((Mac::State)mac.getState());
-
-		if (mac.getStat1())
-			_stats.updateMacStat1Statistics((Mac::State)mac.getState());
-
-		if (mac.isDeactivated())
-			_stats.updateMacDeactStatistics((Mac::State)mac.getState());
 
 		if (mac.isDead())
 		{
@@ -1053,31 +1041,29 @@ void GrSimulation::growExtMtb()
 			if (g.isCaseated(p))
 			{
 				// Bacteria don't gp.x in caseated compartments
-				_stats.incNrCaseated();
-				_stats.incTotNonRepExtMtb(extMtb);
-				_stats.incTotExtMtb(extMtb);
+				++_stats.getNrCaseated();
+				_stats.getTotNonRepExtMtb()+=(extMtb);
+				_stats.getTotExtMtb()+=(extMtb);
 			}
 			else
 			{
 				double dExtMtb = growthRate * extMtb * (1.0 - extMtb / upperBound);
         extMtb += dExtMtb;
-				_stats.incTotExtMtb(extMtb);
+				_stats.getTotExtMtb() += (extMtb);
 			}
 
-			_stats.incTotMacAttractant(g.macAttractant(p));
-			_stats.incTotTNF(g.TNF(p));
-            _stats.incTotIL10(g.il10(p));
-			_stats.incTotCCL2(g.CCL2(p));
-			_stats.incTotCCL5(g.CCL5(p));
-			_stats.incTotCXCL9(g.CXCL9(p));
+			_stats.getTotMacAttractant() += (g.macAttractant(p));
+			_stats.getTotTNF() += (g.TNF(p));
+      _stats.getTotIL10() += (g.il10(p));
+			_stats.getTotCCL2() += (g.CCL2(p));
+			_stats.getTotCCL5() += (g.CCL5(p));
+			_stats.getTotCXCL9() += (g.CXCL9(p));
 
 			if (g.TNF(p) >= _areaThreshold)
-				_stats.incAreaTNF();
+				++_stats.getAreaTNF();
 
 			if (g.getCellDensity(p) >= _areaThresholdCellDensity)
-			{
-				_stats.incAreaCellDensity();
-			}
+				++_stats.getAreaCellDensity();
 		}
 	}
 }

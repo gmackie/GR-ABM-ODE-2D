@@ -14,7 +14,7 @@
 class Treg : public Tcell
 {
 public:
-enum State {TREG_DEAD, TREG_ACTIVE, NSTATES};
+  enum State {TREG_ACTIVE, TREG_DEAD, NSTATES};
 private:
 	static const std::string _ClassName;
 
@@ -23,7 +23,7 @@ private:
 	 */
 	Treg::State _state;
 	Treg::State _nextState;
-	void handleResting(const int time, GrGrid& grid, GrStat& stats);
+	void handleResting(const int time, GrGrid& grid, Stats& stats);
 
 public:
 	Treg();
@@ -31,13 +31,14 @@ public:
 	~Treg();
 	void move(GrGrid& grid);
 	void secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDepletion, bool il10rDynamics, bool il10Depletion, int mdt);
-	void computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tnfrDynamics, bool nfkbDynamics, bool il10Depletion, bool);
+	void computeNextState(const int time, GrGrid& grid, Stats& stats, bool tnfrDynamics, bool nfkbDynamics, bool il10Depletion, bool);
 	void updateState();
+  void updateStatistics(Stats& s) const;
 	int getState() const;
 	Treg::State getNextState() const;
 	void kill();
 	void deactivate(const int time);
-	bool isDead();
+	bool isDead() const;
 	bool isDeadNext();
 	static bool isTreg(const Agent* pAgent);
 	static bool isTreg(const Agent* pAgent, Treg::State state);
@@ -80,7 +81,7 @@ inline bool Treg::isTreg(const Agent* pAgent, Treg::State state)
 	}
 }
 
-inline bool Treg::isDead()
+inline bool Treg::isDead() const
 {
 	return _state == TREG_DEAD;
 }

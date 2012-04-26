@@ -15,8 +15,8 @@ class MtbTest: public TTest
 public:
 	MtbTest(double alpha, int testPeriod, int samplePeriod);
 	~MtbTest();
-	void update(const int time, const int index, GrStat& stats);
-	void evaluate(const int index, GrStat& stats, double degressOfFreedom);
+	void update(const int time, const int index, Stats& stats);
+	void evaluate(const int index, Stats& stats, double degressOfFreedom);
 	OutcomeMethod getMethod() const;
 
 };

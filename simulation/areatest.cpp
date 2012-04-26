@@ -16,12 +16,12 @@ AreaTest::~AreaTest()
 {
 }
 
-void AreaTest::update(const int time, const int index, GrStat& stats)
+void AreaTest::update(const int time, const int index, Stats& stats)
 {
 	TTest::update(time, index, stats, stats.getAreaTNF());
 }
 
-void AreaTest::evaluate(const int index, GrStat& stats, double degressOfFreedom)
+void AreaTest::evaluate(const int index, Stats& stats, double degressOfFreedom)
 {
 
 	//double pValContainment = twoSided(degressOfFreedom);
@@ -41,11 +41,11 @@ void AreaTest::evaluate(const int index, GrStat& stats, double degressOfFreedom)
 	}*/
 	if (pValDissemination < _alpha)
 	{
-		stats.setGrStatus(index, GR_DISSEMINATION);
+		stats.setStatus(index, GR_DISSEMINATION);
 	}
 	else //if (_stat1.getMean() == _stat2.getMean() && _stat1.getVariance() == _stat2.getVariance())
 	{
-		stats.setGrStatus(index, GR_CONTAINMENT);
+		stats.setStatus(index, GR_CONTAINMENT);
 	}
 	/*else
 	{

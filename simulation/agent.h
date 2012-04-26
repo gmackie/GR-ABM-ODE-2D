@@ -126,8 +126,9 @@ public:
 
 	virtual void move(GrGrid& grid) = 0;
 	virtual void secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDepletion, bool il10rDynamics, bool il10Depletion, int mdt) = 0;
-	virtual void computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tnfrDynamics, bool nfkbDynamics, bool il10rDynamics, bool tgammatransition) = 0;
+	virtual void computeNextState(const int time, GrGrid& grid, Stats& stats, bool tnfrDynamics, bool nfkbDynamics, bool il10rDynamics, bool tgammatransition) = 0;
 	virtual void updateState() = 0;
+  virtual void updateStatistics(Stats& s) const = 0;
 
 	virtual void solveTNF (GrGrid& grid, double dt);
 	virtual void solveIL10 (GrGrid& grid, double dt);
@@ -162,7 +163,7 @@ public:
 
 	virtual void kill() = 0;
 	virtual void deactivate(const int time) = 0;
-	virtual bool isDead() = 0;
+	virtual bool isDead() const = 0;
 	virtual bool isDeadNext() = 0;
 	virtual void print() const = 0;
 	virtual AgentType getAgentType() const = 0;

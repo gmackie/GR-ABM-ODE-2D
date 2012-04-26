@@ -7,7 +7,7 @@
 
 #include "macrophage.h"
 #include "params.h"
-#include "grstat.h"
+#include "stat.h"
 #include "grgrid.h"
 #include "serialization.h"
 
@@ -297,7 +297,7 @@ void Mac::apoptosis(GrGrid& grid)
 	}
 }
 
-void Mac::computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tnfrDynamics, bool nfkbDynamics, bool, bool)
+void Mac::computeNextState(const int time, GrGrid& grid, Stats& stats, bool tnfrDynamics, bool nfkbDynamics, bool, bool)
 {
 	double tnfBoundFraction = grid.TNF(_pos) / (grid.TNF(_pos) + _PARAM(PARAM_GR_KD1) * 48.16e11);
 	double nfkb_adjusted_k_apoptosis = _PARAM(PARAM_GR_K_APOPTOSIS_NFKB_MOLECULAR) * (_PARAM(PARAM_GR_K_IAP)/(_PARAM(PARAM_GR_K_IAP) + _normalizedIAP));
@@ -322,21 +322,21 @@ void Mac::computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tnf
 			 g_Rand.getReal() < 1 - pow(2.7183, -_PARAM(PARAM_GR_K_APOPTOSIS_MOLECULAR) * (_intBoundTNFR1 - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR))))
 	{
 		// TNF induced apoptosis
-		stats.incMacApoptosisTNF(_state);
+		++stats.getMacApoptosisTNF(_state);
 		apoptosis(grid);
 	}
 	else if (nfkbDynamics && _intBoundTNFR1 > _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR) &&	
 			 g_Rand.getReal() < 1 - pow(2.7183, -nfkb_adjusted_k_apoptosis * (_intBoundTNFR1 - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR))))
 	{
 		// TNF induced apoptosis
-		stats.incMacApoptosisTNF(_state);
+		++stats.getMacApoptosisTNF(_state);
 		apoptosis(grid);
 	}
 	else if (!tnfrDynamics && tnfBoundFraction > _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF) &&
 			 g_Rand.getReal() < 1 - pow(2.7183, -_PARAM(PARAM_GR_K_APOPTOSIS) * (tnfBoundFraction - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF))))
 	{
 		// TNF induced apoptosis
-		stats.incMacApoptosisTNF(_state);
+		++stats.getMacApoptosisTNF(_state);
 		apoptosis(grid);
 	}
 	else
@@ -404,7 +404,7 @@ void Mac::solveDegradation(GrGrid& grid, double dt, bool tnfrDynamics, bool il10
 	Agent::solveDegradation(grid, dt, tnfrDynamics, il10rDynamics, _PARAM(PARAM_GR_MEAN_TNFR1_MAC), _PARAM(PARAM_GR_I_IL10R_MAC));
 }
 
-void Mac::handleResting(const int time, GrGrid& grid, GrStat& stats, bool nfkbDynamics)
+void Mac::handleResting(const int time, GrGrid& grid, Stats& stats, bool nfkbDynamics)
 {
 	_stat1 |= g_Rand.getReal() < getCountTgam(Tgam::TGAM_ACTIVE, grid) * _PARAM(PARAM_MAC_PROB_STAT1_TGAM);
 
@@ -456,7 +456,7 @@ void Mac::handleResting(const int time, GrGrid& grid, GrStat& stats, bool nfkbDy
 				_activationTime = time;
 				_deathTime = time + _PARAM(PARAM_MAC_A_AGE);
 				_nextState = Mac::MAC_ACTIVE;
-				stats.incRestingMacActivationTNF();
+				++stats.getRestingMacActivationTNF();
 			}
 		}
 	}
@@ -466,11 +466,11 @@ void Mac::handleResting(const int time, GrGrid& grid, GrStat& stats, bool nfkbDy
 		_activationTime = time;
 		_deathTime = time + _PARAM(PARAM_MAC_A_AGE);
 		_nextState = Mac::MAC_ACTIVE;
-		stats.incRestingMacActivationTNF();
+		++stats.getRestingMacActivationTNF();
 	}
 }
 
-void Mac::handleInfected(const int time, GrGrid& grid, GrStat& stats, bool nfkbDynamics)
+void Mac::handleInfected(const int time, GrGrid& grid, Stats& stats, bool nfkbDynamics)
 {
 	// intracellular bacteria reproduce
 	_intMtb *= getIntMtbGrowthRate(time);
@@ -516,7 +516,7 @@ void Mac::handleInfected(const int time, GrGrid& grid, GrStat& stats, bool nfkbD
 					_activationTime = time;
 					_deathTime = time + _PARAM(PARAM_MAC_A_AGE);
 					_nextState = Mac::MAC_ACTIVE;
-					stats.incInfMacActivationTNF();
+					++stats.getInfMacActivationTNF();
 				}
 				else 
 				{
@@ -532,7 +532,7 @@ void Mac::handleInfected(const int time, GrGrid& grid, GrStat& stats, bool nfkbD
 				_activationTime = time;
 				_deathTime = time + _PARAM(PARAM_MAC_A_AGE);
 				_nextState = Mac::MAC_ACTIVE;
-				stats.incInfMacActivationTNF();
+				++stats.getInfMacActivationTNF();
 			}
 			else
 			{
@@ -542,7 +542,7 @@ void Mac::handleInfected(const int time, GrGrid& grid, GrStat& stats, bool nfkbD
 	}
 }
 
-void Mac::handleChronicallyInfected(const int time, GrGrid& grid, GrStat&)
+void Mac::handleChronicallyInfected(const int time, GrGrid& grid, Stats&)
 {
 	// intracellular bacteria reproduce
 	_intMtb *= getIntMtbGrowthRate(time);
@@ -564,7 +564,7 @@ void Mac::handleChronicallyInfected(const int time, GrGrid& grid, GrStat&)
 	}
 }
 
-void Mac::handleActivated(const int, GrGrid& grid, GrStat&)
+void Mac::handleActivated(const int, GrGrid& grid, Stats&)
 {
 	// kill extracellular bacteria in the compartment the macrophage resides
 	grid.extMTB(_pos) += (-1 * std::min(grid.extMTB(_pos), _PARAM(PARAM_MAC_NR_UPTAKE_A_EXTMTB)));
@@ -757,3 +757,31 @@ void Mac::disperseMtb(GrGrid& grid, double fraction)
     _intMtb -= mtb;
 }
 
+void Mac::updateStatistics(Stats& stats) const {
+  //TODO: Implement
+  ++stats.getNrOfMacs((Mac::State)getState());
+  stats.getMacIntMtbStats((Mac::State)getState())(getIntMtb());
+  if(getState() == Mac::MAC_INFECTED || getState() == Mac::MAC_CINFECTED){
+    // This can happen if  _PARAM(PARAM_MAC_THRESHOLD_BURST_CI_INTMTB) < _PARAM(PARAM_MAC_THRESHOLD_BECOME_CI_INTMTB)
+    // or if the intMtb growth rate is high enough for intMtb for a mac > both PARAM(PARAM_MAC_THRESHOLD_BECOME_CI_INTMTB)
+    // and _PARAM(PARAM_MAC_THRESHOLD_BURST_CI_INTMTB). In either case intMtb >  _PARAM(PARAM_MAC_THRESHOLD_BURST_CI_INTMTB)
+    // when an Mi becomes an MCi. The new MCi won't burst until the next time step, so the assert condition would be true here.
+    //assert(pMac->getIntMtb() < _PARAM(PARAM_MAC_THRESHOLD_BURST_CI_INTMTB));
+
+    assert(getIntMtb() < stats.getIntMtbFreq().size());
+
+    ++stats.getIntMtbFreq(int(getIntMtb()));
+  }
+
+  if (!isDead())
+    stats.getTotIntMtb() += (getIntMtb());
+
+  if (getNFkB())
+    ++stats.getMacNFkB((Mac::State)getState());
+
+  if (getStat1())
+    ++stats.getMacStat1((Mac::State)getState());
+
+  if (isDeactivated())
+    ++stats.getMacDeact((Mac::State)getState());
+}

@@ -14,7 +14,7 @@
 class Tcyt : public Tcell
 {
 public:
-enum State {TCYT_DEAD, TCYT_ACTIVE, TCYT_DOWN_REGULATED, NSTATES};
+  enum State {TCYT_ACTIVE, TCYT_DOWN_REGULATED, TCYT_DEAD, NSTATES};
 private:
 	static const std::string _ClassName;
 
@@ -25,8 +25,8 @@ private:
 	Tcyt::State _nextState;
 	int _deactivationTime;
 	
-	void handleActive(const int time, GrGrid& grid, GrStat& stats);
-	void handleDownRegulated(const int time, GrGrid& grid, GrStat& stats);
+	void handleActive(const int time, GrGrid& grid, Stats& stats);
+	void handleDownRegulated(const int time, GrGrid& grid, Stats& stats);
 
 public:
 	Tcyt();
@@ -34,13 +34,14 @@ public:
 	~Tcyt();
 	void move(GrGrid& grid);
 	void secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDepletion, bool il10rDynamics, bool il10Depletion, int mdt);
-	void computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tnfrDynamics, bool nfkbDynamics, bool il10rDynamics, bool);
+	void computeNextState(const int time, GrGrid& grid, Stats& stats, bool tnfrDynamics, bool nfkbDynamics, bool il10rDynamics, bool);
 	void updateState();
+  void updateStatistics(Stats& s) const;
 	int getState() const;
 	Tcyt::State getNextState() const;
 	void deactivate(const int time);
 	void kill();
-	bool isDead();
+	bool isDead() const;
 	bool isDeadNext();
 	int getDeactivationTime() const;
 	static bool isTcyt(const Agent* pAgent);
@@ -89,7 +90,7 @@ inline bool Tcyt::isTcyt(const Agent* pAgent, Tcyt::State state)
 	}
 }
 
-inline bool Tcyt::isDead()
+inline bool Tcyt::isDead() const
 {
 	return _state == TCYT_DEAD;
 }

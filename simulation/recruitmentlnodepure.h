@@ -21,7 +21,7 @@ private:
 	static const int _idxEffectorTH0 = 5;
 	static const int _idxEffectorT80 = 6;
 
-	virtual void solveODE(const int time, const GrStat& statsPrevious, GrStat& stats);
+	virtual void solveODE(const int time, const Stats& statsPrevious, Stats& stats);
 
 public:
 	RecruitmentLnODEPure();

@@ -19,7 +19,7 @@ RecruitmentLnODEProxy::~RecruitmentLnODEProxy() {
 	// TODO Auto-generated destructor stub
 }
 
-void RecruitmentLnODEProxy::solveODE(const int time, const GrStat& statsPrevious, GrStat& stats)
+void RecruitmentLnODEProxy::solveODE(const int time, const Stats& statsPrevious, Stats& stats)
 {
 	//std::cerr << "_PARAM(PARAM_TCELL_LYMPH_PROXY_SCALING_START): " << _PARAM(PARAM_TCELL_LYMPH_PROXY_SCALING_START) << std::endl; //DBG
 	//std::cerr << "_PARAM(PARAM_TCELL_LYMPH_PROXY_FACTOR_TIME_START): " << _PARAM(PARAM_TCELL_LYMPH_PROXY_FACTOR_TIME_START) << std::endl; //DBG

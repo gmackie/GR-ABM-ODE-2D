@@ -16,12 +16,12 @@ MtbTest::~MtbTest()
 {
 }
 
-void MtbTest::update(const int time, const int index, GrStat& stats)
+void MtbTest::update(const int time, const int index, Stats& stats)
 {
 	TTest::update(time, index, stats, stats.getTotExtMtb() + stats.getTotIntMtb());
 }
 
-void MtbTest::evaluate(const int index, GrStat& stats, double degressOfFreedom)
+void MtbTest::evaluate(const int index, Stats& stats, double degressOfFreedom)
 {
 
 	//double pValContainment = twoSided(degressOfFreedom);
@@ -33,37 +33,37 @@ void MtbTest::evaluate(const int index, GrStat& stats, double degressOfFreedom)
 
 	/*else if (pValContainment > _alpha)
 	{
-		stats.setGrStatus(GR_CONTAINMENT);
+		stats.setStatus(GR_CONTAINMENT);
 	}
 	else if (pValClearance < _alpha)
 	{
-		stats.setGrStatus(GR_CLEARANCE);
+		stats.setStatus(GR_CLEARANCE);
 	}*/
 	if (pValDissemination < _alpha)
 	{
 		if (stats.getTotExtMtb() >= stats.getTotIntMtb())
 		{
-			stats.setGrStatus(index, GR_DISSEMINATION);
+			stats.setStatus(index, GR_DISSEMINATION);
 		}
 		else
 		{
-			stats.setGrStatus(index, GR_DISSEMINATION_INCONSISTENT);
+			stats.setStatus(index, GR_DISSEMINATION_INCONSISTENT);
 		}
 	}
 	else //if (_stat1.getMean() == _stat2.getMean() && _stat1.getVariance() == _stat2.getVariance())
 	{
 		if (stats.getTotExtMtb() <= stats.getTotIntMtb())
 		{
-			stats.setGrStatus(index, GR_CONTAINMENT);
+			stats.setStatus(index, GR_CONTAINMENT);
 		}
 		else
 		{
-			stats.setGrStatus(index, GR_CONTAINMENT_INCONSISTENT);
+			stats.setStatus(index, GR_CONTAINMENT_INCONSISTENT);
 		}
 	}
 	/*else
 	{
-		stats.setGrStatus(GR_UNKNOWN);
+		stats.setStatus(GR_UNKNOWN);
 	}*/
 
 

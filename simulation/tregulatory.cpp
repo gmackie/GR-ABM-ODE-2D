@@ -7,7 +7,7 @@
 
 #include "tregulatory.h"
 #include "grgrid.h"
-#include "grstat.h"
+#include "stat.h"
 #include "serialization.h"
 
 using namespace std;
@@ -58,7 +58,7 @@ void Treg::deactivate(const int)
 {
 }
 
-void Treg::computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tnfrDynamics, bool, bool, bool)
+void Treg::computeNextState(const int time, GrGrid& grid, Stats& stats, bool tnfrDynamics, bool, bool, bool)
 {
 	double tnfBoundFraction = grid.TNF(_pos) / (grid.TNF(_pos) + _PARAM(PARAM_GR_KD1) * 48.16e11);
 
@@ -71,14 +71,14 @@ void Treg::computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tn
 			 g_Rand.getReal() < 1 - pow(2.7183, -_PARAM(PARAM_GR_K_APOPTOSIS_MOLECULAR) * (_intBoundTNFR1 - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR))))
 	{
 		// TNF induced apoptosis
-		stats.incTcellApoptosisTNF();
+		++stats.getTcellApoptosisTNF();
 		_nextState = TREG_DEAD;
 	}
 	else if (!tnfrDynamics && tnfBoundFraction > _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF) &&
 			 g_Rand.getReal() < 1 - pow(2.7183, -_PARAM(PARAM_GR_K_APOPTOSIS) * (tnfBoundFraction - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF))))
 	{
 		// TNF induced apoptosis
-		stats.incTcellApoptosisTNF();
+		++stats.getTcellApoptosisTNF();
 		_nextState = TREG_DEAD;
 	}
 	else
@@ -105,7 +105,7 @@ void Treg::computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tn
 // loaded then the agent will be deserialized and added to a cell list, but it will fail to be
 // added to its grid compartment because an agent can't be added to a caseated compartment.
 // This will leave the simulation in an inconsistent state.
-void Treg::handleResting(const int time, GrGrid& grid, GrStat&)
+void Treg::handleResting(const int time, GrGrid& grid, Stats&)
 {
 	for (int i = -1; i <= 1; i++)
 	{
@@ -195,4 +195,8 @@ void Treg::deserialize(std::istream& in)
 	{
 		exit(1);
 	}
+}
+
+void Treg::updateStatistics(Stats& s) const {
+  ++s.getNrOfTregs((Treg::State)getState());
 }

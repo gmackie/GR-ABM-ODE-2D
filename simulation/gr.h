@@ -91,7 +91,7 @@ class Tcyt;
 class Treg;
 class Agent;
 class RecruitmentBase;
-class GrStat;
+class Stats;
 
 // typedefs
 typedef std::list<Mac> MacList;

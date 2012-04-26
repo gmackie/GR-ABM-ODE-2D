@@ -195,7 +195,7 @@
 		/>
 	<Tcell
 		mtbRecEnabled = "35"
-		timeRecEnabled = "2880"
+		timeRecEnabled = "0"
 		lymphProxyMtbThreshold = "50"
 		lymphProxyScalingStart = "2880"
 		lymphProxyFactorStart = "5040"

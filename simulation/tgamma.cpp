@@ -8,7 +8,7 @@
 #include "tgamma.h"
 #include "macrophage.h"
 #include "grgrid.h"
-#include "grstat.h"
+#include "stat.h"
 #include "serialization.h"
 
 const std::string Tgam::_ClassName = "Tgam";
@@ -99,7 +99,7 @@ void Tgam::secrete(GrGrid& grid, bool tnfrDynamics, bool, bool tnfDepletion, boo
     }
 }
 
-void Tgam::computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tnfrDynamics, bool, bool, bool tgammatransition)
+void Tgam::computeNextState(const int time, GrGrid& grid, Stats& stats, bool tnfrDynamics, bool, bool, bool tgammatransition)
 {
 	double tnfBoundFraction = grid.TNF(_pos) / (grid.TNF(_pos) + _PARAM(PARAM_GR_KD1) * 48.16e11);
     
@@ -112,14 +112,14 @@ void Tgam::computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tn
 			 g_Rand.getReal() < 1 - pow(2.7183, -_PARAM(PARAM_GR_K_APOPTOSIS_MOLECULAR) * (_intBoundTNFR1 - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR))))
 	{
 		// TNF induced apoptosis
-		stats.incTcellApoptosisTNF();
+		++stats.getTcellApoptosisTNF();
 		_nextState = TGAM_DEAD;
 	}
 	else if (!tnfrDynamics && tnfBoundFraction > _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF) &&
 			 g_Rand.getReal() < 1 - pow(2.7183, -_PARAM(PARAM_GR_K_APOPTOSIS) * (tnfBoundFraction - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF))))
 	{
 		// TNF induced apoptosis
-		stats.incTcellApoptosisTNF();
+		++stats.getTcellApoptosisTNF();
 		_nextState = TGAM_DEAD;
 	}
     else
@@ -148,7 +148,7 @@ void Tgam::computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tn
 	}
 }
 
-void Tgam::handleActive(const int time, GrGrid& grid, GrStat& stats, bool tgammatransition)
+void Tgam::handleActive(const int time, GrGrid& grid, Stats& stats, bool tgammatransition)
 {
     double ProbSum = 0.0; // Initialize the probability sum for transition to TGAM_ACTIVE_DOUBLE
 
@@ -172,7 +172,7 @@ void Tgam::handleActive(const int time, GrGrid& grid, GrStat& stats, bool tgamma
 				(pMac->getState() == Mac::MAC_INFECTED || pMac->getState() == Mac::MAC_CINFECTED) &&
 				g_Rand.getReal() < _PARAM(PARAM_TGAM_PROB_APOPTOSIS_FAS_FASL))
 			{
-				stats.incApoptosisFasFasL();
+				++stats.getApoptosisFasFasL();
 				pMac->apoptosis(grid);
 				pMac->kill();
 
@@ -277,7 +277,7 @@ void Tgam::handleActive(const int time, GrGrid& grid, GrStat& stats, bool tgamma
                 (pMac->getState() == Mac::MAC_INFECTED || pMac->getState() == Mac::MAC_CINFECTED) &&
                 g_Rand.getReal() < _PARAM(PARAM_TGAM_PROB_APOPTOSIS_FAS_FASL))
             {
-                stats.incApoptosisFasFasL();
+                ++stats.getApoptosisFasFasL();
                 pMac->apoptosis(grid);
                 pMac->kill();
                 
@@ -287,7 +287,7 @@ void Tgam::handleActive(const int time, GrGrid& grid, GrStat& stats, bool tgamma
     }
 }
 
-void Tgam::handleDownRegulated(const int time, GrGrid&, GrStat&)
+void Tgam::handleDownRegulated(const int time, GrGrid&, Stats&)
 {
 	if (time - _deactivationTime >= _PARAM(PARAM_TGAM_TIMESPAN_REGULATED))
 	{
@@ -299,7 +299,7 @@ void Tgam::handleDownRegulated(const int time, GrGrid&, GrStat&)
 	}
 }
 
-void Tgam::handleActiveDouble(const int time, GrGrid& grid, GrStat& stats)
+void Tgam::handleActiveDouble(const int time, GrGrid& grid, Stats& stats)
 {
     // Carries out same action as TGAM_ACTIVE but secretes half rate of IL10
     // Distinct state so it is easier to track
@@ -331,7 +331,7 @@ void Tgam::handleActiveDouble(const int time, GrGrid& grid, GrStat& stats)
 			(pMac->getState() == Mac::MAC_INFECTED || pMac->getState() == Mac::MAC_CINFECTED) &&
 			g_Rand.getReal() < _PARAM(PARAM_TGAM_PROB_APOPTOSIS_FAS_FASL))
 		{
-			stats.incApoptosisFasFasL();
+			++stats.getApoptosisFasFasL();
 			pMac->apoptosis(grid);
 			pMac->kill();
             
@@ -340,7 +340,7 @@ void Tgam::handleActiveDouble(const int time, GrGrid& grid, GrStat& stats)
 	}
 }
 
-void Tgam::handleInducedReg(const int time, GrGrid& grid, GrStat& stats)
+void Tgam::handleInducedReg(const int time, GrGrid& grid, Stats& stats)
 {
     _nextState = TGAM_INDUCED_REG;
 }
@@ -446,4 +446,8 @@ void Tgam::deserialize(std::istream& in)
 	{
 		exit(1);
 	}
+}
+
+void Tgam::updateStatistics(Stats& s) const {
+  ++s.getNrOfTgams((Tgam::State)getState());
 }

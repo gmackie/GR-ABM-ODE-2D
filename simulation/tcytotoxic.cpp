@@ -8,7 +8,7 @@
 #include "tcytotoxic.h"
 #include "macrophage.h"
 #include "grgrid.h"
-#include "grstat.h"
+#include "stat.h"
 #include "serialization.h"
 
 const std::string Tcyt::_ClassName = "Tcyt";
@@ -69,7 +69,7 @@ void Tcyt::secrete(GrGrid& grid, bool tnfrDynamics, bool, bool tnfDepletion, boo
     
 }
 
-void Tcyt::computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tnfrDynamics, bool, bool, bool)
+void Tcyt::computeNextState(const int time, GrGrid& grid, Stats& stats, bool tnfrDynamics, bool, bool, bool)
 {
 	double tnfBoundFraction = grid.TNF(_pos) / (grid.TNF(_pos) + _PARAM(PARAM_GR_KD1) * 48.16e11);
 
@@ -82,14 +82,14 @@ void Tcyt::computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tn
 			 g_Rand.getReal() < 1 - pow(2.7183, -_PARAM(PARAM_GR_K_APOPTOSIS_MOLECULAR) * (_intBoundTNFR1 - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR))))
 	{
 		// TNF induced apoptosis
-		stats.incTcellApoptosisTNF();
+		++stats.getTcellApoptosisTNF();
 		_nextState = TCYT_DEAD;
 	}
 	else if (!tnfrDynamics && tnfBoundFraction > _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF) &&
 			 g_Rand.getReal() < 1 - pow(2.7183, -_PARAM(PARAM_GR_K_APOPTOSIS) * (tnfBoundFraction - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF))))
 	{
 		// TNF induced apoptosis
-		stats.incTcellApoptosisTNF();
+		++stats.getTcellApoptosisTNF();
 		_nextState = TCYT_DEAD;
 	}
 	else
@@ -112,7 +112,7 @@ void Tcyt::computeNextState(const int time, GrGrid& grid, GrStat& stats, bool tn
 	}
 }
 
-void Tcyt::handleActive(const int, GrGrid& grid, GrStat&)
+void Tcyt::handleActive(const int, GrGrid& grid, Stats&)
 {
 
 	if (grid.hasAgentType(MAC, _pos))
@@ -164,7 +164,7 @@ void Tcyt::handleActive(const int, GrGrid& grid, GrStat&)
 	}
 }
 
-void Tcyt::handleDownRegulated(const int time, GrGrid&, GrStat&)
+void Tcyt::handleDownRegulated(const int time, GrGrid&, Stats&)
 {
 	if (time - _deactivationTime >= _PARAM(PARAM_TCYT_TIMESPAN_REGULATED))
 	{
@@ -255,4 +255,8 @@ void Tcyt::deserialize(std::istream& in)
 	{
 		exit(1);
 	}
+}
+
+void Tcyt::updateStatistics(Stats& s) const {
+  ++s.getNrOfTcyts((Tcyt::State)getState());
 }

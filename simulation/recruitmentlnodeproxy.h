@@ -13,7 +13,7 @@
 class RecruitmentLnODEProxy  : public RecruitmentLnODE
 {
 private:
-	virtual void solveODE(const int time, const GrStat& statsPrevious, GrStat& stats);
+	virtual void solveODE(const int time, const Stats& statsPrevious, Stats& stats);
 
 public:
 	RecruitmentLnODEProxy();

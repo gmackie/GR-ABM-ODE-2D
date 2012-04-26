@@ -17,7 +17,7 @@
 
 #include "gr.h"
 #include "grgrid.h"
-#include "grstat.h"
+#include "stat.h"
 #include "recruitmentbase.h"
 #include <string>
 
@@ -51,13 +51,13 @@ protected:
 	const std::string _odeTmpFile;
 
 	void init();
-	void updateInitialConditions(GrStat& stats);
-	virtual void solveODE(const int time, const GrStat& statsPrevious, GrStat& stats);
-	void updateQueue(const int time, GrStat& stats);
-	void recruitMacsGetTcellSources(GrSimulation& sim, GrStat& stats,
+	void updateInitialConditions(Stats& stats);
+	virtual void solveODE(const int time, const Stats& statsPrevious, Stats& stats);
+	void updateQueue(const int time, Stats& stats);
+	void recruitMacsGetTcellSources(GrSimulation& sim, Stats& stats,
 			ThresholdPosList tcellSources[TCELL_TYPE_COUNT]);
 	void recruitMac(GrSimulation& sim, const Pos& pSource);
-	void recruitTcells(GrSimulation& sim, GrStat& stats,
+	void recruitTcells(GrSimulation& sim, Stats& stats,
 			ThresholdPosList tcellSources[TCELL_TYPE_COUNT]);
 
 public:

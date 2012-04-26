@@ -8,7 +8,7 @@
 #include "gr.h"
 #include "params.h"
 #include "grsimulation.h"
-#include "grstat.h"
+#include "stat.h"
 #include "rand.h"
 #include <time.h>
 #include <boost/program_options.hpp>
@@ -32,7 +32,7 @@ void printUsage(char* pArgv0, po::options_description& desc)
 	std::cout << "Usage: " << pArgv0 << " [options]\n" << desc << std::endl;
 }
 
-bool stopCondition(int timeToSimulate, int time, GrStat stats)
+bool stopCondition(int timeToSimulate, int time, Stats stats)
 {
 	return (stats.getTotExtMtb() == 0 &&
 			stats.getTotIntMtb() == 0 &&
@@ -53,7 +53,7 @@ int run(unsigned long seed, const std::string& inputFileName, DiffusionMethod di
 	sim.setTnfrDynamics(tnfrDynamics);
 	sim.setRecruitment(pRecr);
 
-	const GrStat& stats = sim.getStats();
+	const Stats& stats = sim.getStats();
 
 	sim.setDiffusionMethod(diffMethod);
 	sim.init();

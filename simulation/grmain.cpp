@@ -588,7 +588,7 @@ int main(int argc, char** argv)
     return 0;
   }
 
-  std::vector<int> ids;
+  std::vector<size_t> ids;
   {
     std::stringstream ss(track_ids);
     string id;

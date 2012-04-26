@@ -92,7 +92,7 @@ public:
 	~GrSimulation();
 	void init();
 	void initMolecularTracking(Scalar molecularTrackingRadius);
-	void initMolecularTracking(const std::vector<int>& ids);
+	void initMolecularTracking(const std::vector<size_t>& ids);
 	void solve();
 	void performT_Test();
 	int getTime() const;

@@ -22,14 +22,9 @@
 #include "rand.h"
 #include "pos.h"
 #include "params.h"
+#include "version.h"
 #include <valarray>
 #include <boost/mpl/vector.hpp>
-
-#ifndef SVN_VERSION
-#define GR_VERSION "12022010"
-#else
-#define GR_VERSION "r" SVN_VERSION
-#endif
 
 //#ifndef __DIM__
 //  #define __DIM__ (100)

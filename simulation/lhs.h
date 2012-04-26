@@ -9,6 +9,7 @@
 #define LHS_H
 
 #include "paramsbase.h"
+#include "version.h"
 #include <vector>
 
 struct LhsDoubleParam

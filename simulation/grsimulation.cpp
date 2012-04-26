@@ -504,7 +504,7 @@ void GrSimulation::initMolecularTracking(Scalar molecularTrackingRadius)
 		}
 	}
 }
-void GrSimulation::initMolecularTracking(const std::vector<int>& ids) {
+void GrSimulation::initMolecularTracking(const std::vector<size_t>& ids) {
 
 	for (MacList::iterator it = _macList.begin(); it != _macList.end(); it++)
     for(typeof(ids.begin()) i=ids.begin(); i != ids.end(); i++)

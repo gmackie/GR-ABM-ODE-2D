@@ -6,11 +6,13 @@
  */
 
 #include "lhs.h"
+#include "rand.h"
 #include <boost/program_options.hpp>
 #include <iostream>
 #include <fstream>
 #include <stdio.h>
 
+extern Rand g_Rand;
 namespace po = boost::program_options;
 
 /*
@@ -599,7 +601,7 @@ int main(int argc, char** argv)
 			return 1;
 		}
         if (vm.count("log-scale")) {
-            _logscale = 1;
+            logscale = 1;
         }
 	}
 	catch (std::exception& e)

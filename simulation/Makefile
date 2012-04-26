@@ -1,5 +1,8 @@
 OS := $(shell grep -E 'Ubuntu|Red Hat' /etc/issue)
+
+ifndef BOOST_PREFIX
 BOOST_PREFIX := /usr
+endif
 
 SVNREV := $(shell svn info | grep "Last Changed Rev:" | cut -d" " -f4)
 CXX := g++

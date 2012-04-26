@@ -157,16 +157,16 @@ FORMS += gui/agentswidget.ui \
 QMAKE_CXXFLAGS_RELEASE -= -O2 -Wno-strict-aliasing
 QMAKE_CXXFLAGS_RELEASE += -O3 -fopenmp -DOPENMP -Wno-strict-aliasing
 QMAKE_LFLAGS_RELEASE += -fopenmp -DOPENMP
-isEmpty(BOOST_PREFIX):BOOST_PREFIX=/usr
-INCLUDEPATH += $$quote($${BOOST_PREFIX}/include)
+
+INCLUDEPATH += $$quote($(BOOST_PREFIX)/include)
 LIBS += -lGLU
 
 unix:system(grep -qE \"Ubuntu|Red Hat\" /etc/issue) {
   LIBS += -lboost_program_options -lboost_iostreams -lboost_serialization
-  QMAKE_LIBDIR = $${BOOST_PREFIX}/lib  $${QMAKE_LIBDIR}
+  QMAKE_LIBDIR = $(BOOST_PREFIX)/lib  $${QMAKE_LIBDIR}
 } else:unix|macx {
   LIBS += -lboost_program_options -lboost_iostreams -lboost_serialization
-  QMAKE_LIBDIR = $${BOOST_PREFIX}/lib  $${QMAKE_LIBDIR}
+  QMAKE_LIBDIR = $(BOOST_PREFIX)/lib  $${QMAKE_LIBDIR}
 }
 
 exists( .git/ ) {

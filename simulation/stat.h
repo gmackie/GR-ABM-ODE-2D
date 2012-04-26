@@ -114,7 +114,7 @@ Stats() :
   type& get ## name (size_t i) { assert(i < sz); return _ ## name [i]; }  \
   const boost::array<type, sz>& get ## name ## Array () const { return _ ## name; }  \
   void set ## name (size_t i, const type& v) { assert(i < sz); (_ ## name [i]) = v; } \
-  void set ## name (const type& v) { std::fill_n((_ ## name).begin(), sz, v); }
+  void set ## name (const type& v) { std::fill_n((_ ## name).begin(), (size_t)sz, v); }
 
 #define STATE_STAT(type, name, agent_t, desc, reset) \
   const type& get ## name (agent_t::State i) const { return _ ## name [i]; }  \
@@ -122,7 +122,7 @@ Stats() :
   type get ## name () const { return std::accumulate(_ ## name .begin(), _ ## name .end(), type()); } \
   const boost::array<type, agent_t::NSTATES>& get ## name ## Array () const { return _ ## name; }  \
   void set ## name (agent_t::State i, const type& v) { (_ ## name [i]) = v; } \
-  void set ## name (const type& v) { std::fill_n((_ ## name).begin(), agent_t::NSTATES, v); }
+  void set ## name (const type& v) { std::fill_n((_ ## name).begin(), (size_t)agent_t::NSTATES, v); }
 /*  ///TODO: Implement AGENTSTATE_STAT
 #define AGENTSTATE_STAT(type, name, sz, desc, reset) \
   template<typename agent_t>  \
@@ -149,7 +149,7 @@ Stats() :
   const t& get ## name (AgentType type) const { return _ ## name [type]; }  \
   t& get ## name (AgentType type) { return _ ## name [type]; }  \
   void set ## name (AgentType type, const t& v) { _ ## name [type] = v; } \
-  void set ## name (const t& v) { std::fill_n((_ ## name).begin(), NAGENTS, v); }
+  void set ## name (const t& v) { std::fill_n((_ ## name).begin(), (size_t)NAGENTS, v); }
 #include "stat.def"
 
 // --- Custom Accessors ---
@@ -226,7 +226,7 @@ Stats() :
 
   void clear() {
     #define STAT(type, name, desc, reset)           _##name = type();
-    #define ARRAY_STAT(type, name, sz, desc, reset) std::fill_n(_##name.begin(), sz, type());
+    #define ARRAY_STAT(type, name, sz, desc, reset) std::fill_n(_##name.begin(), (size_t)sz, type());
     #define AGENT_STAT(type, name, desc, reset)     ARRAY_STAT(type, name, NAGENTS, desc, reset)
     #define STATE_STAT(type, name, agent_t, desc, reset) ARRAY_STAT(type, name, agent_t::NSTATES, desc, reset)
     //#define AGENTSTATE_STAT(type, name, sz, desc, reset) s << boost::serialization::make_nvp( #name, _ ## name); 
@@ -235,7 +235,7 @@ Stats() :
 
   void reset() {
     #define STAT(type, name, desc, reset)           BOOST_PP_EXPR_IF(BOOST_PP_EQUAL(reset, 1), _##name = type());
-    #define ARRAY_STAT(type, name, sz, desc, reset) BOOST_PP_EXPR_IF(BOOST_PP_EQUAL(reset, 1), std::fill_n(_##name.begin(), sz, type()));
+    #define ARRAY_STAT(type, name, sz, desc, reset) BOOST_PP_EXPR_IF(BOOST_PP_EQUAL(reset, 1), std::fill_n(_##name.begin(), (size_t)sz, type()));
     #define AGENT_STAT(type, name, desc, reset)     ARRAY_STAT(type, name, NAGENTS, desc, reset)
     #define STATE_STAT(type, name, agent_t, desc, reset) ARRAY_STAT(type, name, agent_t::NSTATES, desc, reset)
     //#define AGENTSTATE_STAT(type, name, sz, desc, reset) s << boost::serialization::make_nvp( #name, _ ## name); 
@@ -243,13 +243,13 @@ Stats() :
   }
   void resetAgentStats() {
     #define STAT(type, name, desc, reset)           BOOST_PP_EXPR_IF(BOOST_PP_EQUAL(reset, 2), _##name = type());
-    #define ARRAY_STAT(type, name, sz, desc, reset) BOOST_PP_EXPR_IF(BOOST_PP_EQUAL(reset, 2), std::fill_n(_##name.begin(), sz, type()));
+    #define ARRAY_STAT(type, name, sz, desc, reset) BOOST_PP_EXPR_IF(BOOST_PP_EQUAL(reset, 2), std::fill_n(_##name.begin(), (size_t)sz, type()));
     #define AGENT_STAT(type, name, desc, reset)     ARRAY_STAT(type, name, NAGENTS, desc, reset)
     #define STATE_STAT(type, name, agent_t, desc, reset) ARRAY_STAT(type, name, agent_t::NSTATES, desc, reset)
     //#define AGENTSTATE_STAT(type, name, sz, desc, reset) s << boost::serialization::make_nvp( #name, _ ## name); 
     #include "stat.def"
     std::fill(_intMtbFreq.begin(), _intMtbFreq.end(), 0);
-    std::fill_n(_macIntMtbStats.begin(), Mac::NSTATES, Stat());
+    std::fill_n(_macIntMtbStats.begin(), (size_t)Mac::NSTATES, Stat());
   }
 
   /*** Custom Functions ***/

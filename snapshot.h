@@ -26,7 +26,7 @@ public:
 	bool isGood() const;
 	void takePicture(const int time, const QImage& image, int slice=-1, const QString prefix=QString());
 	void takePicture(const int time, const QImage& image, const QString prefix);
-	void takeSnapshot(const int time, const GrStat& stats);
+	void takeSnapshot(const int time, const Stats& stats);
 	void takeStateSnapshot(const int time, const Simulation& sim);
 };
 

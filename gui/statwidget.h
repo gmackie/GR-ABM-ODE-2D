@@ -4,6 +4,7 @@
 #include <QtGui/QWidget>
 #include "ui_statwidget.h"
 #include "maininterface.h"
+#include "simulation/gr.h"
 
 class StatWidget : public QWidget
 {
@@ -12,7 +13,7 @@ class StatWidget : public QWidget
 public:
     StatWidget(QWidget* pParent = 0);
     ~StatWidget();
-    void updateLabels(const Stat& stats);
+    void updateLabels(const Stats& stats);
 
 private:
     Ui::StatWidgetClass _ui;

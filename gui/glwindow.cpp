@@ -162,16 +162,16 @@ QString GLWindow::getAgentStr(const Agent* pAgent)
 		const Mac* pMac = dynamic_cast<const Mac*>(pAgent);
 		switch (pMac->getState())
 		{
-		case MAC_RESTING:
+		case Mac::MAC_RESTING:
 			res = "Mr";
 			break;
-		case MAC_INFECTED:
+		case Mac::MAC_INFECTED:
 			res = "Mi";
 			break;
-		case MAC_CINFECTED:
+		case Mac::MAC_CINFECTED:
 			res = "Mci";
 			break;
-		case MAC_ACTIVE:
+		case Mac::MAC_ACTIVE:
 		{
 			res = "Ma";
 
@@ -182,7 +182,7 @@ QString GLWindow::getAgentStr(const Agent* pAgent)
 
 			break;
 		}
-		case MAC_DEAD:
+		case Mac::MAC_DEAD:
 			return res;
 		}
 
@@ -212,13 +212,13 @@ QString GLWindow::getAgentStr(const Agent* pAgent)
 		const Tgam* pTgam = dynamic_cast<const Tgam*>(pAgent);
 		switch (pTgam->getState())
 		{
-		case TGAM_ACTIVE:
+		case Tgam::TGAM_ACTIVE:
 			res = "Tg,a";
 			break;
-		case TGAM_DOWN_REGULATED:
+		case Tgam::TGAM_DOWN_REGULATED:
 			res = "Tg,reg";
 			break;
-		case TGAM_DEAD:
+		case Tgam::TGAM_DEAD:
 			return res;
 		}
 	}
@@ -227,13 +227,13 @@ QString GLWindow::getAgentStr(const Agent* pAgent)
 		const Tcyt* pTcyt = dynamic_cast<const Tcyt*>(pAgent);
 		switch (pTcyt->getState())
 		{
-		case TCYT_ACTIVE:
+		case Tcyt::TCYT_ACTIVE:
 			res = "Tc";
 			break;
-		case TCYT_DOWN_REGULATED:
+		case Tcyt::TCYT_DOWN_REGULATED:
 			res = "Tc,reg";
 			break;
-		case TCYT_DEAD:
+		case Tcyt::TCYT_DEAD:
 			return res;
 		}
 	}
@@ -242,10 +242,10 @@ QString GLWindow::getAgentStr(const Agent* pAgent)
 		const Treg* pTreg = dynamic_cast<const Treg*>(pAgent);
 		switch (pTreg->getState())
 		{
-		case TREG_ACTIVE:
+		case Treg::TREG_ACTIVE:
 			res = "Tr";
 			break;
-		case TREG_DEAD:
+		case Treg::TREG_DEAD:
 			return res;
 		}
 	}

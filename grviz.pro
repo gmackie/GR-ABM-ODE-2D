@@ -65,7 +65,6 @@ HEADERS += scalardatasets/scalartotmtbdataset.h \
     simulation/grdiffusionwrongbtcs.h \
     simulation/grgrid.h \
     simulation/grsimulation.h \
-    simulation/grstat.h \
     simulation/macrophage.h \
     simulation/mtbtest.h \
     simulation/onlinestat.h \
@@ -130,7 +129,6 @@ SOURCES += simulation/serialization.cpp \
     simulation/grdiffusion.cpp \
     simulation/areatest.cpp \
     simulation/onlinestat.cpp \
-    simulation/grstat.cpp \
     simulation/agent.cpp \
     simulation/grgrid.cpp \
     simulation/grsimulation.cpp \

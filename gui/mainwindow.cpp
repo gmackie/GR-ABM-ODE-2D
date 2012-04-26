@@ -580,7 +580,7 @@ void MainWindow::timerEvent(QTimerEvent*)
 
 	int simTime = sim.getTime();
 	_pItfc->setSimTime(simTime);
-	const GrStat stats = sim.getStats();
+	const Stats stats = sim.getStats();
 	
 	// clear update flag
 	sim.setUpdated(false);
@@ -680,11 +680,11 @@ bool MainWindow::isTimeForAction(int actionInterval, int simTime)
 void MainWindow::updateWindowStatus()
 {
 	Simulation& sim = _pItfc->getSimulation();
-	const GrStat stats = sim.getStats();
+	const Stats stats = sim.getStats();
 
 	for (int i = 0; i < NOUTCOMES; i++)
 	{
-		_pGLWindow->setGrStatus(i, stats.getGrStatus(i));
+		_pGLWindow->setGrStatus(i, stats.getStatus(i));
 	}
 }
 

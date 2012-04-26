@@ -10,26 +10,37 @@ StatWidget::~StatWidget()
 {
 }
 
-void StatWidget::updateLabels(const GrStat& stats)
+static QString toString(const Scalar& v) {
+  return QString::number(v, 'f', 2);
+}
+template<typename T>
+static QString toString(const T& v) {
+  return QString("%1").arg(v);
+}
+template<typename InputIterator>
+static void toString(InputIterator start, InputIterator end, QString& s) {
+  s = QString('(');
+  while(start != end)
+    s += toString(*(start++)) + ',';
+  s[s.size()-1] = ')';
+}
+void StatWidget::updateLabels(const Stats& stats)
 {
-	QString str = QString("%1 - (%2,%3,%4,%5,%6)").arg(stats.getNrOfMac()).
-			arg(stats.getNrOfMacResting()).arg(stats.getNrOfMacInfected()).
-			arg(stats.getNrOfMacCInfected()).arg(stats.getNrOfMacActive()).
-			arg(stats.getNrOfMacDead());
+  QString str;
+  toString(stats.getNrOfMacsArray().begin(), stats.getNrOfMacsArray().end(), str);
+	str = QString("%1 - %2").arg(stats.getNrOfMacs()).arg(str);
 	_ui.labelMac->setText(str);
 
-	str = QString("%1 - (%2,%3,%4)").arg(stats.getNrOfTgam()).
-			arg(stats.getNrOfTgamActive()).arg(stats.getNrOfTgamDownRegulated()).
-			arg(stats.getNrOfTgamDead());
+  toString(stats.getNrOfTgamsArray().begin(), stats.getNrOfTgamsArray().end(), str);
+	str = QString("%1 - %2").arg(stats.getNrOfTgams()).arg(str);
 	_ui.labelTgam->setText(str);
 
-	str = QString("%1 - (%2,%3,%4)").arg(stats.getNrOfTcyt()).
-			arg(stats.getNrOfTcytActive()).arg(stats.getNrOfTcytDownRegulated()).
-			arg(stats.getNrOfTcytDead());
+  toString(stats.getNrOfTcytsArray().begin(), stats.getNrOfTcytsArray().end(), str);
+	str = QString("%1 - %2").arg(stats.getNrOfTcyts()).arg(str);
 	_ui.labelTcyt->setText(str);
 
-	str = QString("%1 - (%2,%3)").arg(stats.getNrOfTreg()).
-			arg(stats.getNrOfTregActive()).arg(stats.getNrOfTregDead());
+  toString(stats.getNrOfTregsArray().begin(), stats.getNrOfTregsArray().end(), str);
+	str = QString("%1 - %2").arg(stats.getNrOfTregs()).arg(str);
 	_ui.labelTreg->setText(str);
 
 	str = QString("(%1,%2)").arg(stats.getTotExtMtb(), 0, 'f', 2).
@@ -40,39 +51,27 @@ void StatWidget::updateLabels(const GrStat& stats)
 			arg(stats.getTotNonRepExtMtb(), 0, 'f', 2);
 	_ui.labelMtbNonRep->setText(str);
 
-	str = QString("%1 - (%2,%3,%4,%5,%6)").arg(stats.getNrOfMacNFkB()).
-			arg(stats.getNrOfMacNFkBResting()).arg(stats.getNrOfMacNFkBInfected()).
-			arg(stats.getNrOfMacNFkBCInfected()).arg(stats.getNrOfMacNFkBActive()).
-			arg(stats.getNrOfMacNFkBDead());
+  toString(stats.getMacNFkBArray().begin(), stats.getMacNFkBArray().end(), str);
+	str = QString("%1 - %2").arg(stats.getMacNFkB()).arg(str);
 	_ui.labelMacNFkB->setText(str);
 
-	str = QString("%1 - (%2,%3,%4,%5,%6)").arg(stats.getNrOfMacStat1()).
-			arg(stats.getNrOfMacStat1Resting()).arg(stats.getNrOfMacStat1Infected()).
-			arg(stats.getNrOfMacStat1CInfected()).arg(stats.getNrOfMacStat1Active()).
-			arg(stats.getNrOfMacStat1Dead());
+  toString(stats.getMacStat1Array().begin(), stats.getMacStat1Array().end(), str);
+	str = QString("%1 - %2").arg(stats.getMacStat1()).arg(str);
 	_ui.labelMacStat1->setText(str);
 
-	str = QString("%1 - (%2,%3,%4,%5,%6)").arg(stats.getNrOfMacDeact()).
-			arg(stats.getNrOfMacDeactResting()).arg(stats.getNrOfMacDeactInfected()).
-			arg(stats.getNrOfMacDeactCInfected()).arg(stats.getNrOfMacDeactActive()).
-			arg(stats.getNrOfMacDeactDead());
+  toString(stats.getMacDeactArray().begin(), stats.getMacDeactArray().end(), str);
+	str = QString("%1 - %2").arg(stats.getMacDeact()).arg(str);
 	_ui.labelMacDeact->setText(str);
 
-	str = QString("(%1,%2)").arg(stats.getNrMacApoptosisTNF()).arg(stats.getNrApoptosisFasFasL());
+	str = QString("(%1,%2)").arg(stats.getMacApoptosisTNF()).arg(stats.getApoptosisFasFasL());
 	_ui.labelApoptosis->setText(str);
 
-	str = QString("(%1,%2,%3,%4)").
-		arg(stats.getNrSourcesMac()).
-		arg(stats.getNrSourcesTgam()).
-		arg(stats.getNrSourcesTcyt()).
-		arg(stats.getNrSourcesTreg());
+  toString(stats.getNrSourcesArray().begin(), stats.getNrSourcesArray().end(), str);
+	str = QString("%1 - %2").arg(stats.getTotNrSources()).arg(str);
 	_ui.labelSources->setText(str);
 
-	str = QString("(%1,%2,%3,%4)").
-		arg(stats.getNrSourcesActiveMac()).
-		arg(stats.getNrSourcesActiveTgam()).
-		arg(stats.getNrSourcesActiveTcyt()).
-		arg(stats.getNrSourcesActiveTreg());
+  toString(stats.getNrSourcesActiveArray().begin(), stats.getNrSourcesArray().end(), str);
+	str = QString("%1 - %2").arg(stats.getTotNrSourcesActive()).arg(str);
 	_ui.labelSourcesAct->setText(str);
 
 	str = QString("%1").arg(stats.getTotMacAttractant(), 0, 'f', 2);
@@ -101,16 +100,16 @@ void StatWidget::updateLabels(const GrStat& stats)
 	str = QString("%1").arg(stats.getMDC());
 	_ui.labeldMDC->setText(str);
 
-	str = QString("(%1,%2,%3)").arg(stats.getNrTgamQueued()).
-		arg(stats.getNrTcytQueued()).arg(stats.getNrTregQueued());
+	str = QString("(%1,%2,%3)").arg(stats.getNrQueued(TGAM)).
+		arg(stats.getNrQueued(TCYT)).arg(stats.getNrQueued(TREG));
 	_ui.labelTcellQueue->setText(str);
 
-	str = QString("%1").arg(stats.getFluxTgam());
+	str = QString("%1").arg(stats.getFlux(TGAM));
 	_ui.labelTgamFlux->setText(str);
 
-	str = QString("%1").arg(stats.getFluxTcyt());
+	str = QString("%1").arg(stats.getFlux(TCYT));
 	_ui.labelTcytFlux->setText(str);
 
-	str = QString("%1").arg(stats.getFluxTreg());
+	str = QString("%1").arg(stats.getFlux(TREG));
 	_ui.labelTregFlux->setText(str);
 }

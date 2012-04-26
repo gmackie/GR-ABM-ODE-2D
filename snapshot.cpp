@@ -177,126 +177,73 @@ void Snapshot::takePicture(const int time, const QImage& image, const QString pr
     takePicture(time, image, -1, prefix);
 }
 
-void Snapshot::takeSnapshot(const int time, const GrStat& stats)
+void Snapshot::takeSnapshot(const int time, const Stats& stats)
 {
-	_outFile << time
-		<< ','
-		<< stats.getNrOfMac()
-		<< ','
-		<< stats.getNrOfMacResting()
-		<< ','
-		<< stats.getNrOfMacInfected()
-		<< ','
-		<< stats.getNrOfMacCInfected()
-		<< ','
-		<< stats.getNrOfMacActive()
-		<< ','
-		<< stats.getNrOfMacDead()
-		<< ','
-		<< stats.getNrOfTgam()
-		<< ','
-		<< stats.getNrOfTgamActive()
-		<< ','
-		<< stats.getNrOfTgamDownRegulated()
-		<< ','
-		<< stats.getNrOfTgamDead()
-		<< ','
-		<< stats.getNrOfTcyt()
-		<< ','
-		<< stats.getNrOfTcytActive()
-		<< ','
-		<< stats.getNrOfTcytDownRegulated()
-		<< ','
-		<< stats.getNrOfTcytDead()
-		<< ','
-		<< stats.getNrOfTreg()
-		<< ','
-		<< stats.getNrOfTregActive()
-		<< ','
-		<< stats.getNrOfTregDead()
-		<< ','
-		<< stats.getTotIntMtb()
-		<< ','
-		<< stats.getTotExtMtb()
-		<< ','
-		<< stats.getTotNonRepExtMtb()
-		<< ','
-		<< (stats.getTotIntMtb() + stats.getTotExtMtb())
-		<< ','
-		<< stats.getTotTNF()
-		<< ','
-		<< stats.getTotCCL2()
-		<< ','
-		<< stats.getTotCCL5()
-		<< ','
-		<< stats.getTotCXCL9()
-		<< ','
-		<< stats.getAreaTNF()
-		<< ','
-		<< stats.getAreaCellDensity()
-		<< ','
-		<< stats.getMDC()
-		<< ','
-		<< stats.getN4()
-		<< ','
-		<< stats.getTH0()
-		<< ','
-		<< stats.getTH1()
-		<< ','
-		<< stats.getN8()
-		<< ','
-		<< stats.getT80()
-		<< ','
-		<< stats.getT8()
-		<< ','
-		<< stats.getTC()
-		<< ','
-		<< stats.getTH0lung()
-		<< ','
-		<< stats.getTH1lung()
-		<< ','
-		<< stats.getT80lung()
-		<< ','
-		<< stats.getT8lung()
-		<< ','
+    _outFile << time;
+
+    _outFile << (stats.getNrOfMacs()) << ',';
+    for(size_t i=0;i<Mac::NSTATES;i++)
+      _outFile << (stats.getNrOfMacs(Mac::State(i))) << ',';
+    _outFile << (stats.getNrOfTgams()) << ',';
+    for(size_t i=0;i<Tgam::NSTATES;i++)
+      _outFile << (stats.getNrOfTgams(Tgam::State(i))) << ',';
+    _outFile << (stats.getNrOfTcyts()) << ',';
+    for(size_t i=0;i<Tcyt::NSTATES;i++)
+      _outFile << (stats.getNrOfTcyts(Tcyt::State(i))) << ',';
+    _outFile << (stats.getNrOfTregs()) << ',';
+    for(size_t i=0;i<Treg::NSTATES;i++)
+      _outFile << (stats.getNrOfTregs(Treg::State(i))) << ',';
+    _outFile
+		<< stats.getTotIntMtb() << ','
+		<< stats.getTotExtMtb() << ','
+		<< stats.getTotNonRepExtMtb() << ','
+		<< (stats.getTotIntMtb() + stats.getTotExtMtb()) << ','
+		<< stats.getTotTNF() << ','
+		<< stats.getTotCCL2() << ','
+		<< stats.getTotCCL5() << ','
+		<< stats.getTotCXCL9() << ','
+		<< stats.getAreaTNF() << ','
+		<< stats.getAreaCellDensity() << ','
+		<< stats.getMDC() << ','
+		<< stats.getN4() << ','
+		<< stats.getTH0() << ','
+		<< stats.getTH1()	<< ','
+		<< stats.getN8()	<< ','
+		<< stats.getT80()	<< ','
+		<< stats.getT8()	<< ','
+		<< stats.getTC()	<< ','
+		<< stats.getTH0lung()	<< ','
+		<< stats.getTH1lung()	<< ','
+		<< stats.getT80lung()	<< ','
+		<< stats.getT8lung()	<< ','
 		<< stats.getTClung();
 
 	int startState = 1; // Skip the dead state: apoptosis doesn't occur for an already dead mac.
-	static int totMacApoptosisTNF[NMAC_STATES] = {0}; //Just temporary for Mohammed Fallahi
+	static int totMacApoptosisTNF[Mac::NSTATES] = {0}; //Just temporary for Mohammed Fallahi
 	int sumMacApoptosisTNF = 0;
-	for(int i=startState;i<NMAC_STATES;i++){    //Keep a running sum of deaths
-	totMacApoptosisTNF[i]+=(stats.getNrMacApoptosisTNF((MacState)i));
-	sumMacApoptosisTNF+=totMacApoptosisTNF[i];
+	for(int i=startState;i<Mac::NSTATES;i++){    //Keep a running sum of deaths
+    totMacApoptosisTNF[i]+=(stats.getMacApoptosisTNF((Mac::State)i));
+    sumMacApoptosisTNF+=totMacApoptosisTNF[i];
 	}
 
-	_outFile
-		<< ','
-		<< stats.getNrSourcesMac()
-		<< ','
-		<< stats.getNrSourcesTgam()
-		<< ','
-		<< stats.getNrSourcesTcyt()
-		<< ','
-		<< stats.getNrSourcesTreg()
-		<< ','
-		<< stats.getNrCaseated()
-		<< ','
-    << sumMacApoptosisTNF 
-    << ',';
+  _outFile << (stats.getTotNrSources()) << ',';
+  for(size_t i=0;i<NAGENTS;i++)
+    _outFile << (stats.getNrSources((AgentType)i)) << ',';
 
-    for(int i=startState;i<NMAC_STATES;i++)    //Keep a running sum of deaths
-    {
-      _outFile<<totMacApoptosisTNF[i]<<',';
-    }
-    
-		_outFile << stats.getNrTcellApoptosisTNF()
-		<< ','
-		<< stats.getNrRestingMacActivationTNF()
-		<< ','
-		<< stats.getNrInfMacActivationTNF()
-		;
+  _outFile << stats.getNrCaseated()
+  << ','
+  << sumMacApoptosisTNF 
+  << ',';
+
+  for(int i=startState;i<Mac::NSTATES;i++)
+    _outFile<<totMacApoptosisTNF[i]<<',';
+  
+  _outFile
+  << stats.getTcellApoptosisTNF()	<< ','
+  << stats.getRestingMacActivationTNF()	<< ','
+  << stats.getInfMacActivationTNF();
 
 
-	_outFile << std::endl;
+  _outFile << std::endl;
 
 }

@@ -412,7 +412,7 @@ int main(int argc, char *argv[])
 		{
 			// take final snapshot when in scripting mode
 			int time = itfc.getSimulation().getTime();
-			const GrStat& stats = itfc.getSimulation().getStats();
+			const Stats& stats = itfc.getSimulation().getStats();
 
 			if (pngInterval != 0){
 				glWindow.updateWindow();  //Update the graphics window before taking the picture

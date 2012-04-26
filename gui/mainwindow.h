@@ -170,7 +170,7 @@ private:
 	void refreshCurrentScalarGrid(const QString& colorMapSource);
 	ScalarDataset* getNewScalarDataset(const QString& value);
 	VectorDataset* getNewVectorDataset(const QString& value);
-	void updateStatLabels(const GrStat& stats);
+	void updateStatLabels(const Stats& stats);
 	void switchStatus(SimStatus newStatus);
 	void updateWindowStatus();
 	bool isTimeForAction(int actionInterval, int simTime);

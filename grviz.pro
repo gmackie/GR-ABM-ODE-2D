@@ -2,6 +2,7 @@ TEMPLATE = app
 TARGET = grviz-lung
 
 # CONFIG += debug
+
 CONFIG *= debug_and_release qt opengl
 QT += core gui opengl
 
@@ -162,10 +163,10 @@ LIBS *= -lGLU
 
 unix:system(grep -qE \"Ubuntu|Red Hat\" /etc/issue) {
   LIBS *= -lboost_program_options -lboost_iostreams -lboost_serialization
-  QMAKE_LIBDIR = $(BOOST_PREFIX)/lib  $${QMAKE_LIBDIR}
+  QMAKE_LIBDIR = ${BOOST_PREFIX}/lib  $${QMAKE_LIBDIR}
 } else:unix|macx {
   LIBS *= -lboost_program_options -lboost_iostreams -lboost_serialization
-  QMAKE_LIBDIR = $(BOOST_PREFIX)/lib  $${QMAKE_LIBDIR}
+  QMAKE_LIBDIR = ${BOOST_PREFIX}/lib  $${QMAKE_LIBDIR}
 }
 
 exists( .git/ ) {
@@ -201,3 +202,6 @@ release {
     DEFINES += NDEBUG
     OBJECTS_DIR = release
 }
+
+# This is for g++ code only.  Use this if you are compiling the executable for ONE MACHINE only
+# DO NOT move the generated executable to another machine with this option on

@@ -421,6 +421,10 @@ void run(GrSimulation* pSim, int stateInterval, int csvInterval, bool screenDisp
 void buildSim(GrSimulation* pSim, DiffusionMethod diffMethod, RecruitmentBase* pRecr, int odeMethod , bool tnfrDynamics, bool il10rDynamics,
               bool nfkbDynamics, int tnfDepletionTimeStep, int il10DepletionTimeStep, bool tgammatransition, float areaTNFThreshold, float areaCellDensityThreshold) {
   
+    cout << "\nODE SOLVER" << std::endl;
+    cout << "----------" << std::endl;
+    cout << "   " << odeMethod << "\n" << std::endl;
+    
 	pSim->setTnfrDynamics(tnfrDynamics || nfkbDynamics); // when NFkB is turned on, tnfr dynamics will be on automatically.
     
     cout << "Tunable Resolution" << std::endl;

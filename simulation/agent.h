@@ -150,14 +150,13 @@ public:
     virtual void solveForwardEuler(GrGrid& grid, double dt, void(Agent::*derivativeType)(const valarray<double>& vecread, valarray<double>& vecwrite, double dt, GrGrid& grid));
     virtual void solveEulerPC(GrGrid& grid, double dt, void(Agent::*derivativeType)(const valarray<double>& vecread, valarray<double>& vecwrite, double dt, GrGrid& grid));
 
+    virtual void checkTolerance(valarray<double>& veccheck);
     
     virtual void solveMolecularScaleFE(GrGrid& grid, double dt, bool nfkbDynamics, bool tnfrDynamics, bool il10rDynamics);
     virtual void solveMolecularScaleRK2(GrGrid& grid, double dt, bool nfkbDynamics, bool tnfrDynamics, bool il10rDynamics);
     virtual void solveMolecularScaleRK4(GrGrid& grid, double dt, bool nfkbDynamics, bool tnfrDynamics, bool il10rDynamics);
     virtual void solveMolecularScaleEPC(GrGrid& grid, double dt, bool nfkbDynamics, bool tnfrDynamics, bool il10rDynamics);
 
-
-    
 	virtual void solveDegradation (GrGrid& grid, double dt, bool tnfrDynamics, bool il10rDynamics) = 0;
 	virtual void solveDegradation (GrGrid& grid, double dt, bool tnfrDynamics, bool il10rDynamics, Scalar meanTNFR1, Scalar iIL10R);
 
@@ -175,7 +174,9 @@ public:
 	int getBirthTime() const;
 	int getDeathTime() const;
 	bool timeToDie(const int time) const;
-
+    
+    virtual bool intCompareGT(const double param1, const double param2);
+    
 	// TNF associated attributes
 	Scalar getMTNF() const;
 	Scalar getSurfTNFR1() const;

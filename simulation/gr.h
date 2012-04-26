@@ -74,6 +74,9 @@
 // Time step of agent movement in seconds
 #define AGENT_TIME_STEP 600
 
+// Number of Sig Figs of ODE Solver (Scaled to Power - i.e. 6 sig figs is 1e6)
+#define ABS_TOL 1000000
+
 #ifdef _DEBUG
 #define assert_res(a) (assert(a))
 #else

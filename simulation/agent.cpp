@@ -194,11 +194,11 @@ void Agent::solveMolecularScaleFE(GrGrid& grid, double dt, bool nfkbDynamics, bo
             solveForwardEuler(grid, dt, &Agent::derivativeIL10);
             break;
         case 10:
-            assert(tnfrDynamics); // Verify the options are correct
+            assert(tnfrDynamics || tnfrDynamics && nfkbDynamics); // Verify the options are correct
             solveForwardEuler(grid, dt, &Agent::derivativeTNF);
             break;
         case 13:
-            assert(tnfrDynamics && il10rDynamics); // Verify the options are correct
+            assert(tnfrDynamics && il10rDynamics || tnfrDynamics && nfkbDynamics && il10rDynamics); // Verify the options are correct
             solveForwardEuler(grid, dt, &Agent::derivativeTNFandIL10);
             break;
         case 38:
@@ -225,11 +225,11 @@ void Agent::solveMolecularScaleEPC(GrGrid& grid, double dt, bool nfkbDynamics, b
             solveEulerPC(grid, dt, &Agent::derivativeIL10);
             break;
         case 10:
-            assert(tnfrDynamics); // Verify the options are correct
+            assert(tnfrDynamics || tnfrDynamics && nfkbDynamics); // Verify the options are correct
             solveEulerPC(grid, dt, &Agent::derivativeTNF);
             break;
         case 13:
-            assert(tnfrDynamics && il10rDynamics); // Verify the options are correct
+            assert(tnfrDynamics && il10rDynamics || tnfrDynamics && nfkbDynamics && il10rDynamics); // Verify the options are correct
             solveEulerPC(grid, dt, &Agent::derivativeTNFandIL10);
             break;
         case 38:
@@ -256,11 +256,11 @@ void Agent::solveMolecularScaleRK4(GrGrid& grid, double dt, bool nfkbDynamics, b
             solveRK4(grid, dt, &Agent::derivativeIL10);
             break;
         case 10:
-            assert(tnfrDynamics); // Verify the options are correct
+            assert(tnfrDynamics || tnfrDynamics && nfkbDynamics); // Verify the options are correct
             solveRK4(grid, dt, &Agent::derivativeTNF);
             break;
         case 13:
-            assert(tnfrDynamics && il10rDynamics); // Verify the options are correct
+            assert(tnfrDynamics && il10rDynamics || tnfrDynamics && nfkbDynamics && il10rDynamics); // Verify the options are correct
             solveRK4(grid, dt, &Agent::derivativeTNFandIL10);
             break;
         case 38:
@@ -287,11 +287,11 @@ void Agent::solveMolecularScaleRK2(GrGrid& grid, double dt, bool nfkbDynamics, b
             solveRK2(grid, dt, &Agent::derivativeIL10);
             break;
         case 10:
-            assert(tnfrDynamics); // Verify the options are correct
+            assert(tnfrDynamics || tnfrDynamics && nfkbDynamics); // Verify the options are correct
             solveRK2(grid, dt, &Agent::derivativeTNF);
             break;
         case 13:
-            assert(tnfrDynamics && il10rDynamics); // Verify the options are correct
+            assert(tnfrDynamics && il10rDynamics || tnfrDynamics && nfkbDynamics && il10rDynamics); // Verify the options are correct
             solveRK2(grid, dt, &Agent::derivativeTNFandIL10);
             break;
         case 38:
@@ -341,7 +341,10 @@ void Agent::solveRK4(GrGrid& grid, double dt, void(Agent::*derivativeType)(const
     
     // Determine the next time point using the RK4 Standard Formula
     _switchvector = (_initvector + ((1.0/6.0) * (_k1vector + (_k2vector * 2.0) + (_k3vector * 2.0) + _k4vector)));
-  
+    
+    // Adjust each solution for correct sig figs
+//    checkTolerance(_switchvector);
+    
     // Write members from _switchvector
     writeMembersFromValarray(grid, _switchvector);
 }
@@ -367,6 +370,9 @@ void Agent::solveRK2(GrGrid& grid, double dt, void(Agent::*derivativeType)(const
     
     // Determine the next time point using the RK2 Standard Formula
     _switchvector = (_initvector + _k2vector);
+    
+    // Adjust each solution for correct sig figs
+//    checkTolerance(_switchvector);
     
     // Write members from _switchvector
     writeMembersFromValarray(grid, _switchvector);
@@ -394,6 +400,9 @@ void Agent::solveEulerPC(GrGrid& grid, double dt, void(Agent::*derivativeType)(c
     // Determine the next time point using the EulerPC Standard Formula
     _switchvector = (_initvector + ((1.0/2.0) * (_k1vector + _k2vector)));
     
+    // Adjust each solution for correct sig figs
+//    checkTolerance(_switchvector);
+    
     // Write members from _switchvector
     writeMembersFromValarray(grid, _switchvector);
 }
@@ -412,6 +421,9 @@ void Agent::solveForwardEuler(GrGrid& grid, double dt, void(Agent::*derivativeTy
     
     // Compute Forward Euler Formula
     _switchvector = (_initvector + _k1vector);  
+    
+    // Adjust each solution for correct sig figs
+//    checkTolerance(_switchvector);
     
     // Write members from _k1vector
     writeMembersFromValarray(grid, _switchvector);
@@ -611,6 +623,88 @@ void Agent::writeMembersFromValarray(GrGrid& grid, const valarray<double>& input
         }
     }
 }
+
+void Agent::checkTolerance(valarray<double>& veccheck)
+{
+    double intpart, fracpart, TempStoreLarge, TempStorePower;
+    int intpartStore;
+    
+    // Checks sig figs and round correctly to that number
+    for (int i = 0; i < (int)veccheck.size(); i++) 
+    {
+        if (veccheck[i] > 0) 
+        {
+            TempStorePower = floor(log10(veccheck[i]));
+            TempStoreLarge = (veccheck[i] * (ABS_TOL/(pow(10,TempStorePower))));
+            fracpart = modf(TempStoreLarge, &intpart);
+            intpartStore = intpart;
+//            if (fracpart >= 0.5) 
+//            {
+//                intpartStore += (int)(ceil(fracpart));
+//            }
+            TempStoreLarge = (intpartStore / (ABS_TOL/(pow(10,TempStorePower))));
+            veccheck[i] = TempStoreLarge;
+        } 
+    }
+}
+
+bool Agent::intCompareGT(const double param1, const double param2)
+{
+    // Compares two values based on the number of sig figs we hold in gr.h (ABS_TOL)
+    // If the values are not within 2 orders of magnitude we do not convert to ints
+    // since it should not matter
+    // COMPARES PARAM1 > PARAM2 and returns bool based on this evaluation
+    
+    double intpart1, intpart2, fracpart1, fracpart2, Store1, Store2, StorePower;
+    int intpart1Store, intpart2Store;
+    
+    bool result = 0;
+ 
+    if (fabs(floor(log10(param1)) - floor(log10(param2))) < 2  ) 
+    {
+        if (floor(log10(param1)) < floor(log10(param2)))
+        {
+            StorePower = floor(log10(param1));
+        }
+        else
+        {
+            StorePower = floor(log10(param2));
+        }
+        
+        Store1 = (param1 * (ABS_TOL/(pow(10,StorePower))));
+        Store2 = (param2 * (ABS_TOL/(pow(10,StorePower))));
+        
+        fracpart1 = modf(Store1, &intpart1);
+        fracpart2 = modf(Store2, &intpart2);
+        
+        intpart1Store = intpart1;
+        intpart2Store = intpart2;
+        
+        if (intpart1Store > intpart2Store) 
+        {
+            result = 1;
+        }
+        
+//        std::cout << param1 << "   " << param2 << std::endl;
+//        std::cout << intpart1Store << "   " << intpart2Store << std::endl;
+        
+    }
+    else
+    {
+        if (param1 > param2) 
+        {
+            result = 1;
+        }
+        
+//        std::cout << param1 << "   " << param2 << std::endl;
+    }
+    
+//    std::cout << result << std::endl;
+    
+    return result;
+}
+
+
 
 void Agent::derivativeTNF(const valarray<double>& vecread, valarray<double>& vecwrite, double dt, GrGrid& grid)
 {

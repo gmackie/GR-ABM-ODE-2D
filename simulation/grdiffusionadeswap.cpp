@@ -16,7 +16,7 @@ GrDiffusionADE_Swap::~GrDiffusionADE_Swap()
 {
 }
 
-
+using namespace std;
 
 // 2-D Alternating Direction Explicit Algorithm
 
@@ -32,7 +32,7 @@ GrDiffusionADE_Swap::~GrDiffusionADE_Swap()
 
 // This function is the main ADE diffusion algorithm.
 //Assumes padding on borders
-static void diffuse(const Scalar* __restrict__ grid_u, Scalar* __restrict__ newgrid_u, const Pos& dim, const Scalar u_diffuse, const Scalar cutOff) {
+static void diffuse_all(const Scalar* __restrict__ grid_u, Scalar* __restrict__ newgrid_u, const Pos& dim, const Scalar u_diffuse, const Scalar cutOff) {
 
     register Scalar up_u, dn_u, lt_u, rt_u, ct_u;
 
@@ -46,6 +46,7 @@ static void diffuse(const Scalar* __restrict__ grid_u, Scalar* __restrict__ newg
     const Scalar coefficient_a = (1-lambda)/(1+lambda);
     const Scalar coefficient_b = ((u_diffuse * dt)/(pow(dy,2)))/(1+lambda);
     const Scalar coefficient_c = ((u_diffuse * dt)/(pow(dx,2)))/(1+lambda);
+    
     
     // ADE SCHEME FOR U
     // up: i-1, j n+1
@@ -132,7 +133,6 @@ static void diffuse_avg(Scalar* __restrict__ newgrid_u, Scalar* __restrict__ new
             Scalar& newconc = newgrid[Indexer::padInd(dim,i,j)];
             
             newconc = (_u + _v)/2.0;
-            
         }
     }
     
@@ -142,7 +142,6 @@ static void diffuse_avg(Scalar* __restrict__ newgrid_u, Scalar* __restrict__ new
 // It takes in extra grids for CCL5 and CXCL9 since they are ratios of CCL2
 static void diffuse_avg_ratio(Scalar* newgrid_u, Scalar* newgrid_v, Scalar* newgridccl2, Scalar* newgridccl5, Scalar* newgridcxcl9, const Pos& dim)
 {
-    
     // NOTE: THE _SEC_RATE_CCL should both be multiplied by the MOLECULAR_DT but since these terms will cancel
     // in the division they are not used to keep the error of the floating point division down.
     
@@ -182,7 +181,7 @@ static void diffuse_degrade(GrGrid& nextGrid)
             // Degradation of sTNF
             nextGrid.incTNF(p, (-1.0 * nextGrid.TNF(p) * _PARAM(PARAM_GR_K_DEG) * dt));
             
-            // Degradation of sTNF
+            // Degradation of il10
             nextGrid.incil10(p, (-1.0 * nextGrid.il10(p) * _PARAM(PARAM_GR_I_K_DEG) * dt));
             
             // Degradation of CCL2
@@ -218,33 +217,33 @@ void GrDiffusionADE_Swap::diffuse(GrSimulationGrid& grSim) const {
     {
 #pragma omp section
         {
-            ::diffuse(grid.u_TNF(), nextGrid.u_TNF(), grid.getRange(), _PARAM(PARAM_GR_D_TNF), _cutOffValue);
-            ::diffuse(grid.v_TNF(), nextGrid.v_TNF(), grid.getRange(), _PARAM(PARAM_GR_D_TNF), _cutOffValue);
+            ::diffuse_all(grid.u_TNF(), nextGrid.u_TNF(), grid.getRange(), _PARAM(PARAM_GR_D_TNF), _cutOffValue);
+            ::diffuse_all(grid.v_TNF(), nextGrid.v_TNF(), grid.getRange(), _PARAM(PARAM_GR_D_TNF), _cutOffValue);
             ::diffuse_avg(nextGrid.u_TNF(), nextGrid.v_TNF(), nextGrid.TNF(), grid.getRange());
         }
 #pragma omp section
         {
-            ::diffuse(grid.u_shedTNFR2(), nextGrid.u_shedTNFR2(), grid.getRange(), _PARAM(PARAM_GR_D_SHED_TNFR2), _cutOffValue);
-            ::diffuse(grid.v_shedTNFR2(), nextGrid.v_shedTNFR2(), grid.getRange(), _PARAM(PARAM_GR_D_SHED_TNFR2), _cutOffValue);
+            ::diffuse_all(grid.u_shedTNFR2(), nextGrid.u_shedTNFR2(), grid.getRange(), _PARAM(PARAM_GR_D_SHED_TNFR2), _cutOffValue);
+            ::diffuse_all(grid.v_shedTNFR2(), nextGrid.v_shedTNFR2(), grid.getRange(), _PARAM(PARAM_GR_D_SHED_TNFR2), _cutOffValue);
             ::diffuse_avg(nextGrid.u_shedTNFR2(), nextGrid.v_shedTNFR2(), nextGrid.shedTNFR2(), grid.getRange());
         }
 #pragma omp section
         {
-            ::diffuse(grid.u_macAttractant(), nextGrid.u_macAttractant(), grid.getRange(), _PARAM(PARAM_GR_D_CHEMOKINES), _cutOffValue);
-            ::diffuse(grid.v_macAttractant(), nextGrid.v_macAttractant(), grid.getRange(), _PARAM(PARAM_GR_D_CHEMOKINES), _cutOffValue);
+            ::diffuse_all(grid.u_macAttractant(), nextGrid.u_macAttractant(), grid.getRange(), _PARAM(PARAM_GR_D_CHEMOKINES), _cutOffValue);
+            ::diffuse_all(grid.v_macAttractant(), nextGrid.v_macAttractant(), grid.getRange(), _PARAM(PARAM_GR_D_CHEMOKINES), _cutOffValue);
             ::diffuse_avg(nextGrid.u_macAttractant(), nextGrid.v_macAttractant(), nextGrid.macAttractant(), grid.getRange());
         }
 #pragma omp section
         {
-            ::diffuse(grid.u_CCL2(), nextGrid.u_CCL2(), grid.getRange(), _PARAM(PARAM_GR_D_CHEMOKINES), _cutOffValue);
-            ::diffuse(grid.v_CCL2(), nextGrid.v_CCL2(), grid.getRange(), _PARAM(PARAM_GR_D_CHEMOKINES), _cutOffValue);
+            ::diffuse_all(grid.u_CCL2(), nextGrid.u_CCL2(), grid.getRange(), _PARAM(PARAM_GR_D_CHEMOKINES), _cutOffValue);
+            ::diffuse_all(grid.v_CCL2(), nextGrid.v_CCL2(), grid.getRange(), _PARAM(PARAM_GR_D_CHEMOKINES), _cutOffValue);
             ::diffuse_avg_ratio(nextGrid.u_CCL2(), nextGrid.v_CCL2(), nextGrid.CCL2(), nextGrid.CCL5(), nextGrid.CXCL9(), grid.getRange());
 
         }
 #pragma omp section
         {
-            ::diffuse(grid.u_il10(), nextGrid.u_il10(), grid.getRange(), _PARAM(PARAM_GR_D_IL10), _cutOffValue);
-            ::diffuse(grid.v_il10(), nextGrid.v_il10(), grid.getRange(), _PARAM(PARAM_GR_D_IL10), _cutOffValue);
+            ::diffuse_all(grid.u_il10(), nextGrid.u_il10(), grid.getRange(), _PARAM(PARAM_GR_D_IL10), _cutOffValue);
+            ::diffuse_all(grid.v_il10(), nextGrid.v_il10(), grid.getRange(), _PARAM(PARAM_GR_D_IL10), _cutOffValue);
             ::diffuse_avg(nextGrid.u_il10(), nextGrid.v_il10(), nextGrid.il10(), grid.getRange());
         }
     } //omp parallel

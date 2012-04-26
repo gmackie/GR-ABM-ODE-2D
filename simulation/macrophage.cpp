@@ -160,7 +160,7 @@ void Mac::secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDe
                     //std::cout << "LOG OF IL10: " << il10 << std::endl;
                     double tnfMOD = (1.0/(1.0 + exp((il10 + _PARAM(PARAM_GR_LINK_LOG_ALPHA))/_PARAM(PARAM_GR_LINK_LOG_BETA)))); // calculate the fraction of inhibition
                     //std::cout << "tnfMOD: " << tnfMOD << std::endl;
-		    grid.incTNF(_pos, (tnfMOD * 0.5 * _PARAM(PARAM_MAC_SEC_RATE_TNF) * mdt));
+                    grid.incTNF(_pos, (tnfMOD * 0.5 * _PARAM(PARAM_MAC_SEC_RATE_TNF) * mdt));
                 }
                 
                 ++grid.nSecretions(_pos);
@@ -212,7 +212,7 @@ void Mac::secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDe
                     double il10 = log(((grid.il10(_pos) * MW_IL10 * 1e6)/(NAV * VOL))); // converting il10 concentration to log(ng/mL) for use in dose dependence
                     //std::cout << "LOG OF IL10: " << il10 << std::endl;
                     double tnfMOD = (1.0/(1.0 + exp((il10 + _PARAM(PARAM_GR_LINK_LOG_ALPHA))/_PARAM(PARAM_GR_LINK_LOG_BETA)))); // calculate the fraction of inhibition
-		    grid.incTNF(_pos,(tnfMOD * _PARAM(PARAM_MAC_SEC_RATE_TNF) * mdt));
+                    grid.incTNF(_pos,(tnfMOD * _PARAM(PARAM_MAC_SEC_RATE_TNF) * mdt));
                     //cout << "Debug: IL10 inhibition from Mac::MAC_INFECTED" << std::endl;
                     //std::cout << "tnfMOD: " << tnfMOD << std::endl;
                 }
@@ -261,10 +261,10 @@ void Mac::secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDe
                 {    
                     double il10 = log(((grid.il10(_pos) * MW_IL10 * 1e6)/(NAV * VOL))); // converting il10 concentration to log(ng/mL) for use in dose dependence
                     double tnfMOD = (1.0/(1.0 + exp((il10 + _PARAM(PARAM_GR_LINK_LOG_ALPHA))/_PARAM(PARAM_GR_LINK_LOG_BETA)))); // calculate the fraction of inhibition
-		    grid.incTNF(_pos, (tnfMOD * _PARAM(PARAM_MAC_SEC_RATE_TNF) * mdt));
+                    grid.incTNF(_pos, (tnfMOD * _PARAM(PARAM_MAC_SEC_RATE_TNF) * mdt));
                 }
                 if (!il10rDynamics && !il10Depletion) {
-                    //grid.il10(_pos) += (0.0);
+                    grid.incil10(_pos, (0.10 * _PARAM(PARAM_MAC_SEC_RATE_IL10) * mdt));
                 }
                 
                 ++grid.nSecretions(_pos);
@@ -301,8 +301,7 @@ void Mac::computeNextState(const int time, GrGrid& grid, Stats& stats, bool tnfr
 {
 	double tnfBoundFraction = grid.TNF(_pos) / (grid.TNF(_pos) + _PARAM(PARAM_GR_KD1) * 48.16e11);
 	double nfkb_adjusted_k_apoptosis = _PARAM(PARAM_GR_K_APOPTOSIS_NFKB_MOLECULAR) * (_PARAM(PARAM_GR_K_IAP)/(_PARAM(PARAM_GR_K_IAP) + _normalizedIAP));
-	
-	
+    
 	// check if it is time to die
 	if (timeToDie(time))
 	{
@@ -318,20 +317,41 @@ void Mac::computeNextState(const int time, GrGrid& grid, Stats& stats, bool tnfr
 
 		_nextState = Mac::MAC_DEAD;
 	}
-	else if (!nfkbDynamics && tnfrDynamics && _intBoundTNFR1 > _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR) &&	
-			 g_Rand.getReal() < 1 - pow(2.7183, -_PARAM(PARAM_GR_K_APOPTOSIS_MOLECULAR) * (_intBoundTNFR1 - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR))))
+    
+//	else if (!nfkbDynamics && tnfrDynamics && _intBoundTNFR1 > _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR) &&	
+//			 g_Rand.getReal() < 1 - pow(2.7183, -_PARAM(PARAM_GR_K_APOPTOSIS_MOLECULAR) * (_intBoundTNFR1 - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR))))
+//	{
+//		// TNF induced apoptosis
+//		stats.incMacApoptosisTNF(_state);
+//		apoptosis(grid);
+//	}
+    
+    else if (!nfkbDynamics && tnfrDynamics && intCompareGT(_intBoundTNFR1, _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR)) &&	
+			 intCompareGT(1 - pow(2.7183, -_PARAM(PARAM_GR_K_APOPTOSIS_MOLECULAR) * (_intBoundTNFR1 - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR))), g_Rand.getReal()))
 	{
 		// TNF induced apoptosis
 		++stats.getMacApoptosisTNF(_state);
 		apoptosis(grid);
 	}
-	else if (nfkbDynamics && _intBoundTNFR1 > _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR) &&	
-			 g_Rand.getReal() < 1 - pow(2.7183, -nfkb_adjusted_k_apoptosis * (_intBoundTNFR1 - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR))))
+    
+//	else if (nfkbDynamics && _intBoundTNFR1 > _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR) &&	
+//			 g_Rand.getReal() < 1 - pow(2.7183, -nfkb_adjusted_k_apoptosis * (_intBoundTNFR1 - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR))))
+//	{
+//		// TNF induced apoptosis
+//		stats.incMacApoptosisTNF(_state);
+//		apoptosis(grid);
+//	}
+    
+    
+    else if (nfkbDynamics && intCompareGT(_intBoundTNFR1, _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR)) &&	
+			 intCompareGT(1 - pow(2.7183, -nfkb_adjusted_k_apoptosis * (_intBoundTNFR1 - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR))), g_Rand.getReal()))
 	{
 		// TNF induced apoptosis
 		++stats.getMacApoptosisTNF(_state);
 		apoptosis(grid);
 	}
+    
+    
 	else if (!tnfrDynamics && tnfBoundFraction > _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF) &&
 			 g_Rand.getReal() < 1 - pow(2.7183, -_PARAM(PARAM_GR_K_APOPTOSIS) * (tnfBoundFraction - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF))))
 	{
@@ -352,8 +372,8 @@ void Mac::computeNextState(const int time, GrGrid& grid, Stats& stats, bool tnfr
 			// update _NFkB
 			bool tnfInducedNFkB;
 			if (tnfrDynamics)
-				tnfInducedNFkB = _surfBoundTNFR1 > _PARAM(PARAM_MAC_THRESHOLD_NFKB_TNF_MOLECULAR) && 
-				g_Rand.getReal() < 1 - pow(2.7183, -_PARAM(PARAM_MAC_K_NFKB_MOLECULAR) * (_surfBoundTNFR1 - _PARAM(PARAM_MAC_THRESHOLD_NFKB_TNF_MOLECULAR)));
+				tnfInducedNFkB = intCompareGT(_surfBoundTNFR1, _PARAM(PARAM_MAC_THRESHOLD_NFKB_TNF_MOLECULAR)) && 
+				intCompareGT(1 - pow(2.7183, -_PARAM(PARAM_MAC_K_NFKB_MOLECULAR) * (_surfBoundTNFR1 - _PARAM(PARAM_MAC_THRESHOLD_NFKB_TNF_MOLECULAR))), g_Rand.getReal());
 			else
 				tnfInducedNFkB = tnfBoundFraction > _PARAM(PARAM_MAC_THRESHOLD_NFKB_TNF) && 
 					g_Rand.getReal() < 1 - pow(2.7183, -_PARAM(PARAM_MAC_K_NFKB) * (tnfBoundFraction - _PARAM(PARAM_MAC_THRESHOLD_NFKB_TNF)));
@@ -361,8 +381,8 @@ void Mac::computeNextState(const int time, GrGrid& grid, Stats& stats, bool tnfr
 			_NFkB = _state == Mac::MAC_CINFECTED || _state == Mac::MAC_ACTIVE || tnfInducedNFkB ||
 				getExtMtbInMoore(grid) > _PARAM(PARAM_MAC_THRESHOLD_NFKB_EXTMTB);
 				//grid.extMTB(_pos) > _PARAM(PARAM_MAC_THRESHOLD_NFKB_EXTMTB);
-			
-			if (_stat1 && _surfBoundIL10R < _PARAM(PARAM_MAC_THRESHOLD_ICOS))
+            
+			if (_stat1 && intCompareGT(_PARAM(PARAM_MAC_THRESHOLD_ICOS), _surfBoundIL10R))
 			{
 				_ICOS = _stat1;
 			}
@@ -385,8 +405,8 @@ void Mac::computeNextState(const int time, GrGrid& grid, Stats& stats, bool tnfr
 			case Mac::MAC_ACTIVE:
 				handleActivated(time, grid, stats);
 				break;
-      default:
-        throw std::runtime_error("Invalid Macrophage State");
+              default:
+                throw std::runtime_error("Invalid Macrophage State");
 			}
 		}
 	}
@@ -449,8 +469,8 @@ void Mac::handleResting(const int time, GrGrid& grid, Stats& stats, bool nfkbDyn
 				_deathTime = time + _PARAM(PARAM_MAC_A_AGE);
 				_nextState = Mac::MAC_ACTIVE;
 			}
-			else if (_normalizedACT > _PARAM(PARAM_GR_ACT_THRESHOLD) &&
-					 g_Rand.getReal() < 1 - pow(2.7183, -_PARAM(PARAM_GR_ACT_K) * (_normalizedACT - _PARAM(PARAM_GR_ACT_THRESHOLD))))
+			else if (intCompareGT(_normalizedACT, _PARAM(PARAM_GR_ACT_THRESHOLD)) &&
+					 intCompareGT(1 - pow(2.7183, -_PARAM(PARAM_GR_ACT_K) * (_normalizedACT - _PARAM(PARAM_GR_ACT_THRESHOLD))), g_Rand.getReal()))
 			{
 				_intMtb = 0;
 				_activationTime = time;
@@ -509,8 +529,8 @@ void Mac::handleInfected(const int time, GrGrid& grid, Stats& stats, bool nfkbDy
 					_deathTime = time + _PARAM(PARAM_MAC_A_AGE);
 					_nextState = Mac::MAC_ACTIVE;
 				}
-				else if (_normalizedACT > _PARAM(PARAM_GR_ACT_THRESHOLD) &&
-						 g_Rand.getReal() < 1 - pow(2.7183, -_PARAM(PARAM_GR_ACT_K) * (_normalizedACT - _PARAM(PARAM_GR_ACT_THRESHOLD))))
+				else if (intCompareGT(_normalizedACT, _PARAM(PARAM_GR_ACT_THRESHOLD)) &&
+                         intCompareGT(1 - pow(2.7183, -_PARAM(PARAM_GR_ACT_K) * (_normalizedACT - _PARAM(PARAM_GR_ACT_THRESHOLD))), g_Rand.getReal()))
 				{
 					_intMtb = 0;
 					_activationTime = time;

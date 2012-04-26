@@ -1,0 +1,70 @@
+/*
+
+STATE_STAT(type, name, agent_t, desc, [reset=0]) //A stat for every state
+
+AGENT_STAT(type, name, desc, [reset=0]) //A stat for every agent type
+
+STAT(type, name, desc, [reset=0])  //Standard stat
+
+ARRAY_STAT(type, name, sz, desc, [reset=0])  //Standard array of stats
+
+Reset can be either 0 = do not ever reset, 1 = reset on timestep, 2 = reset on agent, 
+
+*/
+//Agent stats
+AGENT_STAT(int, NrOfAgents, "Number of agents", 2)
+STATE_STAT(int, NrOfMacs, Mac, "Number of Macs", 2)
+STATE_STAT(int, NrOfTgams, Tgam, "Number of Tgams", 2)
+STATE_STAT(int, NrOfTregs, Treg, "Number of Tregs", 2)
+STATE_STAT(int, NrOfTcyts, Tcyt, "Number of Tcyts", 2)
+STATE_STAT(int, MacNFkB, Mac,       "", 2)
+STATE_STAT(int, MacStat1, Mac,      "", 2)
+STATE_STAT(int, MacDeact, Mac,      "", 2)
+STATE_STAT(int, MacApoptosisTNF, Mac,  "", 2)
+STAT(int, TcellApoptosisTNF,        "", 2)
+//Regular stats
+STAT(Scalar, TotExtMtb,          "Total External MTB", 1)
+STAT(Scalar, TotNonRepExtMtb,    "Total Non-replicating External MTB", 1)
+STAT(Scalar, TotIntMtb,          "Total Internal MTB", 1)
+STAT(Scalar, TotMacAttractant,   "", 1)
+STAT(Scalar, TotTNF,             "", 1)
+STAT(Scalar, TotIL10,            "", 1)
+STAT(Scalar, TotCCL2,            "", 1)
+STAT(Scalar, TotCCL5,            "", 1)
+STAT(Scalar, TotCXCL9,           "", 1)
+STAT(Scalar, TotTNFR1int,        "", 1)
+STAT(Scalar, TotkmRNA,           "", 1)
+STAT(int, ApoptosisFasFasL,      "", 1)
+STAT(int, RestingMacActivationTNF,  "", 0)
+STAT(int, InfMacActivationTNF,      "", 0)
+AGENT_STAT(int, NrSources,            "", 1)
+AGENT_STAT(int, NrSourcesActive,      "", 1)
+AGENT_STAT(int, NrSourcesCrowded,     "", 0)
+STAT(int, NBactAct,         "", 0)
+STAT(int, AreaTNF,          "", 1)
+STAT(int, AreaCellDensity,  "", 1)
+STAT(int, NrCaseated,       "", 1)
+ARRAY_STAT(GrStatus, Status, NOUTCOMES, "", 0)
+AGENT_STAT(int, NrQueued,     "", 1)
+AGENT_STAT(int, NrQueuedDie,  "", 1)
+AGENT_STAT(int, NrRecruited,  "", 1)
+AGENT_STAT(int, Flux,       "", 0)
+STAT(Scalar, MDC,     "", 0)
+STAT(Scalar, N4,      "", 0)
+STAT(Scalar, TH0,     "", 0)
+STAT(Scalar, TH1,     "", 0)
+STAT(Scalar, N8,      "", 0)
+STAT(Scalar, T80,     "", 0)
+STAT(Scalar, T8,      "", 0)
+STAT(Scalar, TC,      "", 0)
+STAT(Scalar, TH0lung, "", 0)
+STAT(Scalar, TH1lung, "", 0)
+STAT(Scalar, T80lung, "", 0)
+STAT(Scalar, T8lung,  "", 0)
+STAT(Scalar, TClung,  "", 0)
+STAT(int, NrOfCellsTnfInhibited, "", 1)
+
+#undef AGENT_STAT
+#undef STATE_STAT
+#undef STAT
+#undef ARRAY_STAT

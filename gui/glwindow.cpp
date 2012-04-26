@@ -16,6 +16,7 @@ GLWindow::GLWindow(MainInterface* pItfc, QWidget* parent)
 
 	_ui.setupUi(this);
 
+    _ui.glWidget->dim = pItfc->getSimulation().getSize();
 	connect(_ui.glWidget, SIGNAL(updateSelection(int, int)), this, SIGNAL(updateSelection(int, int)));
 	connect(_ui.glWidget, SIGNAL(visualize(void)), this, SLOT(visualize(void)));
 	connect(_ui.glWidget, SIGNAL(printText(void)), this, SLOT(printText(void)));

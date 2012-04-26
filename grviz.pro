@@ -2,10 +2,9 @@ TEMPLATE = app
 TARGET = grviz-lung
 
 # CONFIG += debug
-CONFIG += debug_and_release
-QT += core \
-    gui \
-    opengl
+CONFIG *= debug_and_release qt opengl
+QT += core gui opengl
+
 HEADERS += scalardatasets/scalartotmtbdataset.h \
     simulation/serialization.h \
     simulation/params.h \
@@ -158,14 +157,14 @@ QMAKE_CXXFLAGS_RELEASE -= -O2 -Wno-strict-aliasing
 QMAKE_CXXFLAGS_RELEASE += -O3 -fopenmp -DOPENMP -Wno-strict-aliasing
 QMAKE_LFLAGS_RELEASE += -fopenmp -DOPENMP
 
-INCLUDEPATH += $$quote($(BOOST_PREFIX)/include)
-LIBS += -lGLU
+INCLUDEPATH *= $$quote($(BOOST_PREFIX)/include)
+LIBS *= -lGLU
 
 unix:system(grep -qE \"Ubuntu|Red Hat\" /etc/issue) {
-  LIBS += -lboost_program_options -lboost_iostreams -lboost_serialization
+  LIBS *= -lboost_program_options -lboost_iostreams -lboost_serialization
   QMAKE_LIBDIR = $(BOOST_PREFIX)/lib  $${QMAKE_LIBDIR}
 } else:unix|macx {
-  LIBS += -lboost_program_options -lboost_iostreams -lboost_serialization
+  LIBS *= -lboost_program_options -lboost_iostreams -lboost_serialization
   QMAKE_LIBDIR = $(BOOST_PREFIX)/lib  $${QMAKE_LIBDIR}
 }
 
@@ -186,6 +185,7 @@ macx {
     # application bundle. Ex. put the executable in grviz-lung
     # rather than in grviz-lung.app/Contents/MacOS/grviz-lung.
     CONFIG -= app_bundle
+    LIBS *= -framework OpenGL
 }
 win32 { 
     CONFIG -= flat

@@ -486,6 +486,7 @@ int main(int argc, char** argv)
 
   double molecularTrackingRadius;
   std::string molecularTrackingFileName;
+  std::string track_ids;
 	
 	/*
 	 * Set seed to current time, in case not specified
@@ -506,8 +507,8 @@ int main(int argc, char** argv)
 	("version,v", "Version number")
 	("quiet,q", "Suppress printing statistics on the console.\n"
 	            "This option is implied by --lhs.")
-	("output-dir,o", po::value<std::string>(&outputDir)->default_value("./"), "Output directory")
-	("input-file,i", po::value<std::string>(&paramFile), "Parameter file")
+	("output-dir,o", po::value(&outputDir)->default_value("./"), "Output directory")
+	("input-file,i", po::value(&paramFile), "Parameter file")
 	("seed,s", po::value(&seed), "RNG seed, default is based on the current time");
 
   po::options_description stats("Statistics");
@@ -534,13 +535,14 @@ int main(int argc, char** argv)
 
   po::options_description simdyn_opts("Simulation Dynamics");
   simdyn_opts.add_options()
-	("tnfr-dynamics", "Use molecular level TNF/TNFR dynamics in the model")
+    ("tnfr-dynamics", "Use molecular level TNF/TNFR dynamics in the model")
     ("il10r-dynamics", "Use molecular level IL10/IL10R dynamics in the model")
-	("NFkB-dynamics", "Use molecular level intracellular NFkB dynamics in the model")
+    ("NFkB-dynamics", "Use molecular level intracellular NFkB dynamics in the model")
     ("Treg-induction", "Allow Tregs to be induced from Tgams in the model")
-	("tnf-depletion", po::value<int>()->default_value(-1), "The time step at which to stop secreting tnf, including by tnfr dynamics. -1: no depletion")
+    ("tnf-depletion", po::value<int>()->default_value(-1), "The time step at which to stop secreting tnf, including by tnfr dynamics. -1: no depletion")
     ("il10-depletion", po::value<int>()->default_value(-1), "The time step at which to stop secreting il10, including by il10r dynamics. -1: no depletion")
-    ("molecular-track-radius", po::value<double>(&molecularTrackingRadius)->default_value(0.0), "Radius from center of grid of initial cells to track molecular dynamics. 0 means don't track any cells.")
+    ("molecular-track-radius", po::value(&molecularTrackingRadius)->default_value(0.0), "Radius from center of grid of initial cells to track molecular dynamics. 0 means don't track any cells.")
+    ("molecular-track-ids", po::value(&track_ids), "Comma-seperated list of ids to track")
     ("molecular-track-file", po::value<std::string>(&molecularTrackingFileName), "File name to hold molecular dynamics cell tracking data");
 
 	
@@ -581,6 +583,15 @@ int main(int argc, char** argv)
     printUsage(argv[0], desc);
     return 0;
   }
+
+  std::vector<int> ids;
+  {
+    std::stringstream ss(track_ids);
+    string id;
+    while(std::getline(ss, id, ','))
+      ids.push_back(atoi(id.c_str()));
+  }
+
   unsigned timeToSimulate;
   if (!vm.count("timesteps"))
     timeToSimulate = TIME_STEPS_PER_DAY * vm["days"].as<unsigned>();
@@ -662,7 +673,6 @@ int main(int argc, char** argv)
     if(!in)
       throw std::runtime_error("Failed to open saved state file");
     pSim->deserialize(in);
-    pSim->initMolecularTracking(molecularTrackingRadius);
   }
 
   buildSim(pSim, diffMethodEnum, pRecr, vm["odesolver"].as<int>(), vm.count("tnfr-dynamics"), vm.count("il10r-dynamics"), vm.count("NFkB-dynamics"),
@@ -671,8 +681,11 @@ int main(int argc, char** argv)
 
   if (!vm.count("load")){
     g_Rand.setSeed(seed);
-    pSim->init(molecularTrackingRadius);
+    pSim->init();
   }
+
+  pSim->initMolecularTracking(molecularTrackingRadius);
+  pSim->initMolecularTracking(ids);
 
   if(outputDir[outputDir.size()-1] != '/')
     outputDir += '/';
@@ -703,7 +716,7 @@ int main(int argc, char** argv)
     csvStreams.push_back(new GeneralStats(f));
   }
 
-  if(molecularTrackingRadius > 0)
+  if(molecularTrackingRadius > 0 || ids.size() > 0)
   {
 	  if (!molecularTrackingFileName.empty())
 	  {

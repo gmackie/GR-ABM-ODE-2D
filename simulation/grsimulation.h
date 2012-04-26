@@ -90,8 +90,9 @@ private:
 public:
 	GrSimulation(const Pos& dim);
 	~GrSimulation();
-	void init(Scalar molecularTrackingRadius);
+	void init();
 	void initMolecularTracking(Scalar molecularTrackingRadius);
+	void initMolecularTracking(const std::vector<int>& ids);
 	void solve();
 	void performT_Test();
 	int getTime() const;

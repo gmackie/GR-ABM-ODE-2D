@@ -38,14 +38,14 @@ GrSimulation::GrSimulation(const Pos& dim)
 	, _pRecruitment(NULL)
 	, _tnfrDynamics(false)
 	, _nfkbDynamics(false)
-    , _il10rDynamics(false)
-    , _tgammatransition(false)
-    , _odeSolver(-1)
-	, _tnfDepletionTimeStep(-1)
-    , _il10DepletionTimeStep(-1)
+  , _il10rDynamics(false)
+  , _tgammatransition(false)
+  , _odeSolver(-1)
+  , _tnfDepletionTimeStep(-1)
+  , _il10DepletionTimeStep(-1)
 	, _tcellRecruitmentBegun(false)
-    , _numMolecularPerDiffusion(0)
-    , _numDiffusionPerAgent(0)
+  , _numMolecularPerDiffusion(0)
+  , _numDiffusionPerAgent(0)
 {
 	for (int i = 0; i < NOUTCOMES; i++)
     {
@@ -367,7 +367,7 @@ void GrSimulation::deserialize(std::istream& in)
 	}
 }
 
-void GrSimulation::init(Scalar molecularTrackingRadius)
+void GrSimulation::init()
 {
 	// Before initializing anything check to see if the time step criteria are met
     timestepSync();
@@ -437,7 +437,6 @@ void GrSimulation::init(Scalar molecularTrackingRadius)
 		}
 	}
 
-	initMolecularTracking(molecularTrackingRadius);
 }
 
 // Mark each cell within the molecular tracking radius to be tracked.
@@ -504,6 +503,25 @@ void GrSimulation::initMolecularTracking(Scalar molecularTrackingRadius)
 			it->setTrackMolecularDynamics(false);
 		}
 	}
+}
+void GrSimulation::initMolecularTracking(const std::vector<int>& ids) {
+
+	for (MacList::iterator it = _macList.begin(); it != _macList.end(); it++)
+    for(typeof(ids.begin()) i=ids.begin(); i != ids.end(); i++)
+      if(*i == it->getID())
+        it->setTrackMolecularDynamics(true);
+	for (TgamList::iterator it = _tgamList.begin(); it != _tgamList.end(); it++)
+    for(typeof(ids.begin()) i=ids.begin(); i != ids.end(); i++)
+      if(*i == it->getID())
+        it->setTrackMolecularDynamics(true);
+	for (TcytList::iterator it = _tcytList.begin(); it != _tcytList.end(); it++)
+    for(typeof(ids.begin()) i=ids.begin(); i != ids.end(); i++)
+      if(*i == it->getID())
+        it->setTrackMolecularDynamics(true);
+	for (TregList::iterator it = _tregList.begin(); it != _tregList.end(); it++)
+    for(typeof(ids.begin()) i=ids.begin(); i != ids.end(); i++)
+      if(*i == it->getID())
+        it->setTrackMolecularDynamics(true);
 }
 
 void GrSimulation::solve()

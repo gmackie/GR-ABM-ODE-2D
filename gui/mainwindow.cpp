@@ -141,8 +141,8 @@ MainWindow::MainWindow(MainInterface* pItfc, GLWindow* pGLWindow, QWidget* pPara
 
 	_pMainWindow = this;
 	_ui.setupUi(this);
-	_pStatWidget->setParent(_ui.tabStatistics);
-	_pAgentsWidget->setParent(_ui.tabAgents);
+    _ui.tabStatistics->layout()->addWidget(_pStatWidget);
+    _ui.tabAgents->layout()->addWidget(_pAgentsWidget);
 
 	initSimulationTab();
 	initVisualizationTab();

@@ -28,7 +28,7 @@ Simulation::Simulation(const Pos& dim)
 	, _timeStepsToSimulate(_TIMESTEPS_TO_SIMULATE) //_DAYS_TO_SIMULATE _TIMESTEPS_TO_SIMULATE
 	, _mtbClearance(true)
 {
-	_gr->init(false); // Molecular tracking not available in gui version of the model.
+	_gr->init(); // Molecular tracking not available in gui version of the model.
 	_gr->setAreaThreshold(_AREA_THRESHOLD);
 	update();
 }

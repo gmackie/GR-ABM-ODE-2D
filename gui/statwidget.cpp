@@ -70,7 +70,7 @@ void StatWidget::updateLabels(const Stats& stats)
 	str = QString("%1 - %2").arg(stats.getTotNrSources()).arg(str);
 	_ui.labelSources->setText(str);
 
-  toString(stats.getNrSourcesActiveArray().begin(), stats.getNrSourcesArray().end(), str);
+  toString(stats.getNrSourcesActiveArray().begin(), stats.getNrSourcesActiveArray().end(), str);
 	str = QString("%1 - %2").arg(stats.getTotNrSourcesActive()).arg(str);
 	_ui.labelSourcesAct->setText(str);
 

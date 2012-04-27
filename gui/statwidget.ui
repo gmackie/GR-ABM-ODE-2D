@@ -6,566 +6,586 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>276</width>
-    <height>633</height>
+    <width>256</width>
+    <height>496</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>StatWidget</string>
   </property>
-  <widget class="QGroupBox" name="groupBoxStatistics">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>251</width>
-     <height>621</height>
-    </rect>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="margin">
+    <number>0</number>
    </property>
-   <property name="title">
-    <string>Statistics</string>
-   </property>
-   <widget class="QWidget" name="layoutWidget1">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>20</y>
-      <width>253</width>
-      <height>591</height>
-     </rect>
-    </property>
-    <layout class="QGridLayout" name="gridLayout_18">
-     <item row="0" column="0">
-      <widget class="QLabel" name="labelMacCap">
-       <property name="text">
-        <string>Mac</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="1">
-      <widget class="QLabel" name="labelMac">
-       <property name="minimumSize">
-        <size>
-         <width>130</width>
-         <height>0</height>
-        </size>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
-       </property>
-       <property name="toolTip">
-        <string>Mac (Resting, Infected, Chronically Infected, Active, Dead)</string>
-       </property>
-       <property name="text">
-        <string>0 - (0,0,0,0,0)</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="labelTgamCap">
-       <property name="text">
-        <string>Tgam</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="0">
-      <widget class="QLabel" name="labelTcytCap">
-       <property name="text">
-        <string>Tcyt</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="1">
-      <widget class="QLabel" name="labelTcyt">
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
-       </property>
-       <property name="toolTip">
-        <string>Tcyt (Resting, Regulated, Dead)</string>
-       </property>
-       <property name="text">
-        <string>0 - (0,0,0)</string>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="0">
-      <widget class="QLabel" name="labelTregCap">
-       <property name="text">
-        <string>Treg</string>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="1">
-      <widget class="QLabel" name="labelTreg">
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
-       </property>
-       <property name="toolTip">
-        <string>Treg (Resting, Dead)</string>
-       </property>
-       <property name="text">
-        <string>0 - (0,0)</string>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="0">
-      <widget class="QLabel" name="labelMtbCap">
-       <property name="text">
-        <string>Mtb.</string>
-       </property>
-      </widget>
-     </item>
-     <item row="6" column="1">
-      <widget class="QLabel" name="labelMacNFkB">
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
-       </property>
-       <property name="toolTip">
-        <string>NFkB: Mac (Resting, Infected, Chronically Infected, Active, Dead)</string>
-       </property>
-       <property name="text">
-        <string>0 - (0,0,0,0,0)</string>
-       </property>
-      </widget>
-     </item>
-     <item row="9" column="0">
-      <widget class="QLabel" name="labelSrcCap">
-       <property name="text">
-        <string>Sources (thold)</string>
-       </property>
-      </widget>
-     </item>
-     <item row="9" column="1">
-      <widget class="QLabel" name="labelSources">
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
-       </property>
-       <property name="toolTip">
-        <string>Active (threshold) sources (Mac, Tgam, Tcyt, Treg)</string>
-       </property>
-       <property name="text">
-        <string>(0,0,0,0)</string>
-       </property>
-      </widget>
-     </item>
-     <item row="11" column="0">
-      <widget class="QLabel" name="labelApoptCap">
-       <property name="text">
-        <string>Apopt</string>
-       </property>
-      </widget>
-     </item>
-     <item row="11" column="1">
-      <widget class="QLabel" name="labelApoptosis">
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
-       </property>
-       <property name="toolTip">
-        <string>Apoptosis (TNF,Fas/FasL)</string>
-       </property>
-       <property name="text">
-        <string>(0,0)</string>
-       </property>
-      </widget>
-     </item>
-     <item row="13" column="0">
-      <widget class="QLabel" name="labelTNFCap">
-       <property name="text">
-        <string>TNF</string>
-       </property>
-      </widget>
-     </item>
-     <item row="14" column="0">
-      <widget class="QLabel" name="labelCCL2Cap">
-       <property name="text">
-        <string>CCL2</string>
-       </property>
-      </widget>
-     </item>
-     <item row="15" column="0">
-      <widget class="QLabel" name="labelCCL5Cap">
-       <property name="text">
-        <string>CCL5</string>
-       </property>
-      </widget>
-     </item>
-     <item row="16" column="0">
-      <widget class="QLabel" name="labelCXCL9Cap">
-       <property name="text">
-        <string>CXCL9</string>
-       </property>
-      </widget>
-     </item>
-     <item row="13" column="1">
-      <widget class="QLabel" name="labelTNF">
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
-       </property>
-       <property name="toolTip">
-        <string/>
-       </property>
-       <property name="text">
-        <string>0</string>
-       </property>
-      </widget>
-     </item>
-     <item row="14" column="1">
-      <widget class="QLabel" name="labelCCL2">
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
-       </property>
-       <property name="toolTip">
-        <string/>
-       </property>
-       <property name="text">
-        <string>0</string>
-       </property>
-      </widget>
-     </item>
-     <item row="15" column="1">
-      <widget class="QLabel" name="labelCCL5">
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
-       </property>
-       <property name="toolTip">
-        <string/>
-       </property>
-       <property name="text">
-        <string>0</string>
-       </property>
-      </widget>
-     </item>
-     <item row="16" column="1">
-      <widget class="QLabel" name="labelCXCL9">
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
-       </property>
-       <property name="toolTip">
-        <string/>
-       </property>
-       <property name="text">
-        <string>0</string>
-       </property>
-      </widget>
-     </item>
-     <item row="7" column="0">
-      <widget class="QLabel" name="labelMacStat1Cap">
-       <property name="text">
-        <string>Mac (stat1)</string>
-       </property>
-      </widget>
-     </item>
-     <item row="7" column="1">
-      <widget class="QLabel" name="labelMacStat1">
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
-       </property>
-       <property name="toolTip">
-        <string>stat1: Mac (Resting, Infected, Chronically Infected, Active, Dead)</string>
-       </property>
-       <property name="text">
-        <string>0 - (0,0,0,0,0)</string>
-       </property>
-      </widget>
-     </item>
-     <item row="18" column="1">
-      <widget class="QLabel" name="labelGranulomaAreaVal">
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>0</string>
-       </property>
-      </widget>
-     </item>
-     <item row="18" column="0">
-      <widget class="QLabel" name="labelGrAreaCap">
-       <property name="text">
-        <string>Gr area</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1">
-      <widget class="QLabel" name="labelTgam">
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
-       </property>
-       <property name="toolTip">
-        <string>Tgam (Active, Regulated, Dead)</string>
-       </property>
-       <property name="text">
-        <string>0 - (0,0,0)</string>
-       </property>
-      </widget>
-     </item>
-     <item row="6" column="0">
-      <widget class="QLabel" name="labelMacNFkBCap">
-       <property name="text">
-        <string>Mac (NFkB)</string>
-       </property>
-      </widget>
-     </item>
-     <item row="8" column="0">
-      <widget class="QLabel" name="labelMacDeactCap">
-       <property name="text">
-        <string>Mac (deact)</string>
-       </property>
-      </widget>
-     </item>
-     <item row="8" column="1">
-      <widget class="QLabel" name="labelMacDeact">
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
-       </property>
-       <property name="toolTip">
-        <string>deact: Mac (Resting, Infected, Chronically Infected, Active, Dead)</string>
-       </property>
-       <property name="text">
-        <string>0 - (0,0,0,0,0)</string>
-       </property>
-      </widget>
-     </item>
-     <item row="12" column="0">
-      <widget class="QLabel" name="labelMacAttractabtCap">
-       <property name="text">
-        <string>Attractant</string>
-       </property>
-      </widget>
-     </item>
-     <item row="12" column="1">
-      <widget class="QLabel" name="labelMacAttractant">
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
-       </property>
-       <property name="toolTip">
-        <string/>
-       </property>
-       <property name="text">
-        <string>0</string>
-       </property>
-      </widget>
-     </item>
-     <item row="10" column="0">
-      <widget class="QLabel" name="labelSrcActCap">
-       <property name="text">
-        <string>Sources (act)</string>
-       </property>
-      </widget>
-     </item>
-     <item row="10" column="1">
-      <widget class="QLabel" name="labelSourcesAct">
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
-       </property>
-       <property name="toolTip">
-        <string>Active sources (Mac, Tgam, Tcyt, Treg)</string>
-       </property>
-       <property name="text">
-        <string>(0,0,0,0)</string>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="1">
-      <widget class="QLabel" name="labelMtb">
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
-       </property>
-       <property name="toolTip">
-        <string>(Ext. Mtb, Int. Mtb)</string>
-       </property>
-       <property name="text">
-        <string>(0,0)</string>
-       </property>
-      </widget>
-     </item>
-     <item row="5" column="0">
-      <widget class="QLabel" name="labelMtbNonRepCap">
-       <property name="text">
-        <string>Caseated</string>
-       </property>
-      </widget>
-     </item>
-     <item row="5" column="1">
-      <widget class="QLabel" name="labelMtbNonRep">
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
-       </property>
-       <property name="toolTip">
-        <string>(Caseated compartments, Non-replicating Mtb.)</string>
-       </property>
-       <property name="text">
-        <string>(0,0)</string>
-       </property>
-      </widget>
-     </item>
-     <item row="19" column="0">
-      <widget class="QLabel" name="labelTcellQueueCap">
-       <property name="text">
-        <string>T cell queue</string>
-       </property>
-      </widget>
-     </item>
-     <item row="19" column="1">
-      <widget class="QLabel" name="labelTcellQueue">
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
-       </property>
-       <property name="toolTip">
-        <string>Recruitment queue (Tgam, Tcyt, Treg)</string>
-       </property>
-       <property name="text">
-        <string>0</string>
-       </property>
-      </widget>
-     </item>
-     <item row="20" column="0">
-      <widget class="QLabel" name="labeldMDCCap">
-       <property name="text">
-        <string>MDC flux</string>
-       </property>
-      </widget>
-     </item>
-     <item row="20" column="1">
-      <widget class="QLabel" name="labeldMDC">
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>0</string>
-       </property>
-      </widget>
-     </item>
-     <item row="21" column="0">
-      <widget class="QLabel" name="labelTgamFluxCap">
-       <property name="text">
-        <string>Tgam flux</string>
-       </property>
-      </widget>
-     </item>
-     <item row="21" column="1">
-      <widget class="QLabel" name="labelTgamFlux">
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
-       </property>
-       <property name="toolTip">
-        <string/>
-       </property>
-       <property name="text">
-        <string>0</string>
-       </property>
-      </widget>
-     </item>
-     <item row="22" column="0">
-      <widget class="QLabel" name="labelTcytFluxCap">
-       <property name="text">
-        <string>Tcyt flux</string>
-       </property>
-      </widget>
-     </item>
-     <item row="22" column="1">
-      <widget class="QLabel" name="labelTcytFlux">
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
-       </property>
-       <property name="toolTip">
-        <string/>
-       </property>
-       <property name="text">
-        <string>0</string>
-       </property>
-      </widget>
-     </item>
-     <item row="23" column="0">
-      <widget class="QLabel" name="labelTregFluxCap">
-       <property name="text">
-        <string>Treg flux</string>
-       </property>
-      </widget>
-     </item>
-     <item row="23" column="1">
-      <widget class="QLabel" name="labelTregFlux">
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
-       </property>
-       <property name="toolTip">
-        <string/>
-       </property>
-       <property name="text">
-        <string>0</string>
-       </property>
-      </widget>
-     </item>
-     <item row="17" column="0">
-      <widget class="QLabel" name="labelIL10Cap">
-       <property name="text">
-        <string>IL10</string>
-       </property>
-      </widget>
-     </item>
-     <item row="17" column="1">
-      <widget class="QLabel" name="labelIL10">
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
-       </property>
-       <property name="toolTip">
-        <string/>
-       </property>
-       <property name="text">
-        <string>0</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </widget>
-  </widget>
+   <item>
+    <widget class="QGroupBox" name="groupBoxStatistics">
+     <property name="title">
+      <string>Statistics</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <property name="margin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="QScrollArea" name="scrollArea">
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="widgetResizable">
+         <bool>true</bool>
+        </property>
+        <widget class="QWidget" name="scrollAreaWidgetContents">
+         <property name="geometry">
+          <rect>
+           <x>0</x>
+           <y>0</y>
+           <width>252</width>
+           <height>478</height>
+          </rect>
+         </property>
+         <layout class="QGridLayout" name="gridLayout">
+          <property name="margin">
+           <number>0</number>
+          </property>
+          <item row="0" column="0">
+           <widget class="QLabel" name="labelMacCap">
+            <property name="text">
+             <string>Mac</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLabel" name="labelMac">
+            <property name="minimumSize">
+             <size>
+              <width>130</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="font">
+             <font>
+              <pointsize>8</pointsize>
+             </font>
+            </property>
+            <property name="toolTip">
+             <string>Mac (Resting, Infected, Chronically Infected, Active, Dead)</string>
+            </property>
+            <property name="text">
+             <string>0 - (0,0,0,0,0)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="labelTgamCap">
+            <property name="text">
+             <string>Tgam</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLabel" name="labelTgam">
+            <property name="font">
+             <font>
+              <pointsize>8</pointsize>
+             </font>
+            </property>
+            <property name="toolTip">
+             <string>Tgam (Active, Regulated, Dead)</string>
+            </property>
+            <property name="text">
+             <string>0 - (0,0,0)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="labelTcytCap">
+            <property name="text">
+             <string>Tcyt</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QLabel" name="labelTcyt">
+            <property name="font">
+             <font>
+              <pointsize>8</pointsize>
+             </font>
+            </property>
+            <property name="toolTip">
+             <string>Tcyt (Resting, Regulated, Dead)</string>
+            </property>
+            <property name="text">
+             <string>0 - (0,0,0)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="labelTregCap">
+            <property name="text">
+             <string>Treg</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QLabel" name="labelTreg">
+            <property name="font">
+             <font>
+              <pointsize>8</pointsize>
+             </font>
+            </property>
+            <property name="toolTip">
+             <string>Treg (Resting, Dead)</string>
+            </property>
+            <property name="text">
+             <string>0 - (0,0)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0">
+           <widget class="QLabel" name="labelMtbCap">
+            <property name="text">
+             <string>Mtb.</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1">
+           <widget class="QLabel" name="labelMtb">
+            <property name="font">
+             <font>
+              <pointsize>8</pointsize>
+             </font>
+            </property>
+            <property name="toolTip">
+             <string>(Ext. Mtb, Int. Mtb)</string>
+            </property>
+            <property name="text">
+             <string>(0,0)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="0">
+           <widget class="QLabel" name="labelMtbNonRepCap">
+            <property name="text">
+             <string>Caseated</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="1">
+           <widget class="QLabel" name="labelMtbNonRep">
+            <property name="font">
+             <font>
+              <pointsize>8</pointsize>
+             </font>
+            </property>
+            <property name="toolTip">
+             <string>(Caseated compartments, Non-replicating Mtb.)</string>
+            </property>
+            <property name="text">
+             <string>(0,0)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="0">
+           <widget class="QLabel" name="labelMacNFkBCap">
+            <property name="text">
+             <string>Mac (NFkB)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="1">
+           <widget class="QLabel" name="labelMacNFkB">
+            <property name="font">
+             <font>
+              <pointsize>8</pointsize>
+             </font>
+            </property>
+            <property name="toolTip">
+             <string>NFkB: Mac (Resting, Infected, Chronically Infected, Active, Dead)</string>
+            </property>
+            <property name="text">
+             <string>0 - (0,0,0,0,0)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="7" column="0">
+           <widget class="QLabel" name="labelMacStat1Cap">
+            <property name="text">
+             <string>Mac (stat1)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="7" column="1">
+           <widget class="QLabel" name="labelMacStat1">
+            <property name="font">
+             <font>
+              <pointsize>8</pointsize>
+             </font>
+            </property>
+            <property name="toolTip">
+             <string>stat1: Mac (Resting, Infected, Chronically Infected, Active, Dead)</string>
+            </property>
+            <property name="text">
+             <string>0 - (0,0,0,0,0)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="8" column="0">
+           <widget class="QLabel" name="labelMacDeactCap">
+            <property name="text">
+             <string>Mac (deact)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="8" column="1">
+           <widget class="QLabel" name="labelMacDeact">
+            <property name="font">
+             <font>
+              <pointsize>8</pointsize>
+             </font>
+            </property>
+            <property name="toolTip">
+             <string>deact: Mac (Resting, Infected, Chronically Infected, Active, Dead)</string>
+            </property>
+            <property name="text">
+             <string>0 - (0,0,0,0,0)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="9" column="0">
+           <widget class="QLabel" name="labelSrcCap">
+            <property name="text">
+             <string>Sources (thold)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="9" column="1">
+           <widget class="QLabel" name="labelSources">
+            <property name="font">
+             <font>
+              <pointsize>8</pointsize>
+             </font>
+            </property>
+            <property name="toolTip">
+             <string>Active (threshold) sources (Mac, Tgam, Tcyt, Treg)</string>
+            </property>
+            <property name="text">
+             <string>(0,0,0,0)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="10" column="0">
+           <widget class="QLabel" name="labelSrcActCap">
+            <property name="text">
+             <string>Sources (act)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="10" column="1">
+           <widget class="QLabel" name="labelSourcesAct">
+            <property name="font">
+             <font>
+              <pointsize>8</pointsize>
+             </font>
+            </property>
+            <property name="toolTip">
+             <string>Active sources (Mac, Tgam, Tcyt, Treg)</string>
+            </property>
+            <property name="text">
+             <string>(0,0,0,0)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="11" column="0">
+           <widget class="QLabel" name="labelApoptCap">
+            <property name="text">
+             <string>Apopt</string>
+            </property>
+           </widget>
+          </item>
+          <item row="11" column="1">
+           <widget class="QLabel" name="labelApoptosis">
+            <property name="font">
+             <font>
+              <pointsize>8</pointsize>
+             </font>
+            </property>
+            <property name="toolTip">
+             <string>Apoptosis (TNF,Fas/FasL)</string>
+            </property>
+            <property name="text">
+             <string>(0,0)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="12" column="0">
+           <widget class="QLabel" name="labelMacAttractabtCap">
+            <property name="text">
+             <string>Attractant</string>
+            </property>
+           </widget>
+          </item>
+          <item row="12" column="1">
+           <widget class="QLabel" name="labelMacAttractant">
+            <property name="font">
+             <font>
+              <pointsize>8</pointsize>
+             </font>
+            </property>
+            <property name="toolTip">
+             <string/>
+            </property>
+            <property name="text">
+             <string>0</string>
+            </property>
+           </widget>
+          </item>
+          <item row="13" column="0">
+           <widget class="QLabel" name="labelTNFCap">
+            <property name="text">
+             <string>TNF</string>
+            </property>
+           </widget>
+          </item>
+          <item row="13" column="1">
+           <widget class="QLabel" name="labelTNF">
+            <property name="font">
+             <font>
+              <pointsize>8</pointsize>
+             </font>
+            </property>
+            <property name="toolTip">
+             <string/>
+            </property>
+            <property name="text">
+             <string>0</string>
+            </property>
+           </widget>
+          </item>
+          <item row="14" column="0">
+           <widget class="QLabel" name="labelCCL2Cap">
+            <property name="text">
+             <string>CCL2</string>
+            </property>
+           </widget>
+          </item>
+          <item row="14" column="1">
+           <widget class="QLabel" name="labelCCL2">
+            <property name="font">
+             <font>
+              <pointsize>8</pointsize>
+             </font>
+            </property>
+            <property name="toolTip">
+             <string/>
+            </property>
+            <property name="text">
+             <string>0</string>
+            </property>
+           </widget>
+          </item>
+          <item row="15" column="0">
+           <widget class="QLabel" name="labelCCL5Cap">
+            <property name="text">
+             <string>CCL5</string>
+            </property>
+           </widget>
+          </item>
+          <item row="15" column="1">
+           <widget class="QLabel" name="labelCCL5">
+            <property name="font">
+             <font>
+              <pointsize>8</pointsize>
+             </font>
+            </property>
+            <property name="toolTip">
+             <string/>
+            </property>
+            <property name="text">
+             <string>0</string>
+            </property>
+           </widget>
+          </item>
+          <item row="16" column="0">
+           <widget class="QLabel" name="labelCXCL9Cap">
+            <property name="text">
+             <string>CXCL9</string>
+            </property>
+           </widget>
+          </item>
+          <item row="16" column="1">
+           <widget class="QLabel" name="labelCXCL9">
+            <property name="font">
+             <font>
+              <pointsize>8</pointsize>
+             </font>
+            </property>
+            <property name="toolTip">
+             <string/>
+            </property>
+            <property name="text">
+             <string>0</string>
+            </property>
+           </widget>
+          </item>
+          <item row="17" column="0">
+           <widget class="QLabel" name="labelIL10Cap">
+            <property name="text">
+             <string>IL10</string>
+            </property>
+           </widget>
+          </item>
+          <item row="17" column="1">
+           <widget class="QLabel" name="labelIL10">
+            <property name="font">
+             <font>
+              <pointsize>8</pointsize>
+             </font>
+            </property>
+            <property name="toolTip">
+             <string/>
+            </property>
+            <property name="text">
+             <string>0</string>
+            </property>
+           </widget>
+          </item>
+          <item row="18" column="0">
+           <widget class="QLabel" name="labelGrAreaCap">
+            <property name="text">
+             <string>Gr area</string>
+            </property>
+           </widget>
+          </item>
+          <item row="18" column="1">
+           <widget class="QLabel" name="labelGranulomaAreaVal">
+            <property name="font">
+             <font>
+              <pointsize>8</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string>0</string>
+            </property>
+           </widget>
+          </item>
+          <item row="19" column="0">
+           <widget class="QLabel" name="labelTcellQueueCap">
+            <property name="text">
+             <string>T cell queue</string>
+            </property>
+           </widget>
+          </item>
+          <item row="19" column="1">
+           <widget class="QLabel" name="labelTcellQueue">
+            <property name="font">
+             <font>
+              <pointsize>8</pointsize>
+             </font>
+            </property>
+            <property name="toolTip">
+             <string>Recruitment queue (Tgam, Tcyt, Treg)</string>
+            </property>
+            <property name="text">
+             <string>0</string>
+            </property>
+           </widget>
+          </item>
+          <item row="20" column="0">
+           <widget class="QLabel" name="labeldMDCCap">
+            <property name="text">
+             <string>MDC flux</string>
+            </property>
+           </widget>
+          </item>
+          <item row="20" column="1">
+           <widget class="QLabel" name="labeldMDC">
+            <property name="font">
+             <font>
+              <pointsize>8</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string>0</string>
+            </property>
+           </widget>
+          </item>
+          <item row="21" column="0">
+           <widget class="QLabel" name="labelTgamFluxCap">
+            <property name="text">
+             <string>Tgam flux</string>
+            </property>
+           </widget>
+          </item>
+          <item row="21" column="1">
+           <widget class="QLabel" name="labelTgamFlux">
+            <property name="font">
+             <font>
+              <pointsize>8</pointsize>
+             </font>
+            </property>
+            <property name="toolTip">
+             <string/>
+            </property>
+            <property name="text">
+             <string>0</string>
+            </property>
+           </widget>
+          </item>
+          <item row="22" column="0">
+           <widget class="QLabel" name="labelTcytFluxCap">
+            <property name="text">
+             <string>Tcyt flux</string>
+            </property>
+           </widget>
+          </item>
+          <item row="22" column="1">
+           <widget class="QLabel" name="labelTcytFlux">
+            <property name="font">
+             <font>
+              <pointsize>8</pointsize>
+             </font>
+            </property>
+            <property name="toolTip">
+             <string/>
+            </property>
+            <property name="text">
+             <string>0</string>
+            </property>
+           </widget>
+          </item>
+          <item row="23" column="0">
+           <widget class="QLabel" name="labelTregFluxCap">
+            <property name="text">
+             <string>Treg flux</string>
+            </property>
+           </widget>
+          </item>
+          <item row="23" column="1">
+           <widget class="QLabel" name="labelTregFlux">
+            <property name="font">
+             <font>
+              <pointsize>8</pointsize>
+             </font>
+            </property>
+            <property name="toolTip">
+             <string/>
+            </property>
+            <property name="text">
+             <string>0</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>

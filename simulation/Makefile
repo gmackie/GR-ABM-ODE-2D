@@ -40,7 +40,7 @@ gpu:	gr_gpu
 
 SRCS := paramsbase.cpp params.cpp rand.cpp agent.cpp gr.cpp grsimulationgrid.cpp grgrid.cpp macrophage.cpp grsimulation.cpp onlinestat.cpp grdiffusion.cpp grdiffusionbtcs.cpp grdiffusionwrongbtcs.cpp grdiffusionadeswap.cpp grdiffusionftcsswap.cpp ttest.cpp areatest.cpp mtbtest.cpp tcell.cpp tcytotoxic.cpp tgamma.cpp tregulatory.cpp recruitmentbase.cpp recruitmentprob.cpp recruitmentlnode.cpp recruitmentlnodeproxy.cpp recruitmentlnodepure.cpp serialization.cpp 
 OBJS := ${SRCS:.cpp=.o}
-TINYXML_SRC := tinyxml/tinystr.cpp tinyxml/tinyxml.cpp tinyxml/tinyxmlerror.cpp tinyxml/tinyxmlparser.cpp
+TINYXML_SRCS := tinyxml/tinystr.cpp tinyxml/tinyxml.cpp tinyxml/tinyxmlerror.cpp tinyxml/tinyxmlparser.cpp
 TINYXML_OBJS := ${TINYXML_SRCS:.cpp=.o}
 
 # If Makefile or gr.h changes, we need to recompile everything -- We can do this here because object files only depend on one file
@@ -73,6 +73,6 @@ lhs:	$(TINYXML_OBJS) rand.o paramsbase.o params.o lhs.o
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
 clean:
-	rm -f *.o tinyxml/*.o gr gr1 gr2 gr3 gr4 lhs
+	rm -f ${OBJS} ${TINYXML_OBJS} gr gr1 gr2 gr3 gr4 lhs
 
 -include Makefile.depend

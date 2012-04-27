@@ -151,7 +151,8 @@ void Tgam::computeNextState(const int time, GrGrid& grid, Stats& stats, bool tnf
 void Tgam::handleActive(const int time, GrGrid& grid, Stats& stats, bool tgammatransition)
 {
     double ProbSum = 0.0; // Initialize the probability sum for transition to TGAM_ACTIVE_DOUBLE
-
+    double AgProb = 0.0, TGFProb = 0.0, ICOSProb = 0.0;
+    
     if(tgammatransition)
 	{
 		if (grid.hasAgentType(MAC, _pos))
@@ -199,20 +200,23 @@ void Tgam::handleActive(const int time, GrGrid& grid, Stats& stats, bool tgammat
         }
         if (_nAntigenStim > 1) 
         {
-            double AgProb = (1.0/3.0) * (1 - pow(2.7183, (-_PARAM(PARAM_TGAM_PROB_AGSTIM)*(_nAntigenStim - 1.0))));
+            AgProb = (1.0/3.0) * (1 - pow(2.7183, (-_PARAM(PARAM_TGAM_RATE_AGSTIM)*(_nAntigenStim - 1.0))));
             ProbSum += AgProb;
         }
         if (_nDownRegulated > 0) 
         {
-            double TGFProb = (1.0/3.0) * (1 - pow(2.7183, (-_PARAM(PARAM_TGAM_PROB_TGFB)*(_nDownRegulated))));
+            TGFProb = (1.0/3.0) * (1 - pow(2.7183, (-_PARAM(PARAM_TGAM_RATE_TGFB)*(_nDownRegulated))));
             ProbSum += TGFProb;
         }
         if (_nICOS > 0) 
         {
-            double ICOSProb = (1.0/3.0) * (1 - pow(2.7183, (-_PARAM(PARAM_TGAM_PROB_ICOS)*(_nICOS))));
+            ICOSProb = (1.0/3.0) * (1 - pow(2.7183, (-_PARAM(PARAM_TGAM_RATE_ICOS)*(_nICOS))));
             ProbSum += ICOSProb;
         }
         if (g_Rand.getReal() < ProbSum) {
+            
+            std::cout << AgProb << "  " << TGFProb << "  " << ICOSProb << std::endl;
+            std::cout << _nAntigenStim << "  " << _nDownRegulated << "  " << _nICOS << std::endl;
             
             _nextState = TGAM_ACTIVE_DOUBLE;
             _transitionTime = time;

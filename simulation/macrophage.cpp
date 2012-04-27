@@ -297,9 +297,10 @@ void Mac::apoptosis(GrGrid& grid)
 	}
 }
 
-void Mac::computeNextState(const int time, GrGrid& grid, Stats& stats, bool tnfrDynamics, bool nfkbDynamics, bool, bool)
+void Mac::computeNextState(const int time, GrGrid& grid, Stats& stats, bool tnfrDynamics, bool nfkbDynamics, bool il10rDynamics, bool)
 {
 	double tnfBoundFraction = grid.TNF(_pos) / (grid.TNF(_pos) + _PARAM(PARAM_GR_KD1) * 48.16e11);
+    double il10BoundFraction = grid.il10(_pos) / (grid.il10(_pos) + _PARAM(PARAM_GR_I_KD) * 48.16e11);
 	double nfkb_adjusted_k_apoptosis = _PARAM(PARAM_GR_K_APOPTOSIS_NFKB_MOLECULAR) * (_PARAM(PARAM_GR_K_IAP)/(_PARAM(PARAM_GR_K_IAP) + _normalizedIAP));
     
 	// check if it is time to die
@@ -382,11 +383,15 @@ void Mac::computeNextState(const int time, GrGrid& grid, Stats& stats, bool tnfr
 				getExtMtbInMoore(grid) > _PARAM(PARAM_MAC_THRESHOLD_NFKB_EXTMTB);
 				//grid.extMTB(_pos) > _PARAM(PARAM_MAC_THRESHOLD_NFKB_EXTMTB);
             
-			if (_stat1 && intCompareGT(_PARAM(PARAM_MAC_THRESHOLD_ICOS), _surfBoundIL10R))
-			{
-				_ICOS = _stat1;
-			}
-
+            // Update ICOS
+            bool il10InhibitionICOS;
+            if (il10rDynamics)
+                il10InhibitionICOS = _stat1 && intCompareGT(_PARAM(PARAM_MAC_THRESHOLD_ICOS), _surfBoundIL10R);
+            else
+                il10InhibitionICOS = _stat1 && _PARAM(PARAM_MAC_THRESHOLD_ICOS) > il10BoundFraction;
+                
+            _ICOS = il10InhibitionICOS;
+            
 			switch (_state)
 			{
 			case Mac::MAC_DEAD:

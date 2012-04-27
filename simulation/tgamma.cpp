@@ -165,8 +165,6 @@ void Tgam::handleActive(const int time, GrGrid& grid, Stats& stats, bool tgammat
 			{
 				return;
 			}
-
-
 			// Fas/FasL induced apoptosis with probability
 			if (pMac &&
 				(pMac->getState() == Mac::MAC_INFECTED || pMac->getState() == Mac::MAC_CINFECTED) &&
@@ -178,68 +176,42 @@ void Tgam::handleActive(const int time, GrGrid& grid, Stats& stats, bool tgammat
 
 				grid.incKillings(_pos);
 			}
-
-
-            
             // If mac does not die then check for Tgam10 conditions - Macs
             if (pMac && (pMac->getState() == Mac::MAC_INFECTED || pMac->getState() == Mac::MAC_CINFECTED))
             {
-                
                 if (pMac && pMac->getICOS())
                 {
                     _nICOS ++;
-//                    cout << "ICOS" << std::endl;
                 }
-                
                 if (g_Rand.getReal() < _PARAM(PARAM_TGAM_PROB_ANTIGEN_PRESENTATION))
                 {
                     _nAntigenStim ++;
-//                    cout << "Antigen Stim" << std::endl;
                 }
-                
             }
         	if (pMac && ((pMac->getState() == Mac::MAC_RESTING && pMac->getNFkB()) || (pMac->getState() == Mac::MAC_RESTING && pMac->getICOS()) || (pMac->getState() == Mac::MAC_ACTIVE)) && grid.extMTB(_pos) > _PARAM(PARAM_TGAM_THRESHOLD_EXT_MTB))
         	{
          	   _nAntigenStim ++;
-//         	   cout << "Antigen Stim" << std::endl;
-       		 }
+            }
         	if (pMac && ((pMac->getState() == Mac::MAC_RESTING && pMac->getICOS()) || (pMac->getState() == Mac::MAC_ACTIVE && pMac->getICOS())))
-       	 {
+            {
 	            _nICOS ++;
-// 	           cout << "ICOS" << std::endl;
 	        }
-            
         }
-        
         if (_nAntigenStim > 1) 
         {
-            
             double AgProb = (1.0/3.0) * (1 - pow(2.7183, (-_PARAM(PARAM_TGAM_PROB_AGSTIM)*(_nAntigenStim - 1.0))));
             ProbSum += AgProb;
-            
         }
-        
-        
         if (_nDownRegulated > 0) 
         {
-            
             double TGFProb = (1.0/3.0) * (1 - pow(2.7183, (-_PARAM(PARAM_TGAM_PROB_TGFB)*(_nDownRegulated))));
             ProbSum += TGFProb;
-            
         }
-        
         if (_nICOS > 0) 
         {
-            
             double ICOSProb = (1.0/3.0) * (1 - pow(2.7183, (-_PARAM(PARAM_TGAM_PROB_ICOS)*(_nICOS))));
-            
             ProbSum += ICOSProb;
-            
         }
-        
-//        cout << "ProbabilitySum:   " << ProbSum << std::endl;
-        
-        
         if (g_Rand.getReal() < ProbSum) {
             
             _nextState = TGAM_ACTIVE_DOUBLE;
@@ -253,9 +225,7 @@ void Tgam::handleActive(const int time, GrGrid& grid, Stats& stats, bool tgammat
         if (ProbSum < 0 || ProbSum > 1) {
             std::cout << "Error: Probability of Transition to IL10 Producing Tgamma is  " << ProbSum << std::endl;
         }
-
     }
-    
     else
     {
         if (grid.hasAgentType(MAC, _pos))
@@ -347,13 +317,13 @@ void Tgam::handleInducedReg(const int time, GrGrid& grid, Stats& stats)
 
 void Tgam::deactivate(const int time)
 {
-    if (_state == TGAM_ACTIVE || _state == TGAM_ACTIVE_DOUBLE) {
+    if (_state == TGAM_ACTIVE || _state == TGAM_ACTIVE_DOUBLE) 
+    {
         _nDownRegulated ++;
-//        cout << _nDownRegulated << std::endl;
-//        cout << "TGF-B" << std::endl;
     }
     
-    if (_state == TGAM_INDUCED_REG) {
+    if (_state == TGAM_INDUCED_REG)
+    {
         _nextState = TGAM_INDUCED_REG;
     }
     else
@@ -388,7 +358,7 @@ void Tgam::print() const
 	case TGAM_ACTIVE:
 		std::cout << "active" << std::endl;
 		break;
-  default: throw std::runtime_error("Unknown Tcyt state");
+  default: throw std::runtime_error("Unknown Tgam state");
 	}
 }
 

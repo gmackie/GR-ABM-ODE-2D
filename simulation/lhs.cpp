@@ -12,7 +12,7 @@
 #include <fstream>
 #include <stdio.h>
 
-extern Rand g_Rand;
+Rand g_Rand(1337);
 namespace po = boost::program_options;
 
 /*

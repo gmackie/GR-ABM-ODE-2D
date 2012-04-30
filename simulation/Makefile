@@ -69,7 +69,7 @@ gr3: $(TINYXML_OBJS) $(OBJS) grmain.o
 gr4: $(TINYXML_OBJS) $(OBJS) grmain.o
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
-lhs:	$(TINYXML_OBJS) rand.o paramsbase.o params.o lhs.o
+lhs:	$(TINYXML_OBJS) rand.o paramsbase.o params.o serialization.o lhs.o
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
 clean:

@@ -138,11 +138,11 @@ public:
   void outputHeader() {
     write("time");
     write("Mac"); write("Mr"); write("Mi"); write("Mci"); write("Ma"); write("Md");
-    write("Tgam"); write("Tgam a"); write("Tgam ad") ;write("Tgam reg");  write("Tgam d");
+    write("Tgam"); write("Tgam a"); write("Tgam dr"); write("Tgam ad"); write("Tgam reg");  write("Tgam d");
     write("Tcyt"); write("Tcyt a"); write("Tcyt reg"); write("Tcyt d");
     write("Treg"); write("Treg r"); write("Treg d");
     write("Int. Mtb."); write("Ext. Mtb."); write("repExtMtb"); write("NonRepl Ext. Mtb."); write("Tot Mtb.");
-      write("TNF"); write("IntTNFR1"); write("TotMiMa kmRNA"); write("IL10"); write("CCL2"); write("CCL5"); write("CXCL9"); 
+    write("TNF"); write("IntTNFR1"); write("TotMiMa kmRNA"); write("IL10"); write("CCL2"); write("CCL5"); write("CXCL9"); 
     write("AreaTNF"); write("AreaCellDensity"); write("LesionSize");
     write("MDC"); write("N4"); write("TH0"); write("TH1"); write("N8");
     write("T80"); write("T8"); write("TC"); write("TH0lung"); write("TH1lung");
@@ -155,10 +155,10 @@ public:
     write("TcellApoptTNF");
     write("MrActivationTNF");
     write("MiActivationTNF");
-	write("NrOfMacsFullyInhibited");
-	write("TgamQueued"); write("TcytQueued"); write("TregQueued");
-	write("TgamQueuedDie"); write("TcytQueuedDie"); write("TregQueuedDie");
-	write("TgamRecruited"); write("TcytRecruited"); write("TregRecruited");
+    write("NrOfMacsFullyInhibited");
+    write("TgamQueued"); write("TcytQueued"); write("TregQueued");
+    write("TgamQueuedDie"); write("TcytQueuedDie"); write("TregQueuedDie");
+    write("TgamRecruited"); write("TcytRecruited"); write("TregRecruited");
     endRow();
 
   }
@@ -192,35 +192,31 @@ public:
     write(stats.getT80()); write(stats.getT8()); write(stats.getTC());  write(stats.getTH0lung()); write(stats.getTH1lung());
     write(stats.getT80lung()); write(stats.getT8lung()); write(stats.getTClung());
 
-    write(stats.getTotNrSources());
     for(size_t i=0;i<NAGENTS;i++)
       write(stats.getNrSources((AgentType)i));
-    write(stats.getTotNrSourcesActive());
     for(size_t i=0;i<NAGENTS;i++)
       write(stats.getNrSourcesActive((AgentType)i));
-    write(stats.getTotNrSourcesCrowded());
     for(size_t i=0;i<NAGENTS;i++)
       write(stats.getNrSourcesCrowded((AgentType)i));
+
     write(stats.getNrCaseated());
 
-    int startState = 1; // Skip the dead state: apoptosis doesn't occur for an already dead mac.
     static int totMacApoptosisTNF[Mac::NSTATES] = {0}; //Just temporary for Mohammed Fallahi
     int sumMacApoptosisTNF = 0;
 
-    //
-    for(int i=startState;i<Mac::NSTATES;i++){    //Keep a running sum of deaths
+    for(int i=0;i<Mac::MAC_DEAD;i++){    //Keep a running sum of deaths
       totMacApoptosisTNF[i]+=(stats.getMacApoptosisTNF((Mac::State)i));
       sumMacApoptosisTNF+=totMacApoptosisTNF[i];
     }
 
     write(sumMacApoptosisTNF);
-    for(int i=startState;i<Mac::NSTATES;i++)
+    for(int i=0;i<Mac::MAC_DEAD;i++)
       write(totMacApoptosisTNF[i]);
 
     write(stats.getTcellApoptosisTNF());
     write(stats.getRestingMacActivationTNF());
     write(stats.getInfMacActivationTNF());
-	write(stats.getNrOfCellsTnfInhibited()/100);
+    write(stats.getNrOfCellsTnfInhibited()/100);
 
     for(size_t i=TGAM;i<NAGENTS;i++)
       write(stats.getNrQueued((AgentType)i));

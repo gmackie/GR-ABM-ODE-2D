@@ -25,6 +25,8 @@ AgentsWidget::AgentsWidget(AgentsVisualization* pAgentsVisualization, QWidget *p
 	connect(_ui.checkBoxDrawAgentSourcesTgam, SIGNAL(toggled(bool)), this, SLOT(updateAgentsSettings(void)));
 	connect(_ui.checkBoxDrawAgentSourcesTcyt, SIGNAL(toggled(bool)), this, SLOT(updateAgentsSettings(void)));
 	connect(_ui.checkBoxDrawAgentSourcesTreg, SIGNAL(toggled(bool)), this, SLOT(updateAgentsSettings(void)));
+    connect(_ui.checkBoxDrawM1M2, SIGNAL(toggled(bool)), this, SLOT(updateM1M2Settings(void)));
+    connect(_ui.doubleSpinBoxM1M2Threshold, SIGNAL(valueChanged(double)), this, SLOT(updateAgentsSettings(void)));
 }
 
 AgentsWidget::~AgentsWidget()
@@ -34,6 +36,14 @@ AgentsWidget::~AgentsWidget()
 void AgentsWidget::setAgentSelection(int row, int col)
 {
 	_pAgentsVisualization->setSelection(row, col);
+}
+
+void AgentsWidget::updateM1M2Settings()
+{
+    _ui.checkBoxDrawAgentTcyt->setChecked(false);
+    _ui.checkBoxDrawAgentTgam->setChecked(false);
+    _ui.checkBoxDrawAgentTreg->setChecked(false);
+    updateAgentsSettings();
 }
 
 void AgentsWidget::updateAgentsSettings()
@@ -54,6 +64,8 @@ void AgentsWidget::updateAgentsSettings()
 	_pAgentsVisualization->setPredicates(_ui.checkBoxDrawAgentSourcesMac->isChecked(),
 			_ui.checkBoxDrawAgentSourcesTgam->isChecked(), _ui.checkBoxDrawAgentSourcesTcyt->isChecked(),
 			_ui.checkBoxDrawAgentSourcesTreg->isChecked());
+    _pAgentsVisualization->setDrawM1M2(_ui.checkBoxDrawM1M2->isChecked(),
+                                       _ui.doubleSpinBoxM1M2Threshold->value());
 
 	emit updateGL();
 }

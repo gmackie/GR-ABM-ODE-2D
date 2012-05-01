@@ -32,8 +32,8 @@ private:
 	
 	void handleActive(const int time, GrGrid& grid, Stats& stats, bool tgammatransition);
 	void handleDownRegulated(const int time, GrGrid& grid, Stats& stats);
-    void handleActiveDouble(const int time, GrGrid& grid, Stats& stats);
-    void handleInducedReg(const int time, GrGrid& grid, Stats& stats);
+  void handleActiveDouble(const int time, GrGrid& grid, Stats& stats);
+  void handleInducedReg(const int time, GrGrid& grid, Stats& stats);
 
 public:
 	Tgam();

@@ -38,11 +38,10 @@ private:
 	int _outcomeTestPeriod;
 	double _outcomeAlpha;
 
-	void update();
 	bool stopCondition();
 
 public:
-
+    void update();
 	/* The following methods are thread-safe */
 	Simulation(const Pos& dim);
 	virtual ~Simulation();
@@ -54,7 +53,8 @@ public:
 	void modelUnlock() const;
 	int getTime() const;
 	int getTimeToSimulate() const;
-  const Pos& getSize() const { return getGrGrid().getRange(); }
+    GrSimulation& getSim();
+    const Pos& getSize() const { return getGrGrid().getRange(); }
 	bool getUpdated() const;
 	double getAreaThreshold() const;
 	DiffusionMethod getDiffusionMethod() const;
@@ -286,6 +286,11 @@ inline void Simulation::modelLock() const
 inline void Simulation::modelUnlock() const
 {
 	_modelMutex.unlock();
+}
+
+inline GrSimulation& Simulation::getSim()
+{
+    return *_gr;
 }
 
 #endif /* SMOKESIMULATION_H_ */

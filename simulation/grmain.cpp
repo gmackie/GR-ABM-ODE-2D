@@ -515,7 +515,10 @@ int main(int argc, char** argv)
   stats.add_options()
   ("moi", "Generate csv file of internal MTB statistics, saved in -moi.csv")
   ("stats", "Generate csv file of general statistics, saved in .csv")
-  ("csv-interval", po::value<unsigned>()->default_value(1), "CSV update interval (10 min timesteps)");
+  ("csv-interval", po::value<unsigned>()->default_value(1), "CSV update interval (10 min timesteps)")
+  ("molecular-track-radius", po::value(&molecularTrackingRadius)->default_value(0.0), "Radius from center of grid of initial cells to track molecular dynamics. 0 means don't track any cells.")
+  ("molecular-track-ids", po::value(&track_ids), "Comma-seperated list of ids to track")
+  ("molecular-track-file", po::value<std::string>(&molecularTrackingFileName), "File name to hold molecular dynamics cell tracking data");
 
   po::options_description sim_opts("Simulation");
   sim_opts.add_options()
@@ -528,8 +531,8 @@ int main(int argc, char** argv)
 	("recr", po::value<unsigned>()->default_value(0), "recruitment:\n0 - probability\n1 - lymph node ode proxy\n2 - lymph node ode pure")
 	("diffusion", po::value<unsigned>()->default_value(4),
 	 "Diffusion method:\n0 - FTCS\n1 - BTCS (SOR, correct)\n2 - BTCS (SOR, wrong)\n3 - FTCS Grid Swap\n4 - ADE Grid Swap")
-    ("odesolver", po::value<int>()->default_value(0),
-     "ODE Solver Method:\n0 - Forward Euler\n1 - Runge-Kutta 4th Order\n2 - Runge-Kutta 2nd Order\n3 - Euler Predictor-Corrector")
+  ("odesolver", po::value<int>()->default_value(0),
+   "ODE Solver Method:\n0 - Forward Euler\n1 - Runge-Kutta 4th Order\n2 - Runge-Kutta 2nd Order\n3 - Euler Predictor-Corrector")
 	("area-tnf-threshold", po::value<float>()->default_value(0.5),"Threshold for granuloma area defined by TNF, in the range [0.0, 1.0]\n")
 	("area-cell-density-threshold", po::value<float>()->default_value(0.5),"Threshold for granuloma area defined by cell density, in the range [0.0, 1.0]");
 
@@ -540,10 +543,7 @@ int main(int argc, char** argv)
     ("NFkB-dynamics", "Use molecular level intracellular NFkB dynamics in the model")
     ("Treg-induction", "Allow Tregs to be induced from Tgams in the model")
     ("tnf-depletion", po::value<int>()->default_value(-1), "The time step at which to stop secreting tnf, including by tnfr dynamics. -1: no depletion")
-    ("il10-depletion", po::value<int>()->default_value(-1), "The time step at which to stop secreting il10, including by il10r dynamics. -1: no depletion")
-    ("molecular-track-radius", po::value(&molecularTrackingRadius)->default_value(0.0), "Radius from center of grid of initial cells to track molecular dynamics. 0 means don't track any cells.")
-    ("molecular-track-ids", po::value(&track_ids), "Comma-seperated list of ids to track")
-    ("molecular-track-file", po::value<std::string>(&molecularTrackingFileName), "File name to hold molecular dynamics cell tracking data");
+    ("il10-depletion", po::value<int>()->default_value(-1), "The time step at which to stop secreting il10, including by il10r dynamics. -1: no depletion");
 
 	
   po::options_description lhs_opts("LHS");

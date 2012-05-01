@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
 {
 	QApplication a(argc, argv);
 
-	bool ode;
+    int odeSolver;
 	bool tnfrDynamics;
 	bool nfkbDynamics;
 	int tnfDepletionTimeStep;
@@ -114,6 +114,8 @@ int main(int argc, char *argv[])
     ("dim,d", po::value(&dim)->default_value(100))
 		("diffusion", po::value<int>(&diffMethod)->default_value(3),
      "Diffusion method:\n0 - FTCS\n1 - BTCS (SOR, correct)\n2 - BTCS (SOR, wrong)\n3 - FTCS Grid Swap\n4 - ADE Grid Swap")
+    ("odesolver", po::value(&odeSolver)->default_value(0),
+     "ODE Solver Method:\n0 - Forward Euler\n1 - Runge-Kutta 4th Order\n2 - Runge-Kutta 2nd Order\n3 - Euler Predictor-Corrector")
 		("timesteps,t", po::value<int>(&timesteps), "Number of time steps to simulate\nTakes precedence over --days")
 		("days", po::value<int>(&nDays)->default_value(200), "Number of days to simulate")
 		("script,c", "Scripting mode")
@@ -141,8 +143,10 @@ int main(int argc, char *argv[])
 		("load-state,l",  po::value<std::string>(&stateFileName), "File name of saved state to load")
 		("snapshot",  po::value<std::string>(&stateFileName), "Load a saved state, save a graphic snapshot and quit.\nArgument is the saved state to load.")
 		("recr", po::value<unsigned>()->default_value(0), "recruitment:\n0 - probability\n1 - lymph node ode proxy\n2 - lymph node ode pure")
-		("tnfr-dynamics", "Use molecular level TNF/TNFR dynamics in the model")
-		("NFkB-dynamics", "Use molecular level intracellular NFkB dynamics in the model")
+    ("tnfr-dynamics", "Use molecular level TNF/TNFR dynamics in the model")
+    ("il10r-dynamics", "Use molecular level IL10/IL10R dynamics in the model")
+    ("NFkB-dynamics", "Use molecular level intracellular NFkB dynamics in the model")
+    ("Treg-induction", "Allow Tregs to be induced from Tgams in the model")
 		("tnf-depletion", po::value<int>(&tnfDepletionTimeStep)->default_value(-1), "The time step at which to stop secreting tnf, including by tnfr dynamics. -1: no depletion")
 		("il10-depletion", po::value<int>(&il10DepletionTimeStep)->default_value(-1), "The time step at which to stop secreting il10, including by il10r dynamics. -1: no depletion")
 		("ln-ode", po::value<std::string>(&lymphNodeODE), "Lymph node application")
@@ -181,7 +185,6 @@ int main(int argc, char *argv[])
 		scriptingMode = vm.count("script");
 		outputEnabled = vm.count("output");
 
-		ode = vm.count("ode");
 		tnfrDynamics = vm.count("tnfr-dynamics");
 		nfkbDynamics = vm.count("NFkB-dynamics");
 
@@ -335,11 +338,14 @@ int main(int argc, char *argv[])
 	
 	/* set TNF/TNFR and NFkB dynamics */
 	/* When NFkB is turned on, tnfr dynamics will be turned on autamatically */
-	itfc.getSimulation().setTnfrDynamics(tnfrDynamics || nfkbDynamics);
-	itfc.getSimulation().setNfkbDynamics(nfkbDynamics);
-	itfc.getSimulation().setTnfDepletionTimeStep(tnfDepletionTimeStep);
-	itfc.getSimulation().setIl10DepletionTimeStep(il10DepletionTimeStep);
-
+  GrSimulation& gr = itfc.getSimulation().getSim();
+  gr.setTnfrDynamics(vm.count("tnfr-dynamics") || vm.count("NFkB-dynamics"));
+  gr.setIl10rDynamics(vm.count("il10r-dynamics"));
+  gr.setNfkbDynamics(vm.count("NFkB-dynamics"));
+  gr.setTnfDepletionTimeStep(tnfDepletionTimeStep);
+  gr.setIl10DepletionTimeStep(il10DepletionTimeStep);
+  gr.setTgammaTransition(vm.count("Treg-induction"));
+  gr.setODESolverMethod(odeSolver);
 
 	glWindow.resizeGLWidget(resWidth, resHeight);
 	Ui::MainWindowClass& ui = w.getUI();
@@ -388,6 +394,11 @@ int main(int argc, char *argv[])
 		}
 		w.loadState(stateFileName);
 	}
+  else {
+    gr.init(); // Molecular tracking not available in gui version of the model.
+    gr.setAreaThreshold(_AREA_THRESHOLD);
+  }
+  itfc.getSimulation().update();
 
 	// This must come after any load of a saved state so that the loaded
 	// seed will be used as part of the file name, not a random seed or

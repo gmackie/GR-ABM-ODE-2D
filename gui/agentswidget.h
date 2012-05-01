@@ -14,6 +14,7 @@ public:
     ~AgentsWidget();
 
 public slots:
+    void updateM1M2Settings();
 	void updateAgentsSettings();
 	void setAgentSelection(int row, int col);
 

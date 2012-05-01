@@ -23,6 +23,7 @@ AgentsVisualization::AgentsVisualization(int DIM, const ScalarAgentGrid* pScalar
 	, _drawCas(true)
 	, _drawSrc(true)
 	, _drawExtMtb(true)
+    , _drawm1m2(false)
 	, _gridAlpha(0.7f)
 	, _gridHeight(0.0f)
 	, _drawSrcMac(false)
@@ -88,6 +89,35 @@ void AgentsVisualization::visualize(bool blend, const Simulation*, const ColorMa
 				glColor4f(1.0f, 1.0f, 1.0f, _gridAlpha);
 				drawCross(i, j);
 			}
+            else if(_drawm1m2)
+            {
+              for(int k=0;k<2;k++)
+              {
+                if(grid[i*_DIM+j]._pAgent[k])
+                {
+                  if((grid[i*_DIM+j]._pAgent[k]->getSurfBoundTNFR1() / grid[i*_DIM+j]._pAgent[k]->getSurfBoundIL10R()) > _m1m2thres)
+                    glColor4f(0,1,0, _gridAlpha);   //Green if over the threshold
+                  else glColor4f(1,0,0, _gridAlpha);    //Red otherwise
+
+                  switch(grid[i*_DIM+j]._pAgent[k]->getAgentType())
+                  { //Don't draw if not drawing this type
+                  case TGAM: if(!_drawTgam) continue; else break;
+                  case TCYT: if(!_drawTcyt) continue; else break;
+                  case TREG: if(!_drawTreg) continue; else break;
+                  case MAC:
+                      switch((Mac::State)grid[i*_DIM+j]._pAgent[k]->getState())
+                      {
+                      case Mac::MAC_ACTIVE:    if(!_drawMacActive) continue; else break;
+                      case Mac::MAC_INFECTED:  if(!_drawMacInfected) continue; else break;
+                      case Mac::MAC_CINFECTED: if(!_drawMacCInfected) continue; else break;
+                      case Mac::MAC_RESTING:   if(!_drawMacResting) continue; else break;
+                      }
+                      break;
+                  }
+                  drawQuad(i, j);
+                }
+              }
+            }
 			else if (GET_BIT(val, ScalarAgentGrid::_bitTgam) && _drawTgam)
 			{
 				glColor4f(1.0f, 0.71f, 0.76f, _gridAlpha);
@@ -105,26 +135,26 @@ void AgentsVisualization::visualize(bool blend, const Simulation*, const ColorMa
 			}
 			else if (GET_BIT(val, ScalarAgentGrid::_bitMac))
 			{
-				if (GET_BIT(val, ScalarAgentGrid::_bitMacResting) && _drawMacResting)
-				{
-					glColor4f(0.0f, 1.0f, 0.0f, _gridAlpha);
-					drawQuad(i, j);
-				}
-				else if (GET_BIT(val, ScalarAgentGrid::_bitMacInfected) && _drawMacInfected)
-				{
-					glColor4f(1.0f, 0.65f, 0.0f, _gridAlpha);
-					drawQuad(i, j);
-				}
-				else if (GET_BIT(val, ScalarAgentGrid::_bitMacCInfected) && _drawMacCInfected)
-				{
-					glColor4f(1.0f, 0.0f, 0.0f, _gridAlpha);
-					drawQuad(i, j);
-				}
-				else if (GET_BIT(val, ScalarAgentGrid::_bitMacActive) && _drawMacActive)
-				{
-					glColor4f(0.0f, 0.0f, 1.0f, _gridAlpha);
-					drawQuad(i, j);
-				}
+        if (GET_BIT(val, ScalarAgentGrid::_bitMacResting) && _drawMacResting)
+        {
+          glColor4f(0.0f, 1.0f, 0.0f, _gridAlpha);
+          drawQuad(i, j);
+        }
+        else if (GET_BIT(val, ScalarAgentGrid::_bitMacInfected) && _drawMacInfected)
+        {
+          glColor4f(1.0f, 0.65f, 0.0f, _gridAlpha);
+          drawQuad(i, j);
+        }
+        else if (GET_BIT(val, ScalarAgentGrid::_bitMacCInfected) && _drawMacCInfected)
+        {
+          glColor4f(1.0f, 0.0f, 0.0f, _gridAlpha);
+          drawQuad(i, j);
+        }
+        else if (GET_BIT(val, ScalarAgentGrid::_bitMacActive) && _drawMacActive)
+        {
+          glColor4f(0.0f, 0.0f, 1.0f, _gridAlpha);
+          drawQuad(i, j);
+        }
 			}
 			else if (GET_BIT(val, ScalarAgentGrid::_bitExtMtb) && _drawExtMtb)
 			{

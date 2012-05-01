@@ -32,6 +32,8 @@ private:
 	bool _drawSrcTgam;
 	bool _drawSrcTcyt;
 	bool _drawSrcTreg;
+    bool _drawm1m2;
+    double _m1m2thres;
 	int _selRow;
 	int _selCol;
 	void drawGrid() const;
@@ -59,7 +61,8 @@ public:
 	void setDrawExtMtb(bool value);
 	void setGridHeight(float gridHeight);
 	void setPredicates(bool mac, bool tgam, bool tcyt, bool treg);
-	void setSelection(int row, int col);
+    void setSelection(int row, int col);
+    void setDrawM1M2(bool value, double threshold);
 };
 
 inline void AgentsVisualization::setSelection(int row, int col)
@@ -193,6 +196,11 @@ inline float AgentsVisualization::getGridAlpha() const
 inline void AgentsVisualization::setGridAlpha(float alpha)
 {
 	_gridAlpha = alpha;
+}
+inline void AgentsVisualization::setDrawM1M2(bool value, double threshold)
+{
+    _drawm1m2 = value;
+    _m1m2thres = threshold;
 }
 
 

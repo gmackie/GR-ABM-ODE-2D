@@ -808,7 +808,7 @@ void GrSimulation::secreteFromCaseations(int mdt)
 
 void GrSimulation::updateMolecularScaleRK4(double dt)
 {
-    for (MacList::iterator it = _macList.begin(); it != _macList.end(); it++)
+  for (MacList::iterator it = _macList.begin(); it != _macList.end(); it++)
 	{
         it->solveMolecularScaleRK4(_grid.getGrid(), dt, _nfkbDynamics, _tnfrDynamics, _il10rDynamics);
 	}
@@ -1220,6 +1220,7 @@ void GrSimulation::setOutcomeMethod(int index, OutcomeMethod method, double alph
 
 void GrSimulation::shuffleCells()
 {
+  //TODO: replace with random_shuffle
 	MacList::iterator mac1 = _macList.begin();
 	MacList::iterator mac2 = _macList.end();
 	TgamList::iterator tgam1 = _tgamList.begin();

@@ -77,6 +77,7 @@ private:
     void updateTNFandIL10Dynamics(double dt);
     void updateNFkBandTNFandIL10Dynamics(double dt);
     void updateNFkBandTNFDynamics(double dt);
+    void updateMolecularScaleAdaptive(double dt);
     void updateMolecularScaleRK4(double dt);
     void updateMolecularScaleRK2(double dt);
     void updateMolecularScaleFE(double dt);

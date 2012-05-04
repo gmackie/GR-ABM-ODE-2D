@@ -531,8 +531,8 @@ int main(int argc, char** argv)
 	("recr", po::value<unsigned>()->default_value(0), "recruitment:\n0 - probability\n1 - lymph node ode proxy\n2 - lymph node ode pure")
 	("diffusion", po::value<unsigned>()->default_value(4),
 	 "Diffusion method:\n0 - FTCS\n1 - BTCS (SOR, correct)\n2 - BTCS (SOR, wrong)\n3 - FTCS Grid Swap\n4 - ADE Grid Swap")
-  ("odesolver", po::value<int>()->default_value(0),
-   "ODE Solver Method:\n0 - Forward Euler\n1 - Runge-Kutta 4th Order\n2 - Runge-Kutta 2nd Order\n3 - Euler Predictor-Corrector")
+    ("odesolver", po::value<int>()->default_value(0),
+     "ODE Solver Method:\n0 - Forward Euler\n1 - Runge-Kutta 4th Order\n2 - Runge-Kutta 2nd Order\n3 - Euler Predictor-Corrector\n4 - Adaptive RK")
 	("area-tnf-threshold", po::value<float>()->default_value(0.5),"Threshold for granuloma area defined by TNF, in the range [0.0, 1.0]\n")
 	("area-cell-density-threshold", po::value<float>()->default_value(0.5),"Threshold for granuloma area defined by cell density, in the range [0.0, 1.0]");
 
@@ -652,7 +652,7 @@ int main(int argc, char** argv)
       exit(1);
   }
  
-  if (vm["odesolver"].as<int>() != 0 && vm["odesolver"].as<int>() != 1 && vm["odesolver"].as<int>() !=2 && vm["odesolver"].as<int>() !=3) 
+    if (vm["odesolver"].as<int>() != 0 && vm["odesolver"].as<int>() != 1 && vm["odesolver"].as<int>() !=2 && vm["odesolver"].as<int>() !=3 && vm["odesolver"].as<int>() !=4) 
   {
       std::cerr<<"Unsupported ODE method"<<std::endl;
       printUsage(argv[0], desc);

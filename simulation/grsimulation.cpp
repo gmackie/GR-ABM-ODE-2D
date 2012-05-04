@@ -565,13 +565,33 @@ void GrSimulation::solve()
 	for (int DiffStep = 0; DiffStep < _numDiffusionPerAgent; DiffStep++) 
 	{
 		_pDiffusion->diffuse(_grid);
-        
-        for (int MolStep = 0; MolStep < _numMolecularPerDiffusion; MolStep++)
-            {
-                    secreteFromMacrophages(tnfDepletion, il10Depletion, _PARAM(PARAM_GR_DT_MOLECULAR));
-                    secreteFromTcells(tnfDepletion, il10Depletion, _PARAM(PARAM_GR_DT_MOLECULAR));
-                    secreteFromCaseations(_PARAM(PARAM_GR_DT_MOLECULAR));
+                
+        if (_odeSolver == 4) 
+        {
+            secreteFromMacrophages(tnfDepletion, il10Depletion, _PARAM(PARAM_GR_DT_DIFFUSION));
+            secreteFromTcells(tnfDepletion, il10Depletion, _PARAM(PARAM_GR_DT_DIFFUSION));
+            secreteFromCaseations(_PARAM(PARAM_GR_DT_DIFFUSION));
             
+            if (_nfkbDynamics || _tnfrDynamics || _il10rDynamics)
+            {
+                updateMolecularScaleAdaptive(_PARAM(PARAM_GR_DT_MOLECULAR));
+            }
+            
+            else if (!_il10rDynamics || !_tnfrDynamics)
+            {
+                adjustFauxDegradation(_PARAM(PARAM_GR_DT_DIFFUSION));
+                //adjustTNFDegradation(_PARAM(PARAM_GR_DT_MOLECULAR));
+            }
+        }
+        
+        else
+        {
+            for (int MolStep = 0; MolStep < _numMolecularPerDiffusion; MolStep++)
+            {
+                secreteFromMacrophages(tnfDepletion, il10Depletion, _PARAM(PARAM_GR_DT_MOLECULAR));
+                secreteFromTcells(tnfDepletion, il10Depletion, _PARAM(PARAM_GR_DT_MOLECULAR));
+                secreteFromCaseations(_PARAM(PARAM_GR_DT_MOLECULAR));
+                
                 if (_nfkbDynamics || _tnfrDynamics || _il10rDynamics) {
                     switch (_odeSolver) {
                         case 0:
@@ -592,37 +612,40 @@ void GrSimulation::solve()
                             break;
                     }
                 }
-//                if (_nfkbDynamics)
-//                {
-//                    if (_il10rDynamics) {
-//                        updateNFkBandTNFandIL10Dynamics(_PARAM(PARAM_GR_DT_MOLECULAR));
-//                    }
-//                    else
-//                    {
-//                        updateNFkBandTNFDynamics(_PARAM(PARAM_GR_DT_MOLECULAR));
-//                    }
-//                }
-//                else if (_tnfrDynamics && _il10rDynamics)
-//                {
-//                    updateTNFandIL10Dynamics(_PARAM(PARAM_GR_DT_MOLECULAR));
-//                }
-//                
-//                else if (_tnfrDynamics && !_il10rDynamics)
-//                {
-//                    updateTNFDynamics(_PARAM(PARAM_GR_DT_MOLECULAR));
-//                }
-//            
-//                else if (_il10rDynamics && !_tnfrDynamics)
-//                {
-//                    updateIL10Dynamics(_PARAM(PARAM_GR_DT_MOLECULAR));
-//                }
-            
+                //                if (_nfkbDynamics)
+                //                {
+                //                    if (_il10rDynamics) {
+                //                        updateNFkBandTNFandIL10Dynamics(_PARAM(PARAM_GR_DT_MOLECULAR));
+                //                    }
+                //                    else
+                //                    {
+                //                        updateNFkBandTNFDynamics(_PARAM(PARAM_GR_DT_MOLECULAR));
+                //                    }
+                //                }
+                //                else if (_tnfrDynamics && _il10rDynamics)
+                //                {
+                //                    updateTNFandIL10Dynamics(_PARAM(PARAM_GR_DT_MOLECULAR));
+                //                }
+                //                
+                //                else if (_tnfrDynamics && !_il10rDynamics)
+                //                {
+                //                    updateTNFDynamics(_PARAM(PARAM_GR_DT_MOLECULAR));
+                //                }
+                //            
+                //                else if (_il10rDynamics && !_tnfrDynamics)
+                //                {
+                //                    updateIL10Dynamics(_PARAM(PARAM_GR_DT_MOLECULAR));
+                //                }
+                
                 else if (!_il10rDynamics || !_tnfrDynamics)
                 {
                     adjustFauxDegradation(_PARAM(PARAM_GR_DT_MOLECULAR));
                     //adjustTNFDegradation(_PARAM(PARAM_GR_DT_MOLECULAR));
                 }
-		}
+            }
+            
+        }  
+
     }
 	
 	// move macrophages
@@ -802,6 +825,27 @@ void GrSimulation::secreteFromCaseations(int mdt)
 				g.incmacAttractant(p, (_PARAM(PARAM_GR_SEC_RATE_ATTRACTANT) * mdt));
 			}
 		}
+	}
+}
+
+
+void GrSimulation::updateMolecularScaleAdaptive(double dt)
+{
+    for (MacList::iterator it = _macList.begin(); it != _macList.end(); it++)
+	{
+        it->solveMolecularScaleRKadaptive(_grid.getGrid(), dt, _nfkbDynamics, _tnfrDynamics, _il10rDynamics, _PARAM(PARAM_GR_DT_DIFFUSION));
+	}
+	for (TgamList::iterator it = _tgamList.begin(); it != _tgamList.end(); it++)
+	{
+        it->solveMolecularScaleRKadaptive(_grid.getGrid(), dt, _nfkbDynamics, _tnfrDynamics, _il10rDynamics, _PARAM(PARAM_GR_DT_DIFFUSION));
+	}
+	for (TcytList::iterator it = _tcytList.begin(); it != _tcytList.end(); it++)
+	{
+        it->solveMolecularScaleRKadaptive(_grid.getGrid(), dt, _nfkbDynamics, _tnfrDynamics, _il10rDynamics, _PARAM(PARAM_GR_DT_DIFFUSION));
+	}
+	for (TregList::iterator it = _tregList.begin(); it != _tregList.end(); it++)
+	{
+        it->solveMolecularScaleRKadaptive(_grid.getGrid(), dt, _nfkbDynamics, _tnfrDynamics, _il10rDynamics, _PARAM(PARAM_GR_DT_DIFFUSION));
 	}
 }
 

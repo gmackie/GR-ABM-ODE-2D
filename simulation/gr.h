@@ -72,6 +72,48 @@
 // Number of Sig Figs of ODE Solver (Scaled to Power - i.e. 6 sig figs is 1e6)
 #define ABS_TOL 1000000
 
+// Define the Cash-Karp Butcher Table
+#define CK_B_2_1 (1.0/5.0)
+#define CK_B_3_1 (3.0/40.0)
+#define CK_B_3_2 (9.0/40.0)
+#define CK_B_4_1 (3.0/10.0)
+#define CK_B_4_2 (-9.0/10.0)
+#define CK_B_4_3 (6.0/5.0)
+#define CK_B_5_1 (-11.0/54.0)
+#define CK_B_5_2 (5.0/2.0)
+#define CK_B_5_3 (-70.0/27.0)
+#define CK_B_5_4 (35.0/27.0)
+#define CK_B_6_1 (1631.0/55296.0)
+#define CK_B_6_2 (175.0/512.0)
+#define CK_B_6_3 (575.0/13824.0)
+#define CK_B_6_4 (44275.0/110592.0)
+#define CK_B_6_5 (253.0/4096.0)
+#define CK_C_1 (37.0/378.0)
+#define CK_C_3 (250.0/621.0)
+#define CK_C_4 (125.0/594.0)
+#define CK_C_6 (512.0/1771.0)
+#define CK_DC_1 (CK_C_1-(2825.0/27648.0))
+#define CK_DC_3 (CK_C_3-(18575.0/48384.0))
+#define CK_DC_4 (CK_C_4-(13525.0/55296.0))
+#define CK_DC_5 (-277.0/14336.0)
+#define CK_DC_6 (CK_C_6-(0.25))
+
+// Define Error Estimate Factors
+#define SAFETY 0.9
+#define PGROW -0.2
+#define PSHRINK -0.25
+#define ERRCON 1.89e-4
+
+// Define Accuracy
+#define ACCURACY 1e-5
+#define TINY 1e-30
+
+// Define Max # of Steps
+#define MAXSTEP 10000
+
+// Define Min Step Size
+#define MIN_STEP_SIZE 0.01
+
 #ifdef _DEBUG
 #define assert_res(a) (assert(a))
 #else

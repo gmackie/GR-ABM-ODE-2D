@@ -79,6 +79,7 @@ Agent::Agent()
     , _IAPt(-1.0)
     , _IAP(-1.0)
     , _normalizedIAP(-1.0)
+    , _lasttimestep(-1.0)
 
     // Valarrays for Numerical Methods
     , _initvector(0) // Used for numerical methods - current values of ODEs
@@ -86,7 +87,12 @@ Agent::Agent()
     , _k2vector(0) // RK4 K2
     , _k3vector(0) // RK4 K3
     , _k4vector(0) // RK4 K4
+    , _k5vector(0) // RKCK
+    , _k6vector(0) // RKCK
+    , _tempvector(0) // RKCK
+    , _errorvector(0) // RKCK
     , _switchvector(0) // Valarray used to store solutions before reassigning to member variables
+    , _currentsolution(0)
 
 {
 }
@@ -168,6 +174,7 @@ Agent::Agent(int birthtime, int deathtime, int row, int col
     , _IAPt(0.0)
     , _IAP(0.0)
     , _normalizedIAP(0.0)
+    , _lasttimestep(_PARAM(PARAM_GR_DT_MOLECULAR))
 
     // Valarrays for Numerical Methods
     , _initvector(0.0, odesize)
@@ -175,7 +182,13 @@ Agent::Agent(int birthtime, int deathtime, int row, int col
     , _k2vector(0.0, odesize)
     , _k3vector(0.0, odesize)
     , _k4vector(0.0, odesize)
+    , _k5vector(0.0, odesize)
+    , _k6vector(0.0, odesize)
+    , _tempvector(0.0, odesize)
+    , _errorvector(0.0, odesize)
     , _switchvector(0.0, odesize)
+    , _currentsolution(0.0, odesize)
+
 
 {
 	_id = createID();
@@ -307,6 +320,228 @@ void Agent::solveMolecularScaleRK2(GrGrid& grid, double dt, bool nfkbDynamics, b
             exit(1);
             break;
     }
+}
+
+void Agent::solveMolecularScaleRKadaptive(GrGrid& grid, double dt, bool nfkbDynamics, bool tnfrDynamics, bool il10rDynamics, double diffusionlength)
+{
+//    std::cout << "Diffusion Step" << std::endl;
+    
+    switch (_initvector.size()) 
+    {
+        case 3:
+            assert(il10rDynamics); // Verify the options are correct
+            AdaptiveRK(grid, 0.0, diffusionlength, ACCURACY, _lasttimestep, MIN_STEP_SIZE, &Agent::derivativeIL10);
+            break;
+        case 10:
+            assert(tnfrDynamics || tnfrDynamics && nfkbDynamics); // Verify the options are correct
+            AdaptiveRK(grid, 0.0, diffusionlength, ACCURACY, _lasttimestep, MIN_STEP_SIZE, &Agent::derivativeTNF);
+            break;
+        case 13:
+            assert(tnfrDynamics && il10rDynamics || tnfrDynamics && nfkbDynamics && il10rDynamics); // Verify the options are correct
+            AdaptiveRK(grid, 0.0, diffusionlength, ACCURACY, _lasttimestep, MIN_STEP_SIZE, &Agent::derivativeTNFandIL10);
+            break;
+        case 38:
+            assert(tnfrDynamics && nfkbDynamics); // Verify the options are correct
+            AdaptiveRK(grid, 0.0, diffusionlength, ACCURACY, _lasttimestep, MIN_STEP_SIZE, &Agent::derivativeTNFandNFKB);
+            break;
+        case 41:
+            assert(tnfrDynamics && nfkbDynamics && il10rDynamics); // Verify the options are correct
+            AdaptiveRK(grid, 0.0, diffusionlength, ACCURACY, _lasttimestep, MIN_STEP_SIZE, &Agent::derivativeTNFandIL10andNFKB);
+            break;
+        default:
+            std::cerr<<"Error: ODE options and valarray size do not match"<<std::endl;
+            exit(1);
+            break;
+    }
+}
+
+void Agent::AdaptiveRK(GrGrid& grid, double timestart, double timeend, double accuracy, double stepguess, double minstep, void(Agent::*derivs)(const valarray<double>& vecread, valarray<double>& vecwrite, double dt, GrGrid& grid))
+{
+    double time, hnext, hdid, h;
+        
+    assert(timeend > timestart && stepguess > 0); // Verify the ODE is moving forward
+    
+    h = stepguess;
+    time = timestart;
+    
+    // Initialize _currentsolution
+    writeValarrayFromMembers(grid, _currentsolution);
+    
+    for (int nstp = 0; nstp <= MAXSTEP; nstp++) 
+    {
+        (this->*derivs)(_currentsolution, _switchvector,h,grid);
+        
+        _switchvector = abs(_currentsolution) + abs(_switchvector);
+        
+        if (((time + h - timeend)) > (-0.01 * timeend) && ((time + h - timeend)) < 0.0) 
+        {
+            h += (timeend - time - h);
+        }
+        
+        if (((time + h - timeend) * (time + h - timestart)) > 0.0) 
+        {
+            h = timeend - time;
+        }
+        
+        RKStepper(grid, h, accuracy, hnext, hdid, time, timestart, timeend, _switchvector, derivs);
+        
+        if (((time - timeend) * (timeend - timestart)) >= 0.0) 
+        {
+            _lasttimestep = (hnext > 6.0) ? hnext/2.0 : _PARAM(PARAM_GR_DT_MOLECULAR);
+            return;
+        }
+        
+        if (abs(hnext) <= minstep) 
+        {
+            std::cerr << "Next Step-Size too small in Adaptive ODE Solver: " << hnext << "  " << "At: " << _pos << std::endl;
+        }
+        
+        h=hnext;
+                
+    }
+    
+    std::cerr << "Max number of steps reached in Adaptive Routine - Change something(?)" <<std::endl;
+}
+
+void Agent::RKStepper(GrGrid& grid, double dttry, double accuracy, double& dtnext, double& dtdid, double& currenttime, const double& starttime, const double& endtime, valarray<double> yscal, void(Agent::*derivativeType)(const valarray<double>& vecread, valarray<double>& vecwrite, double dt, GrGrid& grid))
+{
+    double errmax;
+    double h = dttry;
+    double newtime;
+        
+    for ( ; ; ) 
+    {
+        errmax = 0.0;
+
+//        std::cout << "Timestep: " << h << "  " << _pos << "  " << currenttime << std::endl;
+        solveRKCK(grid, h, derivativeType);
+        
+        for (int i=0; i < (int)_initvector.size(); i++) {
+            if (yscal[i] <= 0.0) 
+            {
+                errmax = max(errmax, 0.0);
+            }
+            else
+            {
+                errmax = max(errmax, abs(_errorvector[i]/(yscal[i]+TINY)));
+            }
+        }
+
+        errmax /= accuracy;
+
+//        std::cout << "Step" << std::endl;
+//        std::cout << "Stuff: " << h << "  " << _pos << "  "  << errmax << std::endl;
+//        for (int j = 0; j < (int)_currentsolution.size(); j++) 
+//        {
+//            std::cerr << _errorvector[j] << "  " << yscal[j] << std::endl;
+//            std::cerr << abs(_errorvector[j]/yscal[j]) << std::endl;
+//            
+//        }
+
+        if (errmax > 1.0) 
+        {
+
+            newtime = 0.0;
+            double htest = SAFETY * h * pow(errmax,PSHRINK);
+
+            if (htest < (0.1 * h)) 
+            {
+                htest = (0.1 * h);
+            }
+            
+            h = htest;
+            
+            if (((currenttime + h - endtime)) > (-0.01 * endtime) && ((currenttime + h - endtime)) < 0.0) 
+            {
+                h += (endtime - currenttime - h);
+            }
+            
+            
+            newtime = currenttime + h;
+                        
+            if (newtime == currenttime) 
+            {
+                std::cerr << "Stepsize underflow in RKStepper" << std::endl;
+            }
+            continue;
+        }
+        else
+        {
+            if (errmax > ERRCON) 
+            {
+                dtnext = SAFETY * h * pow(errmax,PGROW);
+            }
+            else
+            {
+                dtnext = 5.0 * h;
+            }
+            dtdid = h;
+            currenttime += dtdid;
+            
+            writeMembersFromValarray(grid, _tempvector);
+            _currentsolution = _tempvector;
+            break; 
+        }
+        
+    }
+        
+}
+
+void Agent::solveRKCK(GrGrid& grid, double dt, void(Agent::*derivativeType)(const valarray<double>& vecread, valarray<double>& vecwrite, double dt, GrGrid& grid))
+{
+    // This is a generalized function that carries out the Runge-Kutta Cash-Karp numerical method
+    // The third input to the solveRKCK function is a function pointer allowing the method
+    // to be applicable to any derivative function in valarray form
+    
+    // This method is an embedded-Runge-Kutta formula allwing for calculation of RK4 and RK5
+    // using only 6 derivative evaluations. The 5th and 4th order methods are compared to get
+    // an estimate of error for the adaptive time step method
+        
+    // Initialize _initvector
+    writeValarrayFromMembers(grid, _initvector);
+    
+    // Evaluate K1
+    (this->*derivativeType)(_initvector, _k1vector, dt, grid);
+    
+    // Multiply by its Butcher Values and add it to the initial vector. Store these values in _switchvector
+    _switchvector = (_initvector + (_k1vector * CK_B_2_1));  
+    
+    // Evaluate K2 based on _switchvector
+    (this->*derivativeType)(_switchvector, _k2vector, dt, grid);
+    
+    // Multiply by its Butcher Values and add it to the initial vector. Store these values in _switchvector
+    _switchvector = (_initvector + (_k1vector * CK_B_3_1) + (_k2vector * CK_B_3_2));
+    
+    // Evaluate K3 based on _switchvector
+    (this->*derivativeType)(_switchvector, _k3vector, dt, grid);
+    
+    // Multiply by its Butcher Values and add it to the initial vector. Store these values in _switchvector
+    _switchvector = (_initvector + (_k1vector * CK_B_4_1) + (_k2vector * CK_B_4_2) + (_k3vector * CK_B_4_3));
+    
+    // Evaluate K4 based on _switchvector
+    (this->*derivativeType)(_switchvector, _k4vector, dt, grid);
+    
+    // Multiply by its Butcher Values and add it to the initial vector. Store these values in _switchvector
+    _switchvector = (_initvector + (_k1vector * CK_B_5_1) + (_k2vector * CK_B_5_2) + (_k3vector * CK_B_5_3) + (_k4vector * CK_B_5_4));
+    
+    // Evaluate K5 based on _switchvector
+    (this->*derivativeType)(_switchvector, _k5vector, dt, grid);
+    
+    // Multiply by its Butcher Values and add it to the initial vector. Store these values in _switchvector
+    _switchvector = (_initvector + (_k1vector * CK_B_6_1) + (_k2vector * CK_B_6_2) + (_k3vector * CK_B_6_3) + (_k4vector * CK_B_6_4) + (_k5vector * CK_B_6_5));
+    
+    // Evaluate K6 based on _switchvector
+    (this->*derivativeType)(_switchvector, _k6vector, dt, grid);
+    
+    // Determine the RK4 Solution using the 4th Order Formula
+    _tempvector = (_initvector + (CK_C_1 * _k1vector) + (CK_C_3 * _k3vector) + (CK_C_4 * _k4vector) + (CK_C_6 * _k6vector));
+    
+    // Estimate the Error Based on the RK5 Solution
+    _errorvector = ((CK_DC_1 * _k1vector) + (CK_DC_3 * _k3vector) + (CK_DC_4 * _k4vector) + (CK_DC_5 * _k5vector) + (CK_DC_6 * _k6vector));
+    
+    // DO NOT WRITE THE VALUES OF THE RK4 METHOD TO THE MEMBER VALUES - THESE MAY NOT BE CORRECT YET THUS WE WANT TO KEEP THE MEMBER VALUES AS Yn
+    // THE VALUES OF THE RK4 METHOD ARE STORED IN _tempvector UNTIL THEY ARE VERIFIED TO BE CORRECT BASED ON THE ERROR CONTROL METHODS
+
 }
 
 void Agent::solveRK4(GrGrid& grid, double dt, void(Agent::*derivativeType)(const valarray<double>& vecread, valarray<double>& vecwrite, double dt, GrGrid& grid))
@@ -1812,6 +2047,7 @@ void Agent::serialize(std::ostream& out) const
 	out << _IAPt << std::endl; // transcript of IAP (inhibitor of apoptosis)
 	out << _IAP << std::endl; 
 	out << _normalizedIAP << std::endl;
+    out << _lasttimestep << std::endl;
 
     out << _initvector.size() << endl;
     
@@ -1822,7 +2058,13 @@ void Agent::serialize(std::ostream& out) const
         out << _k2vector[jj] << std::endl;
         out << _k3vector[jj] << std::endl;
         out << _k4vector[jj] << std::endl;
+        out << _k5vector[jj] << std::endl;
+        out << _k6vector[jj] << std::endl;  
+        out << _tempvector[jj] << std::endl;       
+        out << _errorvector[jj] << std::endl;       
         out << _switchvector[jj] << std::endl;
+        out << _currentsolution[jj] << std::endl;
+
     }
 
 	Serialization::writeFooter(out, Agent::_ClassName);
@@ -1899,6 +2141,7 @@ void Agent::deserialize(std::istream& in)
 	in >> _IAPt; // transcript of IAP (inhibitor of apoptosis)
 	in >> _IAP; 
 	in >> _normalizedIAP;
+    in >> _lasttimestep;
     
     size_t vectorSize;
     in >> vectorSize;
@@ -1908,7 +2151,13 @@ void Agent::deserialize(std::istream& in)
     _k2vector.resize(vectorSize, 0.0);
     _k3vector.resize(vectorSize, 0.0);
     _k4vector.resize(vectorSize, 0.0);
+    _k5vector.resize(vectorSize, 0.0);
+    _k6vector.resize(vectorSize, 0.0);
+    _tempvector.resize(vectorSize, 0.0);
+    _errorvector.resize(vectorSize, 0.0);
     _switchvector.resize(vectorSize, 0.0);
+    _currentsolution.resize(vectorSize, 0.0);
+
 
     for (size_t kk = 0; kk < vectorSize; kk++) 
     {
@@ -1917,7 +2166,13 @@ void Agent::deserialize(std::istream& in)
         in >> _k2vector[kk];
         in >> _k3vector[kk];
         in >> _k4vector[kk];
+        in >> _k5vector[kk];
+        in >> _k6vector[kk];
+        in >> _tempvector[kk];
+        in >> _errorvector[kk];
         in >> _switchvector[kk];
+        in >> _currentsolution[kk];
+
     }
     
 	if (!Serialization::readFooter(in, Agent::_ClassName))

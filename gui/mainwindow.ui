@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>534</width>
-    <height>600</height>
+    <width>574</width>
+    <height>623</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -27,52 +27,18 @@
     <property name="bottomMargin">
      <number>0</number>
     </property>
-    <item row="1" column="0" colspan="2">
-     <widget class="QPushButton" name="pushButtonAnimation">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>550</width>
-        <height>23</height>
-       </size>
-      </property>
-      <property name="toolTip">
-       <string>shortcut: space</string>
-      </property>
-      <property name="text">
-       <string>Start simulation</string>
-      </property>
-     </widget>
-    </item>
     <item row="0" column="0">
      <widget class="QToolBox" name="toolBoxSimulation">
-      <property name="minimumSize">
-       <size>
-        <width>256</width>
-        <height>0</height>
-       </size>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>16777215</width>
-        <height>16777215</height>
-       </size>
-      </property>
       <property name="currentIndex">
-       <number>3</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tabStatistics">
        <property name="geometry">
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>262</width>
-         <height>516</height>
+         <width>429</width>
+         <height>466</height>
         </rect>
        </property>
        <attribute name="label">
@@ -89,8 +55,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>262</width>
-         <height>516</height>
+         <width>279</width>
+         <height>466</height>
         </rect>
        </property>
        <attribute name="label">
@@ -116,8 +82,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>262</width>
-             <height>516</height>
+             <width>279</width>
+             <height>466</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_6">
@@ -300,8 +266,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>262</width>
-         <height>516</height>
+         <width>429</width>
+         <height>466</height>
         </rect>
        </property>
        <attribute name="label">
@@ -327,8 +293,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>262</width>
-             <height>516</height>
+             <width>429</width>
+             <height>466</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_11">
@@ -515,8 +481,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>262</width>
-         <height>459</height>
+         <width>429</width>
+         <height>466</height>
         </rect>
        </property>
        <attribute name="label">
@@ -542,8 +508,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>262</width>
-             <height>459</height>
+             <width>429</width>
+             <height>466</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_12">
@@ -660,25 +626,13 @@
     </item>
     <item row="0" column="1">
      <widget class="QToolBox" name="toolBoxVisualization">
-      <property name="minimumSize">
-       <size>
-        <width>256</width>
-        <height>0</height>
-       </size>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>250</width>
-        <height>16777215</height>
-       </size>
-      </property>
       <widget class="QWidget" name="tabVisualization">
        <property name="geometry">
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>256</width>
-         <height>403</height>
+         <width>279</width>
+         <height>404</height>
         </rect>
        </property>
        <attribute name="label">
@@ -704,8 +658,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>256</width>
-             <height>403</height>
+             <width>279</width>
+             <height>404</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_8">
@@ -902,8 +856,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>256</width>
-         <height>460</height>
+         <width>428</width>
+         <height>404</height>
         </rect>
        </property>
        <attribute name="label">
@@ -920,8 +874,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>256</width>
-         <height>460</height>
+         <width>428</width>
+         <height>404</height>
         </rect>
        </property>
        <attribute name="label">
@@ -947,8 +901,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>256</width>
-             <height>460</height>
+             <width>428</width>
+             <height>404</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -1135,8 +1089,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>256</width>
-         <height>460</height>
+         <width>428</width>
+         <height>404</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1165,8 +1119,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>256</width>
-             <height>442</height>
+             <width>428</width>
+             <height>386</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -1278,8 +1232,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>256</width>
-         <height>460</height>
+         <width>428</width>
+         <height>404</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1305,8 +1259,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>256</width>
-             <height>460</height>
+             <width>412</width>
+             <height>441</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout">
@@ -1580,8 +1534,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>256</width>
-         <height>460</height>
+         <width>428</width>
+         <height>404</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1607,8 +1561,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>256</width>
-             <height>460</height>
+             <width>412</width>
+             <height>495</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -1922,6 +1876,16 @@
         </item>
        </layout>
       </widget>
+     </widget>
+    </item>
+    <item row="1" column="0" colspan="2">
+     <widget class="QPushButton" name="pushButtonAnimation">
+      <property name="toolTip">
+       <string>shortcut: space</string>
+      </property>
+      <property name="text">
+       <string>Start simulation</string>
+      </property>
      </widget>
     </item>
    </layout>

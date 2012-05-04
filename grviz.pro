@@ -155,7 +155,7 @@ FORMS += gui/agentswidget.ui \
     gui/glwindow.ui \
     gui/mainwindow.ui
 QMAKE_CXXFLAGS_RELEASE -= -O2 -Wno-strict-aliasing
-QMAKE_CXXFLAGS_RELEASE += -O3 -fopenmp -DOPENMP -Wno-strict-aliasing
+QMAKE_CXXFLAGS_RELEASE += -O3 -Wno-strict-aliasing
 QMAKE_LFLAGS_RELEASE += -fopenmp -DOPENMP
 
 INCLUDEPATH *= $$quote($(BOOST_PREFIX)/include)

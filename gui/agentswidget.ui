@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>236</width>
-    <height>340</height>
+    <width>259</width>
+    <height>390</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -417,14 +417,7 @@
         </property>
        </widget>
       </item>
-      <item row="3" column="0">
-       <widget class="QCheckBox" name="checkBoxDrawM1M2">
-        <property name="text">
-         <string>M1/M2</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="1" colspan="2">
+      <item row="4" column="1" colspan="2">
        <widget class="QDoubleSpinBox" name="doubleSpinBoxM1M2Threshold">
         <property name="enabled">
          <bool>false</bool>
@@ -440,6 +433,32 @@
         </property>
         <property name="value">
          <double>1.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QComboBox" name="comboBoxM1M2">
+        <item>
+         <property name="text">
+          <string>None</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Threshold</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Real-time</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="3" column="0" colspan="3">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>M1/M2 Visualization Method</string>
         </property>
        </widget>
       </item>
@@ -608,22 +627,5 @@
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>
- <connections>
-  <connection>
-   <sender>checkBoxDrawM1M2</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>doubleSpinBoxM1M2Threshold</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>56</x>
-     <y>117</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>100</x>
-     <y>118</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>

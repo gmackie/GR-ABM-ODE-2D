@@ -24,6 +24,7 @@ Agent::Agent()
 	, _deathTime(-1)
 	, _pos(-1, -1)
 	, _trackMolecularDynamics(false)
+    , _isODEsolved(false)
 
 	// TNFR components
 	, _mTNF(-1.0)
@@ -117,6 +118,7 @@ Agent::Agent(int birthtime, int deathtime, int row, int col
 	, _deathTime(deathtime)
 	, _pos(row, col)
 	, _trackMolecularDynamics(false)
+    , _isODEsolved(false)
 
 	// TNFR components
 	, _mTNF(0.0)
@@ -325,34 +327,81 @@ void Agent::solveMolecularScaleRK2(GrGrid& grid, double dt, bool nfkbDynamics, b
 void Agent::solveMolecularScaleRKadaptive(GrGrid& grid, double dt, bool nfkbDynamics, bool tnfrDynamics, bool il10rDynamics, double diffusionlength)
 {
 //    std::cout << "Diffusion Step" << std::endl;
-    
-    switch (_initvector.size()) 
+
+    if (grid.getNumberOfAgents(getPosition()) != 1) 
     {
-        case 3:
-            assert(il10rDynamics); // Verify the options are correct
-            AdaptiveRK(grid, 0.0, diffusionlength, ACCURACY, _lasttimestep, MIN_STEP_SIZE, &Agent::derivativeIL10);
-            break;
-        case 10:
-            assert(tnfrDynamics || tnfrDynamics && nfkbDynamics); // Verify the options are correct
-            AdaptiveRK(grid, 0.0, diffusionlength, ACCURACY, _lasttimestep, MIN_STEP_SIZE, &Agent::derivativeTNF);
-            break;
-        case 13:
-            assert(tnfrDynamics && il10rDynamics || tnfrDynamics && nfkbDynamics && il10rDynamics); // Verify the options are correct
-            AdaptiveRK(grid, 0.0, diffusionlength, ACCURACY, _lasttimestep, MIN_STEP_SIZE, &Agent::derivativeTNFandIL10);
-            break;
-        case 38:
-            assert(tnfrDynamics && nfkbDynamics); // Verify the options are correct
-            AdaptiveRK(grid, 0.0, diffusionlength, ACCURACY, _lasttimestep, MIN_STEP_SIZE, &Agent::derivativeTNFandNFKB);
-            break;
-        case 41:
-            assert(tnfrDynamics && nfkbDynamics && il10rDynamics); // Verify the options are correct
-            AdaptiveRK(grid, 0.0, diffusionlength, ACCURACY, _lasttimestep, MIN_STEP_SIZE, &Agent::derivativeTNFandIL10andNFKB);
-            break;
-        default:
-            std::cerr<<"Error: ODE options and valarray size do not match"<<std::endl;
-            exit(1);
-            break;
+        // If the ODEs have already been solved do not solve the ODEs again
+        // This resets the value of _isODEsolved back to false for the next time step
+        if (getODEstatus()) 
+        {
+            this->setODEstatus(false);
+            Agent* otherCell = (grid.agent(getPosition(), 0) == this ? grid.agent(getPosition(), 1) : grid.agent(getPosition(), 0));
+            otherCell->setODEstatus(false);
+        }
+        
+        else
+        {
+            switch (_initvector.size()) 
+            {
+                case 3:
+                    assert(il10rDynamics); // Verify the options are correct
+                    AdaptiveRK2cell((grid.agent(getPosition(), 0) == this ? grid.agent(getPosition(), 1) : grid.agent(getPosition(), 0)), grid, 0.0, diffusionlength, ACCURACY, _lasttimestep, MIN_STEP_SIZE, &Agent::derivativeIL10);
+                    break;
+                case 10:
+                    assert(tnfrDynamics || tnfrDynamics && nfkbDynamics); // Verify the options are correct
+                    AdaptiveRK2cell((grid.agent(getPosition(), 0) == this ? grid.agent(getPosition(), 1) : grid.agent(getPosition(), 0)), grid, 0.0, diffusionlength, ACCURACY, _lasttimestep, MIN_STEP_SIZE, &Agent::derivativeTNF);
+                    break;
+                case 13:
+                    assert(tnfrDynamics && il10rDynamics || tnfrDynamics && nfkbDynamics && il10rDynamics); // Verify the options are correct
+                    AdaptiveRK2cell((grid.agent(getPosition(), 0) == this ? grid.agent(getPosition(), 1) : grid.agent(getPosition(), 0)), grid, 0.0, diffusionlength, ACCURACY, _lasttimestep, MIN_STEP_SIZE, &Agent::derivativeTNFandIL10);
+                    break;
+                case 38:
+                    assert(tnfrDynamics && nfkbDynamics); // Verify the options are correct
+                    AdaptiveRK2cell((grid.agent(getPosition(), 0) == this ? grid.agent(getPosition(), 1) : grid.agent(getPosition(), 0)), grid, 0.0, diffusionlength, ACCURACY, _lasttimestep, MIN_STEP_SIZE, &Agent::derivativeTNFandNFKB);
+                    break;
+                case 41:
+                    assert(tnfrDynamics && nfkbDynamics && il10rDynamics); // Verify the options are correct
+                    AdaptiveRK2cell((grid.agent(getPosition(), 0) == this ? grid.agent(getPosition(), 1) : grid.agent(getPosition(), 0)), grid, 0.0, diffusionlength, ACCURACY, _lasttimestep, MIN_STEP_SIZE, &Agent::derivativeTNFandIL10andNFKB);
+                    break;
+                default:
+                    std::cerr<<"Error: ODE options and valarray size do not match"<<std::endl;
+                    exit(1);
+                    break;
+            }
+        }
     }
+    
+    else
+    {
+        switch (_initvector.size()) 
+        {
+            case 3:
+                assert(il10rDynamics); // Verify the options are correct
+                AdaptiveRK(grid, 0.0, diffusionlength, ACCURACY, _lasttimestep, MIN_STEP_SIZE, &Agent::derivativeIL10);
+                break;
+            case 10:
+                assert(tnfrDynamics || tnfrDynamics && nfkbDynamics); // Verify the options are correct
+                AdaptiveRK(grid, 0.0, diffusionlength, ACCURACY, _lasttimestep, MIN_STEP_SIZE, &Agent::derivativeTNF);
+                break;
+            case 13:
+                assert(tnfrDynamics && il10rDynamics || tnfrDynamics && nfkbDynamics && il10rDynamics); // Verify the options are correct
+                AdaptiveRK(grid, 0.0, diffusionlength, ACCURACY, _lasttimestep, MIN_STEP_SIZE, &Agent::derivativeTNFandIL10);
+                break;
+            case 38:
+                assert(tnfrDynamics && nfkbDynamics); // Verify the options are correct
+                AdaptiveRK(grid, 0.0, diffusionlength, ACCURACY, _lasttimestep, MIN_STEP_SIZE, &Agent::derivativeTNFandNFKB);
+                break;
+            case 41:
+                assert(tnfrDynamics && nfkbDynamics && il10rDynamics); // Verify the options are correct
+                AdaptiveRK(grid, 0.0, diffusionlength, ACCURACY, _lasttimestep, MIN_STEP_SIZE, &Agent::derivativeTNFandIL10andNFKB);
+                break;
+            default:
+                std::cerr<<"Error: ODE options and valarray size do not match"<<std::endl;
+                exit(1);
+                break;
+        }
+    }
+
 }
 
 void Agent::AdaptiveRK(GrGrid& grid, double timestart, double timeend, double accuracy, double stepguess, double minstep, void(Agent::*derivs)(const valarray<double>& vecread, valarray<double>& vecwrite, double dt, GrGrid& grid))
@@ -486,6 +535,203 @@ void Agent::RKStepper(GrGrid& grid, double dttry, double accuracy, double& dtnex
     }
         
 }
+
+
+void Agent::AdaptiveRK2cell(Agent* secondCell, GrGrid& grid, double timestart, double timeend, double accuracy, double stepguess, double minstep, void(Agent::*derivs)(const valarray<double>& vecread, valarray<double>& vecwrite, double dt, GrGrid& grid))
+{
+//    std::cout << __FUNCTION__ <<std::endl;
+
+    double time, hnext, hdid, h;
+    
+    assert(timeend > timestart && stepguess > 0); // Verify the ODE is moving forward
+    
+    h = stepguess;
+    time = timestart;
+    
+    // Since solving 2 cells - set both cells _isODEsolved to true
+    // This will prevent the 2 cells from being solved again when
+    // they come up in the cell lists again
+    
+    this->setODEstatus(true);
+    secondCell->setODEstatus(true);
+    
+    // Initialize _currentsolution
+    writeValarrayFromMembers(grid, this->_currentsolution);
+    
+    secondCell->writeValarrayFromMembers(grid, secondCell->_currentsolution);
+    
+    for (int nstp = 0; nstp <= MAXSTEP; nstp++) 
+    {
+//        std::cout << "Current Solution: " << std::endl;
+//        for (int i = 0; i < (int)this->_currentsolution.size(); i++) {
+//            std::cout << (this->_currentsolution[i]) << "  " << (secondCell->_currentsolution[i]) << std::endl;
+//            
+//        }
+//        
+//        (this->*derivs)(_currentsolution, _switchvector,h,grid);
+//        (secondCell->*derivs)(secondCell->_currentsolution, secondCell->_switchvector,h,grid);
+//        
+//        std::cout << "Derivative Estimate: " << std::endl;
+//        for (int i = 0; i < (int)this->_switchvector.size(); i++) {
+//            std::cout << (this->_switchvector[i]) << "  " << (secondCell->_switchvector[i]) << std::endl;
+//            
+//        }
+//        
+//        _switchvector = abs(_currentsolution) + abs(_switchvector);
+//        secondCell->_switchvector = abs(secondCell->_currentsolution) + abs(secondCell->_switchvector);
+//        
+//        std::cout << "Error Estimate: " << std::endl;
+//        for (int i = 0; i < (int)this->_switchvector.size(); i++) {
+//            std::cout << (this->_switchvector[i]) << "  " << (secondCell->_switchvector[i]) << std::endl;
+//            
+//        }
+        
+        if (((time + h - timeend)) > (-0.01 * timeend) && ((time + h - timeend)) < 0.0) 
+        {
+            h += (timeend - time - h);
+        }
+        
+        if (((time + h - timeend) * (time + h - timestart)) > 0.0) 
+        {
+            h = timeend - time;
+        }
+        
+        RKStepper2cell(secondCell, grid, h, accuracy, hnext, hdid, time, timestart, timeend, _switchvector, secondCell->_switchvector, derivs);
+                
+        if (((time - timeend) * (timeend - timestart)) >= 0.0) 
+        {
+            _lasttimestep = (hnext > 6.0) ? hnext/2.0 : _PARAM(PARAM_GR_DT_MOLECULAR);
+            secondCell->_lasttimestep = (hnext > 6.0) ? hnext/2.0 : _PARAM(PARAM_GR_DT_MOLECULAR);
+            return;
+        }
+        
+        if (abs(hnext) <= minstep) 
+        {
+            std::cerr << "Next Step-Size too small in Adaptive ODE Solver: " << hnext << "  " << "At: " << _pos << std::endl;
+        }
+        
+        h=hnext;
+        
+    }
+    
+    std::cerr << "Max number of steps reached in Adaptive Routine - Change something(?)" <<std::endl;
+    
+}
+
+void Agent::RKStepper2cell(Agent* secondCell, GrGrid& grid, double dttry, double accuracy, double& dtnext, double& dtdid, double& currenttime, const double& starttime, const double& endtime, valarray<double> yscal, valarray<double> yscal2nd, void(Agent::*derivativeType)(const valarray<double>& vecread, valarray<double>& vecwrite, double dt, GrGrid& grid))
+{
+//    std::cout << __FUNCTION__ <<std::endl;
+    
+    
+    
+    double errmax;
+    double h = dttry;
+    double newtime;
+    
+    for ( ; ; ) 
+    {
+        errmax = 0.0;
+        
+//        std::cout << "Timestep: " << h << "  " << _pos << "  " << currenttime << std::endl;
+        this->solveRKCK(grid, h, derivativeType);
+        secondCell->solveRKCK(grid, h, derivativeType);
+        
+        for (int i=0; i < (int)_initvector.size(); i++) {
+            if (yscal[i] <= 0.0) 
+            {
+                errmax = max(errmax, 0.0);
+            }
+            else
+            {
+                errmax = max(errmax, abs(_errorvector[i]/(yscal[i]+TINY)));
+            }
+        }
+        
+        for (int i=0; i < (int)secondCell->_initvector.size(); i++) {
+            if (yscal2nd[i] <= 0.0) 
+            {
+                errmax = max(errmax, 0.0);
+            }
+            else
+            {
+                errmax = max(errmax, abs(secondCell->_errorvector[i]/(yscal2nd[i]+TINY)));
+            }
+        }
+        
+        
+        errmax /= accuracy;
+        
+        //        std::cout << "Step" << std::endl;
+        //        std::cout << "Stuff: " << h << "  " << _pos << "  "  << errmax << std::endl;
+        //        for (int j = 0; j < (int)_currentsolution.size(); j++) 
+        //        {
+        //            std::cerr << _errorvector[j] << "  " << yscal[j] << std::endl;
+        //            std::cerr << abs(_errorvector[j]/yscal[j]) << std::endl;
+        //            
+        //        }
+        
+        if (errmax > 1.0) 
+        {
+            
+            newtime = 0.0;
+            double htest = SAFETY * h * pow(errmax,PSHRINK);
+            
+            if (htest < (0.1 * h)) 
+            {
+                htest = (0.1 * h);
+            }
+            
+            h = htest;
+            
+            if (((currenttime + h - endtime)) > (-0.01 * endtime) && ((currenttime + h - endtime)) < 0.0) 
+            {
+                h += (endtime - currenttime - h);
+            }
+            
+            
+            newtime = currenttime + h;
+            
+            if (newtime == currenttime) 
+            {
+                std::cerr << "Stepsize underflow in RKStepper" << std::endl;
+            }
+            continue;
+        }
+        else
+        {
+            if (errmax > ERRCON) 
+            {
+                dtnext = SAFETY * h * pow(errmax,PGROW);
+            }
+            else
+            {
+                dtnext = 5.0 * h;
+            }
+            dtdid = h;
+            currenttime += dtdid;
+            
+//            std::cout << "Current Solution Write" << std::endl;
+            
+            this->writeMembersFromValarray(grid, this->_tempvector);
+            this->_currentsolution = this->_tempvector;
+            
+            secondCell->writeMembersFromValarray(grid, secondCell->_tempvector);
+            secondCell->_currentsolution = secondCell->_tempvector;
+            
+            break; 
+        }
+        
+    }
+    
+    
+    
+    
+    
+}
+
+
+
+
 
 void Agent::solveRKCK(GrGrid& grid, double dt, void(Agent::*derivativeType)(const valarray<double>& vecread, valarray<double>& vecwrite, double dt, GrGrid& grid))
 {
@@ -1991,6 +2237,7 @@ void Agent::serialize(std::ostream& out) const
 	out << _pos.x << std::endl;
 	out << _pos.y << std::endl;
 	out << _trackMolecularDynamics << std::endl;
+    out << _isODEsolved <<std::endl;
 
 	// TNF associated attributes
 	out << _mTNF << std::endl;
@@ -2085,6 +2332,7 @@ void Agent::deserialize(std::istream& in)
 	in >> _pos.x;
 	in >> _pos.y;
 	in >> _trackMolecularDynamics;
+    in >> _isODEsolved;
 
 	// TNF associated attributes
 	in >> _mTNF;

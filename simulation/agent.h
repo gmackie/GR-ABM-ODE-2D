@@ -35,6 +35,7 @@ protected:
 	Pos _pos;
 
 	bool _trackMolecularDynamics;
+    bool _isODEsolved;
 
 	// TNF associated attributes
 	Scalar _mTNF; // No. of mTNF on the cell membrane
@@ -134,7 +135,7 @@ public:
 	virtual void secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDepletion, bool il10rDynamics, bool il10Depletion, int mdt) = 0;
 	virtual void computeNextState(const int time, GrGrid& grid, Stats& stats, bool tnfrDynamics, bool nfkbDynamics, bool il10rDynamics, bool tgammatransition) = 0;
 	virtual void updateState() = 0;
-  virtual void updateStatistics(Stats& s) const = 0;
+    virtual void updateStatistics(Stats& s) const = 0;
 
     void solveTNF (GrGrid& grid, double dt);
     void solveIL10 (GrGrid& grid, double dt);
@@ -163,6 +164,11 @@ public:
     
     void AdaptiveRK(GrGrid& grid, double timestart, double timeend, double accuracy, double stepguess, double minstep, void(Agent::*derivs)(const valarray<double>& vecread, valarray<double>& vecwrite, double dt, GrGrid& grid));
     
+    void RKStepper2cell(Agent* secondCell, GrGrid& grid, double dttry, double accuracy, double& dtnext, double& dtdid, double& currenttime, const double& starttime, const double& endtime, valarray<double> yscal, valarray<double> yscal2nd, void(Agent::*derivativeType)(const valarray<double>& vecread, valarray<double>& vecwrite, double dt, GrGrid& grid));
+    
+    
+    void AdaptiveRK2cell(Agent* secondCell, GrGrid& grid, double timestart, double timeend, double accuracy, double stepguess, double minstep, void(Agent::*derivs)(const valarray<double>& vecread, valarray<double>& vecwrite, double dt, GrGrid& grid));
+    
     void checkTolerance(valarray<double>& veccheck);
     
     void solveMolecularScaleFE(GrGrid& grid, double dt, bool nfkbDynamics, bool tnfrDynamics, bool il10rDynamics);
@@ -188,6 +194,8 @@ public:
 	int getBirthTime() const;
 	int getDeathTime() const;
 	bool timeToDie(const int time) const;
+    bool getODEstatus() const;
+    void setODEstatus(bool isodesolved);
     
     virtual bool intCompareGT(const double param1, const double param2);
     
@@ -352,6 +360,16 @@ inline bool Agent::getTrackMolecularDynamics() const
 inline void Agent::setTrackMolecularDynamics(bool trackMolecularDynamics)
 {
 	_trackMolecularDynamics = trackMolecularDynamics;
+}
+
+inline bool Agent::getODEstatus() const
+{
+    return _isODEsolved;
+}
+
+inline void Agent::setODEstatus(bool isodesolved)
+{
+    _isODEsolved = isodesolved;
 }
 
 #endif /* AGENT_H */

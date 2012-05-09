@@ -170,6 +170,10 @@ unix:system(grep -qE \"Ubuntu|Red Hat\" /etc/issue) {
   QMAKE_LIBDIR = ${BOOST_PREFIX}/lib  $${QMAKE_LIBDIR}
 }
 
+unix:!macx {
+  LIBS *= -lGLU
+}
+
 exists( .git/ ) {
       VERSION = $$quote($$system(git svn find-rev HEAD))
 } else : exists( .svn/ ) {

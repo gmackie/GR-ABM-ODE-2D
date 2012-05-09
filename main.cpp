@@ -310,11 +310,11 @@ int main(int argc, char *argv[])
 	}
 
 	ScalarAgentGrid agentGrid(dim);
-	AgentsVisualization agentsVisualization(dim, &agentGrid);
-	MainInterface itfc(Pos(dim, dim), &agentsVisualization, &agentGrid);
+    AgentsVisualization agentsVisualization(dim, &agentGrid);
+    MainInterface itfc(Pos(dim, dim), &agentsVisualization, &agentGrid);
 	GLWindow glWindow(&itfc);
 	ParamWindow paramWindow(&itfc);
-	MainWindow w(&itfc, &glWindow, &paramWindow, new StatWidget(), new AgentsWidget(&agentsVisualization));
+    MainWindow w(&itfc, &glWindow, &paramWindow, new StatWidget(), new AgentsWidget(&agentsVisualization));
 
 	/* set recruitment method */
 	// Parameters must be loaded, since since the base lymph ODE class, RecruitmentLnODE, uses parameters in its constructor.

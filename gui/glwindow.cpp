@@ -269,86 +269,8 @@ QString GLWindow::getAgentStr(const Agent* pAgent)
 		{
 			res += ", deact";
 		}
-
-                res += QString(", Bi = %1").arg(pMac->getIntMtb(), 0, 'f', 2);
-		
-                res += QString(", [sTNF/TNFR1] = %1").arg(pMac->getsurfBoundTNFR1(), 0, 'f', 2);
-		
-                res += QString(", norACT = %1").arg(pMac->getnormalizedACT(), 0, 'f', 2);
+        res += QString(", [sbTNF/sbIL10] = %1").arg(pMac->getsurfBoundTNFR1() / pMac->getsurfBoundIL10R(), 0, 'f', 2);
 	}
-	else if (Tgam::isTgam(pAgent))
-	{
-		const Tgam* pTgam = dynamic_cast<const Tgam*>(pAgent);
-		switch (pTgam->getState())
-		{
-		case Tgam::TGAM_ACTIVE:
-			res += "Tg,a";
-			break;
-		case Tgam::TGAM_DOWN_REGULATED:
-			res += "Tg,reg";
-			break;
-		case Tgam::TGAM_DEAD:
-			return res;
-		}
-	}
-	else if (Tcyt::isTcyt(pAgent))
-	{
-		const Tcyt* pTcyt = dynamic_cast<const Tcyt*>(pAgent);
-		switch (pTcyt->getState())
-		{
-		case Tcyt::TCYT_ACTIVE:
-			res += "Tc";
-			break;
-		case Tcyt::TCYT_DOWN_REGULATED:
-			res += "Tc,reg";
-			break;
-		case Tcyt::TCYT_DEAD:
-			return res;
-		}
-	}
-	else if (Treg::isTreg(pAgent))
-	{
-		const Treg* pTreg = dynamic_cast<const Treg*>(pAgent);
-		switch (pTreg->getState())
-		{
-		case Treg::TREG_ACTIVE:
-			res += "Tr";
-			break;
-		case Treg::TREG_DEAD:
-			return res;
-		}
-	}
-
-	if (!res.isEmpty())
-	{
-		int days, hours, minutes;
-/*		GrSimulation::convertSimTime(pAgent->getBirthTime(), days, hours, minutes);
-
-		if (pAgent->getBirthTime() < 0)
-		{
-			res += QString(", birth = -%1d%2h%3m").arg(-1 * days, 3, 10, QChar('0')).
-				arg(-1 * hours, 2, 10, QChar('0')).arg(-1 * minutes, 2, 10, QChar('0'));
-		}
-		else
-		{
-			res += QString(", birth = %1d%2h%3m").arg(days, 3, 10, QChar('0')).
-				arg(hours, 2, 10, QChar('0')).arg(minutes, 2, 10, QChar('0'));
-		}
-*/
-                GrSimulation::convertSimTime(pAgent->getdeathTime(), days, hours, minutes);
-
-                if (pAgent->getdeathTime() < 0)
-		{
-			res += QString(", death = -%1d%2h%3m").arg(-1 * days, 3, 10, QChar('0')).
-				arg(-1 * hours, 2, 10, QChar('0')).arg(-1 * minutes, 2, 10, QChar('0'));
-		}
-		else
-		{
-			res += QString(", death = %1d%2h%3m").arg(days, 3, 10, QChar('0')).
-				arg(hours, 2, 10, QChar('0')).arg(minutes, 2, 10, QChar('0'));
-		}
-	}
-
 	return res;
 }
 

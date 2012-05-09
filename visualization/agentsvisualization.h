@@ -13,13 +13,12 @@
 
 class AgentsVisualization : public Visualization
 {
+public:
+    enum MacSecondStates { ENBL, STAT1, NFKB, DEACT, OTHER, NUM};
 private:
 	const ScalarAgentGrid* _pScalarAgentGrid;
 	bool _drawGrid;
-	bool _drawMacResting;
-	bool _drawMacInfected;
-	bool _drawMacCInfected;
-	bool _drawMacActive;
+    bool _macFilter[Mac::NSTATES][NUM];
 	bool _drawTgam;
 	bool _drawTcyt;
 	bool _drawTreg;
@@ -49,10 +48,6 @@ public:
 	void setDrawGrid(bool drawGrid);
 	float getGridAlpha() const;
 	void setGridAlpha(float alpha);
-	void setDrawMacResting(bool value);
-	void setDrawMacInfected(bool value);
-	void setDrawMacCInfected(bool value);
-	void setDrawMacActive(bool value);
 	void setDrawTgam(bool value);
 	void setDrawTcyt(bool value);
 	void setDrawTreg(bool value);
@@ -63,6 +58,7 @@ public:
 	void setPredicates(bool mac, bool tgam, bool tcyt, bool treg);
     void setSelection(int row, int col);
     void setDrawM1M2(int value, double threshold);
+    void setDrawMac(Mac::State s, MacSecondStates s2, bool enable) { _macFilter[s][s2] = enable; }
 };
 
 inline void AgentsVisualization::setSelection(int row, int col)
@@ -89,26 +85,6 @@ inline void AgentsVisualization::setPredicates(bool mac, bool tgam, bool tcyt, b
 inline void AgentsVisualization::setGridHeight(float gridHeight)
 {
 	_gridHeight = gridHeight;
-}
-
-inline void AgentsVisualization::setDrawMacResting(bool value)
-{
-	_drawMacResting = value;
-}
-
-inline void AgentsVisualization::setDrawMacInfected(bool value)
-{
-	_drawMacInfected = value;
-}
-
-inline void AgentsVisualization::setDrawMacCInfected(bool value)
-{
-	_drawMacCInfected = value;
-}
-
-inline void AgentsVisualization::setDrawMacActive(bool value)
-{
-	_drawMacActive = value;
 }
 
 inline void AgentsVisualization::setDrawTgam(bool value)

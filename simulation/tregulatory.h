@@ -91,4 +91,6 @@ inline bool Treg::isDeadNext()
 	return _nextState == TREG_DEAD;
 }
 
+std::ostream& operator<<(std::ostream& os, const Treg::State& s);
+
 #endif /* TREGULATORY_H */

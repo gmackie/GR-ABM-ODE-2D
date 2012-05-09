@@ -106,4 +106,7 @@ inline bool Tgam::isDeadNext()
 {
 	return _nextState == TGAM_DEAD;
 }
+
+std::ostream& operator<<(std::ostream& os, const Tgam::State& s);
+
 #endif /* TGAMMA_H */

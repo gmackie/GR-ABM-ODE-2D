@@ -200,3 +200,9 @@ void Treg::deserialize(std::istream& in)
 void Treg::updateStatistics(Stats& s) const {
   ++s.getNrOfTregs((Treg::State)getState());
 }
+
+const char* _tregStrings[] = { "Active", "Dead" };
+
+std::ostream& operator<<(std::ostream& os, const Treg::State& s) {
+  return os << _tregStrings[s];
+}

@@ -810,3 +810,9 @@ void Mac::updateStatistics(Stats& stats) const {
   if (isDeactivated())
     ++stats.getMacDeact((Mac::State)getState());
 }
+
+const char* _macStrings[] = { "Resting", "Infected", "Chronically Infected", "Active", "Dead"};
+
+std::ostream& operator<<(std::ostream& os, const Mac::State& s) {
+  return os << _macStrings[s];
+}

@@ -260,3 +260,9 @@ void Tcyt::deserialize(std::istream& in)
 void Tcyt::updateStatistics(Stats& s) const {
   ++s.getNrOfTcyts((Tcyt::State)getState());
 }
+
+const char* _tcytStrings[] = { "Active", "Down Regulated", "Dead"};
+
+std::ostream& operator<<(std::ostream& os, const Tcyt::State& s) {
+  return os << _tcytStrings[s];
+}

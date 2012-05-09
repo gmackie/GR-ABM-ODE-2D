@@ -100,4 +100,6 @@ inline bool Tcyt::isDeadNext()
 	return _nextState == TCYT_DEAD;
 }
 
+std::ostream& operator<<(std::ostream& os, const Tcyt::State& s);
+
 #endif /* TCYTOTOXIC_H */

@@ -218,4 +218,6 @@ inline void Mac::setMacOdeSize(int odesize)
     _macodeSize = odesize;
 }
 
+std::ostream& operator<<(std::ostream& os, const Mac::State& s);
+
 #endif /* MACROPHAGE_H */

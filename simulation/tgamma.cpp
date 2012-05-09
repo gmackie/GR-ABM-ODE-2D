@@ -425,3 +425,9 @@ void Tgam::deserialize(std::istream& in)
 void Tgam::updateStatistics(Stats& s) const {
   ++s.getNrOfTgams((Tgam::State)getState());
 }
+
+const char* _tgamStrings[] = { "Active", "Down Regulated", "Active Double", "Induced Regulated", "Dead"};
+
+std::ostream& operator<<(std::ostream& os, const Tgam::State& s) {
+  return os << _tgamStrings[s];
+}

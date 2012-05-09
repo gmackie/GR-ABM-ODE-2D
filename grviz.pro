@@ -20,6 +20,8 @@ HEADERS += scalardatasets/scalartotmtbdataset.h \
     simulation/recruitmentlnode.h \
     simulation/recruitmentprob.h \
     simulation/recruitmentbase.h \
+    simulation/stat.h \
+    simulation/stat.def \
     scalardatasets/scalarcelldensitydataset.h \
     scalardatasets/scalartnfattrextmtb.h \
     scalardatasets/scalarattractantdataset.h \

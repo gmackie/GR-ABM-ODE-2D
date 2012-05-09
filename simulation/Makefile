@@ -73,6 +73,6 @@ lhs:	$(TINYXML_OBJS) rand.o paramsbase.o params.o serialization.o lhs.o
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
 clean:
-	rm -f ${OBJS} ${TINYXML_OBJS} gr gr1 gr2 gr3 gr4 lhs
+	rm -f ${OBJS} ${TINYXML_OBJS} grmain.o lhs.o gr gr1 gr2 gr3 gr4 lhs
 
 -include Makefile.depend

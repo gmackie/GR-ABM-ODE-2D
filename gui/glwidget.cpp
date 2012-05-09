@@ -10,7 +10,7 @@
 
 GLWidget::GLWidget(QWidget* parent)
 	: QGLWidget(parent)
-	, _radius(88.0)
+	, _radius(100.0)
 	, _phi(1.5 * PI)
 	, _theta(0)
 	, _deltaX(0)
@@ -66,7 +66,7 @@ void GLWidget::updateProjectionMatrix()
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 
-	gluPerspective(60.0, 1.0, 2.0, 300.0);  //for perspective viewing
+	gluPerspective(60.0, width()/(height()+1.0f), 2.0, 300.0);  //for perspective viewing
 	glGetDoublev(GL_PROJECTION_MATRIX, _projectionMatrix);
 }
 
@@ -247,7 +247,7 @@ void GLWidget::set3DViewHeight()
 void GLWidget::set2DView()
 {
 	_deltaX = _deltaY = 0;
-	_radius = 88.0;
+	_radius = 100.0;
 	_phi = 1.5 * PI;
 	_theta = 0.0;
 

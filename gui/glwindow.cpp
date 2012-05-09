@@ -23,13 +23,13 @@ GLWindow::GLWindow(MainInterface* pItfc, QWidget* parent)
 	connect(this, SIGNAL(set2DView(void)), _ui.glWidget, SLOT(set2DView(void)));
 	connect(this, SIGNAL(set3DView(void)), _ui.glWidget, SLOT(set3DViewHeight(void)));
 
-    QStringList hdrs;
-    hdrs << "Property" << "Value" << "Description";
-    agentInfoWindow = new QTreeWidget();
-    agentInfoWindow->resize(400,400);
-    agentInfoWindow->setHeaderLabels(hdrs);
-    agentInfoWindow->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-    agentInfoWindow->setWindowTitle("Agent Information");
+  QStringList hdrs;
+  hdrs << "Property" << "Value" << "Description";
+  agentInfoWindow = new QTreeWidget();
+  agentInfoWindow->resize(400,400);
+  agentInfoWindow->setHeaderLabels(hdrs);
+  agentInfoWindow->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+  agentInfoWindow->setWindowTitle("Agent Information");
 }
 
 GLWindow::~GLWindow()
@@ -133,6 +133,8 @@ void GLWindow::updateSelectedCellStats()
         AgentInfoVisitor(agentInfoWindow).visit(item._pAgent[0]);
         AgentInfoVisitor(agentInfoWindow).visit(item._pAgent[1]);
     }
+    else
+      agentInfoWindow->hide();
 	if (_selRow != -1 && _selCol != -1)
 	{
 		const ScalarAgentGrid* pAgentGrid = static_cast<ScalarAgentGrid*>(_pItfc->getScalarAgentGrid());
@@ -298,14 +300,15 @@ void GLWindow::selectCell(int row, int col)
 	{
 		// unselect
 		_selRow = _selCol = -1;
+    agentInfoWindow->hide();
 	}
 	else
 	{
 		_selRow = row;
 		_selCol = col;
+    if(agentInfoWindow->isHidden()) agentInfoWindow->show();
 	}
 	updateSelectedCellStats();
-        if(agentInfoWindow->isHidden()) agentInfoWindow->show();
 	updateWindow();
 }
 

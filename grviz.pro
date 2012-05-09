@@ -161,7 +161,6 @@ QMAKE_CXXFLAGS_RELEASE += -O3 -Wno-strict-aliasing
 QMAKE_LFLAGS_RELEASE += -fopenmp -DOPENMP
 
 INCLUDEPATH *= $$quote($(BOOST_PREFIX)/include)
-LIBS *= -lGLU
 
 unix:system(grep -qE \"Ubuntu|Red Hat\" /etc/issue) {
   LIBS *= -lboost_program_options -lboost_iostreams -lboost_serialization

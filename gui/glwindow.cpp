@@ -22,10 +22,20 @@ GLWindow::GLWindow(MainInterface* pItfc, QWidget* parent)
 	connect(_ui.glWidget, SIGNAL(printText(void)), this, SLOT(printText(void)));
 	connect(this, SIGNAL(set2DView(void)), _ui.glWidget, SLOT(set2DView(void)));
 	connect(this, SIGNAL(set3DView(void)), _ui.glWidget, SLOT(set3DViewHeight(void)));
+
+    QStringList hdrs;
+    hdrs << "Property" << "Value" << "Description";
+    agentInfoWindow = new QTreeWidget();
+    agentInfoWindow->resize(400,400);
+    agentInfoWindow->setHeaderLabels(hdrs);
+    agentInfoWindow->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+    agentInfoWindow->setWindowTitle("Agent Information");
 }
 
 GLWindow::~GLWindow()
 {
+  agentInfoWindow->close();
+  delete agentInfoWindow;
 }
 
 void GLWindow::setColorMap(ColorMap* pCurrentColorMap)
@@ -64,8 +74,65 @@ void GLWindow::toggleFullScreen()
 	}
 }
 
+struct AgentInfoVisitor {
+    QTreeWidget* _view;
+    QTreeWidgetItem* _curItem;
+    AgentInfoVisitor(QTreeWidget* view) : _view(view), _curItem(NULL) {}
+    void visit(const Agent* a) {
+        if(!a) return;
+        std::stringstream ss;
+        switch(a->getAgentType()) {
+        case MAC:
+            ss<<"Mac "<<(Mac::State)(a->getState());
+            break;
+        case TGAM:
+            ss<<"Tgam "<<(Tgam::State)(a->getState());
+            break;
+        case TCYT:
+            ss<<"Tcyt "<<(Tcyt::State)(a->getState());
+            break;
+        case TREG:
+            ss<<"Treg "<<(Treg::State)(a->getState());
+            break;
+        }
+        _curItem = new QTreeWidgetItem(QStringList(QString::fromStdString(ss.str())));
+        _view->addTopLevelItem(_curItem);
+        _curItem->setExpanded(true);
+        a->visitProperties(*this);
+    }
+    template<typename T>
+    void visit(const char* name, const T& val, const char* desc) {
+        Q_CHECK_PTR(_curItem);
+        QTreeWidgetItem* item = new QTreeWidgetItem();
+        item->setText(0, QString(name));
+        item->setData(1, Qt::DisplayRole, QVariant::fromValue(val));
+        item->setText(2, QString(desc));
+        _curItem->addChild(item);
+    }
+};
+template<>
+inline void AgentInfoVisitor::visit(const char* name, const Pos& val, const char* desc) {
+    Q_CHECK_PTR(_curItem);
+    std::stringstream ss;
+    ss<<val;
+    QTreeWidgetItem* item = new QTreeWidgetItem();
+    item->setText(0, QString(name));
+    item->setText(1, QString::fromStdString(ss.str()));
+    item->setText(2, QString(desc));
+    _curItem->addChild(item);
+}
+
 void GLWindow::updateSelectedCellStats()
 {
+    if(_selRow != -1 && _selCol != -1)
+    {
+        agentInfoWindow->clear();
+        const ScalarAgentGrid* pAgentGrid = static_cast<ScalarAgentGrid*>(_pItfc->getScalarAgentGrid());
+        const ScalarAgentItem& item
+                = pAgentGrid->getGrid()[_selRow * _ui.glWidget->dim.x + _selCol];
+        AgentInfoVisitor(agentInfoWindow).visit(item._pAgent[0]);
+        AgentInfoVisitor(agentInfoWindow).visit(item._pAgent[1]);
+    }
 	if (_selRow != -1 && _selCol != -1)
 	{
 		const ScalarAgentGrid* pAgentGrid = static_cast<ScalarAgentGrid*>(_pItfc->getScalarAgentGrid());
@@ -203,11 +270,11 @@ QString GLWindow::getAgentStr(const Agent* pAgent)
 			res += ", deact";
 		}
 
-		res += QString(", Bi = %1").arg(pMac->getIntMtb(), 0, 'f', 2);
+                res += QString(", Bi = %1").arg(pMac->getIntMtb(), 0, 'f', 2);
 		
-		res += QString(", [sTNF/TNFR1] = %1").arg(pMac->getSurfBoundTNFR1(), 0, 'f', 2);
+                res += QString(", [sTNF/TNFR1] = %1").arg(pMac->getsurfBoundTNFR1(), 0, 'f', 2);
 		
-		res += QString(", norACT = %1").arg(pMac->getNormalizedACT(), 0, 'f', 2);
+                res += QString(", norACT = %1").arg(pMac->getnormalizedACT(), 0, 'f', 2);
 	}
 	else if (Tgam::isTgam(pAgent))
 	{
@@ -268,9 +335,9 @@ QString GLWindow::getAgentStr(const Agent* pAgent)
 				arg(hours, 2, 10, QChar('0')).arg(minutes, 2, 10, QChar('0'));
 		}
 */
-		GrSimulation::convertSimTime(pAgent->getDeathTime(), days, hours, minutes);
+                GrSimulation::convertSimTime(pAgent->getdeathTime(), days, hours, minutes);
 
-		if (pAgent->getDeathTime() < 0)
+                if (pAgent->getdeathTime() < 0)
 		{
 			res += QString(", death = -%1d%2h%3m").arg(-1 * days, 3, 10, QChar('0')).
 				arg(-1 * hours, 2, 10, QChar('0')).arg(-1 * minutes, 2, 10, QChar('0'));
@@ -315,8 +382,8 @@ void GLWindow::selectCell(int row, int col)
 		_selRow = row;
 		_selCol = col;
 	}
-
 	updateSelectedCellStats();
+        if(agentInfoWindow->isHidden()) agentInfoWindow->show();
 	updateWindow();
 }
 
@@ -360,7 +427,7 @@ void GLWindow::visualize()
 void GLWindow::printText()
 {
     const Simulation* pSim = &(_pItfc->getSimulation());
-	updateSelectedCellStats();
+        updateSelectedCellStats();
 
 	glColor3f(1.0f, 0.0f, 0.0f);
 

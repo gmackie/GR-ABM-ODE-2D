@@ -19,12 +19,77 @@ unsigned long Agent::_nextID = 0;
 // Avoids the calls to the random number generator in the normal constructor, allowing the random number generator
 // to remain in synch after deserialization.
 Agent::Agent()
+<<<<<<< HEAD
+    : _id(0)
+	, _birthTime(-1)
+	, _deathTime(-1)
+	, _pos(-1, -1)
+	, _trackMolecularDynamics(false)
+    , _isODEsolved(false)
+
+	// TNFR components
+	, _mTNF(-1.0)
+	, _surfTNFR1(-1.0)
+	, _surfTNFR2(-1.0)
+	, _surfBoundTNFR1(-1.0)
+	, _surfBoundTNFR2(-1.0)
+	, _intBoundTNFR1(-1.0)
+	, _intBoundTNFR2(-1.0)
+	, _mTNFRNA(-1.0)
+	, _vTNFR1(-1.0)
+	, _vTNFR2(-1.0)
+	, _kSynth(-1.0)
+	, _kTACE(-1.0)
+	, _kmRNA(-1.0)
+
+	// IL10 components
+	, _surfIL10R(-1.0)
+	, _vIL10R(-1.0)
+	, _surfBoundIL10R(-1.0)
+	, _kISynth(-1.0)
+    , _meanIL10R(0)
+
+    // NF-kB signaling pathway components
+    , _IKKKa(-1.0)
+    , _IKKn(-1.0)
+    , _IKKa(-1.0)
+    , _IKKi(-1.0)
+    , _IkBp(-1.0)
+    , _NFkB_IkBp(-1.0)
+    , _NFkBc(-1.0)
+    , _NFkBn(-1.0)
+    , _A20(-1.0)
+    , _A20t(-1.0)
+    , _IkB(-1.0)
+    , _IkBn(-1.0)
+    , _IkBt(-1.0)
+    , _NFkB_IkB(-1.0)
+    , _NFkB_IkBn(-1.0)
+    , _GA20(-1.0)
+    , _GIkB(-1.0)
+    , _GR(-1.0)
+    , _c1rrChemTNF(-1.0)
+    , _c1rChem(-1.0)
+    , _c1rTNF(-1.0)
+    , _chemt(-1.0)
+    , _chem(-1.0)
+    , _TNFt(-1.0)
+    , _TNF(-1.0)
+    , _ACTt(-1.0)
+    , _ACT(-1.0)
+    , _normalizedACT(-1.0)
+    , _IAPt(-1.0)
+    , _IAP(-1.0)
+    , _normalizedIAP(-1.0)
+    , _lasttimestep(-1.0)
+=======
     :
     #define P(type, name, ival, desc) \
       _##name (),
     AGENT_PROPS
     #undef P
     _lasttimestep(-1.0),
+>>>>>>> Added x-macros to agent class and visitation methods.  Added new agent property window for selected agents
 
     // Valarrays for Numerical Methods
     _initvector(0), // Used for numerical methods - current values of ODEs
@@ -38,6 +103,7 @@ Agent::Agent()
     _errorvector(0), // RKCK
     _switchvector(0), // Valarray used to store solutions before reassigning to member variables
     _currentsolution(0)
+
 {
 }
 
@@ -54,13 +120,94 @@ Agent::Agent(int birthtime, int deathtime, int row, int col
 				// IL10 components
 				, Scalar iIL10R
 				, Scalar stdIL10R
-                , int odesize
+        , int odesize
 			)
+<<<<<<< HEAD
+    : _id(0)
+	, _birthTime(birthtime)
+	, _deathTime(deathtime)
+	, _pos(row, col)
+	, _trackMolecularDynamics(false)
+    , _isODEsolved(false)
+
+	// TNFR components
+	, _mTNF(0.0)
+	, _surfTNFR1(g_Rand.getReal(meanTNFR1 - stdTNFR1, meanTNFR1 + stdTNFR1))
+	, _surfTNFR2(g_Rand.getReal(meanTNFR2 - stdTNFR2, meanTNFR2 + stdTNFR2))
+	//	, _surfTNFR1(g_Rand.getLogNormal(meanTNFR1),_PARAM(stdTNFR1)))
+	//	, _surfTNFR2(g_Rand.getLogNormal(meanTNFR2),_PARAM(stdTNFR2)))
+	, _surfBoundTNFR1(0.0)
+	, _surfBoundTNFR2(0.0)
+	, _intBoundTNFR1(0.0)
+	, _intBoundTNFR2(0.0)
+	, _mTNFRNA(0.0)
+	, _vTNFR1(_surfTNFR1 * _PARAM(PARAM_GR_K_T1))
+	, _vTNFR2(_surfTNFR2 * _PARAM(PARAM_GR_K_T2))
+	, _kSynth(kSynth)
+	, _kTACE(kTACE)
+	, _kmRNA(0.0)
+
+	// IL10 components
+	, _surfIL10R(g_Rand.getReal(iIL10R - stdIL10R, iIL10R + stdIL10R))
+	, _vIL10R(_surfIL10R * _PARAM(PARAM_GR_I_K_T))
+	, _surfBoundIL10R(0.0)
+	, _kISynth(0.0)
+    , _meanIL10R(iIL10R)
+
+    // NF-kB signaling pathway components
+    , _IKKKa(0.0)
+    , _IKKn(_PARAM(PARAM_GR_KNN))
+    , _IKKa(0.0)
+    , _IKKi(0.0)
+    , _IkBp(0.0)
+    , _NFkB_IkBp(0.0)
+    , _NFkBc(0.0)
+    , _NFkBn(0.0)
+    , _A20(0.0)
+    , _A20t(0.0)
+    , _IkB(0.0)
+    , _IkBn(0.0)
+    , _IkBt(0.0)
+    , _NFkB_IkB((_PARAM(PARAM_GR_MEAN_NFKB) > 0 ) ? g_Rand.getLogNormal(_PARAM(PARAM_GR_MEAN_NFKB),0.64872*_PARAM(PARAM_GR_MEAN_NFKB)) : 0)
+    , _NFkB_IkBn(0.0)
+    , _GA20(0.0)
+    , _GIkB(0.0)
+    , _GR(0.0)
+    , _c1rrChemTNF(0.0)
+    , _c1rChem(0.0)
+    , _c1rTNF(0.0)
+    , _chemt(0.0)
+    , _chem(0.0)
+    , _TNFt(0.0)
+    , _TNF(0.0)
+    , _ACTt(0.0)
+    , _ACT(0.0)
+    , _normalizedACT(0.0)
+    , _IAPt(0.0)
+    , _IAP(0.0)
+    , _normalizedIAP(0.0)
+    , _lasttimestep(_PARAM(PARAM_GR_DT_MOLECULAR))
+
+    // Valarrays for Numerical Methods
+    , _initvector(0.0, odesize)
+    , _k1vector(0.0, odesize)
+    , _k2vector(0.0, odesize)
+    , _k3vector(0.0, odesize)
+    , _k4vector(0.0, odesize)
+    , _k5vector(0.0, odesize)
+    , _k6vector(0.0, odesize)
+    , _tempvector(0.0, odesize)
+    , _errorvector(0.0, odesize)
+    , _switchvector(0.0, odesize)
+    , _currentsolution(0.0, odesize)
+=======
     :
     #define P(type, name, ival, desc) \
       _##name (ival) ,
     AGENT_PROPS
     #undef P
+>>>>>>> Added x-macros to agent class and visitation methods.  Added new agent property window for selected agents
+
     _lasttimestep(_PARAM(PARAM_GR_DT_MOLECULAR)),
 
     // Valarrays for Numerical Methods
@@ -2135,10 +2282,76 @@ void Agent::serialize(std::ostream& out) const
 
 	Serialization::writeHeader(out, Agent::_ClassName);
 
+<<<<<<< HEAD
+	out << _id << std::endl;
+	out << _birthTime << std::endl;
+	out << _deathTime << std::endl;
+	out << _pos.x << std::endl;
+	out << _pos.y << std::endl;
+	out << _trackMolecularDynamics << std::endl;
+    out << _isODEsolved <<std::endl;
+
+	// TNF associated attributes
+	out << _mTNF << std::endl;
+	out << _surfTNFR1 << std::endl;
+	out << _surfTNFR2 << std::endl;
+	out << _surfBoundTNFR1 << std::endl;
+	out << _surfBoundTNFR2 << std::endl;
+	out << _intBoundTNFR1 << std::endl;
+	out << _intBoundTNFR2 << std::endl;
+    out << _mTNFRNA << std::endl;
+	out << _vTNFR1 << std::endl;
+	out << _vTNFR2 << std::endl;
+	out << _kSynth << std::endl;
+	out << _kTACE << std::endl;
+    out << _kmRNA << std::endl;
+
+    // IL10 associated attributes
+    out << _surfIL10R << std::endl;
+    out << _vIL10R << std::endl;
+    out << _surfBoundIL10R << std::endl;
+    out << _kISynth << std::endl;
+    out << _meanIL10R <<std::endl;
+    
+
+    // NF-kB signaling pathway components
+	out << _IKKKa << std::endl; // (IKKK in active state)
+	out << _IKKn << std::endl; // (IKK in neutral state)
+	out << _IKKa << std::endl; // (IKK in the active state)
+	out << _IKKi << std::endl; // (IKK in inactive state)
+	out << _IkBp << std::endl; // (Phospho-IkB)
+	out << _NFkB_IkBp << std::endl; // %NFkB|IkBp
+	out << _NFkBc << std::endl; // cytoplasmic NFkB
+	out << _NFkBn << std::endl; // nucluar NFkB
+	out << _A20 << std::endl;
+	out << _A20t << std::endl; // A20 transcript
+	out << _IkB << std::endl;
+	out << _IkBn << std::endl; // nucluar IkB
+	out << _IkBt << std::endl; // IkB trancript
+	out << _NFkB_IkB << std::endl;
+	out << _NFkB_IkBn << std::endl;
+	out << _GA20 << std::endl; // (The state of A20)
+	out << _GIkB << std::endl; // (The state of IkB)
+	out << _GR << std::endl; // (The state of reporter genes)
+	out << _c1rrChemTNF << std::endl; // NF-kB independent rate of TNF/chemokine mRNA synthesis  
+	out << _c1rChem << std::endl;
+	out << _c1rTNF << std::endl;
+	out << _chemt << std::endl; // generic chemokine transcript
+	out << _chem << std::endl; // intracellular generic chemokine protein
+	out << _TNFt << std::endl; // TNF transcript
+	out << _TNF << std::endl; // intracellular TNF 
+	out << _ACTt << std::endl; // transcript of macrophage activating molecules
+	out << _ACT << std::endl; // mac-activation molecules
+	out << _normalizedACT << std::endl;
+	out << _IAPt << std::endl; // transcript of IAP (inhibitor of apoptosis)
+	out << _IAP << std::endl; 
+	out << _normalizedIAP << std::endl;
+=======
   #define P(type, name, ival, desc) \
     out << _##name << std::endl;
   AGENT_PROPS
   #undef P
+>>>>>>> Added x-macros to agent class and visitation methods.  Added new agent property window for selected agents
     out << _lasttimestep << std::endl;
 
     out << _initvector.size() << endl;
@@ -2171,10 +2384,76 @@ void Agent::deserialize(std::istream& in)
 		exit(1);
 	}
 
+<<<<<<< HEAD
+	in >> _id;
+	in >> _birthTime;
+	in >> _deathTime;
+	in >> _pos.x;
+	in >> _pos.y;
+	in >> _trackMolecularDynamics;
+    in >> _isODEsolved;
+
+	// TNF associated attributes
+	in >> _mTNF;
+	in >> _surfTNFR1;
+	in >> _surfTNFR2;
+	in >> _surfBoundTNFR1;
+	in >> _surfBoundTNFR2;
+	in >> _intBoundTNFR1;
+	in >> _intBoundTNFR2;
+    in >> _mTNFRNA;
+	in >> _vTNFR1;
+	in >> _vTNFR2;
+	in >> _kSynth;
+	in >> _kTACE;
+    in >> _kmRNA;
+
+    // IL10 associated attributes
+    in >> _surfIL10R;
+    in >> _vIL10R;
+    in >> _surfBoundIL10R;
+    in >> _kISynth;
+    in >> _meanIL10R;
+
+
+    // NF-kB signaling pathway components
+	in >> _IKKKa; // (IKKK in active state)
+	in >> _IKKn; // (IKK in neutral state)
+	in >> _IKKa; // (IKK in the active state)
+	in >> _IKKi; // (IKK in inactive state)
+	in >> _IkBp; // (Phospho-IkB)
+	in >> _NFkB_IkBp; // %NFkB|IkBp
+	in >> _NFkBc; // cytoplasmic NFkB
+	in >> _NFkBn; // nucluar NFkB
+	in >> _A20;
+	in >> _A20t; // A20 transcript
+	in >> _IkB;
+	in >> _IkBn; // nucluar IkB
+	in >> _IkBt; // IkB trancript
+	in >> _NFkB_IkB;
+	in >> _NFkB_IkBn;
+	in >> _GA20; // (The state of A20)
+	in >> _GIkB; // (The state of IkB)
+	in >> _GR; // (The state of reporter genes)
+	in >> _c1rrChemTNF; // NF-kB independent rate of TNF/chemokine mRNA synthesis  
+	in >> _c1rChem;
+	in >> _c1rTNF;
+	in >> _chemt; // generic chemokine transcript
+	in >> _chem; // intracellular generic chemokine protein
+	in >> _TNFt; // TNF transcript
+	in >> _TNF; // intracellular TNF 
+	in >> _ACTt; // transcript of macrophage activating molecules
+	in >> _ACT; // mac-activation molecules
+	in >> _normalizedACT;
+	in >> _IAPt; // transcript of IAP (inhibitor of apoptosis)
+	in >> _IAP; 
+	in >> _normalizedIAP;
+=======
   #define P(type, name, ival, desc) \
     in >> _##name;
   AGENT_PROPS
   #undef P
+>>>>>>> Added x-macros to agent class and visitation methods.  Added new agent property window for selected agents
     in >> _lasttimestep;
     
     size_t vectorSize;

@@ -76,8 +76,8 @@ void AgentsVisualization::visualize(bool blend, const Simulation*, const ColorMa
         for(int k=0;k<2;k++)
         {
           if(!grid[i*_DIM+j]._pAgent[k]) continue;
-          const double stnfr = std::max(1e-5, grid[i*_DIM+j]._pAgent[k]->getSurfBoundTNFR1());
-          const double sil10r = std::max(1e-5, grid[i*_DIM+j]._pAgent[k]->getSurfBoundIL10R());
+          const double stnfr = std::max(1e-5, grid[i*_DIM+j]._pAgent[k]->getsurfBoundTNFR1());
+          const double sil10r = std::max(1e-5, grid[i*_DIM+j]._pAgent[k]->getsurfBoundIL10R());
           minRatio = std::min(minRatio, stnfr / sil10r);
           maxRatio = std::max(maxRatio, stnfr / sil10r);
         }
@@ -109,15 +109,15 @@ void AgentsVisualization::visualize(bool blend, const Simulation*, const ColorMa
                             if(grid[i*_DIM+j]._pAgent[k])
                             {
                               if(_drawm1m2 == 1){
-                                  if((grid[i*_DIM+j]._pAgent[k]->getSurfBoundTNFR1() / grid[i*_DIM+j]._pAgent[k]->getSurfBoundIL10R()) > _m1m2thres)
+                                  if((grid[i*_DIM+j]._pAgent[k]->getsurfBoundTNFR1() / grid[i*_DIM+j]._pAgent[k]->getsurfBoundIL10R()) > _m1m2thres)
                                       glColor4f(0,1,0, _gridAlpha);   //Green if over the threshold
                                   else
                                       glColor4f(1,0,0, _gridAlpha);    //Red otherwise
                               }
                               else {
                                   if(minRatio != maxRatio) {
-                                      const double stnfr =  std::max(1e-5, grid[i*_DIM+j]._pAgent[k]->getSurfBoundTNFR1());
-                                      const double sil10r = std::max(1e-5, grid[i*_DIM+j]._pAgent[k]->getSurfBoundIL10R());
+                                      const double stnfr =  std::max(1e-5, grid[i*_DIM+j]._pAgent[k]->getsurfBoundTNFR1());
+                                      const double sil10r = std::max(1e-5, grid[i*_DIM+j]._pAgent[k]->getsurfBoundIL10R());
                                       const double ratio = ( (stnfr / sil10r) - minRatio) / (maxRatio - minRatio);
                                       glColor4f(1-ratio, ratio, 0, _gridAlpha);
                                   }

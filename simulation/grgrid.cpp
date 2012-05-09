@@ -142,7 +142,7 @@ void GrGrid::deserialize(std::istream& in)
 
   Pos range;
   const Pos& standard = getRange();
-  in >> range;
+  in>>range;
 
   if(GETROW(range) != GETROW(standard) && GETCOL(range) != GETCOL(standard))
     throw std::length_error("Dimension mismatch in deserialization");
@@ -177,7 +177,7 @@ void GrGrid::deserialize(std::istream& in)
   int sz = 0;
   in >> sz;
   for(int i=0;i<sz;i++) {
-    in >> p;
+    in>>p;
     _sources.push_back(p);
   }
 

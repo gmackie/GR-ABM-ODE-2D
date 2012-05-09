@@ -27,6 +27,32 @@ protected:
 	 */
     
     static unsigned long createID();
+<<<<<<< HEAD
+    
+	// Unique agent ID.
+	unsigned long _id;
+	int _birthTime;
+	int _deathTime;
+	Pos _pos;
+
+	bool _trackMolecularDynamics;
+    bool _isODEsolved;
+
+	// TNF associated attributes
+	Scalar _mTNF; // No. of mTNF on the cell membrane
+	Scalar _surfTNFR1; // No. of cell surface TNFR1
+	Scalar _surfTNFR2;
+	Scalar _surfBoundTNFR1; // No. of sTNF-bound cell surface TNFR1
+	Scalar _surfBoundTNFR2;
+	Scalar _intBoundTNFR1; // No. of internalized TNF-bound TNFR1
+	Scalar _intBoundTNFR2;
+    Scalar _mTNFRNA;
+	Scalar _vTNFR1; // Rate of TNFR1 synthesis by cell
+	Scalar _vTNFR2;
+	Scalar _kSynth; // Rate of mTNF synthesis by cell
+	Scalar _kTACE; // Rate of mTNF release from cell by TACE activity
+    Scalar _kmRNA; // Rate of RNA synthesis for mTNF
+=======
   
   #define AGENT_PROPS \
 	P(unsigned long, id, 0, "Unique agent ID")  \
@@ -90,8 +116,8 @@ protected:
 #define P(type, name, ival, desc) type _##name; 
   AGENT_PROPS
 #undef P
+>>>>>>> Added x-macros to agent class and visitation methods.  Added new agent property window for selected agents
 
-    bool _isODEsolved;
     Scalar _lasttimestep;
     
     valarray<double> _initvector;
@@ -109,8 +135,6 @@ protected:
 	Pos moveAgent(GrGrid& grid, bool ccl2, bool ccl5, bool cxcl9, bool attractant, double bonusFactor);
 	int getDestinationOrdinal(GrGrid& grid, bool ccl2, bool ccl5, bool cxcl9, bool attractant, double bonusFactor);
 	Pos compartmentOrdinalToCoordinates(int ordinal, const Pos& dim) const;
-  bool getODEstatus() const;
-  void setODEstatus(bool isodesolved);
 
 public:
 	Agent();
@@ -125,7 +149,7 @@ public:
 			// IL10 components
 			, Scalar iIL10R
 			, Scalar stdIL10R
-            , int odesize
+                        , int odesize
 		);
 
 	virtual ~Agent();
@@ -139,6 +163,7 @@ public:
 	virtual void updateState() = 0;
     virtual void updateStatistics(Stats& s) const = 0;
 
+<<<<<<< HEAD
     void solveTNF (GrGrid& grid, double dt);
     void solveIL10 (GrGrid& grid, double dt);
     void solveTNFandIL10(GrGrid& grid, double dt);
@@ -178,6 +203,42 @@ public:
     void solveMolecularScaleRK4(GrGrid& grid, double dt, bool nfkbDynamics, bool tnfrDynamics, bool il10rDynamics);
     void solveMolecularScaleRKadaptive(GrGrid& grid, double dt, bool nfkbDynamics, bool tnfrDynamics, bool il10rDynamics, double diffusionlength);
     void solveMolecularScaleEPC(GrGrid& grid, double dt, bool nfkbDynamics, bool tnfrDynamics, bool il10rDynamics);
+=======
+  void solveTNF (GrGrid& grid, double dt);
+  void solveIL10 (GrGrid& grid, double dt);
+  void solveTNFandIL10(GrGrid& grid, double dt);
+  void solveNFkBandTNF (GrGrid& grid, double dt);
+  void solveTNFandIL10andNFkB (GrGrid& grid, double dt);
+  void solveNFkBODEsEquilibrium (double dt);
+  
+  void derivativeTNF(const valarray<double>& vecread, valarray<double>& vecwrite, double dt, GrGrid& grid);
+  void derivativeIL10(const valarray<double>& vecread, valarray<double>& vecwrite, double dt, GrGrid& grid);
+  void derivativeTNFandIL10(const valarray<double>& vecread, valarray<double>& vecwrite, double dt, GrGrid& grid);
+  void derivativeTNFandNFKB(const valarray<double>& vecread, valarray<double>& vecwrite, double dt, GrGrid& grid);
+  void derivativeTNFandIL10andNFKB(const valarray<double>& vecread, valarray<double>& vecwrite, double dt, GrGrid& grid);
+  void writeValarrayFromMembers(GrGrid& grid, valarray<double>& inputVector);
+  void writeMembersFromValarray(GrGrid& grid, const valarray<double>& inputVector);
+  
+  void solveRK2(GrGrid& grid, double dt, void(Agent::*derivativeType)(const valarray<double>& vecread, valarray<double>& vecwrite, double dt, GrGrid& grid));
+  void solveRK4(GrGrid& grid, double dt, void(Agent::*derivativeType)(const valarray<double>& vecread, valarray<double>& vecwrite, double dt, GrGrid& grid));
+  void solveForwardEuler(GrGrid& grid, double dt, void(Agent::*derivativeType)(const valarray<double>& vecread, valarray<double>& vecwrite, double dt, GrGrid& grid));
+  void solveEulerPC(GrGrid& grid, double dt, void(Agent::*derivativeType)(const valarray<double>& vecread, valarray<double>& vecwrite, double dt, GrGrid& grid));
+
+  void solveRKCK(GrGrid& grid, double dt, void(Agent::*derivativeType)(const valarray<double>& vecread, valarray<double>& vecwrite, double dt, GrGrid& grid));
+  
+  void RKStepper(GrGrid& grid, double dttry, double accuracy, double& dtnext, double& dtdid, double& currenttime, const double& starttime, const double& endtime, valarray<double> yscal, void(Agent::*derivativeType)(const valarray<double>& vecread, valarray<double>& vecwrite, double dt, GrGrid& grid));
+  
+  
+  void AdaptiveRK(GrGrid& grid, double timestart, double timeend, double accuracy, double stepguess, double minstep, void(Agent::*derivs)(const valarray<double>& vecread, valarray<double>& vecwrite, double dt, GrGrid& grid));
+  
+  void checkTolerance(valarray<double>& veccheck);
+  
+  void solveMolecularScaleFE(GrGrid& grid, double dt, bool nfkbDynamics, bool tnfrDynamics, bool il10rDynamics);
+  void solveMolecularScaleRK2(GrGrid& grid, double dt, bool nfkbDynamics, bool tnfrDynamics, bool il10rDynamics);
+  void solveMolecularScaleRK4(GrGrid& grid, double dt, bool nfkbDynamics, bool tnfrDynamics, bool il10rDynamics);
+  void solveMolecularScaleRKadaptive(GrGrid& grid, double dt, bool nfkbDynamics, bool tnfrDynamics, bool il10rDynamics, double diffusionlength);
+  void solveMolecularScaleEPC(GrGrid& grid, double dt, bool nfkbDynamics, bool tnfrDynamics, bool il10rDynamics);
+>>>>>>> Added x-macros to agent class and visitation methods.  Added new agent property window for selected agents
 
 	virtual void solveDegradation (GrGrid& grid, double dt, bool tnfrDynamics, bool il10rDynamics) = 0;
 	virtual void solveDegradation (GrGrid& grid, double dt, bool tnfrDynamics, bool il10rDynamics, Scalar meanTNFR1, Scalar iIL10R);
@@ -192,8 +253,10 @@ public:
 	int getRow() const;
 	int getCol() const;
 	bool timeToDie(const int time) const;
+    bool getODEstatus() const;
+    void setODEstatus(bool isodesolved);
     
-    virtual bool intCompareGT(const double param1, const double param2);
+  virtual bool intCompareGT(const double param1, const double param2);
     
 
   #define P(type, name, ival, desc) \
@@ -246,7 +309,15 @@ inline void Agent::visitProperties(Visitor& v) const {
   AGENT_PROPS
   #undef P
 }
-inline bool Agent::getODEstatus() const { return _isODEsolved; }
-inline void Agent::setODEstatus(bool isodesolved) { _isODEsolved = isodesolved; }
+
+inline bool Agent::getODEstatus() const
+{
+    return _isODEsolved;
+}
+
+inline void Agent::setODEstatus(bool isodesolved)
+{
+    _isODEsolved = isodesolved;
+}
 
 #endif /* AGENT_H */

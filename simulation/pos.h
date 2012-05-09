@@ -69,6 +69,8 @@ inline std::istream& operator>>(std::istream& s, Pos& p) {
   s>>tmp; assert(tmp == ',');
   s>>p.y;
   s>>tmp; assert(tmp == ')');
+  s>>p.x;
+  s>>p.y;
   return s;
 }
 

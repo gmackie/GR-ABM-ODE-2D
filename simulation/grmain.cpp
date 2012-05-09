@@ -259,7 +259,7 @@ public:
 		MacList macList = sim.getMacList();
 		for (MacList::iterator it = macList.begin(); it != macList.end(); it++)
 		{
-			if (it->getTrackMolecularDynamics())
+			if (it->gettrackMolecularDynamics())
 			{
 				saveAgentRow(sim.getTime(), *it);
 			}
@@ -290,25 +290,25 @@ public:
 		}
 
 		// TNF associated attributes
-		write(agent.getMTNF());
-		write(agent.getSurfTNFR1());
-		write(agent.getSurfTNFR2());
-		write(agent.getSurfBoundTNFR1());
-		write(agent.getSurfBoundTNFR2());
-		write(agent.getIntBoundTNFR1());
-		write(agent.getIntBoundTNFR2());
-		write(agent.getMTNFRNA());
-		write(agent.getVTNFR1());
-		write(agent.getVTNFR2());
-		write(agent.getKSynth());
-		write(agent.getKTACE());
-		write(agent.getKmRNA());
+		write(agent.getmTNF());
+		write(agent.getsurfTNFR1());
+		write(agent.getsurfTNFR2());
+		write(agent.getsurfBoundTNFR1());
+		write(agent.getsurfBoundTNFR2());
+		write(agent.getintBoundTNFR1());
+		write(agent.getintBoundTNFR2());
+		write(agent.getmTNFRNA());
+		write(agent.getvTNFR1());
+		write(agent.getvTNFR2());
+		write(agent.getkSynth());
+		write(agent.getkTACE());
+		write(agent.getkmRNA());
 
 		// IL10 associated attributes
-		write(agent.getSurfIL10R());
-		write(agent.getVIL10R());
-		write(agent.getSurfBoundIL10R());
-		write(agent.getKISynth());
+		write(agent.getsurfIL10R());
+		write(agent.getvIL10R());
+		write(agent.getsurfBoundIL10R());
+		write(agent.getkISynth());
 
 		oCSVStream::endRow();
   }

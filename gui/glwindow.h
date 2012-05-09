@@ -8,6 +8,7 @@
 #include <QImage>
 #include <QString>
 #include <QCloseEvent>
+#include <QTreeWidget>
 
 class GLWindow : public QWidget
 {
@@ -54,6 +55,7 @@ private:
 	GrStatus _status[NOUTCOMES];
 	bool _printTime;
 	bool _printOutcome;
+  QTreeWidget* agentInfoWindow;
 
     QString getAgentStr(const Agent* pAgent);
 };

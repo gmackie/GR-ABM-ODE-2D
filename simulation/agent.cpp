@@ -1204,10 +1204,13 @@ void Agent::derivativeIL10(const valarray<double>& vecread, valarray<double>& ve
 {
     
     assert(vecread.size() == 3); // Make sure the valarray length is set correctly
+
+    double Ikoff = _PARAM(PARAM_GR_I_K_ON) * _PARAM(PARAM_GR_I_KD);
+
     
     // IL10 Ordinary Differential Equations
     // sIL10
-    vecwrite[0] = (((DENSITY/NAV) * _kISynth) + ((DENSITY/NAV) * (_PARAM(PARAM_GR_I_K_OFF) * vecread[2] - _PARAM(PARAM_GR_I_K_ON) * vecread[1] * vecread[0]))) * dt;
+    vecwrite[0] = (((DENSITY/NAV) * _kISynth) + ((DENSITY/NAV) * (Ikoff * vecread[2] - _PARAM(PARAM_GR_I_K_ON) * vecread[1] * vecread[0]))) * dt;
     // surfIL10R
     vecwrite[1] = (_vIL10R - _PARAM(PARAM_GR_I_K_ON) * vecread[1] * vecread[0] + _PARAM(PARAM_GR_I_K_OFF) * vecread[2] - _PARAM(PARAM_GR_I_K_T) * vecread[1]) * dt;
     // surfBoundIL10R
@@ -1218,15 +1221,16 @@ void Agent::derivativeIL10(const valarray<double>& vecread, valarray<double>& ve
 void Agent::solveIL10(GrGrid& grid, double dt)
 {
     double il10 = grid.il10(_pos) / (NAV * VOL);
+    double Ikoff = _PARAM(PARAM_GR_I_K_ON) * _PARAM(PARAM_GR_I_KD);
 
     double dsIL10;
 	double dsurfIL10R;
 	double dsurfBoundIL10R;
 
     // IL10 differential equations
-    dsIL10 = ((DENSITY/NAV) * _kISynth + ((DENSITY/NAV) * (_PARAM(PARAM_GR_I_K_OFF) * _surfBoundIL10R - _PARAM(PARAM_GR_I_K_ON) * _surfIL10R * il10))) * dt;
-	dsurfIL10R = (_vIL10R - _PARAM(PARAM_GR_I_K_ON) * _surfIL10R * il10 + _PARAM(PARAM_GR_I_K_OFF) * _surfBoundIL10R - _PARAM(PARAM_GR_I_K_T) * _surfIL10R) * dt;
-	dsurfBoundIL10R = (_PARAM(PARAM_GR_I_K_ON) * _surfIL10R * il10 - _PARAM(PARAM_GR_I_K_OFF) * _surfBoundIL10R - _PARAM(PARAM_GR_I_K_INT) * _surfBoundIL10R) * dt;
+    dsIL10 = ((DENSITY/NAV) * _kISynth + ((DENSITY/NAV) * (Ikoff * _surfBoundIL10R - _PARAM(PARAM_GR_I_K_ON) * _surfIL10R * il10))) * dt;
+    dsurfIL10R = (_vIL10R - _PARAM(PARAM_GR_I_K_ON) * _surfIL10R * il10 + Ikoff * _surfBoundIL10R - _PARAM(PARAM_GR_I_K_T) * _surfIL10R) * dt;
+    dsurfBoundIL10R = (_PARAM(PARAM_GR_I_K_ON) * _surfIL10R * il10 - Ikoff * _surfBoundIL10R - _PARAM(PARAM_GR_I_K_INT) * _surfBoundIL10R) * dt;
     // end of IL10 differential equations
 
     // update il10 variables
@@ -1249,6 +1253,7 @@ void Agent::derivativeTNFandIL10(const valarray<double>& vecread, valarray<doubl
     
     double koff1 = _PARAM(PARAM_GR_K_ON1) * _PARAM(PARAM_GR_KD1);
 	double koff2 = _PARAM(PARAM_GR_K_ON2) * _PARAM(PARAM_GR_KD2);
+    double Ikoff = _PARAM(PARAM_GR_I_K_ON) * _PARAM(PARAM_GR_I_KD);
     double IkmRNA;
     
     // solving for TNF parameters that depend on IL10
@@ -1286,11 +1291,11 @@ void Agent::derivativeTNFandIL10(const valarray<double>& vecread, valarray<doubl
     
     // IL10 Ordinary Differential Equations
     // sIL10
-    vecwrite[10] = (((DENSITY/NAV) * _kISynth) + ((DENSITY/NAV) * (_PARAM(PARAM_GR_I_K_OFF) * vecread[12] - _PARAM(PARAM_GR_I_K_ON) * vecread[11] * vecread[10]))) * dt;
+    vecwrite[10] = (((DENSITY/NAV) * _kISynth) + ((DENSITY/NAV) * (Ikoff * vecread[12] - _PARAM(PARAM_GR_I_K_ON) * vecread[11] * vecread[10]))) * dt;
     // surfIL10R
-    vecwrite[11] = (_vIL10R - _PARAM(PARAM_GR_I_K_ON) * vecread[11] * vecread[10] + _PARAM(PARAM_GR_I_K_OFF) * vecread[12] - _PARAM(PARAM_GR_I_K_T) * vecread[11]) * dt;
+    vecwrite[11] = (_vIL10R - _PARAM(PARAM_GR_I_K_ON) * vecread[11] * vecread[10] + Ikoff * vecread[12] - _PARAM(PARAM_GR_I_K_T) * vecread[11]) * dt;
     // surfBoundIL10R
-    vecwrite[12] = (_PARAM(PARAM_GR_I_K_ON) * vecread[11] * vecread[10] - _PARAM(PARAM_GR_I_K_OFF) * vecread[12] - _PARAM(PARAM_GR_I_K_INT) * vecread[12]) * dt;
+    vecwrite[12] = (_PARAM(PARAM_GR_I_K_ON) * vecread[11] * vecread[10] - Ikoff * vecread[12] - _PARAM(PARAM_GR_I_K_INT) * vecread[12]) * dt;
     
 }
 
@@ -1298,6 +1303,7 @@ void Agent::solveTNFandIL10(GrGrid& grid, double dt)
 {
 	double koff1 = _PARAM(PARAM_GR_K_ON1) * _PARAM(PARAM_GR_KD1);
 	double koff2 = _PARAM(PARAM_GR_K_ON2) * _PARAM(PARAM_GR_KD2);
+    double Ikoff = _PARAM(PARAM_GR_I_K_ON) * _PARAM(PARAM_GR_I_KD);
 	
 	double tnf = grid.TNF(_pos) / (NAV * VOL);
 	double shedtnfr2 = grid.shedTNFR2(_pos) / (NAV * VOL);
@@ -1347,9 +1353,9 @@ void Agent::solveTNFandIL10(GrGrid& grid, double dt)
 	// end of TNF differential equations
     
     // IL10 differential equations
-    dsIL10 = ((DENSITY/NAV) * _kISynth + ((DENSITY/NAV) * (_PARAM(PARAM_GR_I_K_OFF) * _surfBoundIL10R - _PARAM(PARAM_GR_I_K_ON) * _surfIL10R * il10))) * dt;
-	dsurfIL10R = (_vIL10R - _PARAM(PARAM_GR_I_K_ON) * _surfIL10R * il10 + _PARAM(PARAM_GR_I_K_OFF) * _surfBoundIL10R - _PARAM(PARAM_GR_I_K_T) * _surfIL10R) * dt;
-	dsurfBoundIL10R = (_PARAM(PARAM_GR_I_K_ON) * _surfIL10R * il10 - _PARAM(PARAM_GR_I_K_OFF) * _surfBoundIL10R - _PARAM(PARAM_GR_I_K_INT) * _surfBoundIL10R) * dt;
+    dsIL10 = ((DENSITY/NAV) * _kISynth + ((DENSITY/NAV) * (Ikoff * _surfBoundIL10R - _PARAM(PARAM_GR_I_K_ON) * _surfIL10R * il10))) * dt;
+    dsurfIL10R = (_vIL10R - _PARAM(PARAM_GR_I_K_ON) * _surfIL10R * il10 + Ikoff * _surfBoundIL10R - _PARAM(PARAM_GR_I_K_T) * _surfIL10R) * dt;
+    dsurfBoundIL10R = (_PARAM(PARAM_GR_I_K_ON) * _surfIL10R * il10 - Ikoff * _surfBoundIL10R - _PARAM(PARAM_GR_I_K_INT) * _surfBoundIL10R) * dt;
     // end of IL10 differential equations
     
     // update tnf variables
@@ -1622,6 +1628,7 @@ void Agent::derivativeTNFandIL10andNFKB(const valarray<double>& vecread, valarra
     
     double koff1 = _PARAM(PARAM_GR_K_ON1) * _PARAM(PARAM_GR_KD1);
 	double koff2 = _PARAM(PARAM_GR_K_ON2) * _PARAM(PARAM_GR_KD2);
+    double Ikoff = _PARAM(PARAM_GR_I_K_ON) * _PARAM(PARAM_GR_I_KD);
     double IkmRNA;
     
     // solving for TNF parameters that depend on IL10
@@ -1679,11 +1686,11 @@ void Agent::derivativeTNFandIL10andNFKB(const valarray<double>& vecread, valarra
     
     // IL10 Ordinary Differential Equations
     // sIL10
-    vecwrite[38] = (((DENSITY/NAV) * _kISynth) + ((DENSITY/NAV) * (_PARAM(PARAM_GR_I_K_OFF) * vecread[40] - _PARAM(PARAM_GR_I_K_ON) * vecread[39] * vecread[38]))) * dt;
+    vecwrite[38] = (((DENSITY/NAV) * _kISynth) + ((DENSITY/NAV) * (Ikoff * vecread[40] - _PARAM(PARAM_GR_I_K_ON) * vecread[39] * vecread[38]))) * dt;
     // surfIL10R
-    vecwrite[39] = (_vIL10R - _PARAM(PARAM_GR_I_K_ON) * vecread[39] * vecread[38] + _PARAM(PARAM_GR_I_K_OFF) * vecread[40] - _PARAM(PARAM_GR_I_K_T) * vecread[39]) * dt;
+    vecwrite[39] = (_vIL10R - _PARAM(PARAM_GR_I_K_ON) * vecread[39] * vecread[38] + Ikoff * vecread[40] - _PARAM(PARAM_GR_I_K_T) * vecread[39]) * dt;
     // surfBoundIL10R
-    vecwrite[40] = (_PARAM(PARAM_GR_I_K_ON) * vecread[39] * vecread[38] - _PARAM(PARAM_GR_I_K_OFF) * vecread[40] - _PARAM(PARAM_GR_I_K_INT) * vecread[40]) * dt;
+    vecwrite[40] = (_PARAM(PARAM_GR_I_K_ON) * vecread[39] * vecread[38] - Ikoff * vecread[40] - _PARAM(PARAM_GR_I_K_INT) * vecread[40]) * dt;
     
 }
 
@@ -1691,6 +1698,7 @@ void Agent::solveTNFandIL10andNFkB(GrGrid& grid, double dt)
 {
 	double koff1 = _PARAM(PARAM_GR_K_ON1) * _PARAM(PARAM_GR_KD1);
 	double koff2 = _PARAM(PARAM_GR_K_ON2) * _PARAM(PARAM_GR_KD2);
+    double Ikoff = _PARAM(PARAM_GR_I_K_ON) * _PARAM(PARAM_GR_I_KD);
 	
 	double tnf = grid.TNF(_pos) / (NAV * VOL);
 	double shedtnfr2 = grid.shedTNFR2(_pos) / (NAV * VOL);
@@ -1794,9 +1802,9 @@ void Agent::solveTNFandIL10andNFkB(GrGrid& grid, double dt)
 	dIAP = (_PARAM(PARAM_GR_c4IAP)*_IAPt-_PARAM(PARAM_GR_c5IAP)*_IAP) * dt;
 	
     // IL10 differential equations
-    dsIL10 = ((DENSITY/NAV) * _kISynth + ((DENSITY/NAV) * (_PARAM(PARAM_GR_I_K_OFF) * _surfBoundIL10R - _PARAM(PARAM_GR_I_K_ON) * _surfIL10R * il10))) * dt;
-	dsurfIL10R = (_vIL10R - _PARAM(PARAM_GR_I_K_ON) * _surfIL10R * il10 + _PARAM(PARAM_GR_I_K_OFF) * _surfBoundIL10R - _PARAM(PARAM_GR_I_K_T) * _surfIL10R) * dt;
-	dsurfBoundIL10R = (_PARAM(PARAM_GR_I_K_ON) * _surfIL10R * il10 - _PARAM(PARAM_GR_I_K_OFF) * _surfBoundIL10R - _PARAM(PARAM_GR_I_K_INT) * _surfBoundIL10R) * dt;
+    dsIL10 = ((DENSITY/NAV) * _kISynth + ((DENSITY/NAV) * (Ikoff * _surfBoundIL10R - _PARAM(PARAM_GR_I_K_ON) * _surfIL10R * il10))) * dt;
+    dsurfIL10R = (_vIL10R - _PARAM(PARAM_GR_I_K_ON) * _surfIL10R * il10 + Ikoff * _surfBoundIL10R - _PARAM(PARAM_GR_I_K_T) * _surfIL10R) * dt;
+    dsurfBoundIL10R = (_PARAM(PARAM_GR_I_K_ON) * _surfIL10R * il10 - Ikoff * _surfBoundIL10R - _PARAM(PARAM_GR_I_K_INT) * _surfBoundIL10R) * dt;
     // end of IL10 differential equations
     
 	_mTNF += dmTNF;

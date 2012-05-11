@@ -20,6 +20,10 @@ debug:	gr
 release:	CXXFLAGS += -DNDEBUG -O3
 release:	gr
 
+openmp:  CXXFLAGS += -DNDEBUG -O3 -fopenmp
+openmp:  gr
+
+
 profile:	CXXFLAGS += -pg -g
 profile:	release
 

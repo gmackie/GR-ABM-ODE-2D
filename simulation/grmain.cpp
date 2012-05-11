@@ -153,6 +153,8 @@ public:
     write("NrCaseated");
     write("MacApoptosisTNF"); write("MrApoptTNF"); write("MiApoptTNF"); write("MciApoptTNF");  write("MaApoptTNF");
     write("TcellApoptTNF");
+    write("MrNFkBActivationTNF");
+    write("MiNFkBActivationTNF");
     write("MrActivationTNF");
     write("MiActivationTNF");
     write("NrOfMacsFullyInhibited");
@@ -201,7 +203,7 @@ public:
 
     write(stats.getNrCaseated());
 
-    static int totMacApoptosisTNF[Mac::NSTATES] = {0}; //Just temporary for Mohammed Fallahi
+    int totMacApoptosisTNF[Mac::NSTATES] = {0}; //Just temporary for Mohammed Fallahi
     int sumMacApoptosisTNF = 0;
 
     for(int i=0;i<Mac::MAC_DEAD;i++){    //Keep a running sum of deaths
@@ -214,6 +216,10 @@ public:
       write(totMacApoptosisTNF[i]);
 
     write(stats.getTcellApoptosisTNF());
+
+    write(stats.getRestingMacNFkBTNF());
+    write(stats.getInfMacNFkBTNF());
+
     write(stats.getRestingMacActivationTNF());
     write(stats.getInfMacActivationTNF());
     write(stats.getNrOfCellsTnfInhibited()/100);

@@ -334,7 +334,10 @@ void saveState(const GrSimulation* pSim, int time, std::string dir=std::string("
     out.push(bio::file_sink((dir+std::string(fname)).c_str()));
     if(!out.good())
         std::cerr<<"Unable to open output file: "<<fname<<endl;
-    else pSim->serialize(out);
+    else
+    {
+    	pSim->serialize(out);
+    }
 }
 
 void printStats(const GrSimulation* pSim) {
@@ -392,32 +395,63 @@ bool shouldStop(int time, GrSimulation* pSim)
 	return false;
 }
 
+void performOutput(GrSimulation* pSim, int stateInterval, int csvInterval, bool screenDisplay, int timeToSimulate, std::string outputDir, std::vector<oCSVStream*> csvStreams, int time)
+{
+    // If not doing chunks then always save at the last time step.
+    // If doing chunks only save at the last time step for the last chunk.
+    // Except if stopping early then always save at the time step when we stop.
+    bool saveAtLastTimeStep = (time == timeToSimulate || shouldStop(time, pSim));
+
+    if (stateInterval > 0 && (time % stateInterval == 0  || saveAtLastTimeStep) )
+    {
+        saveState(pSim, time, outputDir);
+    }
+
+    if (time % csvInterval == 0 || saveAtLastTimeStep)  //Write out each csv file
+      for(unsigned i=0;i<csvStreams.size();i++)
+        csvStreams[i]->saveRow(*pSim);
+
+    if (screenDisplay)
+      printStats(pSim);
+}
+
 void run(GrSimulation* pSim, int stateInterval, int csvInterval, bool screenDisplay, int timeToSimulate, std::string outputDir, std::vector<oCSVStream*> csvStreams, bool lhs)
 {
   if(screenDisplay)
   	cout << endl << "--seed " << g_Rand.getSeed() << endl;
   csvInterval = csvInterval < 1 ? 1 : csvInterval;
 
-  for (int time = 0; time <= timeToSimulate; time += 1)
-  {
-    //if (!lhs) fprintf(stderr, "Done: %3.2f%%\r", 100.0*(time / float(timeToSimulate)));
-    // Display and write output at the requested interval, and after the last time step.
-    if (stateInterval > 0 && time % stateInterval == 0)
-       saveState(pSim, time, outputDir);
-    if (time % csvInterval == 0 || time == timeToSimulate)  //Write out each csv file
-      for(unsigned i=0;i<csvStreams.size();i++)
-        csvStreams[i]->saveRow(*pSim);
-    if (screenDisplay)
-      printStats(pSim);
-    //Run the pSimulation one step
-    if(time != timeToSimulate)
-      pSim->solve();
+  // Needed for chunks. Any script that manages running chunks needs to know if the simulation stopped during a chunk
+  // prior to the last chunk, so it knows not to run any subsequent chunks for a run.
+  bool earlyStop = false;
 
-    //Check stopping criteria.
-    if (lhs && shouldStop(time, pSim))
-    {
-    	return;
-    }
+  // Needed when starting a simulation from a saved state.
+  int time = pSim->getTime();
+
+  // Only perform output before the simulation loop if this is time 0.
+  // We don't want to repeat output for a time step when doing a simulation in chunks.
+  if (time == 0)
+  {
+          performOutput(pSim, stateInterval, csvInterval, screenDisplay, timeToSimulate, outputDir, csvStreams, time);
+  }
+
+  // ++time so we don't repeat the simulation for the time step of a saved state - the last time step
+  // performed for a prior chunk.
+  for (++time; time <= timeToSimulate; time++)
+  {
+		pSim->solve();
+		performOutput(pSim, stateInterval, csvInterval, screenDisplay, timeToSimulate, outputDir, csvStreams, time);
+
+	//    gettimeofday(&end, NULL);
+	//    acc( (end.tv_sec - start.tv_sec) + (end.tv_usec - start.tv_usec)/1000000.0);
+	//    printf("%7d,%10.4lf,%7d\n", pSim->getTime(), be::rolling_mean(acc), pSim->getStats().getNrOfAgents());
+
+	    //Check stopping criteria.
+	    if (shouldStop(time, pSim))
+	    {
+	      earlyStop = true;
+	      break;
+	    }
   }
 }
 void buildSim(GrSimulation* pSim, DiffusionMethod diffMethod, RecruitmentBase* pRecr, int odeMethod , bool tnfrDynamics, bool il10rDynamics,
@@ -657,8 +691,8 @@ int main(int argc, char** argv)
       printUsage(argv[0], desc);
       exit(1);
   }
- 
-    if (vm["odesolver"].as<int>() != 0 && vm["odesolver"].as<int>() != 1 && vm["odesolver"].as<int>() !=2 && vm["odesolver"].as<int>() !=3 && vm["odesolver"].as<int>() !=4) 
+
+  if (vm["odesolver"].as<int>() != 0 && vm["odesolver"].as<int>() != 1 && vm["odesolver"].as<int>() !=2 && vm["odesolver"].as<int>() !=3 && vm["odesolver"].as<int>() !=4)
   {
       std::cerr<<"Unsupported ODE method"<<std::endl;
       printUsage(argv[0], desc);

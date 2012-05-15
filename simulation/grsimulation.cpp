@@ -67,6 +67,10 @@ void GrSimulation::serialize(std::ostream& out) const
 {
 	assert(out.good());
 
+	/*** Set initial fmt flags ***/
+	out.setf(std::ios::scientific, std::ios::floatfield);
+	out.precision(Scalar_PRECISION);
+
 	Serialization::writeHeader(out, GrSimulation::_ClassName);
 
 	// Model version

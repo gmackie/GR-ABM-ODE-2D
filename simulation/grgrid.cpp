@@ -108,6 +108,8 @@ void GrGrid::serialize(std::ostream& out) const
 	out << _nCaseation << endl;
 
 	Pos p;
+
+	// The main grid.
 	for (p.x = 0; p.x < _dim.x; p.x++)
 	{
 		for (p.y = 0; p.y < _dim.y; p.y++)
@@ -121,6 +123,37 @@ void GrGrid::serialize(std::ostream& out) const
 			out << shedTNFR2(p) << endl;
 			out << il10(p) << endl;
 			out << extMTB(p) << endl;
+			out << std::endl;
+		}
+		out << std::endl;
+	}
+
+	// The u grid.
+	for (p.x = 0; p.x < _dim.x; p.x++)
+	{
+		for (p.y = 0; p.y < _dim.y; p.y++)
+		{
+			out << u_macAttractant(p) << endl;
+			out << u_TNF(p) << endl;
+			out << u_CCL2(p) << endl; // CCL5, CSCL9 values are based on CCL2 values.
+			out << u_shedTNFR2(p) << endl;
+			out << u_il10(p) << endl;
+			out << std::endl;
+		}
+		out << std::endl;
+	}
+
+	// The v grid.
+	for (p.x = 0; p.x < _dim.x; p.x++)
+	{
+		for (p.y = 0; p.y < _dim.y; p.y++)
+		{
+			out << v_macAttractant(p) << endl;
+			out << v_TNF(p) << endl;
+			out << v_CCL2(p) << endl; // CCL5, CSCL9 values are based on CCL2 values.
+			out << v_shedTNFR2(p) << endl;
+			out << v_il10(p) << endl;
+			out << std::endl;
 		}
 		out << std::endl;
 	}
@@ -152,6 +185,8 @@ void GrGrid::deserialize(std::istream& in)
   _sources.clear();
 
   Pos p;
+
+  // The main grid.
   for(p.x = 0; p.x < _dim.x; p.x++)
     for(p.y = 0; p.y < _dim.y; p.y++)
     {
@@ -172,6 +207,28 @@ void GrGrid::deserialize(std::istream& in)
         {
         	agent(p, i) = NULL;
         }
+     }
+
+  // The u grid.
+  for(p.x = 0; p.x < _dim.x; p.x++)
+    for(p.y = 0; p.y < _dim.y; p.y++)
+    {
+		in >> (Scalar&) u_macAttractant(p);
+		in >> (Scalar&) u_TNF(p);
+		in >> (Scalar&) u_CCL2(p);  // CCL5, CSCL9 values are based on CCL2 values.
+		in >> (Scalar&) u_shedTNFR2(p);
+		in >> (Scalar&) u_il10(p);
+     }
+
+  // The v grid.
+  for(p.x = 0; p.x < _dim.x; p.x++)
+    for(p.y = 0; p.y < _dim.y; p.y++)
+    {
+		in >> (Scalar&) v_macAttractant(p);
+		in >> (Scalar&) v_TNF(p);
+		in >> (Scalar&) v_CCL2(p);  // CCL5, CSCL9 values are based on CCL2 values.
+		in >> (Scalar&) v_shedTNFR2(p);
+		in >> (Scalar&) v_il10(p);
      }
 
   int sz = 0;

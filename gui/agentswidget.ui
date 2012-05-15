@@ -219,7 +219,7 @@
       </item>
       <item row="0" column="0" colspan="4">
        <layout class="QGridLayout" name="gridLayout">
-        <item row="4" column="2" alignment="Qt::AlignHCenter">
+        <item row="4" column="2">
          <widget class="QCheckBox" name="checkBoxMciDeact">
           <property name="text">
            <string/>
@@ -229,7 +229,7 @@
           </property>
          </widget>
         </item>
-        <item row="1" column="2" alignment="Qt::AlignHCenter">
+        <item row="1" column="2">
          <widget class="QCheckBox" name="checkBoxMrDeact">
           <property name="text">
            <string/>
@@ -239,7 +239,7 @@
           </property>
          </widget>
         </item>
-        <item row="3" column="1" alignment="Qt::AlignHCenter">
+        <item row="3" column="1" >
          <widget class="QCheckBox" name="checkBoxMiStat1">
           <property name="text">
            <string/>
@@ -406,7 +406,7 @@
           </property>
          </widget>
         </item>
-        <item row="3" column="2" alignment="Qt::AlignHCenter">
+        <item row="3" column="2" >
          <widget class="QCheckBox" name="checkBoxMiDeact">
           <property name="text">
            <string/>
@@ -416,14 +416,14 @@
           </property>
          </widget>
         </item>
-        <item row="0" column="2" alignment="Qt::AlignHCenter">
+        <item row="0" column="2" >
          <widget class="QLabel" name="label_4">
           <property name="text">
            <string>Deact</string>
           </property>
          </widget>
         </item>
-        <item row="2" column="1" alignment="Qt::AlignHCenter">
+        <item row="2" column="1" >
          <widget class="QCheckBox" name="checkBoxMaStat1">
           <property name="text">
            <string/>
@@ -433,7 +433,7 @@
           </property>
          </widget>
         </item>
-        <item row="4" column="3" alignment="Qt::AlignHCenter">
+        <item row="4" column="3" >
          <widget class="QCheckBox" name="checkBoxMciNFkB">
           <property name="text">
            <string/>
@@ -443,7 +443,7 @@
           </property>
          </widget>
         </item>
-        <item row="1" column="1" alignment="Qt::AlignHCenter">
+        <item row="1" column="1" >
          <widget class="QCheckBox" name="checkBoxMrStat1">
           <property name="text">
            <string/>
@@ -453,14 +453,14 @@
           </property>
          </widget>
         </item>
-        <item row="0" column="1" alignment="Qt::AlignHCenter">
+        <item row="0" column="1" >
          <widget class="QLabel" name="label_3">
           <property name="text">
            <string>Stat1</string>
           </property>
          </widget>
         </item>
-        <item row="4" column="1" alignment="Qt::AlignHCenter">
+        <item row="4" column="1" >
          <widget class="QCheckBox" name="checkBoxMciStat1">
           <property name="text">
            <string/>
@@ -520,7 +520,7 @@
           </property>
          </widget>
         </item>
-        <item row="2" column="3" alignment="Qt::AlignHCenter">
+        <item row="2" column="3" >
          <widget class="QCheckBox" name="checkBoxMaNFkB">
           <property name="text">
            <string/>
@@ -530,7 +530,7 @@
           </property>
          </widget>
         </item>
-        <item row="3" column="3" alignment="Qt::AlignHCenter">
+        <item row="3" column="3" >
          <widget class="QCheckBox" name="checkBoxMiNFkB">
           <property name="text">
            <string/>
@@ -540,7 +540,7 @@
           </property>
          </widget>
         </item>
-        <item row="2" column="2" alignment="Qt::AlignHCenter">
+        <item row="2" column="2" >
          <widget class="QCheckBox" name="checkBoxMaDeact">
           <property name="text">
            <string/>
@@ -550,7 +550,7 @@
           </property>
          </widget>
         </item>
-        <item row="1" column="3" alignment="Qt::AlignHCenter">
+        <item row="1" column="3" >
          <widget class="QCheckBox" name="checkBoxMrNFkB">
           <property name="text">
            <string/>
@@ -560,7 +560,7 @@
           </property>
          </widget>
         </item>
-        <item row="0" column="3" alignment="Qt::AlignHCenter">
+        <item row="0" column="3" >
          <widget class="QLabel" name="label_5">
           <property name="text">
            <string>NFkB</string>
@@ -574,7 +574,7 @@
           </property>
          </widget>
         </item>
-        <item row="1" column="4" alignment="Qt::AlignHCenter">
+        <item row="1" column="4" >
          <widget class="QCheckBox" name="checkBoxMrOther">
           <property name="text">
            <string/>
@@ -584,7 +584,7 @@
           </property>
          </widget>
         </item>
-        <item row="2" column="4" alignment="Qt::AlignHCenter">
+        <item row="2" column="4" >
          <widget class="QCheckBox" name="checkBoxMaOther">
           <property name="text">
            <string/>
@@ -594,7 +594,7 @@
           </property>
          </widget>
         </item>
-        <item row="3" column="4" alignment="Qt::AlignHCenter">
+        <item row="3" column="4" >
          <widget class="QCheckBox" name="checkBoxMiOther">
           <property name="text">
            <string/>
@@ -604,7 +604,7 @@
           </property>
          </widget>
         </item>
-        <item row="4" column="4" alignment="Qt::AlignHCenter">
+        <item row="4" column="4" >
          <widget class="QCheckBox" name="checkBoxMciOther">
           <property name="text">
            <string/>

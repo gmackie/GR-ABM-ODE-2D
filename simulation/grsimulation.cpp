@@ -194,6 +194,11 @@ void GrSimulation::serialize(std::ostream& out) const
 
 void GrSimulation::deserialize(std::istream& in)
 {
+
+  timestepSync();
+
+  setODEsize();
+
 	assert(in.good());
 
 	if (!Serialization::readHeader(in, GrSimulation::_ClassName))

@@ -108,6 +108,7 @@ const QString MainWindow::_DIFF_FTCS = "Recursive eq";
 const QString MainWindow::_DIFF_SOR_CORRECT = "SOR correct";
 const QString MainWindow::_DIFF_SOR_WRONG = "SOR wrong";
 const QString MainWindow::_DIFF_FTCS_SWAP = "Swap Recursive eq";
+const QString MainWindow::_DIFF_ADE_SWAP = "Swap ADE eq";
 
 const QString MainWindow::_OUTCOME_AREA = "Area";
 const QString MainWindow::_OUTCOME_MTB = "Mtb.";
@@ -367,6 +368,7 @@ void MainWindow::initSimulationTab()
 	_ui.comboBoxDiffusion->addItem(_DIFF_SOR_CORRECT);
 	_ui.comboBoxDiffusion->addItem(_DIFF_SOR_WRONG);
 	_ui.comboBoxDiffusion->addItem(_DIFF_FTCS_SWAP);
+	_ui.comboBoxDiffusion->addItem(_DIFF_ADE_SWAP);
 
 	// So seeds don't get truncated.
 	_ui.spinBoxSeed->setMaximum(INT_MAX);
@@ -1315,6 +1317,10 @@ void MainWindow::updateDiffusionMethod(const QString& value)
 	else if (value == _DIFF_FTCS_SWAP)
 	{
 		sim.setDiffusionMethod(DIFF_REC_EQ_SWAP);
+	}
+	else if (value == _DIFF_ADE_SWAP)
+	{
+		sim.setDiffusionMethod(DIFF_ADE_SWAP);
 	}
 	else
 	{

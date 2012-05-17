@@ -350,6 +350,7 @@ int main(int argc, char *argv[])
 	glWindow.resizeGLWidget(resWidth, resHeight);
 	Ui::MainWindowClass& ui = w.getUI();
 
+  gr.setDiffusionMethod((DiffusionMethod)diffMethod);
 	ui.comboBoxDiffusion->setCurrentIndex(diffMethod);
 	
 	 // Force a value changed signal to be emitted.

@@ -265,9 +265,9 @@ public:
 		MacList macList = sim.getMacList();
 		for (MacList::iterator it = macList.begin(); it != macList.end(); it++)
 		{
-			if (it->gettrackMolecularDynamics())
+			if ((*it)->gettrackMolecularDynamics())
 			{
-				saveAgentRow(sim.getTime(), *it);
+				saveAgentRow(sim.getTime(), **it);
 			}
 		}
 

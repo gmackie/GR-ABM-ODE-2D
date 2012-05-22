@@ -343,8 +343,8 @@ inline Stats& GrSimulation::getStatsPrevious()
 
 inline Mac* GrSimulation::createMac(int row, int col, int birthtime, Mac::State state, bool NFkB, bool stat1)
 {
-	_macList.push_back(Mac(birthtime, row, col, state, 0, NFkB, stat1));
-	Mac* pMac = &_macList.back();
+	_macList.push_back(new Mac(birthtime, row, col, state, 0, NFkB, stat1));
+	Mac* pMac = _macList.back();
 	
 	assert_res(_grid.getGrid().addAgent(pMac, row, col));
 	_stats.updateAgentStatistics(pMac);
@@ -354,8 +354,8 @@ inline Mac* GrSimulation::createMac(int row, int col, int birthtime, Mac::State 
 
 inline Tgam* GrSimulation::createTgam(int row, int col, int birthtime, Tgam::State state)
 {
-	_tgamList.push_back(Tgam(birthtime, row, col, state));
-	Tgam* pTgam = &_tgamList.back();
+	_tgamList.push_back(new Tgam(birthtime, row, col, state));
+	Tgam* pTgam = _tgamList.back();
 	
 	assert_res(_grid.getGrid().addAgent(pTgam, row, col));
 	_stats.updateAgentStatistics(pTgam);
@@ -365,8 +365,8 @@ inline Tgam* GrSimulation::createTgam(int row, int col, int birthtime, Tgam::Sta
 
 inline Tcyt* GrSimulation::createTcyt(int row, int col, int birthtime, Tcyt::State state)
 {
-	_tcytList.push_back(Tcyt(birthtime, row, col, state));
-	Tcyt* pTcyt = &_tcytList.back();
+	_tcytList.push_back(new Tcyt(birthtime, row, col, state));
+	Tcyt* pTcyt = _tcytList.back();
 	
 	assert_res(_grid.getGrid().addAgent(pTcyt, row, col));
 	_stats.updateAgentStatistics(pTcyt);
@@ -376,8 +376,8 @@ inline Tcyt* GrSimulation::createTcyt(int row, int col, int birthtime, Tcyt::Sta
 
 inline Treg* GrSimulation::createTreg(int row, int col, int birthtime, Treg::State state)
 {
-	_tregList.push_back(Treg(birthtime, row, col, state));
-	Treg* pTreg = &_tregList.back();
+	_tregList.push_back(new Treg(birthtime, row, col, state));
+	Treg* pTreg = _tregList.back();
 	
 	assert_res(_grid.getGrid().addAgent(pTreg, row, col));
 	_stats.updateAgentStatistics(pTreg);

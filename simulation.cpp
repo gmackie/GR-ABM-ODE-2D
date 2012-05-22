@@ -39,11 +39,24 @@ void Simulation::update()
 	_updated = true;
 	// get copies
 	_grid = _gr->getGrid();
+  _macList.clear();
 	_time = _gr->getTime();
-	_macList = _gr->getMacList();
-	_tgamList = _gr->getTgamList();
-	_tcytList = _gr->getTcytList();
-	_tregList = _gr->getTregList();
+  const MacList& macList = _gr->getMacList();
+  _macList.clear();
+  for(typeof(macList.begin()) it = macList.begin(); it != macList.end(); it++)
+    _macList.push_back(**it);
+  const TgamList& tgamList = _gr->getTgamList();
+  _tgamList.clear();
+  for(typeof(tgamList.begin()) it = tgamList.begin(); it != tgamList.end(); it++)
+    _tgamList.push_back(**it);
+  const TcytList& tcytList = _gr->getTcytList();
+  _tcytList.clear();
+  for(typeof(tcytList.begin()) it = tcytList.begin(); it != tcytList.end(); it++)
+    _tcytList.push_back(**it);
+  const TregList& tregList = _gr->getTregList();
+  _tregList.clear();
+  for(typeof(tregList.begin()) it = tregList.begin(); it != tregList.end(); it++)
+    _tregList.push_back(**it);
 	_stats = _gr->getStats();
 }
 

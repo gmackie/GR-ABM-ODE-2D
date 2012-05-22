@@ -39,10 +39,10 @@ class ScalarAgentGrid : public ScalarAgentGridBase
 {
 private:
 	std::vector<ScalarAgentItem> _grid;
-	MacList _macList;
-	TgamList _tgamList;
-	TcytList _tcytList;
-	TregList _tregList;
+  std::vector<Mac> _macList;
+  std::vector<Tgam> _tgamList;
+  std::vector<Tcyt> _tcytList;
+  std::vector<Treg> _tregList;
 
 public:
 	ScalarAgentGrid(size_t _DIM);

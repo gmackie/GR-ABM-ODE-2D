@@ -25,10 +25,10 @@ private:
 	int _delay;
 	bool _updated;
 	bool _stopFlag;
-	MacList _macList;
-	TgamList _tgamList;
-	TcytList _tcytList;
-	TregList _tregList;
+	std::vector<Mac> _macList;
+	std::vector<Tgam> _tgamList;
+	std::vector<Tcyt> _tcytList;
+	std::vector<Treg> _tregList;
 	Stats _stats;
 	int _timeStepsToSimulate;
 	bool _mtbClearance;
@@ -72,10 +72,10 @@ public:
 	/* The following methods are NOT thread-safe, first a lock must be obtained */
 	const GrGrid& getGrGrid() const;
 	const Stats& getStats() const;
-	const MacList& getMacList() const;
-	const TgamList& getTgamList() const;
-	const TcytList& getTcytList() const;
-	const TregList& getTregList() const;
+	const std::vector<Mac>& getMacList() const;
+	const std::vector<Tgam>& getTgamList() const;
+	const std::vector<Tcyt>& getTcytList() const;
+	const std::vector<Treg>& getTregList() const;
 	void loadState(std::istream& in);
 	void saveState(std::ostream& out) const;
 	void setRecruitment(RecruitmentBase* pRecruitment);
@@ -225,22 +225,22 @@ inline const Stats& Simulation::getStats() const
 	return _stats;
 }
 
-inline const MacList& Simulation::getMacList() const
+inline const std::vector<Mac>& Simulation::getMacList() const
 {
 	return _macList;
 }
 
-inline const TgamList& Simulation::getTgamList() const
+inline const std::vector<Tgam>& Simulation::getTgamList() const
 {
 	return _tgamList;
 }
 
-inline const TcytList& Simulation::getTcytList() const
+inline const std::vector<Tcyt>& Simulation::getTcytList() const
 {
 	return _tcytList;
 }
 
-inline const TregList& Simulation::getTregList() const
+inline const std::vector<Treg>& Simulation::getTregList() const
 {
 	return _tregList;
 }

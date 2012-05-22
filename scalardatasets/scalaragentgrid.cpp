@@ -97,7 +97,7 @@ void ScalarAgentGrid::evaluate(const Simulation* pSimulation)
 		}
 	}
 
-	for (MacList::const_iterator it = _macList.begin(); it != _macList.end(); it++)
+	for (typeof(_macList.begin()) it = _macList.begin(); it != _macList.end(); it++)
 	{
 		const Mac& mac = *it;
 		ScalarAgentItem& item = _grid[it->getRow() * _DIM + it->getCol()];
@@ -141,7 +141,7 @@ void ScalarAgentGrid::evaluate(const Simulation* pSimulation)
 		}
 	}
 
-	for (TgamList::const_iterator it = _tgamList.begin(); it != _tgamList.end(); it++)
+	for (typeof(_tgamList.begin()) it = _tgamList.begin(); it != _tgamList.end(); it++)
 	{
 		const Tgam& tgam = *it;
 		ScalarAgentItem& item = _grid[it->getRow() * _DIM + it->getCol()];
@@ -170,7 +170,7 @@ void ScalarAgentGrid::evaluate(const Simulation* pSimulation)
 		}
 	}
 
-	for (TcytList::const_iterator it = _tcytList.begin(); it != _tcytList.end(); it++)
+	for (typeof(_tcytList.begin()) it = _tcytList.begin(); it != _tcytList.end(); it++)
 	{
 		const Tcyt& tcyt = *it;
 		ScalarAgentItem& item = _grid[it->getRow() * _DIM + it->getCol()];
@@ -199,7 +199,7 @@ void ScalarAgentGrid::evaluate(const Simulation* pSimulation)
 		}
 	}
 
-	for (TregList::const_iterator it = _tregList.begin(); it != _tregList.end(); it++)
+	for (typeof(_tregList.begin()) it = _tregList.begin(); it != _tregList.end(); it++)
 	{
 		const Treg& treg = *it;
 		ScalarAgentItem& item = _grid[it->getRow() * _DIM + it->getCol()];

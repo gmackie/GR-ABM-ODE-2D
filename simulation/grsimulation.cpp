@@ -56,11 +56,23 @@ GrSimulation::GrSimulation(const Pos& dim)
     _numDiffusionPerAgent = (AGENT_TIME_STEP / _PARAM(PARAM_GR_DT_DIFFUSION)); // Number of diffusion iterations per agent iteration
 }
 
+template<typename T>
+inline void clearPtrList(T& container) {
+  typename T::iterator end = container.end();
+  for(typename T::iterator begin = container.begin(); begin!=end; begin++)
+    delete *begin;
+  container.clear();
+}
+
 GrSimulation::~GrSimulation()
 {
 	delete _pDiffusion;
 	for (int i = 0; i < NOUTCOMES; i++)
 		delete _pTTest[i];
+  clearPtrList(_macList);
+  clearPtrList(_tgamList);
+  clearPtrList(_tregList);
+  clearPtrList(_tcytList);
 }
 
 void GrSimulation::serialize(std::ostream& out) const
@@ -108,76 +120,76 @@ void GrSimulation::serialize(std::ostream& out) const
 	out << _macList.size() << std::endl;
 	for (MacList::const_iterator it = _macList.begin(); it != _macList.end(); it++)
 	{
-		int agentIndex = getGrid().agentIndex(&(*it));
+		int agentIndex = getGrid().agentIndex(*it);
 
 		if (agentIndex < 0 || agentIndex >= (int) GrGrid::MAX_AGENTS_PER_CELL)
 		{
 			cerr << "Mac serialization error, invalid agentIndex: " << agentIndex
-				 << " Mac address: " << &(*it)
-				 << " Mac position: " << it->getPosition()
+				 << " Mac address: " << (*it)
+				 << " Mac position: " << (*it)->getPosition()
 				 << endl;
 			exit(1);
 		}
 
-		out << getGrid().agentIndex(&(*it)) << endl;
-		it->serialize(out);
+		out << getGrid().agentIndex((*it)) << endl;
+		(*it)->serialize(out);
 	}
 
 	// serialize tgam cells
 	out << _tgamList.size() << std::endl;
 	for (TgamList::const_iterator it = _tgamList.begin(); it != _tgamList.end(); it++)
 	{
-		int agentIndex = getGrid().agentIndex(&(*it));
+		int agentIndex = getGrid().agentIndex(*it);
 
 		if (agentIndex < 0 || agentIndex >= (int) GrGrid::MAX_AGENTS_PER_CELL)
 		{
 			cerr << "Tgam serialization error, invalid agentIndex: " << agentIndex
-				 << " Tgam address: " << &(*it)
-				 << " Tgam position: " << it->getPosition()
+				 << " Tgam address: " << (*it)
+				 << " Tgam position: " << (*it)->getPosition()
 				 << endl;
 			exit(1);
 		}
 
-		out << getGrid().agentIndex(&(*it)) << endl;
-		it->serialize(out);
+		out << getGrid().agentIndex(*it) << endl;
+		(*it)->serialize(out);
 	}
 
 	// serialize tcyt cells
 	out << _tcytList.size() << std::endl;
 	for (TcytList::const_iterator it = _tcytList.begin(); it != _tcytList.end(); it++)
 	{
-		int agentIndex = getGrid().agentIndex(&(*it));
+		int agentIndex = getGrid().agentIndex((*it));
 
 		if (agentIndex < 0 || agentIndex >= (int) GrGrid::MAX_AGENTS_PER_CELL)
 		{
 			cerr << "Tcyt serialization error, invalid agentIndex: " << agentIndex
 				 << " Tcyt address: " << &(*it)
-				 << " Tcyt position: " << it->getPosition()
+				 << " Tcyt position: " << (*it)->getPosition()
 				 << endl;
 			exit(1);
 		}
 
-		out << getGrid().agentIndex(&(*it)) << endl;
-		it->serialize(out);
+		out << getGrid().agentIndex((*it)) << endl;
+		(*it)->serialize(out);
 	}
 
 	// serialize treg cells
 	out << _tregList.size() << std::endl;
 	for (TregList::const_iterator it = _tregList.begin(); it != _tregList.end(); it++)
 	{
-		int agentIndex = getGrid().agentIndex(&(*it));
+		int agentIndex = getGrid().agentIndex((*it));
 
 		if (agentIndex < 0 || agentIndex >= (int) GrGrid::MAX_AGENTS_PER_CELL)
 		{
 			cerr << "Treg serialization error, invalid agentIndex: " << agentIndex
 				 << " Treg address: " << &(*it)
-				 << " Treg position: " << it->getPosition()
+				 << " Treg position: " << (*it)->getPosition()
 				 << endl;
 			exit(1);
 		}
 
-		out << getGrid().agentIndex(&(*it)) << endl;
-		it->serialize(out);
+		out << getGrid().agentIndex((*it)) << endl;
+		(*it)->serialize(out);
 	}
 
 	// serialize statistics
@@ -254,8 +266,8 @@ void GrSimulation::deserialize(std::istream& in)
         in >> index;
 
 		// create a dummy mac
-		_macList.push_back(Mac());
-		Mac* pMac = &_macList.back();
+		_macList.push_back(new Mac());
+		Mac* pMac = _macList.back();
 
 		// update attributes of dummy mac and add to grid
 		pMac->deserialize(in);
@@ -284,8 +296,8 @@ void GrSimulation::deserialize(std::istream& in)
         in >> index;
 
 		// create a dummy tgam cell
-		_tgamList.push_back(Tgam());
-		Tgam* pTgam = &_tgamList.back();
+		_tgamList.push_back(new Tgam());
+		Tgam* pTgam = _tgamList.back();
 
 		if (index < 0 || index >= (int) GrGrid::MAX_AGENTS_PER_CELL)
 		{
@@ -313,8 +325,8 @@ void GrSimulation::deserialize(std::istream& in)
         in >> index;
 
 		// create a dummy tcyt cell
-		_tcytList.push_back(Tcyt());
-		Tcyt* pTcyt = &_tcytList.back();
+		_tcytList.push_back(new Tcyt());
+		Tcyt* pTcyt = _tcytList.back();
 
 		if (index < 0 || index >= (int) GrGrid::MAX_AGENTS_PER_CELL)
 		{
@@ -343,8 +355,8 @@ void GrSimulation::deserialize(std::istream& in)
         in >> index;
 
 		// create a dummy treg cell
-		_tregList.push_back(Treg());
-		Treg* pTreg = &_tregList.back();
+		_tregList.push_back(new Treg());
+		Treg* pTreg = _tregList.back();
 
 		if (index < 0 || index >= (int) GrGrid::MAX_AGENTS_PER_CELL)
 		{
@@ -466,50 +478,50 @@ void GrSimulation::initMolecularTracking(Scalar molecularTrackingRadius)
 
 	for (MacList::iterator it = _macList.begin(); it != _macList.end(); it++)
 	{
-		if (it->getPosition().distance(center) <= molecularTrackingRadius)
+		if ((*it)->getPosition().distance(center) <= molecularTrackingRadius)
 		{
-			it->setTrackMolecularDynamics(true);
+			(*it)->setTrackMolecularDynamics(true);
 		}
 		else
 		{
-			it->setTrackMolecularDynamics(false);
+			(*it)->setTrackMolecularDynamics(false);
 		}
 
 	}
 
 	for (TgamList::iterator it = _tgamList.begin(); it != _tgamList.end(); it++)
 	{
-		if (it->getPosition().distance(center) <= molecularTrackingRadius)
+		if ((*it)->getPosition().distance(center) <= molecularTrackingRadius)
 		{
-			it->setTrackMolecularDynamics(true);
+			(*it)->setTrackMolecularDynamics(true);
 		}
 		else
 		{
-			it->setTrackMolecularDynamics(false);
+			(*it)->setTrackMolecularDynamics(false);
 		}
 	}
 
 	for (TcytList::iterator it = _tcytList.begin(); it != _tcytList.end(); it++)
 	{
-		if (it->getPosition().distance(center) <= molecularTrackingRadius)
+		if ((*it)->getPosition().distance(center) <= molecularTrackingRadius)
 		{
-			it->setTrackMolecularDynamics(true);
+			(*it)->setTrackMolecularDynamics(true);
 		}
 		else
 		{
-			it->setTrackMolecularDynamics(false);
+			(*it)->setTrackMolecularDynamics(false);
 		}
 	}
 
 	for (TregList::iterator it = _tregList.begin(); it != _tregList.end(); it++)
 	{
-		if (it->getPosition().distance(center) <= molecularTrackingRadius)
+		if ((*it)->getPosition().distance(center) <= molecularTrackingRadius)
 		{
-			it->setTrackMolecularDynamics(true);
+			(*it)->setTrackMolecularDynamics(true);
 		}
 		else
 		{
-			it->setTrackMolecularDynamics(false);
+			(*it)->setTrackMolecularDynamics(false);
 		}
 	}
 }
@@ -517,20 +529,20 @@ void GrSimulation::initMolecularTracking(const std::vector<size_t>& ids) {
 
 	for (MacList::iterator it = _macList.begin(); it != _macList.end(); it++)
     for(typeof(ids.begin()) i=ids.begin(); i != ids.end(); i++)
-      if(*i == it->getID())
-        it->setTrackMolecularDynamics(true);
+      if(*i == (*it)->getID())
+        (*it)->setTrackMolecularDynamics(true);
 	for (TgamList::iterator it = _tgamList.begin(); it != _tgamList.end(); it++)
     for(typeof(ids.begin()) i=ids.begin(); i != ids.end(); i++)
-      if(*i == it->getID())
-        it->setTrackMolecularDynamics(true);
+      if(*i == (*it)->getID())
+        (*it)->setTrackMolecularDynamics(true);
 	for (TcytList::iterator it = _tcytList.begin(); it != _tcytList.end(); it++)
     for(typeof(ids.begin()) i=ids.begin(); i != ids.end(); i++)
-      if(*i == it->getID())
-        it->setTrackMolecularDynamics(true);
+      if(*i == (*it)->getID())
+        (*it)->setTrackMolecularDynamics(true);
 	for (TregList::iterator it = _tregList.begin(); it != _tregList.end(); it++)
     for(typeof(ids.begin()) i=ids.begin(); i != ids.end(); i++)
-      if(*i == it->getID())
-        it->setTrackMolecularDynamics(true);
+      if(*i == (*it)->getID())
+        (*it)->setTrackMolecularDynamics(true);
 }
 
 void GrSimulation::solve()
@@ -702,13 +714,14 @@ void GrSimulation::updateStates()
 	// update states and remove dead macrophages from lists
 	for (MacList::iterator it = _macList.begin(); it != _macList.end();)
 	{
-		Mac& mac = *it;
+		Mac& mac = **it;
 		mac.updateState();
 		_stats.updateAgentStatistics(&mac);
 
 		if (mac.isDead())
 		{
 			assert_res(_grid.getGrid().removeAgent(&mac));
+      delete *it;
 			it = _macList.erase(it);
 		}
 		else
@@ -720,13 +733,14 @@ void GrSimulation::updateStates()
 	// update states and remove dead Tgams from lists
 	for (TgamList::iterator it = _tgamList.begin(); it != _tgamList.end();)
 	{
-		Tgam& tgam = *it;
+		Tgam& tgam = **it;
 		tgam.updateState();
 		_stats.updateAgentStatistics(&tgam);
 
 		if (tgam.isDead())
 		{
 			assert_res(_grid.getGrid().removeAgent(&tgam));
+      delete *it;
 			it = _tgamList.erase(it);
 		}
 		else
@@ -738,13 +752,14 @@ void GrSimulation::updateStates()
 	// update states and remove dead Tcyts from lists
 	for (TcytList::iterator it = _tcytList.begin(); it != _tcytList.end();)
 	{
-		Tcyt& tcyt = *it;
+		Tcyt& tcyt = **it;
 		tcyt.updateState();
 		_stats.updateAgentStatistics(&tcyt);
 
 		if (tcyt.isDead())
 		{
 			assert_res(_grid.getGrid().removeAgent(&tcyt));
+      delete *it;
 			it = _tcytList.erase(it);
 		}
 		else
@@ -756,13 +771,14 @@ void GrSimulation::updateStates()
 	// update states and remove dead Tregs from lists
 	for (TregList::iterator it = _tregList.begin(); it != _tregList.end();)
 	{
-		Treg& treg = *it;
+		Treg& treg = **it;
 		treg.updateState();
 		_stats.updateAgentStatistics(&treg);
 
-		if (it->isDead())
+		if ((*it)->isDead())
 		{
 			assert_res(_grid.getGrid().removeAgent(&treg));
+      delete *it;
 			it = _tregList.erase(it);
 		}
 		else
@@ -776,19 +792,19 @@ void GrSimulation::computeNextStates()
 {
 	for (MacList::iterator it = _macList.begin(); it != _macList.end(); it++)
 	{
-		it->computeNextState(_time, _grid.getGrid(), _stats, _tnfrDynamics, _nfkbDynamics, _il10rDynamics, _tgammatransition);
+		(*it)->computeNextState(_time, _grid.getGrid(), _stats, _tnfrDynamics, _nfkbDynamics, _il10rDynamics, _tgammatransition);
 	}
 	for (TgamList::iterator it = _tgamList.begin(); it != _tgamList.end(); it++)
 	{
-		it->computeNextState(_time, _grid.getGrid(), _stats, _tnfrDynamics, _nfkbDynamics, _il10rDynamics, _tgammatransition);
+		(*it)->computeNextState(_time, _grid.getGrid(), _stats, _tnfrDynamics, _nfkbDynamics, _il10rDynamics, _tgammatransition);
 	}
 	for (TcytList::iterator it = _tcytList.begin(); it != _tcytList.end(); it++)
 	{
-		it->computeNextState(_time, _grid.getGrid(), _stats, _tnfrDynamics, _nfkbDynamics, _il10rDynamics, _tgammatransition);
+		(*it)->computeNextState(_time, _grid.getGrid(), _stats, _tnfrDynamics, _nfkbDynamics, _il10rDynamics, _tgammatransition);
 	}
 	for (TregList::iterator it = _tregList.begin(); it != _tregList.end(); it++)
 	{
-		it->computeNextState(_time, _grid.getGrid(), _stats, _tnfrDynamics, _nfkbDynamics, _il10rDynamics, _tgammatransition);
+		(*it)->computeNextState(_time, _grid.getGrid(), _stats, _tnfrDynamics, _nfkbDynamics, _il10rDynamics, _tgammatransition);
 	} 
 }
 
@@ -796,7 +812,7 @@ void GrSimulation::secreteFromMacrophages(bool tnfDepletion, bool il10Depletion,
 {
 	for (MacList::iterator it = _macList.begin(); it != _macList.end(); it++)
 	{
-		it->secrete(_grid.getGrid(), _tnfrDynamics, _nfkbDynamics, tnfDepletion, _il10rDynamics, il10Depletion, mdt);
+		(*it)->secrete(_grid.getGrid(), _tnfrDynamics, _nfkbDynamics, tnfDepletion, _il10rDynamics, il10Depletion, mdt);
 	}
 }
 
@@ -804,15 +820,15 @@ void GrSimulation::secreteFromTcells(bool tnfDepletion, bool il10Depletion, int 
 {
 	for (TgamList::iterator it = _tgamList.begin(); it != _tgamList.end(); it++)
 	{
-		it->secrete(_grid.getGrid(), _tnfrDynamics, _nfkbDynamics, tnfDepletion, _il10rDynamics, il10Depletion, mdt);
+		(*it)->secrete(_grid.getGrid(), _tnfrDynamics, _nfkbDynamics, tnfDepletion, _il10rDynamics, il10Depletion, mdt);
 	}
 	for (TcytList::iterator it = _tcytList.begin(); it != _tcytList.end(); it++)
 	{
-		it->secrete(_grid.getGrid(), _tnfrDynamics, _nfkbDynamics, tnfDepletion, _il10rDynamics, il10Depletion, mdt);
+		(*it)->secrete(_grid.getGrid(), _tnfrDynamics, _nfkbDynamics, tnfDepletion, _il10rDynamics, il10Depletion, mdt);
 	}
     for (TregList::iterator it = _tregList.begin(); it != _tregList.end(); it++)
 	{
-		it->secrete(_grid.getGrid(), _tnfrDynamics, _nfkbDynamics, tnfDepletion, _il10rDynamics, il10Depletion, mdt);
+		(*it)->secrete(_grid.getGrid(), _tnfrDynamics, _nfkbDynamics, tnfDepletion, _il10rDynamics, il10Depletion, mdt);
 	}
 }
 
@@ -842,19 +858,19 @@ void GrSimulation::updateMolecularScaleAdaptive(double dt)
 {
     for (MacList::iterator it = _macList.begin(); it != _macList.end(); it++)
 	{
-        it->solveMolecularScaleRKadaptive(_grid.getGrid(), dt, _nfkbDynamics, _tnfrDynamics, _il10rDynamics, _PARAM(PARAM_GR_DT_DIFFUSION));
+        (*it)->solveMolecularScaleRKadaptive(_grid.getGrid(), dt, _nfkbDynamics, _tnfrDynamics, _il10rDynamics, _PARAM(PARAM_GR_DT_DIFFUSION));
 	}
 	for (TgamList::iterator it = _tgamList.begin(); it != _tgamList.end(); it++)
 	{
-        it->solveMolecularScaleRKadaptive(_grid.getGrid(), dt, _nfkbDynamics, _tnfrDynamics, _il10rDynamics, _PARAM(PARAM_GR_DT_DIFFUSION));
+        (*it)->solveMolecularScaleRKadaptive(_grid.getGrid(), dt, _nfkbDynamics, _tnfrDynamics, _il10rDynamics, _PARAM(PARAM_GR_DT_DIFFUSION));
 	}
 	for (TcytList::iterator it = _tcytList.begin(); it != _tcytList.end(); it++)
 	{
-        it->solveMolecularScaleRKadaptive(_grid.getGrid(), dt, _nfkbDynamics, _tnfrDynamics, _il10rDynamics, _PARAM(PARAM_GR_DT_DIFFUSION));
+        (*it)->solveMolecularScaleRKadaptive(_grid.getGrid(), dt, _nfkbDynamics, _tnfrDynamics, _il10rDynamics, _PARAM(PARAM_GR_DT_DIFFUSION));
 	}
 	for (TregList::iterator it = _tregList.begin(); it != _tregList.end(); it++)
 	{
-        it->solveMolecularScaleRKadaptive(_grid.getGrid(), dt, _nfkbDynamics, _tnfrDynamics, _il10rDynamics, _PARAM(PARAM_GR_DT_DIFFUSION));
+        (*it)->solveMolecularScaleRKadaptive(_grid.getGrid(), dt, _nfkbDynamics, _tnfrDynamics, _il10rDynamics, _PARAM(PARAM_GR_DT_DIFFUSION));
 	}
 }
 
@@ -863,19 +879,19 @@ void GrSimulation::updateMolecularScaleRK4(double dt)
 {
   for (MacList::iterator it = _macList.begin(); it != _macList.end(); it++)
 	{
-        it->solveMolecularScaleRK4(_grid.getGrid(), dt, _nfkbDynamics, _tnfrDynamics, _il10rDynamics);
+        (*it)->solveMolecularScaleRK4(_grid.getGrid(), dt, _nfkbDynamics, _tnfrDynamics, _il10rDynamics);
 	}
 	for (TgamList::iterator it = _tgamList.begin(); it != _tgamList.end(); it++)
 	{
-        it->solveMolecularScaleRK4(_grid.getGrid(), dt, _nfkbDynamics, _tnfrDynamics, _il10rDynamics);
+        (*it)->solveMolecularScaleRK4(_grid.getGrid(), dt, _nfkbDynamics, _tnfrDynamics, _il10rDynamics);
 	}
 	for (TcytList::iterator it = _tcytList.begin(); it != _tcytList.end(); it++)
 	{
-        it->solveMolecularScaleRK4(_grid.getGrid(), dt, _nfkbDynamics, _tnfrDynamics, _il10rDynamics);
+        (*it)->solveMolecularScaleRK4(_grid.getGrid(), dt, _nfkbDynamics, _tnfrDynamics, _il10rDynamics);
 	}
 	for (TregList::iterator it = _tregList.begin(); it != _tregList.end(); it++)
 	{
-        it->solveMolecularScaleRK4(_grid.getGrid(), dt, _nfkbDynamics, _tnfrDynamics, _il10rDynamics);
+        (*it)->solveMolecularScaleRK4(_grid.getGrid(), dt, _nfkbDynamics, _tnfrDynamics, _il10rDynamics);
 	}
 }
 
@@ -883,19 +899,19 @@ void GrSimulation::updateMolecularScaleRK2(double dt)
 {
     for (MacList::iterator it = _macList.begin(); it != _macList.end(); it++)
 	{
-        it->solveMolecularScaleRK2(_grid.getGrid(), dt, _nfkbDynamics, _tnfrDynamics, _il10rDynamics);
+        (*it)->solveMolecularScaleRK2(_grid.getGrid(), dt, _nfkbDynamics, _tnfrDynamics, _il10rDynamics);
 	}
 	for (TgamList::iterator it = _tgamList.begin(); it != _tgamList.end(); it++)
 	{
-        it->solveMolecularScaleRK2(_grid.getGrid(), dt, _nfkbDynamics, _tnfrDynamics, _il10rDynamics);
+        (*it)->solveMolecularScaleRK2(_grid.getGrid(), dt, _nfkbDynamics, _tnfrDynamics, _il10rDynamics);
 	}
 	for (TcytList::iterator it = _tcytList.begin(); it != _tcytList.end(); it++)
 	{
-        it->solveMolecularScaleRK2(_grid.getGrid(), dt, _nfkbDynamics, _tnfrDynamics, _il10rDynamics);
+        (*it)->solveMolecularScaleRK2(_grid.getGrid(), dt, _nfkbDynamics, _tnfrDynamics, _il10rDynamics);
 	}
 	for (TregList::iterator it = _tregList.begin(); it != _tregList.end(); it++)
 	{
-        it->solveMolecularScaleRK2(_grid.getGrid(), dt, _nfkbDynamics, _tnfrDynamics, _il10rDynamics);
+        (*it)->solveMolecularScaleRK2(_grid.getGrid(), dt, _nfkbDynamics, _tnfrDynamics, _il10rDynamics);
 	}
 }
 
@@ -903,19 +919,19 @@ void GrSimulation::updateMolecularScaleFE(double dt)
 {
     for (MacList::iterator it = _macList.begin(); it != _macList.end(); it++)
 	{
-        it->solveMolecularScaleFE(_grid.getGrid(), dt, _nfkbDynamics, _tnfrDynamics, _il10rDynamics);
+        (*it)->solveMolecularScaleFE(_grid.getGrid(), dt, _nfkbDynamics, _tnfrDynamics, _il10rDynamics);
 	}
 	for (TgamList::iterator it = _tgamList.begin(); it != _tgamList.end(); it++)
 	{
-        it->solveMolecularScaleFE(_grid.getGrid(), dt, _nfkbDynamics, _tnfrDynamics, _il10rDynamics);
+        (*it)->solveMolecularScaleFE(_grid.getGrid(), dt, _nfkbDynamics, _tnfrDynamics, _il10rDynamics);
 	}
 	for (TcytList::iterator it = _tcytList.begin(); it != _tcytList.end(); it++)
 	{
-        it->solveMolecularScaleFE(_grid.getGrid(), dt, _nfkbDynamics, _tnfrDynamics, _il10rDynamics);
+        (*it)->solveMolecularScaleFE(_grid.getGrid(), dt, _nfkbDynamics, _tnfrDynamics, _il10rDynamics);
 	}
 	for (TregList::iterator it = _tregList.begin(); it != _tregList.end(); it++)
 	{
-        it->solveMolecularScaleFE(_grid.getGrid(), dt, _nfkbDynamics, _tnfrDynamics, _il10rDynamics);
+        (*it)->solveMolecularScaleFE(_grid.getGrid(), dt, _nfkbDynamics, _tnfrDynamics, _il10rDynamics);
 	}
 }
 
@@ -923,19 +939,19 @@ void GrSimulation::updateMolecularScaleEPC(double dt)
 {
     for (MacList::iterator it = _macList.begin(); it != _macList.end(); it++)
 	{
-        it->solveMolecularScaleFE(_grid.getGrid(), dt, _nfkbDynamics, _tnfrDynamics, _il10rDynamics);
+        (*it)->solveMolecularScaleFE(_grid.getGrid(), dt, _nfkbDynamics, _tnfrDynamics, _il10rDynamics);
 	}
 	for (TgamList::iterator it = _tgamList.begin(); it != _tgamList.end(); it++)
 	{
-        it->solveMolecularScaleFE(_grid.getGrid(), dt, _nfkbDynamics, _tnfrDynamics, _il10rDynamics);
+        (*it)->solveMolecularScaleFE(_grid.getGrid(), dt, _nfkbDynamics, _tnfrDynamics, _il10rDynamics);
 	}
 	for (TcytList::iterator it = _tcytList.begin(); it != _tcytList.end(); it++)
 	{
-        it->solveMolecularScaleFE(_grid.getGrid(), dt, _nfkbDynamics, _tnfrDynamics, _il10rDynamics);
+        (*it)->solveMolecularScaleFE(_grid.getGrid(), dt, _nfkbDynamics, _tnfrDynamics, _il10rDynamics);
 	}
 	for (TregList::iterator it = _tregList.begin(); it != _tregList.end(); it++)
 	{
-        it->solveMolecularScaleFE(_grid.getGrid(), dt, _nfkbDynamics, _tnfrDynamics, _il10rDynamics);
+        (*it)->solveMolecularScaleFE(_grid.getGrid(), dt, _nfkbDynamics, _tnfrDynamics, _il10rDynamics);
 	}
 }
 
@@ -943,19 +959,19 @@ void GrSimulation::updateTNFDynamics(double dt)
 {
 	for (MacList::iterator it = _macList.begin(); it != _macList.end(); it++)
 	{
-		it->solveTNF(_grid.getGrid(), dt);
+		(*it)->solveTNF(_grid.getGrid(), dt);
 	}
 	for (TgamList::iterator it = _tgamList.begin(); it != _tgamList.end(); it++)
 	{
-		it->solveTNF(_grid.getGrid(), dt);
+		(*it)->solveTNF(_grid.getGrid(), dt);
 	}
 	for (TcytList::iterator it = _tcytList.begin(); it != _tcytList.end(); it++)
 	{
-		it->solveTNF(_grid.getGrid(), dt);
+		(*it)->solveTNF(_grid.getGrid(), dt);
 	}
 	for (TregList::iterator it = _tregList.begin(); it != _tregList.end(); it++)
 	{
-		it->solveTNF(_grid.getGrid(), dt);
+		(*it)->solveTNF(_grid.getGrid(), dt);
 	}
 }
 
@@ -964,19 +980,19 @@ void GrSimulation::updateIL10Dynamics(double dt)
 {
 	for (MacList::iterator it = _macList.begin(); it != _macList.end(); it++)
 	{
-		it->solveIL10(_grid.getGrid(), dt);
+		(*it)->solveIL10(_grid.getGrid(), dt);
 	}
 	for (TgamList::iterator it = _tgamList.begin(); it != _tgamList.end(); it++)
 	{
-		it->solveIL10(_grid.getGrid(), dt);
+		(*it)->solveIL10(_grid.getGrid(), dt);
 	}
 	for (TcytList::iterator it = _tcytList.begin(); it != _tcytList.end(); it++)
 	{
-		it->solveIL10(_grid.getGrid(), dt);
+		(*it)->solveIL10(_grid.getGrid(), dt);
 	}
 	for (TregList::iterator it = _tregList.begin(); it != _tregList.end(); it++)
 	{
-		it->solveIL10(_grid.getGrid(), dt);
+		(*it)->solveIL10(_grid.getGrid(), dt);
 	}
 }
 
@@ -986,19 +1002,19 @@ void GrSimulation::updateTNFandIL10Dynamics(double dt)
 {
 	for (MacList::iterator it = _macList.begin(); it != _macList.end(); it++)
 	{
-		it->solveTNFandIL10(_grid.getGrid(), dt);
+		(*it)->solveTNFandIL10(_grid.getGrid(), dt);
 	}
 	for (TgamList::iterator it = _tgamList.begin(); it != _tgamList.end(); it++)
 	{
-		it->solveTNFandIL10(_grid.getGrid(), dt);
+		(*it)->solveTNFandIL10(_grid.getGrid(), dt);
 	}
 	for (TcytList::iterator it = _tcytList.begin(); it != _tcytList.end(); it++)
 	{
-		it->solveTNFandIL10(_grid.getGrid(), dt);
+		(*it)->solveTNFandIL10(_grid.getGrid(), dt);
 	}
 	for (TregList::iterator it = _tregList.begin(); it != _tregList.end(); it++)
 	{
-		it->solveTNFandIL10(_grid.getGrid(), dt);
+		(*it)->solveTNFandIL10(_grid.getGrid(), dt);
 	}
 }
 
@@ -1009,20 +1025,20 @@ void GrSimulation::updateNFkBandTNFDynamics(double dt)
 	{
 		for (int i = 0; i < _PARAM(PARAM_GR_NF_KB_TIME_COEFF); i++)
 		{
-			it->solveNFkBandTNF(_grid.getGrid(), dt/_PARAM(PARAM_GR_NF_KB_TIME_COEFF));
+			(*it)->solveNFkBandTNF(_grid.getGrid(), dt/_PARAM(PARAM_GR_NF_KB_TIME_COEFF));
 		}
 	}
 	for (TgamList::iterator it = _tgamList.begin(); it != _tgamList.end(); it++)
 	{
-		it->solveTNF(_grid.getGrid(), dt);
+		(*it)->solveTNF(_grid.getGrid(), dt);
 	}
 	for (TcytList::iterator it = _tcytList.begin(); it != _tcytList.end(); it++)
 	{
-		it->solveTNF(_grid.getGrid(), dt);
+		(*it)->solveTNF(_grid.getGrid(), dt);
 	}
 	for (TregList::iterator it = _tregList.begin(); it != _tregList.end(); it++)
 	{
-		it->solveTNF(_grid.getGrid(), dt);
+		(*it)->solveTNF(_grid.getGrid(), dt);
 	}
 }
 
@@ -1033,20 +1049,20 @@ void GrSimulation::updateNFkBandTNFandIL10Dynamics(double dt)
 	{
 		for (int i = 0; i < _PARAM(PARAM_GR_NF_KB_TIME_COEFF); i++)
 		{
-			it->solveTNFandIL10andNFkB(_grid.getGrid(), dt/_PARAM(PARAM_GR_NF_KB_TIME_COEFF));
+			(*it)->solveTNFandIL10andNFkB(_grid.getGrid(), dt/_PARAM(PARAM_GR_NF_KB_TIME_COEFF));
 		}
 	}
 	for (TgamList::iterator it = _tgamList.begin(); it != _tgamList.end(); it++)
 	{
-		it->solveTNFandIL10(_grid.getGrid(), dt);
+		(*it)->solveTNFandIL10(_grid.getGrid(), dt);
 	}
 	for (TcytList::iterator it = _tcytList.begin(); it != _tcytList.end(); it++)
 	{
-		it->solveTNFandIL10(_grid.getGrid(), dt);
+		(*it)->solveTNFandIL10(_grid.getGrid(), dt);
 	}
 	for (TregList::iterator it = _tregList.begin(); it != _tregList.end(); it++)
 	{
-		it->solveTNFandIL10(_grid.getGrid(), dt);
+		(*it)->solveTNFandIL10(_grid.getGrid(), dt);
 	}
 }
 
@@ -1061,19 +1077,19 @@ void GrSimulation::moveMacrophages()
 	for (MacList::iterator it = _macList.begin(); it != _macList.end(); it++)
 	{
 		// move resting macrophages
-		if (_time % timeResting == 0 && it->getState() == Mac::MAC_RESTING)
+		if (_time % timeResting == 0 && (*it)->getState() == Mac::MAC_RESTING)
 		{
-			it->move(_grid.getGrid());
+			(*it)->move(_grid.getGrid());
 		}
 		// move active macrophages
-		else if (_time % timeActive == 0 && it->getState() == Mac::MAC_ACTIVE)
+		else if (_time % timeActive == 0 && (*it)->getState() == Mac::MAC_ACTIVE)
 		{
-			it->move(_grid.getGrid());
+			(*it)->move(_grid.getGrid());
 		}
 		// move infected macrophages
-		else if (_time % timeInfected == 0 && it->getState() == Mac::MAC_INFECTED)
+		else if (_time % timeInfected == 0 && (*it)->getState() == Mac::MAC_INFECTED)
 		{
-			it->move(_grid.getGrid());
+			(*it)->move(_grid.getGrid());
 		}
 	} 
 }
@@ -1083,15 +1099,15 @@ void GrSimulation::moveTcells()
 		
 	for (TgamList::iterator it = _tgamList.begin(); it != _tgamList.end(); it++)
 	{
-		it->move(_grid.getGrid());
+		(*it)->move(_grid.getGrid());
 	}
 	for (TcytList::iterator it = _tcytList.begin(); it != _tcytList.end(); it++)
 	{
-		it->move(_grid.getGrid());
+		(*it)->move(_grid.getGrid());
 	}
 	for (TregList::iterator it = _tregList.begin(); it != _tregList.end(); it++)
 	{
-		it->move(_grid.getGrid());
+		(*it)->move(_grid.getGrid());
 	} 
 }
 
@@ -1171,21 +1187,21 @@ void GrSimulation::adjustTNFDegradation(double dt)
 void GrSimulation::adjustFauxDegradation(double dt)
 {
     
-    for (MacList::iterator it = _macList.begin(); it != _macList.end(); it++)
-    {
-        it->solveDegradation(_grid.getGrid(), dt, _tnfrDynamics, _il10rDynamics);
-    }
-    for (TgamList::iterator it = _tgamList.begin(); it != _tgamList.end(); it++)
+  for (MacList::iterator it = _macList.begin(); it != _macList.end(); it++)
+  {
+      (*it)->solveDegradation(_grid.getGrid(), dt, _tnfrDynamics, _il10rDynamics);
+  }
+  for (TgamList::iterator it = _tgamList.begin(); it != _tgamList.end(); it++)
 	{
-		it->solveDegradation(_grid.getGrid(), dt, _tnfrDynamics, _il10rDynamics);
+		(*it)->solveDegradation(_grid.getGrid(), dt, _tnfrDynamics, _il10rDynamics);
 	}
 	for (TcytList::iterator it = _tcytList.begin(); it != _tcytList.end(); it++)
 	{
-		it->solveDegradation(_grid.getGrid(), dt, _tnfrDynamics, _il10rDynamics);
+		(*it)->solveDegradation(_grid.getGrid(), dt, _tnfrDynamics, _il10rDynamics);
 	}
 	for (TregList::iterator it = _tregList.begin(); it != _tregList.end(); it++)
 	{
-		it->solveDegradation(_grid.getGrid(), dt, _tnfrDynamics, _il10rDynamics);
+		(*it)->solveDegradation(_grid.getGrid(), dt, _tnfrDynamics, _il10rDynamics);
 	}
 }
 
@@ -1273,6 +1289,12 @@ void GrSimulation::setOutcomeMethod(int index, OutcomeMethod method, double alph
 
 void GrSimulation::shuffleCells()
 {
+#if 1
+  std::random_shuffle(_macList.begin(), _macList.end(), g_Rand);
+  std::random_shuffle(_tgamList.begin(), _tgamList.end(), g_Rand);
+  std::random_shuffle(_tcytList.begin(), _tcytList.end(), g_Rand);
+  std::random_shuffle(_tregList.begin(), _tregList.end(), g_Rand);
+#else
   //TODO: replace with random_shuffle
 	MacList::iterator mac1 = _macList.begin();
 	MacList::iterator mac2 = _macList.end();
@@ -1365,4 +1387,5 @@ void GrSimulation::shuffleCells()
 			std::swap(treg1, treg2);
 		}
 	}	
+#endif
 }

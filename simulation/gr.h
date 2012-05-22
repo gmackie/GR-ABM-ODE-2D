@@ -134,14 +134,14 @@ class RecruitmentBase;
 class Stats;
 
 // typedefs
-typedef std::list<Mac> MacList;
-typedef std::list<Tgam> TgamList;
-typedef std::list<Tcyt> TcytList;
-typedef std::list<Treg> TregList;
-typedef std::list<Mac*> MacPtrList;
-typedef std::list<Tgam*> TgamPtrList;
-typedef std::list<Tcyt*> TcytPtrList;
-typedef std::list<Treg*> TregPtrList;
+typedef std::vector<Mac*> MacList;
+typedef std::vector<Tgam*> TgamList;
+typedef std::vector<Tcyt*> TcytList;
+typedef std::vector<Treg*> TregList;
+typedef std::vector<Mac*> MacPtrList;
+typedef std::vector<Tgam*> TgamPtrList;
+typedef std::vector<Tcyt*> TcytPtrList;
+typedef std::vector<Treg*> TregPtrList;
 typedef std::vector<Mac> MacVector;
 typedef std::vector<Tgam> TgamVector;
 typedef std::vector<Tcyt> TcytVector;

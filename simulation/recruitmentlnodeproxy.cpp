@@ -25,7 +25,7 @@ void RecruitmentLnODEProxy::solveODE(const int time, const Stats& statsPrevious,
 	//std::cerr << "_PARAM(PARAM_TCELL_LYMPH_PROXY_FACTOR_TIME_START): " << _PARAM(PARAM_TCELL_LYMPH_PROXY_FACTOR_TIME_START) << std::endl; //DBG
 	//std::cerr << "_PARAM(PARAM_TCELL_LYMPH_PROXY_FACTOR_TIME_END): " << _PARAM(PARAM_TCELL_LYMPH_PROXY_FACTOR_TIME_END) << std::endl; //DBG
 	//std::cerr << "_PARAM(PARAM_TCELL_LYMPH_PROXY_FACTOR_TIME_NONLINEAR_END): " << _PARAM(PARAM_TCELL_LYMPH_PROXY_FACTOR_TIME_NONLINEAR_END) << std::endl; //DBG
-	std::cerr << "_PARAM(PARAM_TCELL_LYMPH_PROXY_MTB_THRESHOLD): " << _PARAM(PARAM_TCELL_LYMPH_PROXY_MTB_THRESHOLD) << std::endl; //DBG
+	//std::cerr << "_PARAM(PARAM_TCELL_LYMPH_PROXY_MTB_THRESHOLD): " << _PARAM(PARAM_TCELL_LYMPH_PROXY_MTB_THRESHOLD) << std::endl; //DBG
 
 	Scalar totMtb = statsPrevious.getTotExtMtb() + statsPrevious.getTotIntMtb();
 	//Scalar replicatingMtb =  totMtb - statsPrevious.getTotNonRepExtMtb();
@@ -33,7 +33,7 @@ void RecruitmentLnODEProxy::solveODE(const int time, const Stats& statsPrevious,
 	// In function RecruitmentLnODE::updateQueue the T gam flux is based on _odeInitialConditions[_idxEffectorT8] +  _odeInitialConditions[_idxEffectorTH1],
 	// both of which are defined by the lymph node ODE. Here in the proxy calculation we calculate a single value for T gam flux,
 	// so we store that in _odeInitialConditions[_idxEffectorT8] and set _odeInitialConditions[_idxEffectorTH1] to 0. Then in RecruitmentLnODE::updateQueue
-	// for this proxy, the gam flux is based in the single value calculated here.
+	// for this proxy, the T gam flux is based on the single value calculated here.
 	_odeInitialConditions[_idxEffectorTH1] = 0.0;
 	if (time >= 0 && time < _PARAM(PARAM_TCELL_LYMPH_PROXY_SCALING_START))
 	{

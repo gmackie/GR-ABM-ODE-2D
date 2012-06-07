@@ -37,13 +37,12 @@ ScalarAgentGrid::~ScalarAgentGrid()
 
 void ScalarAgentGrid::evaluate(const Simulation* pSimulation)
 {
-	const GrGrid& grGrid = pSimulation->getGrGrid();
 	_macList = pSimulation->getMacList();
 	_tgamList = pSimulation->getTgamList();
 	_tcytList = pSimulation->getTcytList();
 	_tregList = pSimulation->getTregList();
 
-  const GrGrid& grid = pSimulation->getGrGrid();
+	const GrGrid& grid = pSimulation->getGrGrid();
 
 	for (int i = 0; i < _DIM; i++)
 	{

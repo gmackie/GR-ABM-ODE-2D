@@ -23,6 +23,9 @@
 
 class RecruitmentLnODE : public RecruitmentBase
 {
+private:
+	static const std::string _ClassName;
+
 protected:
 
 	static const int _nrConditions = 43;
@@ -39,6 +42,7 @@ protected:
 	int _tcellQueueCount[TCELL_TYPE_COUNT];
 	struct TcellTypePair
 	{
+		TcellTypePair(int birthtime, TcellType type) : _birthtime(birthtime), _type(type) {};
 		int _birthtime;
 		TcellType _type;
 	};
@@ -61,9 +65,20 @@ protected:
 			ThresholdPosList tcellSources[TCELL_TYPE_COUNT]);
 
 public:
+	RecruitmentLnODE(const std::string& odeApp, const std::string& odeTmpFile, std::istream& in);
 	RecruitmentLnODE(const std::string& odeApp, const std::string& odeTmpFile);
 	virtual ~RecruitmentLnODE();
+
+	RecruitmentMethod getMethod() const;
+	void serialize(std::ostream& out) const;
+	void deserialize(std::istream& in);
+
 	void recruit(GrSimulation& sim);
 };
+
+inline RecruitmentMethod RecruitmentLnODE::getMethod() const
+{
+	return RECR_LN_ODE;
+}
 
 #endif /* RECRUITMENTLNODE_H_ */

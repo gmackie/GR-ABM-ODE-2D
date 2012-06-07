@@ -314,7 +314,7 @@ void Tgam::handleActiveDouble(const int time, GrGrid& grid, Stats& stats)
 	}
 }
 
-void Tgam::handleInducedReg(const int time, GrGrid& grid, Stats& stats)
+void Tgam::handleInducedReg(const int, GrGrid&, Stats&)
 {
     _nextState = TGAM_INDUCED_REG;
 }

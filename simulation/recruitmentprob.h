@@ -22,7 +22,25 @@ private:
 public:
 	RecruitmentProb();
 	virtual ~RecruitmentProb();
+
+	RecruitmentMethod getMethod() const;
+	void serialize(std::ostream&) const;
+	void deserialize(std::istream&);
+
 	void recruit(GrSimulation& sim);
 };
+
+inline RecruitmentMethod RecruitmentProb::getMethod() const
+{
+	return RECR_PROB;
+}
+
+inline void RecruitmentProb::serialize(std::ostream&) const
+{
+}
+
+inline void RecruitmentProb::deserialize(std::istream&)
+{
+}
 
 #endif /* RECRUITMENTPROB_H_ */

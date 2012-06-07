@@ -20,6 +20,11 @@ class RecruitmentBase
 public:
 	RecruitmentBase();
 	virtual ~RecruitmentBase();
+
+	virtual RecruitmentMethod getMethod() const = 0;
+	virtual void serialize(std::ostream& out) const = 0;
+	virtual void deserialize(std::istream& in) = 0;
+
 	virtual void recruit(GrSimulation& sim) = 0;
     
     static bool intCompareGTEQ(const double param1, const double param2);

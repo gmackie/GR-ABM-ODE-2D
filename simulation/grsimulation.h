@@ -90,7 +90,7 @@ private:
 
 public:
 	GrSimulation(const Pos& dim);
-	~GrSimulation();
+	virtual ~GrSimulation();
 	void init();
 	void initMolecularTracking(Scalar molecularTrackingRadius);
 	void initMolecularTracking(const std::vector<size_t>& ids);
@@ -112,6 +112,10 @@ public:
 	const TregList& getTregList() const;
 	DiffusionMethod getDiffusionMethod() const;
 	void setDiffusionMethod(DiffusionMethod method);
+
+	RecruitmentMethod getRecruitmentMethod();
+	void setRecruitmentMethod(RecruitmentMethod method);
+
     void setODESolverMethod(int odemethod);
     int getODESolverMethod() const;
 	bool getTnfrDynamics() const;
@@ -136,7 +140,7 @@ public:
 	bool getTCellRecruitmentBegun();
 	void serialize(std::ostream& out) const;
 	void deserialize(std::istream& in);
-	void setRecruitment	(RecruitmentBase* pRecruitment);
+	void deserializeRecruitmentMethod(RecruitmentMethod method, std::istream& in);
 	Mac* createMac(int row, int col, int birthtime, Mac::State state, bool NFkB, bool stat1);
 	Tgam* createTgam(int row, int col, int birthtime, Tgam::State state);
 	Tcyt* createTcyt(int row, int col, int birthtime, Tcyt::State state);
@@ -152,11 +156,6 @@ public:
 inline bool GrSimulation::getTCellRecruitmentBegun()
 {
 	return _tcellRecruitmentBegun;
-}
-
-inline void GrSimulation::setRecruitment(RecruitmentBase* pRecruitment)
-{
-	_pRecruitment = pRecruitment;
 }
 
 inline void GrSimulation::getOutcomeParameters(int index,

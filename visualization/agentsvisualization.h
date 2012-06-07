@@ -31,8 +31,8 @@ private:
 	bool _drawSrcTgam;
 	bool _drawSrcTcyt;
 	bool _drawSrcTreg;
-        int _drawm1m2;
-        double _m1m2thres;
+	int _drawm1m2;
+	double _m1m2thres;
 	int _selRow;
 	int _selCol;
 	void drawGrid() const;

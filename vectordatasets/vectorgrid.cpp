@@ -13,9 +13,9 @@ VectorGrid::VectorGrid(size_t _DIM)
 	: Grid(_DIM)
 	, _grid(_DIM*_DIM)
 {
-	for (int i = 0; i < _DIM; i++) // row
+	for (size_t i = 0; i < _DIM; i++) // row
 	{
-		for (int j = 0; j < _DIM; j++) // col
+		for (size_t j = 0; j < _DIM; j++) // col
 		{
 			VectorGridItem& item = _grid[j + i * _DIM];
 

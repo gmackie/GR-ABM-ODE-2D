@@ -15,6 +15,7 @@
 #include <boost/iostreams/device/file.hpp>
 #include <boost/iostreams/filtering_stream.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
+#include <boost/filesystem.hpp>
 #include "recruitmentlnode.h"
 #include "recruitmentlnodepure.h"
 #include "recruitmentprob.h"
@@ -25,6 +26,7 @@
 
 namespace po = boost::program_options;
 using namespace std;
+using namespace boost::filesystem;
 
 void printVersion()
 {
@@ -415,7 +417,7 @@ void performOutput(GrSimulation* pSim, int stateInterval, int csvInterval, bool 
       printStats(pSim);
 }
 
-void run(GrSimulation* pSim, int stateInterval, int csvInterval, bool screenDisplay, int timeToSimulate, std::string outputDir, std::vector<oCSVStream*> csvStreams, bool lhs)
+void run(GrSimulation* pSim, int stateInterval, int csvInterval, bool screenDisplay, int timeToSimulate, std::string outputDir, std::vector<oCSVStream*> csvStreams)
 {
   if(screenDisplay)
   	cout << endl << "--seed " << g_Rand.getSeed() << endl;
@@ -454,7 +456,7 @@ void run(GrSimulation* pSim, int stateInterval, int csvInterval, bool screenDisp
 	    }
   }
 }
-void buildSim(GrSimulation* pSim, DiffusionMethod diffMethod, RecruitmentBase* pRecr, int odeMethod , bool tnfrDynamics, bool il10rDynamics,
+void buildSim(GrSimulation* pSim, DiffusionMethod diffMethod, RecruitmentMethod recrMethod, int odeMethod , bool tnfrDynamics, bool il10rDynamics,
               bool nfkbDynamics, int tnfDepletionTimeStep, int il10DepletionTimeStep, bool tgammatransition, float areaTNFThreshold, float areaCellDensityThreshold) {
   
     cout << "\nODE SOLVER" << std::endl;
@@ -502,8 +504,13 @@ void buildSim(GrSimulation* pSim, DiffusionMethod diffMethod, RecruitmentBase* p
     
     pSim->setTnfDepletionTimeStep(tnfDepletionTimeStep);
     pSim->setIl10DepletionTimeStep(il10DepletionTimeStep);
-	pSim->setRecruitment(pRecr);
+	pSim->setRecruitmentMethod(recrMethod);
 	pSim->setDiffusionMethod(diffMethod);
+
+	// Parameters must be loaded, since since the base lymph ODE class, RecruitmentLnODE, uses parameters in its constructor.
+	/* set recruitment method */
+	pSim->setRecruitmentMethod(recrMethod);
+
     pSim->setODESolverMethod(odeMethod);
 	
 	//	Set area thresholds if specified on the command line.
@@ -645,8 +652,6 @@ int main(int argc, char** argv)
   if (vm.count("seedadj"))
     seed = seed ^ (vm["seedadj"].as<unsigned int>());
   
-  bool lhs = vm.count("lhs");
-
   bool screenDisplay = !(vm.count("quiet") || vm.count("lhs"));
 
   // Must be done before making GrSimulation.
@@ -655,25 +660,6 @@ int main(int argc, char** argv)
   if (!Params::getInstance(pdim)->fromXml(paramFile.c_str()))
     throw std::runtime_error("Unable to get parameters from file, cannot continue...");
   
-  // Parameters must be loaded, since since the base lymph ODE class, RecruitmentLnODE, uses parameters in its constructor.
-  RecruitmentBase* pRecr;
-  switch (vm["recr"].as<unsigned>())
-  {
-    case 0:
-      pRecr = (RecruitmentBase*)new RecruitmentProb();
-      break;
-    case 1:
-      pRecr = (RecruitmentBase*)new RecruitmentLnODEProxy();
-      break;
-    case 2:
-      pRecr = (RecruitmentBase*)new RecruitmentLnODEPure();
-      break;
-    default:
-      std::cerr << std::endl <<"Unsupported recruitment method" << std::endl << std::endl;
-      printUsage(argv[0], desc);
-      exit(1);
-  }
-
   DiffusionMethod diffMethodEnum;
   switch (vm["diffusion"].as<unsigned>())
   {
@@ -687,10 +673,30 @@ int main(int argc, char** argv)
       diffMethodEnum = DIFF_ADE_SWAP;
       break;
     default:
-      std::cerr<<"Unsupported Diffusion method"<<std::endl;
+      std::cerr<<"Unsupported Diffusion method: " << vm["diffusion"].as<unsigned>() << std::endl;
       printUsage(argv[0], desc);
       exit(1);
   }
+
+  RecruitmentMethod recrMethod;
+
+  switch (vm["recr"].as<unsigned>())
+  {
+    case 0:
+    	recrMethod = RECR_PROB;
+      break;
+    case 1:
+    	recrMethod = RECR_LN_ODE_PROXY;
+      break;
+    case 2:
+    	recrMethod = RECR_LN_ODE_PURE;
+      break;
+    default:
+      std::cerr<<"Unsupported recruitment method: " << vm["recr"].as<unsigned>() << std::endl;
+      printUsage(argv[0], desc);
+      exit(1);
+  }
+
 
   if (vm["odesolver"].as<int>() != 0 && vm["odesolver"].as<int>() != 1 && vm["odesolver"].as<int>() !=2 && vm["odesolver"].as<int>() !=3 && vm["odesolver"].as<int>() !=4)
   {
@@ -703,19 +709,28 @@ int main(int argc, char** argv)
   assert(pSim != NULL);
   if(vm.count("load")) {
     namespace bio = boost::iostreams;
+
     std::string savedf = vm["load"].as<std::string>();
+	if (!exists(savedf))
+	{
+		cerr << "File to load, '" << savedf << "' does not exist." << endl;
+		exit(1);
+	}
+
+
     size_t found = string::npos;
     bio::filtering_istream in;
     if((found = savedf.rfind(".")) != string::npos && savedf.substr(found) == ".gz")
       in.push(bio::gzip_decompressor());   //Compressed?
     bio::file_source fileSource(savedf);
     in.push(fileSource);
+
     if(!in)
       throw std::runtime_error("Failed to open saved state file");
     pSim->deserialize(in);
   }
 
-  buildSim(pSim, diffMethodEnum, pRecr, vm["odesolver"].as<int>(), vm.count("tnfr-dynamics"), vm.count("il10r-dynamics"), vm.count("NFkB-dynamics"),
+  buildSim(pSim, diffMethodEnum, recrMethod, vm["odesolver"].as<int>(), vm.count("tnfr-dynamics"), vm.count("il10r-dynamics"), vm.count("NFkB-dynamics"),
            vm["tnf-depletion"].as<int>(), vm["il10-depletion"].as<int>(),vm.count("Treg-induction"), vm["area-tnf-threshold"].as<float>(),
               vm["area-cell-density-threshold"].as<float>());
 
@@ -765,11 +780,10 @@ int main(int argc, char** argv)
   }
 
   run(pSim, vm["state-interval"].as<unsigned>(), vm["csv-interval"].as<unsigned>(),
-      screenDisplay, timeToSimulate, outputDir, csvStreams, lhs);
+      screenDisplay, timeToSimulate, outputDir, csvStreams);
 
   for(unsigned i=0;i<csvStreams.size();i++)
     delete csvStreams[i];
   delete pSim;
-  delete pRecr;
   return 0;
 }

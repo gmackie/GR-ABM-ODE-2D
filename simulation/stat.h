@@ -212,7 +212,7 @@ Stats() :
       ar & _intMtbFreq[i];
   }
 
-  void serialize(std::ostream& s, const unsigned int file_version = 0) const {
+  void serialize(std::ostream& s) const {
     #define STAT(type, name, desc, reset)           s << ( _ ## name) << std::endl;
     #define ARRAY_STAT(type, name, sz, desc, reset) s << ( _ ## name) << std::endl;
     #define AGENT_STAT(type, name, desc, reset)     s << ( _ ## name) << std::endl;

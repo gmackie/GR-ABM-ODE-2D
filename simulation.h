@@ -5,8 +5,8 @@
  *      Author: S030858
  */
 
-#ifndef SMOKESIMULATION_H_
-#define SMOKESIMULATION_H_
+#ifndef SIMULATION_H_
+#define SIMULATION_H_
 
 #include "simulation/grsimulation.h"
 #include <QThread>
@@ -78,7 +78,7 @@ public:
 	const std::vector<Treg>& getTregList() const;
 	void loadState(std::istream& in);
 	void saveState(std::ostream& out) const;
-	void setRecruitment(RecruitmentBase* pRecruitment);
+	void setRecruitmentMethod(RecruitmentMethod recrMethod);
 	
 	void setTnfrDynamics(bool tnfrDynamics);
 	void setNfkbDynamics(bool nfkbDynamics);
@@ -250,9 +250,9 @@ inline const GrGrid& Simulation::getGrGrid() const
 	return _grid;
 }
 
-inline void Simulation::setRecruitment(RecruitmentBase* pRecruitment)
+inline void Simulation::setRecruitmentMethod(RecruitmentMethod recrMethod)
 {
-	_gr->setRecruitment(pRecruitment);
+	_gr->setRecruitmentMethod(recrMethod);
 }
 
 inline void Simulation::setTnfrDynamics(bool tnfrDynamics)
@@ -293,4 +293,4 @@ inline GrSimulation& Simulation::getSim()
     return *_gr;
 }
 
-#endif /* SMOKESIMULATION_H_ */
+#endif /* SIMULATION_H_ */

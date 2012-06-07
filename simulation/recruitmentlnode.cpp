@@ -6,8 +6,18 @@
  */
 
 #include "recruitmentlnode.h"
+#include "serialization.h"
 #include <stdlib.h>
 #include <fstream>
+
+const std::string RecruitmentLnODE::_ClassName = "RecruitmentLnODE";
+
+RecruitmentLnODE::RecruitmentLnODE(const std::string& odeApp, const std::string& odeTmpFile, std::istream& in)
+	: _odeApp(odeApp)
+	, _odeTmpFile(odeTmpFile)
+{
+	RecruitmentLnODE::deserialize(in);
+}
 
 RecruitmentLnODE::RecruitmentLnODE(const std::string& odeApp, const std::string& odeTmpFile)
 	: _odeApp(odeApp)
@@ -102,8 +112,7 @@ void RecruitmentLnODE::updateQueue(const int time, Stats& stats)
 			const int count = (int) (tcellFlux[type] -_tcellTable[type]);
 			for (int j = 0; j < count; j++)
 			{
-				TcellTypePair tcell = { time - g_Rand.getInt(_PARAM(PARAM_TCELL_AGE), 1), type };
-				_tcellQueue.push_back(tcell);
+				_tcellQueue.push_back(TcellTypePair(time - g_Rand.getInt(_PARAM(PARAM_TCELL_AGE), 1), type));
 				_tcellQueueCount[type]++;
 			}
 
@@ -386,4 +395,85 @@ void RecruitmentLnODE::recruitMac(GrSimulation& sim, const Pos& p)
 			}
 		}
 	}
+}
+
+void RecruitmentLnODE::serialize(std::ostream& out) const
+{
+	assert(out.good());
+
+	Serialization::writeHeader(out, RecruitmentLnODE::_ClassName);
+
+	for (int i = 0; i < TCELL_TYPE_COUNT; ++i)
+	{
+		out << _tcellTable[i] << std::endl;
+	}
+
+	for (int i = 0; i < TCELL_TYPE_COUNT; ++i)
+	{
+		out << _tcellQueueCount[i] << std::endl;
+	}
+
+	out << _tcellQueue.size()  << std::endl;
+	for (std::vector<TcellTypePair>::const_iterator it = _tcellQueue.begin(); it != _tcellQueue.end(); ++it)
+	{
+		out << it->_birthtime << " " << it->_type << std::endl;
+	}
+
+	out << _prevMiMci << std::endl;
+
+	for (int i = 0; i < _nrConditions; ++i)
+	{
+		out << _odeInitialConditions[i] << std::endl;
+	}
+
+	// _odeApp and _odeTmpFile are defined in the constructor, so they are not written here.
+	// They are run dependent: a simulation state may be saved on one machine and copied
+	// to another, where the _odeApp and _odeTmpFile might be in different locations.
+
+	Serialization::writeFooter(out, RecruitmentLnODE::_ClassName);
+}
+
+void RecruitmentLnODE::deserialize(std::istream& in)
+{
+	assert(in.good());
+
+	Serialization::readHeader(in, RecruitmentLnODE::_ClassName);
+
+	for (int i = 0; i < TCELL_TYPE_COUNT; ++i)
+	{
+		in >> _tcellTable[i];
+	}
+
+	for (int i = 0; i < TCELL_TYPE_COUNT; ++i)
+	{
+		in >> _tcellQueueCount[i];
+	}
+
+	std::vector<TcellTypePair>::size_type queueSize;
+	in >> queueSize;
+	for (std::vector<TcellTypePair>::size_type i = 0; i < queueSize; ++i)
+	{
+		int birthtime;
+		int temp;
+		TcellType type;
+
+		in >> birthtime;
+		in >> temp;
+		type = (TcellType) temp;
+
+		_tcellQueue.push_back(TcellTypePair(birthtime, type));
+	}
+
+	in >> _prevMiMci;
+
+	for (int i = 0; i < _nrConditions; ++i)
+	{
+		in >> _odeInitialConditions[i];
+	}
+
+	// _odeApp and _odeTmpFile are defined in the constructor, so they are not read here.
+	// They are run dependent: a simulation state may be saved on one machine and copied
+	// to another, where the _odeApp and _odeTmpFile might be in different locations.
+
+	Serialization::readFooter(in, RecruitmentLnODE::_ClassName);
 }

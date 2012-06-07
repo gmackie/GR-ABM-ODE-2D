@@ -112,7 +112,7 @@ int main(int argc, char *argv[])
 		("input-file,i", po::value<std::string>(&inputFileName), "Input file name")
 		("seed,s", po::value(&seed))
     ("dim,d", po::value(&dim)->default_value(100))
-		("diffusion", po::value<int>(&diffMethod)->default_value(3),
+		("diffusion", po::value<int>(&diffMethod)->default_value(4),
      "Diffusion method:\n0 - FTCS\n1 - BTCS (SOR, correct)\n2 - BTCS (SOR, wrong)\n3 - FTCS Grid Swap\n4 - ADE Grid Swap")
     ("odesolver", po::value(&odeSolver)->default_value(0),
      "ODE Solver Method:\n0 - Forward Euler\n1 - Runge-Kutta 4th Order\n2 - Runge-Kutta 2nd Order\n3 - Euler Predictor-Corrector")
@@ -318,23 +318,24 @@ int main(int argc, char *argv[])
 
 	/* set recruitment method */
 	// Parameters must be loaded, since since the base lymph ODE class, RecruitmentLnODE, uses parameters in its constructor.
-	switch (vm["recr"].as<unsigned>())
-	{
-	case 0:
-		itfc.getSimulation().setRecruitment(new RecruitmentProb());
-	  break;
-	case 1:
-	  itfc.getSimulation().setRecruitment(new RecruitmentLnODEProxy());
-	  break;
-	case 2:
-		itfc.getSimulation().setRecruitment(new RecruitmentLnODEPure());
+    RecruitmentMethod recrMethod;
 
-	  break;
-	default:
-	  std::cerr << std::endl <<"Unsupported recruitment method" << std::endl << std::endl;
-	  printUsage(argv[0], desc);
-	  exit(1);
-	}
+    switch (vm["recr"].as<unsigned>())
+    {
+      case 0:
+      	recrMethod = RECR_PROB;
+        break;
+      case 1:
+      	recrMethod = RECR_LN_ODE_PROXY;
+        break;
+      case 2:
+      	recrMethod = RECR_LN_ODE_PURE;
+        break;
+      default:
+        std::cerr<<"Unsupported recruitment method: " << vm["recr"].as<unsigned>() << std::endl;
+        printUsage(argv[0], desc);
+        exit(1);
+    }
 	
 	/* set TNF/TNFR and NFkB dynamics */
 	/* When NFkB is turned on, tnfr dynamics will be turned on autamatically */
@@ -347,11 +348,13 @@ int main(int argc, char *argv[])
   gr.setTgammaTransition(vm.count("Treg-induction"));
   gr.setODESolverMethod(odeSolver);
 
-	glWindow.resizeGLWidget(resWidth, resHeight);
-	Ui::MainWindowClass& ui = w.getUI();
+  glWindow.resizeGLWidget(resWidth, resHeight);
+  Ui::MainWindowClass& ui = w.getUI();
 
   gr.setDiffusionMethod((DiffusionMethod)diffMethod);
-	ui.comboBoxDiffusion->setCurrentIndex(diffMethod);
+  ui.comboBoxDiffusion->setCurrentIndex(diffMethod);
+
+  itfc.getSimulation().setRecruitmentMethod(recrMethod);
 	
 	 // Force a value changed signal to be emitted.
 	 // If timesteps has a value that happens to be the same as the current value in the spinbox

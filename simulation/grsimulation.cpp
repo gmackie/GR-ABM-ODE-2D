@@ -16,6 +16,7 @@
 #include "areatest.h"
 #include "mtbtest.h"
 #include "recruitmentprob.h"
+#include "recruitmentlnodepure.h"
 #include "serialization.h"
 
 using namespace std;
@@ -98,6 +99,11 @@ void GrSimulation::serialize(std::ostream& out) const
 	// serialize diffusion method
 	int intVal = (int) _pDiffusion->getMethod();
 	out << intVal << std::endl;
+
+	// serialize recruitment method and object.
+	int intRecrMtehod = (int) _pRecruitment->getMethod();
+	out << intRecrMtehod << std::endl;
+	_pRecruitment->serialize(out);
 
 	out << _tnfrDynamics << std::endl;
 	out << _nfkbDynamics << std::endl;
@@ -232,6 +238,13 @@ void GrSimulation::deserialize(std::istream& in)
 	int intVal;
 	in >> intVal;
 	setDiffusionMethod((DiffusionMethod) intVal);
+
+	// deserialize recruitment method and object.
+	int intRecrMtehod;
+	in >> intRecrMtehod;
+	RecruitmentMethod recrmethod = (RecruitmentMethod) intRecrMtehod;
+	deserializeRecruitmentMethod(recrmethod, in);
+	_pRecruitment->deserialize(in);
 
 	in >> _tnfrDynamics;
 	in >> _nfkbDynamics;
@@ -1255,6 +1268,62 @@ void GrSimulation::setDiffusionMethod(DiffusionMethod method)
      std::clog<<("*** WARNING: This diffusion method is unstable for timesteps greater than 12 seconds")<<std::endl;
     }
 	}
+}
+
+RecruitmentMethod GrSimulation::getRecruitmentMethod()
+{
+	return _pRecruitment->getMethod();
+}
+
+void GrSimulation::setRecruitmentMethod(RecruitmentMethod method)
+{
+	if (_pRecruitment)
+	{
+		if (method == _pRecruitment->getMethod())
+		{
+			// Already have the correct type of recruitment object.
+			// Don't want to replace it since it may have been deserialized from a saved simulation state.
+			return;
+		}
+
+		delete _pRecruitment;
+	}
+
+  switch (method)
+  {
+  case RECR_PROB:
+	  _pRecruitment = new RecruitmentProb();
+    break;
+
+  case RECR_LN_ODE_PURE:
+	  _pRecruitment = new RecruitmentLnODEPure();
+      break;
+
+  default:
+    std::cerr << "Invalid recruitment method: " << method << std::endl;
+    exit(1);
+  }
+}
+
+void GrSimulation::deserializeRecruitmentMethod(RecruitmentMethod method, std::istream& in)
+{
+	if (_pRecruitment)
+		delete _pRecruitment;
+
+  switch (method)
+  {
+  case RECR_PROB:
+	  _pRecruitment = new RecruitmentProb();
+    break;
+
+  case RECR_LN_ODE_PURE:
+	  _pRecruitment = new RecruitmentLnODEPure(in);
+      break;
+
+  default:
+	    std::cerr << "Invalid recruitment method: " << method << std::endl;
+	    exit(1);
+  }
 }
 
 void GrSimulation::setOutcomeMethod(int index, OutcomeMethod method, double alpha,

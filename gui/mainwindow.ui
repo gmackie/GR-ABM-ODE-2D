@@ -128,7 +128,7 @@
                <item row="3" column="0">
                 <widget class="QLabel" name="labelDiffusion">
                  <property name="text">
-                  <string>Diffusion&lt;br/&gt;method</string>
+                  <string>Diffusion method</string>
                  </property>
                 </widget>
                </item>
@@ -1031,7 +1031,7 @@
                <item row="4" column="0">
                 <widget class="QLabel" name="labelIsolineCount">
                  <property name="text">
-                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Number of&lt;br/&gt;isolines&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  <string>Number of isolines</string>
                  </property>
                 </widget>
                </item>

@@ -384,13 +384,13 @@ void MainWindow::initSimulationTab()
 	connect(_ui.spinBoxStopDays, SIGNAL(valueChanged(int)), this, SLOT(updateTimeBox(int)));
 	connect(_ui.spinBoxStopTime, SIGNAL(valueChanged(int)), this, SLOT(updateStopCriteria(void)));
 
-	// Set the default diffusion method to FTCS swap.
+	// Set the default diffusion method to ADE swap.
 	// This must be after connecting the currentIndexChanged signal
 	// to the updateDiffusionMethod slot. Otherwise, setting
 	// the combo box doesn't update the simulation object diffusion
 	// method, so it remains whatever the default method is from
 	// the simulation object constructor.
-	_ui.comboBoxDiffusion->setCurrentIndex(3);
+	_ui.comboBoxDiffusion->setCurrentIndex(4);
 }
 void MainWindow::updateTimeBox(int x){
 	_ui.spinBoxStopTime->setValue(x*TIME_STEPS_PER_DAY);

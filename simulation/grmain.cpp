@@ -745,6 +745,14 @@ int main(int argc, char** argv)
   if(outputDir[outputDir.size()-1] != '/')
     outputDir += '/';
 
+  // Test if the output directory exists.
+  if (!exists(outputDir))
+  {
+      std::cerr<<"Output directory '" << outputDir << "' doesn't exist."<<endl;
+      exit(1);
+  }
+
+
   // Write the seed to a file, so runs can be repeated.
   // This must come after any load of a saved state, so the correct seed is written,
   // since that loads a saved seed.

@@ -17,7 +17,8 @@ class Params : public ParamsBase
 {
 public:
 
-	static Params* getInstance(const Pos& dim=Pos(-1,-1));
+	static Params* getInstance(const Pos& dim);
+  static Params* getInstance();
 	static bool reinit(const char* filename);
 
 	bool fromXml(const char* filename);
@@ -33,6 +34,12 @@ private:
 	static Params* _pInstance;
 
 };
+
+inline Params* Params::getInstance()
+{
+  assert(_pInstance != NULL);
+  return _pInstance;
+}
 
 inline Params* Params::getInstance(const Pos& dim)
 {

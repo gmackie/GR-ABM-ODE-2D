@@ -16,6 +16,8 @@ using namespace std;
 const std::string Mac::_ClassName = "Mac";
 
 int Mac::_macodeSize = 0;
+auto_ptr<ODESolvers::Stepper> Mac::stepper;
+auto_ptr<ODESolvers::DerivativeFunc> Mac::deriv;
 
 // Needed for deserializing the model state.
 // Avoids the calls to the random number generator in the normal constructor, allowing the random number generator

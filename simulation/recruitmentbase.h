@@ -48,7 +48,7 @@ inline bool RecruitmentBase::intCompareGTEQ(const double param1, const double pa
     // since it should not matter
     // COMPARES PARAM1 >= PARAM2 and returns bool based on this evaluation
     
-    double intpart1, intpart2, fracpart1, fracpart2, Store1, Store2, StorePower;
+    double intpart1, intpart2, Store1, Store2, StorePower;
     int intpart1Store, intpart2Store;
     
     bool result = 0;
@@ -67,8 +67,8 @@ inline bool RecruitmentBase::intCompareGTEQ(const double param1, const double pa
         Store1 = (param1 * (ABS_TOL/(pow(10,StorePower))));
         Store2 = (param2 * (ABS_TOL/(pow(10,StorePower))));
         
-        fracpart1 = modf(Store1, &intpart1);
-        fracpart2 = modf(Store2, &intpart2);
+        modf(Store1, &intpart1);
+        modf(Store2, &intpart2);
         
         intpart1Store = intpart1;
         intpart2Store = intpart2;

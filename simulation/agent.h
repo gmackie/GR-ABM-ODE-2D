@@ -10,8 +10,11 @@
 
 #include "gr.h"
 #include <string>
+#include "numericalMethods.h"
 
 using std::valarray;
+
+struct LungFunc;
 
 class Agent
 {
@@ -93,18 +96,7 @@ protected:
 
     bool _isODEsolved;
     Scalar _lasttimestep;
-    
-    valarray<double> _initvector;
-    valarray<double> _k1vector;
-    valarray<double> _k2vector;
-    valarray<double> _k3vector;
-    valarray<double> _k4vector;
-    valarray<double> _k5vector;
-    valarray<double> _k6vector;
-    valarray<double> _tempvector;
-    valarray<double> _errorvector;
-    valarray<double> _switchvector;
-    valarray<double> _currentsolution;
+    std::valarray<double> _initvector;
     
 	Pos moveAgent(GrGrid& grid, bool ccl2, bool ccl5, bool cxcl9, bool attractant, double bonusFactor);
 	int getDestinationOrdinal(GrGrid& grid, bool ccl2, bool ccl5, bool cxcl9, bool attractant, double bonusFactor);
@@ -133,26 +125,51 @@ public:
 	static void classSerialize(std::ostream& out);
 	static void classDeserialize(std::istream& in);
 
+  static auto_ptr<ODESolvers::Stepper> stepper;
+  static auto_ptr<ODESolvers::DerivativeFunc> deriv;
+
+  virtual ODESolvers::Stepper* getStepper(ODESolvers::ODEMethod method) {
+    static ODESolvers::ODEMethod initMethod = method;
+    if(stepper.get() == NULL || method != initMethod) {
+      stepper.reset(ODESolvers::StepperFactory(method, _initvector.size()));
+      initMethod = method;
+    }
+    return stepper.get();
+  }
+
+  static ODESolvers::DerivativeFunc* buildDerivFunc(); 
+
+  virtual ODESolvers::DerivativeFunc* getDerivFunc() {
+    if(deriv.get() == NULL) {
+      deriv.reset(buildDerivFunc());
+    }
+    return deriv.get();
+  }
+
+  virtual bool NFkBCapable() const { return false; }
+
 	virtual void move(GrGrid& grid) = 0;
 	virtual void secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDepletion, bool il10rDynamics, bool il10Depletion, int mdt) = 0;
 	virtual void computeNextState(const int time, GrGrid& grid, Stats& stats, bool tnfrDynamics, bool nfkbDynamics, bool il10rDynamics, bool tgammatransition) = 0;
 	virtual void updateState() = 0;
-    virtual void updateStatistics(Stats& s) const = 0;
+  virtual void updateStatistics(Stats& s) const = 0;
+  void writeValarrayFromMembers(GrGrid& grid, valarray<double>& inputVector);
+  void writeMembersFromValarray(GrGrid& grid, const valarray<double>& inputVector);
 
+  void solveNFkBODEsEquilibrium (double dt);
+  void solveMolecularScale(GrGrid& grid, double t, double dt, ODESolvers::ODEMethod method);
+#if 0
     void solveTNF (GrGrid& grid, double dt);
     void solveIL10 (GrGrid& grid, double dt);
     void solveTNFandIL10(GrGrid& grid, double dt);
     void solveNFkBandTNF (GrGrid& grid, double dt);
     void solveTNFandIL10andNFkB (GrGrid& grid, double dt);
-    void solveNFkBODEsEquilibrium (double dt);
     
     void derivativeTNF(const valarray<double>& vecread, valarray<double>& vecwrite, double dt, GrGrid& grid);
     void derivativeIL10(const valarray<double>& vecread, valarray<double>& vecwrite, double dt, GrGrid& grid);
     void derivativeTNFandIL10(const valarray<double>& vecread, valarray<double>& vecwrite, double dt, GrGrid& grid);
     void derivativeTNFandNFKB(const valarray<double>& vecread, valarray<double>& vecwrite, double dt, GrGrid& grid);
     void derivativeTNFandIL10andNFKB(const valarray<double>& vecread, valarray<double>& vecwrite, double dt, GrGrid& grid);
-    void writeValarrayFromMembers(GrGrid& grid, valarray<double>& inputVector);
-    void writeMembersFromValarray(GrGrid& grid, const valarray<double>& inputVector);
     
     void solveRK2(GrGrid& grid, double dt, void(Agent::*derivativeType)(const valarray<double>& vecread, valarray<double>& vecwrite, double dt, GrGrid& grid));
     void solveRK4(GrGrid& grid, double dt, void(Agent::*derivativeType)(const valarray<double>& vecread, valarray<double>& vecwrite, double dt, GrGrid& grid));
@@ -171,13 +188,13 @@ public:
     
     void AdaptiveRK2cell(Agent* secondCell, GrGrid& grid, double timestart, double timeend, double accuracy, double stepguess, double minstep, void(Agent::*derivs)(const valarray<double>& vecread, valarray<double>& vecwrite, double dt, GrGrid& grid));
     
-    void checkTolerance(valarray<double>& veccheck);
-    
     void solveMolecularScaleFE(GrGrid& grid, double dt, bool nfkbDynamics, bool tnfrDynamics, bool il10rDynamics);
     void solveMolecularScaleRK2(GrGrid& grid, double dt, bool nfkbDynamics, bool tnfrDynamics, bool il10rDynamics);
     void solveMolecularScaleRK4(GrGrid& grid, double dt, bool nfkbDynamics, bool tnfrDynamics, bool il10rDynamics);
     void solveMolecularScaleRKadaptive(GrGrid& grid, double dt, bool nfkbDynamics, bool tnfrDynamics, bool il10rDynamics, double diffusionlength);
     void solveMolecularScaleEPC(GrGrid& grid, double dt, bool nfkbDynamics, bool tnfrDynamics, bool il10rDynamics);
+#endif
+  void checkTolerance(valarray<double>& veccheck);
 
 	virtual void solveDegradation (GrGrid& grid, double dt, bool tnfrDynamics, bool il10rDynamics) = 0;
 	virtual void solveDegradation (GrGrid& grid, double dt, bool tnfrDynamics, bool il10rDynamics, Scalar meanTNFR1, Scalar iIL10R);
@@ -248,5 +265,29 @@ inline void Agent::visitProperties(Visitor& v) const {
 }
 inline bool Agent::getODEstatus() const { return _isODEsolved; }
 inline void Agent::setODEstatus(bool isodesolved) { _isODEsolved = isodesolved; }
+
+struct LungFunc : ODESolvers::DerivativeFunc {
+  const size_t il10offset;
+  struct Params_t {
+    Agent* agent;
+    GrGrid* grid;
+  };
+  LungFunc(size_t il10) : DerivativeFunc(), il10offset(il10) {}
+  virtual void operator()(const ODESolvers::ODEState& vecread, double /*t*/, ODESolvers::Derivative& vecwrite, void* params) const;
+  void il10deriv(const ODESolvers::ODEState& vecread, double /*t*/, ODESolvers::Derivative& vecwrite, Params_t* params) const;
+  virtual size_t dim() const { return _PARAM(PARAM_TNFODE_EN)*10+_PARAM(PARAM_IL10ODE_EN)*3; }
+};
+
+struct NFKBFunc : LungFunc {
+  NFKBFunc(size_t il10) : LungFunc(il10) {}
+  /*virtual*/ void operator()(const ODESolvers::ODEState& vecread, double /*t*/, ODESolvers::Derivative& vecwrite, void* params) const;
+  /*virtual*/ size_t dim() const { return 36+_PARAM(PARAM_IL10ODE_EN)*3; }
+};
+
+
+inline ODESolvers::DerivativeFunc* Agent::buildDerivFunc() {
+  LungFunc* d = new LungFunc(_PARAM(PARAM_TNFODE_EN)*10);
+  return d;
+}
 
 #endif /* AGENT_H */

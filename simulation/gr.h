@@ -26,6 +26,14 @@
 #include <valarray>
 #include <boost/mpl/vector.hpp>
 
+#if 1
+#define likely(x) __builtin_expect((x), 1)
+#define unlikely(x) __builtin_expect((x), 0)
+#else
+#define unlikely(x) (x)
+#define likely(x) (x)
+#endif
+
 //#ifndef __DIM__
 //  #define __DIM__ (100)
 //#endif //__DIM__

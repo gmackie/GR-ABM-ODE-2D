@@ -46,6 +46,35 @@ public:
 	Mac();
 	Mac(int birthtime, int row, int col, Mac::State state, double intMtb, bool NFkB, bool stat1);
 	~Mac();
+
+  static auto_ptr<ODESolvers::Stepper> stepper;
+  static auto_ptr<ODESolvers::DerivativeFunc> deriv;
+
+  virtual ODESolvers::Stepper* getStepper(ODESolvers::ODEMethod method) {
+    static ODESolvers::ODEMethod initMethod = method;
+    if(unlikely(Mac::stepper.get() == NULL || method != initMethod)) {
+      Mac::stepper.reset(ODESolvers::StepperFactory(method, _initvector.size()));
+      initMethod = method;
+    }
+    return Mac::stepper.get();
+  }
+
+  static ODESolvers::DerivativeFunc* buildDerivFunc() {
+    ODESolvers::DerivativeFunc* d = NULL;
+    if(_PARAM(PARAM_NFKBODE_EN))
+      d = new NFKBFunc(36);
+    else
+      d = Agent::buildDerivFunc();
+    return d;
+  }
+
+  virtual ODESolvers::DerivativeFunc* getDerivFunc() {
+    if(deriv.get() == NULL)
+      deriv.reset(Mac::buildDerivFunc());
+    return deriv.get();
+  }
+
+  /*virtual*/ bool NFkBCapable() const { return true; }
 	void move(GrGrid& grid);
 	void secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDepletion, bool il10rDynamics, bool il10Depletion, int mdt);
 	void computeNextState(const int time, GrGrid& grid, Stats& stats, bool tnfrDynamics, bool nfkbDynamics, bool il10rDynamics, bool);

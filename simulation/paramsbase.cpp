@@ -315,6 +315,9 @@ const ParamDescription ParamsBase::_description[_PARAM_COUNT] =
 	{ "areaCellDensityStoppingThreshold2",	GR_NODE,	false,	true,	0.0,	0,	"um^2",				"Stop simulation if area by cell density above this threshold and simulation is at the time step specified by areaCellDensityStopppingTimeStep"},
 	{ "areaCellDensityStopppingTimeStep",	GR_NODE,	true,	true,	0.0,	0,	"",					"Time step at which to check areaCellDensityStoppingThreshold" },
 	{ "areaCellDensityStopppingTimeStep2",	GR_NODE,	true,	true,	0.0,	0,	"",					"Time step at which to check areaCellDensityStoppingThreshold" },
+	{ "NFkBdynamics",	GR_NODE,	false,	true,	0.0,	0,	"boolean",					"NFkB dynamics" },
+	{ "TNFdynamics",	GR_NODE,	false,	true,	0.0,	0,	"boolean",					"TNF dynamics" },
+	{ "IL10dynamics",	GR_NODE,	false,	true,	0.0,	0,	"boolean",					"IL10 dynamics" },
 };
 
 ParamsBase::ParamsBase(const Pos& dim)

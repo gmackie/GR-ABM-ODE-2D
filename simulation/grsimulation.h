@@ -51,7 +51,7 @@ private:
     bool _tgammatransition;
 
     // ODE Solver
-    int _odeSolver;
+    ODESolvers::ODEMethod _odeSolver;
     
 	// Inhibits tnf secretion if true and if not using tnfr dynamics.
 	int _tnfDepletionTimeStep;
@@ -72,6 +72,7 @@ private:
 	void secreteFromMacrophages(bool tnfDepletion, bool il10Depletion, int mdt);
 	void secreteFromTcells(bool tnfDepletion, bool il10Depletion, int mdt);
 	void secreteFromCaseations(int mdt);
+#if 0
     void updateTNFDynamics(double dt);
     void updateIL10Dynamics(double dt);
     void updateTNFandIL10Dynamics(double dt);
@@ -82,6 +83,9 @@ private:
     void updateMolecularScaleRK2(double dt);
     void updateMolecularScaleFE(double dt);
     void updateMolecularScaleEPC(double dt);
+#else
+    void solveMolecularScale(double dt);
+#endif
 	void adjustTNFDegradation(double dt);
     void adjustFauxDegradation(double dt);
 	void growExtMtb();
@@ -116,8 +120,8 @@ public:
 	RecruitmentMethod getRecruitmentMethod();
 	void setRecruitmentMethod(RecruitmentMethod method);
 
-    void setODESolverMethod(int odemethod);
-    int getODESolverMethod() const;
+  void setODESolverMethod(ODESolvers::ODEMethod odemethod);
+  int getODESolverMethod() const;
 	bool getTnfrDynamics() const;
 	void setTnfrDynamics(bool tnfrDynamics);
 	bool getNfkbDynamics() const;
@@ -220,7 +224,7 @@ inline DiffusionMethod GrSimulation::getDiffusionMethod() const
 	return _pDiffusion->getMethod();
 }
 
-inline void GrSimulation::setODESolverMethod(int odemethod)
+inline void GrSimulation::setODESolverMethod(ODESolvers::ODEMethod odemethod)
 {
     _odeSolver = odemethod;
 }
@@ -422,12 +426,12 @@ inline void GrSimulation::macODEsize()
     {
         if (_il10rDynamics) 
         {
-            vectorlength = 41; // Number of differential equations for TNF, IL10, and NFKB
+            vectorlength = 39; // Number of differential equations for TNF, IL10, and NFKB
         }
         
         else
         {
-            vectorlength = 38; // Number of differential equations for TNF and NFKB
+            vectorlength = 36; // Number of differential equations for TNF and NFKB
         }
     }
     

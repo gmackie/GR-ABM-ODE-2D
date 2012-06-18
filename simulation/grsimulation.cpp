@@ -41,7 +41,7 @@ GrSimulation::GrSimulation(const Pos& dim)
 	, _nfkbDynamics(false)
   , _il10rDynamics(false)
   , _tgammatransition(false)
-  , _odeSolver(-1)
+  , _odeSolver(ODESolvers::NMethods)
   , _tnfDepletionTimeStep(-1)
   , _il10DepletionTimeStep(-1)
 	, _tcellRecruitmentBegun(false)
@@ -250,7 +250,7 @@ void GrSimulation::deserialize(std::istream& in)
 	in >> _nfkbDynamics;
     in >> _il10rDynamics;
     in >> _tgammatransition;
-    in >> _odeSolver;
+    in >> (int&)(_odeSolver);
 	in >> _tnfDepletionTimeStep;
     in >> _il10DepletionTimeStep;
     in >> _tcellRecruitmentBegun;
@@ -600,6 +600,7 @@ void GrSimulation::solve()
 	{
 		_pDiffusion->diffuse(_grid);
                 
+#if 0
         if (_odeSolver == 4) 
         {
             secreteFromMacrophages(tnfDepletion, il10Depletion, _PARAM(PARAM_GR_DT_DIFFUSION));
@@ -608,7 +609,8 @@ void GrSimulation::solve()
             
             if (_nfkbDynamics || _tnfrDynamics || _il10rDynamics)
             {
-                updateMolecularScaleAdaptive(_PARAM(PARAM_GR_DT_MOLECULAR));
+              assert(0 && "NOT IMPLEMENTED");
+                //updateMolecularScaleAdaptive(_PARAM(PARAM_GR_DT_MOLECULAR));
             }
             
             else if (!_il10rDynamics || !_tnfrDynamics)
@@ -620,12 +622,17 @@ void GrSimulation::solve()
         
         else
         {
+#endif
             for (int MolStep = 0; MolStep < _numMolecularPerDiffusion; MolStep++)
             {
                 secreteFromMacrophages(tnfDepletion, il10Depletion, _PARAM(PARAM_GR_DT_MOLECULAR));
                 secreteFromTcells(tnfDepletion, il10Depletion, _PARAM(PARAM_GR_DT_MOLECULAR));
                 secreteFromCaseations(_PARAM(PARAM_GR_DT_MOLECULAR));
+
+                if (_nfkbDynamics || _tnfrDynamics || _il10rDynamics)
+                  solveMolecularScale(_PARAM(PARAM_GR_DT_MOLECULAR));
                 
+#if 0
                 if (_nfkbDynamics || _tnfrDynamics || _il10rDynamics) {
                     switch (_odeSolver) {
                         case 0:
@@ -646,6 +653,7 @@ void GrSimulation::solve()
                             break;
                     }
                 }
+#endif
                 //                if (_nfkbDynamics)
                 //                {
                 //                    if (_il10rDynamics) {
@@ -676,8 +684,6 @@ void GrSimulation::solve()
                     adjustFauxDegradation(_PARAM(PARAM_GR_DT_MOLECULAR));
                     //adjustTNFDegradation(_PARAM(PARAM_GR_DT_MOLECULAR));
                 }
-            }
-            
         }  
 
     }
@@ -866,7 +872,20 @@ void GrSimulation::secreteFromCaseations(int mdt)
 	}
 }
 
+void GrSimulation::solveMolecularScale(double dt)
+{
+  for (MacList::iterator it = _macList.begin(); it != _macList.end(); it++)
+        (*it)->solveMolecularScale(_grid.getGrid(), 0, dt, _odeSolver);   //t is not correct, should be getTime()*600+SEC_SINCE_LAST
+	for (TgamList::iterator it = _tgamList.begin(); it != _tgamList.end(); it++)
+        (*it)->solveMolecularScale(_grid.getGrid(), 0, dt, _odeSolver);
+	for (TcytList::iterator it = _tcytList.begin(); it != _tcytList.end(); it++)
+        (*it)->solveMolecularScale(_grid.getGrid(), 0, dt, _odeSolver);
+	for (TregList::iterator it = _tregList.begin(); it != _tregList.end(); it++)
+        (*it)->solveMolecularScale(_grid.getGrid(), 0, dt, _odeSolver);
+  
+}
 
+#if 0
 void GrSimulation::updateMolecularScaleAdaptive(double dt)
 {
     for (MacList::iterator it = _macList.begin(); it != _macList.end(); it++)
@@ -1078,7 +1097,7 @@ void GrSimulation::updateNFkBandTNFandIL10Dynamics(double dt)
 		(*it)->solveTNFandIL10(_grid.getGrid(), dt);
 	}
 }
-
+#endif
 
 
 void GrSimulation::moveMacrophages()

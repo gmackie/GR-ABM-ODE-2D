@@ -261,7 +261,7 @@ int main(int argc, char *argv[])
 						<< std::endl;
 					return 1;
 				}
-				else if (samplePeriod <= 0 || testPeriod <= 0)
+				else if (samplePeriod[i] <= 0 || testPeriod[i] <= 0)
 				{
 					std::cerr << "Sample and test period should be positive integers"
 						<< std::endl;
@@ -346,7 +346,7 @@ int main(int argc, char *argv[])
   gr.setTnfDepletionTimeStep(tnfDepletionTimeStep);
   gr.setIl10DepletionTimeStep(il10DepletionTimeStep);
   gr.setTgammaTransition(vm.count("Treg-induction"));
-  gr.setODESolverMethod(odeSolver);
+  gr.setODESolverMethod((ODESolvers::ODEMethod)odeSolver);
 
   glWindow.resizeGLWidget(resWidth, resHeight);
   Ui::MainWindowClass& ui = w.getUI();

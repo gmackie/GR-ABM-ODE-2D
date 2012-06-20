@@ -50,6 +50,10 @@ public:
 	void serialize(std::ostream& out) const;
 	void deserialize(std::istream& in);
 	AgentType getAgentType() const;
+  template<typename Visitor>
+  void visitProperties(Visitor& v);
+  template<typename Visitor>
+  void visitProperties(Visitor& v) const;
 };
 
 inline AgentType Tcyt::getAgentType() const
@@ -98,6 +102,17 @@ inline bool Tcyt::isDead() const
 inline bool Tcyt::isDeadNext()
 {
 	return _nextState == TCYT_DEAD;
+}
+
+template<typename Visitor>
+inline void Tcyt::visitProperties(Visitor& v) {
+  v.visit("deactivationTime", _deactivationTime, "");
+  Agent::visitProperties(v);
+}
+template<typename Visitor>
+inline void Tcyt::visitProperties(Visitor& v) const { 
+  v.visit("deactivationTime", _deactivationTime, "");
+  Agent::visitProperties(v);
 }
 
 std::ostream& operator<<(std::ostream& os, const Tcyt::State& s);

@@ -109,7 +109,11 @@ public:
 	void setC1rrChemTNF(double value);
 	AgentType getAgentType() const;
 	void disperseMtb(GrGrid& grid, double fraction);
-    static void setMacOdeSize(int odesize);
+  static void setMacOdeSize(int odesize);
+  template<typename Visitor>
+  void visitProperties(Visitor& v);
+  template<typename Visitor>
+  void visitProperties(Visitor& v) const;
 };
 
 inline AgentType Mac::getAgentType() const
@@ -245,6 +249,27 @@ inline double Mac::getIntMtbGrowthRate(const int time)
 inline void Mac::setMacOdeSize(int odesize)
 {
     _macodeSize = odesize;
+}
+
+template<typename Visitor>
+inline void Mac::visitProperties(Visitor& v) {
+  v.visit("intMtb", _intMtb, "");
+  v.visit("NFkB", _NFkB, "");
+  v.visit("stat1", _stat1, "");
+  v.visit("ICOS", _ICOS, "");
+  v.visit("activationTime", _activationTime, "");
+  v.visit("deactivationTime", _deactivationTime, "");
+  Agent::visitProperties(v);
+}
+template<typename Visitor>
+inline void Mac::visitProperties(Visitor& v) const { 
+  v.visit("intMtb", _intMtb, "");
+  v.visit("NFkB", _NFkB, "");
+  v.visit("stat1", _stat1, "");
+  v.visit("ICOS", _ICOS, "");
+  v.visit("activationTime", _activationTime, "");
+  v.visit("deactivationTime", _deactivationTime, "");
+  Agent::visitProperties(v);
 }
 
 std::ostream& operator<<(std::ostream& os, const Mac::State& s);

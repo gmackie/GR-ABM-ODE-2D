@@ -207,6 +207,9 @@ int main(int argc, char *argv[])
 		// since the base lymph ODE class, RecruitmentLnODE, uses parameters in its constructor.
 		if (!Params::getInstance(Pos(dim, dim))->fromXml(inputFileName.c_str()))
 			return 1;
+    Params::getInstance()->setParam(PARAM_TNFODE_EN, vm.count("tnfr-dynamics") || vm.count("NFkB-dynamics"));
+    Params::getInstance()->setParam(PARAM_IL10ODE_EN, vm.count("il10r-dynamics"));
+    Params::getInstance()->setParam(PARAM_NFKBODE_EN, vm.count("NFkB-dynamics"));
 
     switch (vm["diffusion"].as<int>())
     {

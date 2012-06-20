@@ -81,25 +81,36 @@ struct AgentInfoVisitor {
     void visit(const Agent* a) {
         if(!a) return;
         std::stringstream ss;
+        _curItem = new QTreeWidgetItem();
+        _view->addTopLevelItem(_curItem);
         switch(a->getAgentType()) {
         case MAC:
             ss<<"Mac "<<(Mac::State)(a->getState());
+            visit(static_cast<const Mac*>(a));
             break;
         case TGAM:
             ss<<"Tgam "<<(Tgam::State)(a->getState());
+            visit(static_cast<const Tgam*>(a));
             break;
         case TCYT:
             ss<<"Tcyt "<<(Tcyt::State)(a->getState());
+            visit(static_cast<const Tcyt*>(a));
             break;
         case TREG:
             ss<<"Treg "<<(Treg::State)(a->getState());
+            visit(static_cast<const Treg*>(a));
             break;
         }
-        _curItem = new QTreeWidgetItem(QStringList(QString::fromStdString(ss.str())));
-        _view->addTopLevelItem(_curItem);
+        //a->visitProperties(*this);
+        _curItem->setText(0, QString::fromStdString(ss.str()));
         _curItem->setExpanded(true);
-        a->visitProperties(*this);
     }
+
+    void visit(const Mac* a) { a->visitProperties(*this); }
+    void visit(const Tgam* a) { a->visitProperties(*this); }
+    void visit(const Tcyt* a) { a->visitProperties(*this); }
+    void visit(const Treg* a) { a->visitProperties(*this); }
+
     template<typename T>
     void visit(const char* name, const T& val, const char* desc) {
         Q_CHECK_PTR(_curItem);

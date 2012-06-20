@@ -24,11 +24,11 @@ private:
 	Tgam::State _state;
 	Tgam::State _nextState;
 	int _deactivationTime;
-    int _transitionTime;
-    
-    int _nAntigenStim; // Number of successfull antigen stimulations
-    int _nDownRegulated; // Number of downregulations
-    int _nICOS; // Number of ICOS stimulations
+  int _transitionTime;
+  
+  int _nAntigenStim; // Number of successfull antigen stimulations
+  int _nDownRegulated; // Number of downregulations
+  int _nICOS; // Number of ICOS stimulations
 	
 	void handleActive(const int time, GrGrid& grid, Stats& stats, bool tgammatransition);
 	void handleDownRegulated(const int time, GrGrid& grid, Stats& stats);
@@ -57,6 +57,10 @@ public:
 	void serialize(std::ostream& out) const;
 	void deserialize(std::istream& in);
 	AgentType getAgentType() const;
+  template<typename Visitor>
+  void visitProperties(Visitor& v);
+  template<typename Visitor>
+  void visitProperties(Visitor& v) const;
 };
 
 inline AgentType Tgam::getAgentType() const
@@ -105,6 +109,25 @@ inline bool Tgam::isDead() const
 inline bool Tgam::isDeadNext()
 {
 	return _nextState == TGAM_DEAD;
+}
+
+template<typename Visitor>
+inline void Tgam::visitProperties(Visitor& v) {
+  v.visit("deactivationTime", _deactivationTime, "");
+  v.visit("transitionTime", _transitionTime, "");
+  v.visit("AntigenStim", _nAntigenStim, "Number of successfull antigen stimulations");
+  v.visit("DownRegulated", _nDownRegulated, "Number of downregulations");
+  v.visit("ICOS", _nICOS, "Number of ICOS stimulations");
+  Agent::visitProperties(v);
+}
+template<typename Visitor>
+inline void Tgam::visitProperties(Visitor& v) const { 
+  v.visit("deactivationTime", _deactivationTime, "");
+  v.visit("transitionTime", _transitionTime, "");
+  v.visit("AntigenStim", _nAntigenStim, "Number of successfull antigen stimulations");
+  v.visit("DownRegulated", _nDownRegulated, "Number of downregulations");
+  v.visit("ICOS", _nICOS, "Number of ICOS stimulations");
+  Agent::visitProperties(v);
 }
 
 std::ostream& operator<<(std::ostream& os, const Tgam::State& s);

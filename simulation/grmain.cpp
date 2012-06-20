@@ -660,10 +660,9 @@ int main(int argc, char** argv)
   if (!Params::getInstance(pdim)->fromXml(paramFile.c_str()))
     throw std::runtime_error("Unable to get parameters from file, cannot continue...");
   
-  Params::getInstance()->setParam(PARAM_TNFODE_EN, vm.count("tnfr-dynamics"));
+  Params::getInstance()->setParam(PARAM_TNFODE_EN, vm.count("tnfr-dynamics") || vm.count("NFkB-dynamics"));
   Params::getInstance()->setParam(PARAM_IL10ODE_EN, vm.count("il10r-dynamics"));
   Params::getInstance()->setParam(PARAM_NFKBODE_EN, vm.count("NFkB-dynamics"));
-  cout<<"DUDE: "<<_PARAM(PARAM_NFKBODE_EN)<<endl;
 
   DiffusionMethod diffMethodEnum;
   switch (vm["diffusion"].as<unsigned>())

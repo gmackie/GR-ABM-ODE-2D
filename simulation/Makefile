@@ -19,12 +19,11 @@ all: release
 debug:	CXXFLAGS += -DDEBUG -DVERBOSE -O0 -g -Wextra
 debug:	gr
 
-release:	CXXFLAGS += -DNDEBUG -O2
+release:	CXXFLAGS += -DNDEBUG -O3
 release:	gr
 
 openmp:  CXXFLAGS += -DNDEBUG -O3 -fopenmp
 openmp:  gr
-
 
 profile:	CXXFLAGS += -pg -g
 profile:	release

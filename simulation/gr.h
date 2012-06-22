@@ -176,4 +176,16 @@ unsigned int createTimeSeed();
 // global variables
 extern Rand g_Rand;
 
+//Print agent type
+inline std::ostream& operator<<(std::ostream& os, AgentType at) {
+  switch(at) {
+  case MAC: os<<"Mac"; break;
+  case TGAM: os<<"Tgam"; break;
+  case TCYT: os<<"Tcyt"; break;
+  case TREG: os<<"Treg"; break;
+  default: break;
+  }
+  return os;
+}
+
 #endif /* GR_H_ */

@@ -171,7 +171,7 @@ Stats() :
   template<typename Visitor>
   void visit(Visitor& v) {
     #define STAT(type, name, desc, reset)                v.visit(#name, _ ## name, desc);
-    #define ARRAY_STAT(type, name, sz, desc, reset)      v.visit(#name, _ ## name, desc);
+    #define ARRAY_STAT(type, name, sz, desc, reset)      v.visit(#name, _ ## name, desc, sz);
     #define AGENT_STAT(type, name, desc, reset)          ARRAY_STAT(type, name, NAGENTS, desc, reset)
     #define STATE_STAT(type, name, agent_t, desc, reset) ARRAY_STAT(type, name, agent_t::NSTATES, desc, reset)
     //#define AGENTSTATE_STAT(type, name, sz, desc, reset) v.visit(_ ## name); //???
@@ -185,7 +185,7 @@ Stats() :
   template<typename Visitor>
   void visit(Visitor& v) const {
     #define STAT(type, name, desc, reset)                v.visit(#name, _ ## name, desc);
-    #define ARRAY_STAT(type, name, sz, desc, reset)      v.visit(#name, _ ## name, desc);
+    #define ARRAY_STAT(type, name, sz, desc, reset)      v.visit(#name, _ ## name, desc, sz);
     #define AGENT_STAT(type, name, desc, reset)          ARRAY_STAT(type, name, NAGENTS, desc, reset)
     #define STATE_STAT(type, name, agent_t, desc, reset) ARRAY_STAT(type, name, agent_t::NSTATES, desc, reset)
     //#define AGENTSTATE_STAT(type, name, sz, desc, reset) v.visit(_ ## name); //???

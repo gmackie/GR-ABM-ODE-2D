@@ -27,6 +27,8 @@ typedef struct
 	double _CCL2;
 	double _CCL5;
 	double _CXCL9;
+  double _shedTNFR2;
+  double _il10;
 	double _extMtb;
 } ScalarAgentItem;
 

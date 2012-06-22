@@ -14,21 +14,6 @@ ScalarAgentGrid::ScalarAgentGrid(size_t _DIM)
 	: ScalarAgentGridBase(_DIM)
 	, _grid(_DIM * _DIM)
 {
-	for (size_t i = 0; i < _DIM; i++) // row
-	{
-		for (size_t j = 0; j < _DIM; j++) // col
-		{
-			int idx = j + i * _DIM;
-			_grid[idx]._bitMask = 0;
-			_grid[idx]._nKillings = 0;
-			_grid[idx]._pAgent[0] = _grid[idx]._pAgent[1] = NULL;
-			_grid[idx]._attractant = 0;
-			_grid[idx]._TNF = 0;
-			_grid[idx]._CCL2 = 0;
-			_grid[idx]._CCL5 = 0;
-			_grid[idx]._CXCL9 = 0;
-		}
-	}
 }
 
 ScalarAgentGrid::~ScalarAgentGrid()
@@ -60,6 +45,8 @@ void ScalarAgentGrid::evaluate(const Simulation* pSimulation)
 			item._CCL2 = grid.CCL2(p);
 			item._CCL5 = grid.CCL5(p);
 			item._CXCL9 = grid.CXCL9(p);
+			item._shedTNFR2 = grid.shedTNFR2(p);
+			item._il10 = grid.il10(p);
 			item._extMtb = grid.extMTB(p);
 			item._pAgent[0] = NULL;
 			item._pAgent[1] = NULL;

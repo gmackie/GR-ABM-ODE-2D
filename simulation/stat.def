@@ -23,6 +23,7 @@ STATE_STAT(int, MacDeact, Mac,      "", 2)
 STATE_STAT(int, MacApoptosisTNF, Mac,  "", 0)
 STAT(int, TcellApoptosisTNF,        "", 0)
 //Regular stats
+STAT(Scalar, TimePerStep,      "Wall-Time per simulation step (seconds)", 1)
 STAT(Scalar, TotExtMtb,          "Total External MTB", 1)
 STAT(Scalar, TotNonRepExtMtb,    "Total Non-replicating External MTB", 1)
 STAT(Scalar, TotIntMtb,          "Total Internal MTB", 1)

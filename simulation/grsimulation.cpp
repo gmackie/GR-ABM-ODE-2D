@@ -18,6 +18,7 @@
 #include "recruitmentprob.h"
 #include "recruitmentlnodepure.h"
 #include "serialization.h"
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 using namespace std;
 
@@ -560,8 +561,10 @@ void GrSimulation::initMolecularTracking(const std::vector<size_t>& ids) {
 
 void GrSimulation::solve()
 {
+  using namespace boost::posix_time;
 	// here we perform a timestep, which is 10 minutes
 	_time++;
+  ptime startWallTime(microsec_clock::local_time());
 
 	#if 0
 	//DBG
@@ -726,6 +729,10 @@ void GrSimulation::solve()
 
 	// Copy statistics, so we can use them on the next time step.
 	_statsPrevious = _stats;
+
+  ptime endWallTime(microsec_clock::local_time());
+  time_duration dur = (endWallTime - startWallTime);
+  _stats.setTimePerStep(dur.total_microseconds()*1.0e-6);
 }
 
 void GrSimulation::updateStates()

@@ -11,6 +11,7 @@
 #include "gui/paramwindow.h"
 #include "gui/statwidget.h"
 #include "gui/agentswidget.h"
+#include "gui/graphcontroller.h"
 #include "maininterface.h"
 #include "snapshot.h"
 #include "colormaps/colormap.h"
@@ -30,7 +31,7 @@ public:
     Ui::MainWindowClass& getUI();
     void setScriptingMode(bool scriptingMode);
     void setSnapshot(Snapshot* pSnapshot);
-	void loadState(std::string fileName);
+    void loadState(std::string fileName);
 
     static int getScalarDataSetIndex(const QString &dataSetName);
     static int getScalarDataSetIndex(const std::string &dataSetName);
@@ -54,7 +55,7 @@ public:
     static const QString _DATASET_CCL2_GRADIENT;
     static const QString _DATASET_CXCL9;
     static const QString _DATASET_CXCL9_GRADIENT;
-	static const QString _DATASET_IL10;
+    static const QString _DATASET_IL10;
     static const QString _DATASET_IL10_GRADIENT;
     static const QString _DATASET_ATTRACTANT;
     static const QString _DATASET_ATTRACTANT_GRADIENT;
@@ -178,6 +179,7 @@ private:
 
 	Ui::MainWindowClass _ui;
 	MainInterface* _pItfc;
+    GraphController* _pGraphController;
 	GLWindow* _pGLWindow;
 	QWidget* _pParamWindow;
 	StatWidget* _pStatWidget;

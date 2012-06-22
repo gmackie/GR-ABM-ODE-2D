@@ -121,6 +121,7 @@ MainWindow::MainWindow(MainInterface* pItfc, GLWindow* pGLWindow, QWidget* pPara
 	: QMainWindow(parent)
 	, _ui()
 	, _pItfc(pItfc)
+    , _pGraphController(new GraphController(pItfc->getSimulation().getStats(), 144*200))
 	, _pGLWindow(pGLWindow)
 	, _pParamWindow(pParamWindow)
 	, _pStatWidget(pStatWidget)
@@ -176,6 +177,7 @@ MainWindow::MainWindow(MainInterface* pItfc, GLWindow* pGLWindow, QWidget* pPara
 	connect(this, SIGNAL(updateSelectedCellStats(void)), _pGLWindow, SLOT(updateSelectedCellStats(void)));
 	connect(&_pItfc->getSimulation(), SIGNAL(stopConditionMet(void)), this, SLOT(stop(void)));
 	connect(_pAgentsWidget, SIGNAL(updateGL(void)), _pGLWindow, SLOT(updateWindow(void)));
+    connect(_ui.newGraphWindowButton, SIGNAL(clicked(void)), _pGraphController, SLOT(showNewTimeGraph(void)));
 
 	emit updateColorMap(_pCurrentColorMap);
 }
@@ -548,6 +550,7 @@ void MainWindow::getScalarDataSetNames(std::string &names)
 
 MainWindow::~MainWindow()
 {
+  delete _pGraphController;
 	delete _pSnapshot;
 	_pMainWindow = NULL;
 
@@ -584,12 +587,15 @@ void MainWindow::timerEvent(QTimerEvent*)
 
 	int simTime = sim.getTime();
 	_pItfc->setSimTime(simTime);
-	const Stats stats = sim.getStats();
+    const Stats stats = sim.getStats();
 	
 	// clear update flag
 	sim.setUpdated(false);
 	sim.unlock();
 	/* END CRITICAL SECTION */
+
+    //if(simTime % 72 == 0)   //Update every half day
+        _pGraphController->update(stats, 1.0*simTime);
 
 	_pItfc->incTime(_stopwatch.restart());
 

@@ -74,6 +74,26 @@ void GLWindow::toggleFullScreen()
 	}
 }
 
+template<typename T>
+static inline QTreeWidgetItem* make_item(const char* name, const T& val, const char* desc) {
+  QTreeWidgetItem* item = new QTreeWidgetItem();
+  item->setText(0, QString(name));
+  item->setData(1, Qt::DisplayRole, QVariant::fromValue(val));
+  item->setText(2, QString(desc));
+  return item;
+}
+
+template<>
+inline QTreeWidgetItem* make_item(const char* name, const Pos& val, const char* desc) {
+  std::stringstream ss;
+  ss<<val;
+  QTreeWidgetItem* item = new QTreeWidgetItem();
+  item->setText(0, QString(name));
+  item->setText(1, QString::fromStdString(ss.str()));
+  item->setText(2, QString(desc));
+  return item;
+}
+
 struct AgentInfoVisitor {
     QTreeWidget* _view;
     QTreeWidgetItem* _curItem;
@@ -114,35 +134,42 @@ struct AgentInfoVisitor {
     template<typename T>
     void visit(const char* name, const T& val, const char* desc) {
         Q_CHECK_PTR(_curItem);
-        QTreeWidgetItem* item = new QTreeWidgetItem();
-        item->setText(0, QString(name));
-        item->setData(1, Qt::DisplayRole, QVariant::fromValue(val));
-        item->setText(2, QString(desc));
-        _curItem->addChild(item);
+        _curItem->addChild(make_item(name, val, desc));
     }
 };
-template<>
-inline void AgentInfoVisitor::visit(const char* name, const Pos& val, const char* desc) {
-    Q_CHECK_PTR(_curItem);
-    std::stringstream ss;
-    ss<<val;
-    QTreeWidgetItem* item = new QTreeWidgetItem();
-    item->setText(0, QString(name));
-    item->setText(1, QString::fromStdString(ss.str()));
-    item->setText(2, QString(desc));
-    _curItem->addChild(item);
-}
 
 void GLWindow::updateSelectedCellStats()
 {
     if(_selRow != -1 && _selCol != -1)
     {
-        agentInfoWindow->clear();
+        bool topLevelExpanded[3];
+        for(size_t i=0;i<3;i++) //Hacky way to keep expanded information
+         topLevelExpanded[i] = (agentInfoWindow->topLevelItem(i) ? agentInfoWindow->topLevelItem(i)->isExpanded() : false);
+
+        agentInfoWindow->clear();   //Not the most efficient
         const ScalarAgentGrid* pAgentGrid = static_cast<ScalarAgentGrid*>(_pItfc->getScalarAgentGrid());
         const ScalarAgentItem& item
                 = pAgentGrid->getGrid()[_selRow * _ui.glWidget->dim.x + _selCol];
+        QTreeWidgetItem* gridInfo = new QTreeWidgetItem();
+        agentInfoWindow->addTopLevelItem(gridInfo);
+        gridInfo->setText(0, "Grid Properties");
+        gridInfo->addChild(make_item("nKillings",     item._nKillings,     ""));
+        gridInfo->addChild(make_item("nRecruitments", item._nRecruitments, ""));
+        gridInfo->addChild(make_item("nSecretions",   item._nSecretions,   ""));
+        gridInfo->addChild(make_item("attractant",    item._attractant,    ""));
+        gridInfo->addChild(make_item("TNF",           item._TNF,           ""));
+        gridInfo->addChild(make_item("CCL2",          item._CCL2,          ""));
+        gridInfo->addChild(make_item("CCL5",          item._CCL5,          ""));
+        gridInfo->addChild(make_item("CXCL9",         item._CXCL9,         ""));
+        gridInfo->addChild(make_item("shedTNFR2",     item._shedTNFR2,     ""));
+        gridInfo->addChild(make_item("il10",          item._il10,          ""));
+        gridInfo->addChild(make_item("extMtb",        item._extMtb,        ""));
         AgentInfoVisitor(agentInfoWindow).visit(item._pAgent[0]);
         AgentInfoVisitor(agentInfoWindow).visit(item._pAgent[1]);
+
+        for(size_t i=0;i<3;i++) //Hacky way to keep expanded information
+         if(agentInfoWindow->topLevelItem(i))
+           agentInfoWindow->topLevelItem(i)->setExpanded(topLevelExpanded[i]);
     }
     else
       agentInfoWindow->hide();

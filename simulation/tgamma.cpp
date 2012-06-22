@@ -423,6 +423,7 @@ void Tgam::deserialize(std::istream& in)
 }
 
 void Tgam::updateStatistics(Stats& s) const {
+  ++s.getNrOfAgents(TGAM);
   ++s.getNrOfTgams((Tgam::State)getState());
 }
 

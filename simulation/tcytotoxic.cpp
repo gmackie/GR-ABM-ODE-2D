@@ -258,6 +258,7 @@ void Tcyt::deserialize(std::istream& in)
 }
 
 void Tcyt::updateStatistics(Stats& s) const {
+  ++s.getNrOfAgents(TCYT);
   ++s.getNrOfTcyts((Tcyt::State)getState());
 }
 

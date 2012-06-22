@@ -3,7 +3,10 @@ TARGET = grviz-lung
 
 # CONFIG += debug
 
-CONFIG *= debug_and_release qt opengl
+macx { INSTALLBASE = /opt/local }
+else:unix { INSTALLBASE = /usr }
+
+CONFIG *= debug_and_release qt opengl qwt
 QT += core gui opengl
 
 HEADERS += scalardatasets/scalartotmtbdataset.h \
@@ -27,6 +30,7 @@ HEADERS += scalardatasets/scalartotmtbdataset.h \
     scalardatasets/scalarattractantdataset.h \
     scalardatasets/scalaragentgridbase.h \
     gui/agentswidget.h \
+    gui/graphcontroller.h \
     gui/statwidget.h \
     colormaps/blackwhite.h \
     colormaps/colormap.h \
@@ -90,7 +94,8 @@ HEADERS += scalardatasets/scalartotmtbdataset.h \
     grviz.h \
     maininterface.h \
     simulation.h \
-    snapshot.h
+    snapshot.h \
+    gui/graphviewer.h
 SOURCES += simulation/serialization.cpp \
     simulation/params.cpp \
     simulation/paramsbase.cpp \
@@ -115,6 +120,7 @@ SOURCES += simulation/serialization.cpp \
     colormaps/fixed.cpp \
     colormaps/greenred.cpp \
     colormaps/rainbow.cpp \
+    gui/graphcontroller.cpp \
     gui/colormapwidget.cpp \
     gui/glwidget.cpp \
     gui/glwindow.cpp \
@@ -150,12 +156,14 @@ SOURCES += simulation/serialization.cpp \
     main.cpp \
     maininterface.cpp \
     simulation.cpp \
-    snapshot.cpp
+    snapshot.cpp \
+    gui/graphviewer.cpp
 FORMS += gui/agentswidget.ui \
     gui/statwidget.ui \
     gui/paramwindow.ui \
     gui/glwindow.ui \
-    gui/mainwindow.ui
+    gui/mainwindow.ui \
+    gui/graphviewer.ui
 QMAKE_CXXFLAGS_RELEASE -= -O2 -Wno-strict-aliasing
 QMAKE_CXXFLAGS_RELEASE += -O3 -Wno-strict-aliasing
 QMAKE_LFLAGS_RELEASE += -fopenmp -DOPENMP
@@ -210,3 +218,5 @@ release {
 
 # This is for g++ code only.  Use this if you are compiling the executable for ONE MACHINE only
 # DO NOT move the generated executable to another machine with this option on
+
+#unix|win32: LIBS += -lqwt5

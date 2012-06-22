@@ -807,6 +807,7 @@ void Mac::disperseMtb(GrGrid& grid, double fraction)
 
 void Mac::updateStatistics(Stats& stats) const {
   //TODO: Implement
+  ++stats.getNrOfAgents(MAC);
   ++stats.getNrOfMacs((Mac::State)getState());
   stats.getMacIntMtbStats((Mac::State)getState())(getIntMtb());
   if(getState() == Mac::MAC_INFECTED || getState() == Mac::MAC_CINFECTED){

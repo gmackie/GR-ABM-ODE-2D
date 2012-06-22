@@ -198,6 +198,7 @@ void Treg::deserialize(std::istream& in)
 }
 
 void Treg::updateStatistics(Stats& s) const {
+  ++s.getNrOfAgents(TREG);
   ++s.getNrOfTregs((Treg::State)getState());
 }
 

@@ -159,6 +159,34 @@ public:
   const Agent*  agent         (int x, int y, size_t a) const;
   Agent*&       agent         (int x, int y, size_t a);
   bool incKillings(const Pos& p);
+
+// --- Visitor Methods ---
+
+  /*! \brief visit each grid
+  * \tparam Visitor Visitor type that models the Visitor concept for each stat
+  * \param v Visitor that visits each grid
+  */
+  template<typename Visitor>
+  void visit(Visitor& v) {
+    #define GRID(type, name)                v.visit(#name, _ ## name, "");
+    #define PADDED_GRID(type, name)         v.visit(#name, _ ## name, "");
+    GRIDS_DEFS
+    #undef GRID
+    #undef PADDED_GRID
+  }
+
+  /*! \brief visit each grid
+  * \tparam Visitor Visitor type that models the Visitor concept for each stat
+  * \param v Visitor that visits each grid
+  */
+  template<typename Visitor>
+  void visit(Visitor& v) const {
+    #define GRID(type, name)                v.visit(#name, _ ## name, "");
+    #define PADDED_GRID(type, name)         v.visit(#name, _ ## name, "");
+    GRIDS_DEFS
+    #undef GRID
+    #undef PADDED_GRID
+  }
 };
 
 inline bool GrGrid::isSource(const Pos& p) const {

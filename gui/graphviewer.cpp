@@ -7,6 +7,7 @@
 #include <qwt_legend_item.h>
 #if (QWT_VERSION >> 16) == 0x06
 	#include <qwt_plot_renderer.h>
+  #include <qwt_symbol.h>
 #endif
 
 GraphViewer::GraphViewer(GraphController& _ctrlr, QWidget* parent) : QMainWindow(parent), ui(new Ui::GraphViewer), ctrlr(_ctrlr) {
@@ -18,7 +19,7 @@ GraphViewer::GraphViewer(GraphController& _ctrlr, QWidget* parent) : QMainWindow
   _legend->setItemMode(QwtLegend::CheckableItem);
   ui->centralwidget->insertLegend(_legend, QwtPlot::RightLegend);
 
-  ui->centralwidget->setAxisTitle(QwtPlot::xBottom, "Time, t, in 10 minutes");
+  ui->centralwidget->setAxisTitle(QwtPlot::xBottom, "Time, t, in days");
 
   static const Qt::GlobalColor validColors[] = {
       Qt::black,
@@ -40,7 +41,17 @@ GraphViewer::GraphViewer(GraphController& _ctrlr, QWidget* parent) : QMainWindow
   for(int i=0;i<ctrlr._names.size();i++) {
     curves[i] = new QwtPlotCurve();
     curves[i]->attach(ui->centralwidget);
-    curves[i]->setPen(QPen(QColor(validColors[i%ncolors]), (i/ncolors)%((int)Qt::CustomDashLine)));
+    curves[i]->setPen(QPen(QColor(validColors[i%ncolors])));
+#if (QWT_VERSION >> 16) == 0x06
+    QwtSymbol* sym = new QwtSymbol();
+    sym->setStyle(QwtSymbol::Style((i/ncolors) % ((int)QwtSymbol::Hexagon + 1) - 1));
+    sym->setSize(QSize(2, 2));
+    sym->setColor(QColor(validColors[i%ncolors]));
+    sym->setPen(QPen(QColor(validColors[i%ncolors])));
+    curves[i]->setSymbol(sym);
+    curves[i]->setLegendAttribute(QwtPlotCurve::LegendShowLine);
+    curves[i]->setLegendAttribute(QwtPlotCurve::LegendShowSymbol);
+#endif
     curves[i]->setTitle(ctrlr._names[i]);
     this->showCurve(curves[i], false);
   }

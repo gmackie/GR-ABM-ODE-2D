@@ -43,6 +43,7 @@ GraphController::GraphController(const Stats& stats, size_t maxSamples) : _maxSa
 }
 
 void GraphController::update(const Stats& stats, double t) {
+  t /= 144.0; //Convert to days
   if((size_t)_xdata.size() >= _maxSamples)
   {
     memmove(_xdata.data(), _xdata.data()+1, (_xdata.size() - 1)*sizeof(_xdata[0]));

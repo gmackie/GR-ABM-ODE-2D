@@ -146,6 +146,7 @@ int main(int argc, char *argv[])
     ("tnfr-dynamics", "Use molecular level TNF/TNFR dynamics in the model")
     ("il10r-dynamics", "Use molecular level IL10/IL10R dynamics in the model")
     ("NFkB-dynamics", "Use molecular level intracellular NFkB dynamics in the model")
+    ("adaptive", "Use adaptive time-step dynamics")
     ("Treg-induction", "Allow Tregs to be induced from Tgams in the model")
 		("tnf-depletion", po::value<int>(&tnfDepletionTimeStep)->default_value(-1), "The time step at which to stop secreting tnf, including by tnfr dynamics. -1: no depletion")
 		("il10-depletion", po::value<int>(&il10DepletionTimeStep)->default_value(-1), "The time step at which to stop secreting il10, including by il10r dynamics. -1: no depletion")
@@ -346,6 +347,7 @@ int main(int argc, char *argv[])
   gr.setTnfrDynamics(vm.count("tnfr-dynamics") || vm.count("NFkB-dynamics"));
   gr.setIl10rDynamics(vm.count("il10r-dynamics"));
   gr.setNfkbDynamics(vm.count("NFkB-dynamics"));
+  gr.setAdaptive(vm.count("adaptive"));
   gr.setTnfDepletionTimeStep(tnfDepletionTimeStep);
   gr.setIl10DepletionTimeStep(il10DepletionTimeStep);
   gr.setTgammaTransition(vm.count("Treg-induction"));

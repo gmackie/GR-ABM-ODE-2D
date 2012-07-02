@@ -47,8 +47,9 @@ private:
 	RecruitmentBase* _pRecruitment;
 	bool _tnfrDynamics;
 	bool _nfkbDynamics;
-    bool _il10rDynamics;
-    bool _tgammatransition;
+  bool _il10rDynamics;
+  bool _tgammatransition;
+  bool _adaptive;
 
     // ODE Solver
     ODESolvers::ODEMethod _odeSolver;
@@ -85,6 +86,7 @@ private:
     void updateMolecularScaleEPC(double dt);
 #else
     void solveMolecularScale(double dt);
+    void solveMolecularScaleAdaptive(double dt);
 #endif
 	void adjustTNFDegradation(double dt);
     void adjustFauxDegradation(double dt);
@@ -128,12 +130,14 @@ public:
 	void setNfkbDynamics(bool nfkbDynamics);
 	int getTnfDepletionTimeStep() const;
 	void setTnfDepletionTimeStep(int tnfDepletionTimeStep);
-    bool getIl10rDynamics() const;
-    void setIl10rDynamics(bool il10rdynamics);
-    int getIl10DepletionTimeStep() const;
-    void setIl10DepletionTimeStep (int il10DepletionTimeStep);
-    bool getTgammaTransition() const;
-    void setTgammaTransition(bool tgammatransition);
+  bool getIl10rDynamics() const;
+  void setIl10rDynamics(bool il10rdynamics);
+  int getIl10DepletionTimeStep() const;
+  void setIl10DepletionTimeStep (int il10DepletionTimeStep);
+  bool getTgammaTransition() const;
+  void setTgammaTransition(bool tgammatransition);
+  bool getAdaptive() const;
+  void setAdaptive(bool adaptive);
 	double getAreaThreshold() const;
 	void setAreaThreshold(double areaThreshold);
 	double getAreaThresholdCellDensity() const;
@@ -293,6 +297,8 @@ inline void GrSimulation::setTgammaTransition(bool tgammatransition)
 {
     _tgammatransition = tgammatransition;
 }
+inline bool GrSimulation::getAdaptive() const { return _adaptive; }
+inline void GrSimulation::setAdaptive(bool adaptive) { _adaptive = adaptive; }
 
 inline const MacList& GrSimulation::getMacList() const
 {

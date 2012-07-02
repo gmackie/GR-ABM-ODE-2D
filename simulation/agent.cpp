@@ -2305,8 +2305,48 @@ void NFKBFunc::operator()(const ODESolvers::ODEState& vecread, double t, ODESolv
     il10deriv(vecread, t, vecwrite, ((Params_t*)params));
 }
 
-#if 0 //Possible implementation of adaptive 2 cell ode integration
-void Agent::adaptive2Cell(Agent* other, GrGrid& grid, double t, double dt, ODESolvers::ODEMethod method) {
+#if 1 //Possible implementation of adaptive 2 cell ode integration
+void Agent::solveMolecularScaleAdaptive(GrGrid& grid, double t, double dt, ODESolvers::ODEMethod method) {
+  Agent* other = grid.agent(getPosition(), 0) == this ? grid.agent(getPosition(), 1) : grid.agent(getPosition(), 0);
+  if(other) {
+    assert(getODEstatus() == other->getODEstatus());
+    adaptiveODE2Cell(other, grid, t, dt, method);
+    other->setODEstatus(true);
+  }
+  else
+    adaptiveODE(grid, t, dt, method);
+  setODEstatus(true);
+}
+
+#define SAFETY (0.9)
+#define PGROW (-0.2)
+#define PSHRINK (-0.25)
+#define ERRCON (1.89e-4)
+// Define Accuracy
+#define ACCURACY (1e-5)
+#define TINY (1e-30)
+// Define Max # of Steps
+#define MAXSTEP (10000)
+// Define Min Step Size
+#define MIN_STEP_SIZE (0.01)
+
+#define EPS (1e-5)
+
+void Agent::adaptiveODE(GrGrid& grid, double t, double dt, ODESolvers::ODEMethod method) {
+  writeValarrayFromMembers(grid, _initvector);  //With some pointer magic, should be able to remove this...
+  static valarray<double> error(0); //For adaptive only, not needed atm
+  static LungFunc::Params_t params;
+  params.agent = this;
+  params.grid = &grid;
+  ODESolvers::Stepper* s1 = getStepper(method); 
+  ODESolvers::DerivativeFunc& fn = *getDerivFunc();
+  ODESolvers::AdaptiveStepper stepper(fn.dim(), s1, EPS, TINY, MAXSTEP, PSHRINK, PGROW, SAFETY); // Just use the adaptive stepper from ODESolvers, not very efficient
+  stepper.step(_initvector, fn, t, dt, error, (void*)&params);
+  writeMembersFromValarray(grid, _initvector);
+}
+
+void Agent::adaptiveODE2Cell(Agent* other, GrGrid& grid, double t, double dt, ODESolvers::ODEMethod method) {
+  //Rewrite the adaptive stepper method with two sets of odes
   assert(other && other->getPosition() == this->getPosition());
   writeValarrayFromMembers(grid, _initvector);
   other->writeValarrayFromMembers(grid, other->_initvector);
@@ -2321,41 +2361,51 @@ void Agent::adaptive2Cell(Agent* other, GrGrid& grid, double t, double dt, ODESo
   const double t1 = t, t2 = t+dt;
   static double h = dt; //Static here to adjust for next set of agents
   //Time management
-  for(size_t i=0;i<MAX_STEPS;i++) {
-    params.agent = this;
-    fn1(_initvector, t, dy1, params);
-    yscal1 = abs(tmp1) + abs(dy1)*dt + TINY;
-    params.agent = other;
-    fn2(_initvector, t, dy2, params);
-    yscal2 = abs(tmp2) + abs(dy2)*dt + TINY;
-    if((t+dt-t2)*(t+dt-t1) > 0.0) dt = t2 - t;
+  for(size_t i=0;i<MAXSTEP;i++) {
+    { //fn(i,t,dy,params); yscal = abs(i) + abs(dy)*dt + TINY;
+      params.agent = this;
+      fn1(_initvector, t, dy1, (void*)&params);
+      yscal1 = abs(tmp1) + abs(dy1)*dt + TINY;
+      params.agent = other;
+      fn2(other->_initvector, t, dy2, (void*)&params);
+      yscal2 = abs(tmp2) + abs(dy2)*dt + TINY;
+    }
+    if((t+dt-t2)*(t+dt-t1) > 0.0) //Finish up the last timestep
+      dt = t2 - t;
     //Step management
     for(;;) {
-      params.agent = this;
-      s1->step(steptmp1, fn1, t, h, err1, params);
-      params.agent = other;
-      s2->step(steptmp2, fn2, t, h, err2, params);
-      errmax = max((err1/yscal1).max(), (err2/yscal2).max()) / EPS;
+      { //stepper->step(tmp, fn, t, h, err, params);
+        params.agent = this;
+        s1->step(tmp1, fn1, t, h, err1, (void*)&params);
+        params.agent = other;
+        s2->step(tmp2, fn2, t, h, err2, (void*)&params);
+      }
+      const double errmax = max(abs(err1/yscal1).max(), abs(err2/yscal2).max()) / EPS;
       if(errmax > 1.0) {
-        register double htmp = SAFETY*h*pow(errmax, PSHRINK);
+        double htmp = SAFETY*h*pow(errmax, PSHRINK);
         h = (h >= 0.0 ? max(htmp, 0.1*h) : min(htmp, 0.1*h));
-        steptmp1 = tmp1;
-        steptmp2 = tmp2;
+        { //tmp = i;
+          tmp1 = _initvector;
+          tmp2 = other->_initvector;
+        }
       }
       else {
         if(errmax > ERRCON) dt = SAFETY*h*pow(errmax, PGROW);
         else dt = 5.0*h;
         t += h;
-        tmp1 = step1;
-        tmp2 = step2;
+        { //i = tmp;
+          _initvector = tmp1;
+          other->_initvector = tmp2;
+        }
         break;
       }
     }
     if((t - t2)*(t2 - t1) >= 0.0) {
-      writeMembersFromValarray(grid, tmp1);
-      other->writeMembersFromValarray(grid, tmp2);
+      writeMembersFromValarray(grid, _initvector);
+      other->writeMembersFromValarray(grid, other->_initvector);
       return;
     }
   }
+  //Warning! - required too many steps, increase max_steps, safety, or decrease pgrow
 }
 #endif

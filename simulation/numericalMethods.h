@@ -6,6 +6,7 @@
 #include <assert.h>
 #include <stdarg.h>
 #include <stdexcept>
+#include <limits>
 using namespace std;
 
 namespace ODESolvers {
@@ -183,7 +184,7 @@ struct EulerPCStepper : Stepper {
   /*virtual*/ Stepper* clone() const { return new EulerPCStepper(*this); }
 };
 
-//Heun-Euler. http://en.wikipedia.org/wiki/Heun_method
+//Heun-Euler. http://en.wikipedia.org/wiki/List_of_Runge%E2%80%93Kutta_methods#Heun.E2.80.93Euler
 struct HEStepper : Stepper {
   Derivative a, b;
   HEStepper(size_t dim)
@@ -203,7 +204,7 @@ struct HEStepper : Stepper {
   /*virtual*/ Stepper* clone() const { return new HEStepper(*this); }
 };
 
-//Runge-Kutta Cash-Karp. \ref http://en.wikipedia.org/wiki/Cash%E2%80%93Karp_method
+//Runge-Kutta Cash-Karp. \ref http://en.wikipedia.org/wiki/List_of_Runge%E2%80%93Kutta_methods#Cash-Karp
 struct RKCKStepper : Stepper {
   Derivative a, b, c, d, e, f;
   RKCKStepper(size_t dim)
@@ -235,7 +236,7 @@ struct RKCKStepper : Stepper {
   /*virtual*/ Stepper* clone() const { return new RKCKStepper(*this); }
 };
 
-//Runge-Kutta Fehlberg. \ref http://en.wikipedia.org/wiki/Runge%E2%80%93Kutta%E2%80%93Fehlberg_method
+//Runge-Kutta Fehlberg. \ref http://en.wikipedia.org/wiki/List_of_Runge%E2%80%93Kutta_methods#Fehlberg
 struct RKFStepper : Stepper {
   Derivative a, b, c, d, e, f;
   RKFStepper(size_t dim)
@@ -267,7 +268,7 @@ struct RKFStepper : Stepper {
   /*virtual*/ Stepper* clone() const { return new RKFStepper(*this); }
 };
 
-//Bogacki-Shampine. \ref http://en.wikipedia.org/wiki/Bogacki–Shampine_method
+//Bogacki-Shampine. \ref http://en.wikipedia.org/wiki/List_of_Runge%E2%80%93Kutta_methods#Bogacki.E2.80.93Shampine
 struct BSStepper : Stepper {
   Derivative a, b, c, d;
   BSStepper(size_t dim)
@@ -293,30 +294,30 @@ struct BSStepper : Stepper {
   /*virtual*/ Stepper* clone() const { return new BSStepper(*this); }
 };
 
-#if 0
+#if 1
 //TODO: Verify the adaptive stepper
 struct AdaptiveStepper : Stepper {
   Stepper* stepper;
-  valarray<double> dy, err, yscal, tmp;
-  const double TINY, MAX_STEPS, PSHRINK, PGROW, EPS, SAFETY, ERRCON;
-  ~AdaptiveStepper() { delete stepper; }
-  AdaptiveStepper(size_t dim, Stepper* _s, double _TINY, double _MAX_STEPS, double _PSHRINK, double _PGROW, double _EPS, double _SAFETY, double _ERRCON)
-    : stepper(_s), dy(dim), err(dim), yscal(dim), tmp(dim), steptmp(dim),
-      TINY(_TINY), MAX_STEPS(_MAX_STEPS), PSHRINK(_PSHRINK), PGROW(_PGROW), EPS(_EPS), SAFETY(_SAFETY), ERRCON(_ERRCON)
+  valarray<double> dy, yscal, tmp;
+  double TINY, MAX_STEPS, PSHRINK, PGROW, EPS, SAFETY, ERRCON;
+  //~AdaptiveStepper() { delete stepper; }
+  AdaptiveStepper(size_t dim, Stepper* _s, double _EPS, double _TINY=std::numeric_limits<double>::min(), double _MAX_STEPS=10000, double _PSHRINK=-0.25, double _PGROW=-0.2, double _SAFETY=0.9)
+    : Stepper(dim), stepper(_s), dy(dim), yscal(dim), tmp(dim),
+      TINY(_TINY), MAX_STEPS(_MAX_STEPS), PSHRINK(_PSHRINK), PGROW(_PGROW), EPS(_EPS), SAFETY(_SAFETY), ERRCON(pow(5.0/_SAFETY, 1.0/_PGROW))
       {}
-  /*virtual*/ void step(ODEState& i, DerivativeFunc& fn, double t, double dt, Derivative& error) {
-    tmp = steptmp = i;
+  /*virtual*/ void step(ODEState& i, DerivativeFunc& fn, double t, double dt, Derivative& err, void* params=0) {
+    tmp = i;
     const double t1 = t, t2 = t+dt;
-    for(size_t i=0;i<MAX_STEPS;i++) {
+    for(size_t st=0;st<MAX_STEPS;st++) {
       fn(i, t, dy, params);
       yscal = abs(i) + abs(dy)*dt + TINY;
-      if((t+dt - t2) * (t+dt - t1) > 0.0)
+      if((t+dt - t2) * (t+dt - t1) > 0.0) //Finish up the last timestep
         dt = t2 - t;
       for(double h=dt;;) {
         stepper->step(tmp, fn, t, h, err, params);
-        errmax = (err/yscal).max() / EPS;
+        const double errmax = abs(err/yscal).max() / EPS;
         if(errmax > 1.0) {
-          register double htmp = SAFETY*h*pow(errmax, PSHRINK);
+          double htmp = SAFETY*h*pow(errmax, PSHRINK);
           h = (h > 0.0 ? max(htmp, 0.1*h) : min(htmp, 0.1*h));
           tmp = i;
         }
@@ -328,13 +329,17 @@ struct AdaptiveStepper : Stepper {
           break;
         }
       }
-      if((t - t2)*(t2 - t1) >= 0.0) {
+      if((t - t2)*(t2 - t1) >= 0.0)
         return;
-      }
     }
+    //Warning! - required too many steps, increase max_steps, safety, or decrease pgrow
   }
   /*virtual*/ size_t order() const { return stepper->order(); }
-  /*virtual*/ Stepper* clone() const { return new AdaptiveStepper(0, stepper->clone(), tolerance, lower_limit); }
+  /*virtual*/ Stepper* clone() const {
+    AdaptiveStepper* ret = new AdaptiveStepper(*this);
+    ret->stepper = stepper->clone();
+    return ret;
+  }
 
 };
 #endif
@@ -342,7 +347,7 @@ struct AdaptiveStepper : Stepper {
 enum ODEMethod {
   FEuler = 0,
   EulerPC,
-//  RK2,
+  RK2,
   RK3,
   RK4,
   HeunEuler,
@@ -352,21 +357,42 @@ enum ODEMethod {
   NMethods
 };
 
-inline Stepper* StepperFactory(ODEMethod method, size_t dim, bool adaptive=false) {
-  if(adaptive) throw std::runtime_error("Not yet implemented");
+inline Stepper* StepperFactory(ODEMethod method, size_t dim, bool adaptive=false, double eps=1e-5) {
+  //if(adaptive) throw std::runtime_error("Not yet implemented");
+  Stepper* ret = NULL;
   switch(method) {
-  case FEuler:    return new ForwardEulerStepper(dim);
-  case EulerPC:   return new EulerPCStepper     (dim);
- // case RK2:       return new RK2Stepper         (dim);
-  case RK3:       return new RK3Stepper         (dim);
-  case RK4:       return new RK4Stepper         (dim);
-  case HeunEuler: return new HEStepper          (dim);
-  case RKCK:      return new RKCKStepper        (dim);
-  case RKF:       return new RKFStepper         (dim);
-  case BogShamp:  return new BSStepper          (dim);
+  case FEuler:    ret = new ForwardEulerStepper(dim); break;
+  case EulerPC:   ret = new EulerPCStepper     (dim); break;
+  case RK2:       ret = new RK2Stepper         (dim); break;
+  case RK3:       ret = new RK3Stepper         (dim); break;
+  case RK4:       ret = new RK4Stepper         (dim); break;
+  case HeunEuler: ret = new HEStepper          (dim); break;
+  case RKCK:      ret = new RKCKStepper        (dim); break;
+  case RKF:       ret = new RKFStepper         (dim); break;
+  case BogShamp:  ret = new BSStepper          (dim); break;
   default:
     throw std::runtime_error("Unknown method");
   }
+  if(adaptive)
+    ret = new AdaptiveStepper(dim, ret, eps);
+  return ret;
+}
+
+inline std::ostream& operator<<(std::ostream& s, ODEMethod method) {
+  switch(method) {
+  case FEuler:    s<<"FEuler"; break;
+  case EulerPC:   s<<"EulerPC"; break;
+  case RK2:       s<<"RK2"; break;
+  case RK3:       s<<"RK3"; break;
+  case RK4:       s<<"RK4"; break;
+  case HeunEuler: s<<"HeunEuler"; break;
+  case RKCK:      s<<"RKCK"; break;
+  case RKF:       s<<"RKF"; break;
+  case BogShamp:  s<<"BogShamp"; break;
+  default:
+    throw std::runtime_error("Unknown method");
+  }
+  return s;
 }
 
 } //ODESolvers

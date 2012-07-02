@@ -10,13 +10,15 @@ StatWidget::~StatWidget()
 {
 }
 
-static QString toString(const Scalar& v) {
-  return QString::number(v, 'f', 2);
-}
 template<typename T>
-static QString toString(const T& v) {
+QString toString(const T& v) {
   return QString("%1").arg(v);
 }
+template<>
+QString toString<Scalar>(const Scalar& v) {
+  return QString::number(v, 'f', 2);
+}
+
 template<typename InputIterator>
 static void toString(InputIterator start, InputIterator end, QString& s) {
   s = QString('(');

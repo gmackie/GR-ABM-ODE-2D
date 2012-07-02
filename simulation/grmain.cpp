@@ -425,7 +425,7 @@ void run(GrSimulation* pSim, int stateInterval, int csvInterval, bool screenDisp
 
   // Needed for chunks. Any script that manages running chunks needs to know if the simulation stopped during a chunk
   // prior to the last chunk, so it knows not to run any subsequent chunks for a run.
-  bool earlyStop = false;
+  //bool earlyStop = false;
 
   // Needed when starting a simulation from a saved state.
   int time = pSim->getTime();
@@ -451,13 +451,13 @@ void run(GrSimulation* pSim, int stateInterval, int csvInterval, bool screenDisp
 	    //Check stopping criteria.
 	    if (shouldStop(time, pSim))
 	    {
-	      earlyStop = true;
+	      //earlyStop = true;
 	      break;
 	    }
   }
 }
-void buildSim(GrSimulation* pSim, DiffusionMethod diffMethod, RecruitmentMethod recrMethod, int odeMethod , bool tnfrDynamics, bool il10rDynamics,
-              bool nfkbDynamics, int tnfDepletionTimeStep, int il10DepletionTimeStep, bool tgammatransition, float areaTNFThreshold, float areaCellDensityThreshold) {
+void buildSim(GrSimulation* pSim, DiffusionMethod diffMethod, RecruitmentMethod recrMethod, int odeMethod , bool tnfrDynamics, bool il10rDynamics, bool nfkbDynamics,
+                bool adaptive, int tnfDepletionTimeStep, int il10DepletionTimeStep, bool tgammatransition, float areaTNFThreshold, float areaCellDensityThreshold) {
   
     cout << "\nODE SOLVER" << std::endl;
     cout << "----------" << std::endl;
@@ -500,6 +500,15 @@ void buildSim(GrSimulation* pSim, DiffusionMethod diffMethod, RecruitmentMethod 
     else
     {
         cout << "Treg Induction  -  Off" << std::endl;
+    }
+
+    pSim->setAdaptive(adaptive);
+    if (adaptive == 1) {
+        cout << "Adaptive Dynamics   -  On" << std::endl;
+    }
+    else
+    {
+        cout << "Adaptive Dynamics   -  Off" << std::endl;
     }
     
     pSim->setTnfDepletionTimeStep(tnfDepletionTimeStep);
@@ -578,8 +587,6 @@ int main(int argc, char** argv)
 	("recr", po::value<unsigned>()->default_value(0), "recruitment:\n0 - probability\n1 - lymph node ode proxy\n2 - lymph node ode pure")
 	("diffusion", po::value<unsigned>()->default_value(4),
 	 "Diffusion method:\n0 - FTCS\n1 - BTCS (SOR, correct)\n2 - BTCS (SOR, wrong)\n3 - FTCS Grid Swap\n4 - ADE Grid Swap")
-    ("odesolver", po::value<int>()->default_value(0),
-     "ODE Solver Method:\n0 - Forward Euler\n1 - Euler Predictor-Corrector\n2 - Runge-Kutta 3rd Order\n3 - Runge-Kutta 4th Order\n4 - HuenEuler\n5 - Runge-Kutta Cache-Karp\n6 - Runge-Kutta Fehlberg\n7 - Bogacki-Shampine")
 	("area-tnf-threshold", po::value<float>()->default_value(0.5),"Threshold for granuloma area defined by TNF, in the range [0.0, 1.0]\n")
 	("area-cell-density-threshold", po::value<float>()->default_value(0.5),"Threshold for granuloma area defined by cell density, in the range [0.0, 1.0]");
 
@@ -588,6 +595,9 @@ int main(int argc, char** argv)
     ("tnfr-dynamics", "Use molecular level TNF/TNFR dynamics in the model")
     ("il10r-dynamics", "Use molecular level IL10/IL10R dynamics in the model")
     ("NFkB-dynamics", "Use molecular level intracellular NFkB dynamics in the model")
+    ("adaptive", "Use adaptive time-step ODE Solvers")
+    ("odesolver", po::value<int>()->default_value(0),
+     "ODE Solver Method:\n0 - Forward Euler\n1 - Euler Predictor-Corrector\n2 - Runge-Kutta 3rd Order\n3 - Runge-Kutta 4th Order\n4 - HuenEuler\n5 - Runge-Kutta Cache-Karp\n6 - Runge-Kutta Fehlberg\n7 - Bogacki-Shampine")
     ("Treg-induction", "Allow Tregs to be induced from Tgams in the model")
     ("tnf-depletion", po::value<int>()->default_value(-1), "The time step at which to stop secreting tnf, including by tnfr dynamics. -1: no depletion")
     ("il10-depletion", po::value<int>()->default_value(-1), "The time step at which to stop secreting il10, including by il10r dynamics. -1: no depletion");
@@ -727,7 +737,7 @@ int main(int argc, char** argv)
     pSim->deserialize(in);
   }
 
-  buildSim(pSim, diffMethodEnum, recrMethod, vm["odesolver"].as<int>(), vm.count("tnfr-dynamics"), vm.count("il10r-dynamics"), vm.count("NFkB-dynamics"),
+  buildSim(pSim, diffMethodEnum, recrMethod, vm["odesolver"].as<int>(), vm.count("tnfr-dynamics"), vm.count("il10r-dynamics"), vm.count("NFkB-dynamics"), vm.count("adaptive"), 
            vm["tnf-depletion"].as<int>(), vm["il10-depletion"].as<int>(),vm.count("Treg-induction"), vm["area-tnf-threshold"].as<float>(),
               vm["area-cell-density-threshold"].as<float>());
 

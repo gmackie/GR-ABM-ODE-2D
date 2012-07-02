@@ -633,7 +633,10 @@ void GrSimulation::solve()
                 secreteFromCaseations(_PARAM(PARAM_GR_DT_MOLECULAR));
 
                 if (_nfkbDynamics || _tnfrDynamics || _il10rDynamics)
-                  solveMolecularScale(_PARAM(PARAM_GR_DT_MOLECULAR));
+                  if(_adaptive)
+                    solveMolecularScaleAdaptive(_PARAM(PARAM_GR_DT_MOLECULAR));
+                  else
+                    solveMolecularScale(_PARAM(PARAM_GR_DT_MOLECULAR));
                 
 #if 0
                 if (_nfkbDynamics || _tnfrDynamics || _il10rDynamics) {
@@ -890,6 +893,29 @@ void GrSimulation::solveMolecularScale(double dt)
 	for (TregList::iterator it = _tregList.begin(); it != _tregList.end(); it++)
         (*it)->solveMolecularScale(_grid.getGrid(), 0, dt, _odeSolver);
   
+}
+void GrSimulation::solveMolecularScaleAdaptive(double dt)
+{
+  for (MacList::iterator it = _macList.begin(); it != _macList.end(); it++)
+    (*it)->solveMolecularScaleAdaptive(_grid.getGrid(), 0, dt, _odeSolver);   //t is not correct, should be getTime()*600+SEC_SINCE_LAST
+	for (TgamList::iterator it = _tgamList.begin(); it != _tgamList.end(); it++)
+    if(!(*it)->getODEstatus())
+      (*it)->solveMolecularScaleAdaptive(_grid.getGrid(), 0, dt, _odeSolver);
+	for (TcytList::iterator it = _tcytList.begin(); it != _tcytList.end(); it++)
+    if(!(*it)->getODEstatus())
+      (*it)->solveMolecularScaleAdaptive(_grid.getGrid(), 0, dt, _odeSolver);
+	for (TregList::iterator it = _tregList.begin(); it != _tregList.end(); it++)
+    if(!(*it)->getODEstatus())
+      (*it)->solveMolecularScaleAdaptive(_grid.getGrid(), 0, dt, _odeSolver);
+
+  for (MacList::iterator it = _macList.begin(); it != _macList.end(); it++)
+    (*it)->setODEstatus(false);
+	for (TgamList::iterator it = _tgamList.begin(); it != _tgamList.end(); it++)
+    (*it)->setODEstatus(false);
+	for (TcytList::iterator it = _tcytList.begin(); it != _tcytList.end(); it++)
+    (*it)->setODEstatus(false);
+	for (TregList::iterator it = _tregList.begin(); it != _tregList.end(); it++)
+    (*it)->setODEstatus(false);
 }
 
 #if 0

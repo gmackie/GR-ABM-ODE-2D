@@ -101,8 +101,6 @@ protected:
 	Pos moveAgent(GrGrid& grid, bool ccl2, bool ccl5, bool cxcl9, bool attractant, double bonusFactor);
 	int getDestinationOrdinal(GrGrid& grid, bool ccl2, bool ccl5, bool cxcl9, bool attractant, double bonusFactor);
 	Pos compartmentOrdinalToCoordinates(int ordinal, const Pos& dim) const;
-  bool getODEstatus() const;
-  void setODEstatus(bool isodesolved);
 
 public:
 	Agent();
@@ -138,6 +136,8 @@ public:
   }
 
   static ODESolvers::DerivativeFunc* buildDerivFunc(); 
+  bool getODEstatus() const;
+  void setODEstatus(bool isodesolved);
 
   virtual ODESolvers::DerivativeFunc* getDerivFunc() {
     if(deriv.get() == NULL) {
@@ -158,6 +158,9 @@ public:
 
   void solveNFkBODEsEquilibrium (double dt);
   void solveMolecularScale(GrGrid& grid, double t, double dt, ODESolvers::ODEMethod method);
+  void solveMolecularScaleAdaptive(GrGrid& grid, double t, double dt, ODESolvers::ODEMethod method);
+  void adaptiveODE(GrGrid& grid, double t, double dt, ODESolvers::ODEMethod method);
+  void adaptiveODE2Cell(Agent* other, GrGrid& grid, double t, double dt, ODESolvers::ODEMethod method);
 #if 0
     void solveTNF (GrGrid& grid, double dt);
     void solveIL10 (GrGrid& grid, double dt);

@@ -107,21 +107,6 @@
 #define CK_DC_6 (CK_C_6-(0.25))
 
 // Define Error Estimate Factors
-#define SAFETY 0.9
-#define PGROW -0.2
-#define PSHRINK -0.25
-#define ERRCON 1.89e-4
-
-// Define Accuracy
-#define ACCURACY 1e-5
-#define TINY 1e-30
-
-// Define Max # of Steps
-#define MAXSTEP 10000
-
-// Define Min Step Size
-#define MIN_STEP_SIZE 0.01
-
 #ifdef _DEBUG
 #define assert_res(a) (assert(a))
 #else

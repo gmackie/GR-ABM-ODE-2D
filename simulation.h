@@ -82,6 +82,7 @@ public:
 	
 	void setTnfrDynamics(bool tnfrDynamics);
 	void setNfkbDynamics(bool nfkbDynamics);
+	void setAdaptive(bool adaptive);
 	void setTnfDepletionTimeStep(int tnfDepletionTimeStep);
 	void setIl10DepletionTimeStep(int il10DepletionTimeStep);
 
@@ -263,6 +264,11 @@ inline void Simulation::setTnfrDynamics(bool tnfrDynamics)
 inline void Simulation::setNfkbDynamics(bool nfkbDynamics)
 {
 	_gr->setNfkbDynamics(nfkbDynamics);
+}
+
+inline void Simulation::setAdaptive(bool adaptive)
+{
+  _gr->setAdaptive(adaptive);
 }
 
 inline QString Simulation::getTimeStr(int simTime, int time)

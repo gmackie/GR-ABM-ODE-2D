@@ -110,7 +110,7 @@ void GrSimulation::serialize(std::ostream& out) const
 	out << _nfkbDynamics << std::endl;
     out << _il10rDynamics << std::endl;
     out << _tgammatransition << std::endl;
-    out << _odeSolver << std::endl;
+    out << (int)(_odeSolver) << std::endl;
 	out << _tnfDepletionTimeStep << std::endl;
     out << _il10DepletionTimeStep << std::endl;
     out << _tcellRecruitmentBegun <<std::endl;
@@ -245,8 +245,11 @@ void GrSimulation::deserialize(std::istream& in)
 	in >> intRecrMtehod;
 	RecruitmentMethod recrmethod = (RecruitmentMethod) intRecrMtehod;
 	deserializeRecruitmentMethod(recrmethod, in);
-	_pRecruitment->deserialize(in);
+  assert(in.good());
+	_pRecruitment->deserialize(in); //LnODE recruitment will deserialize twice.
+  assert(in.good());
 
+  assert(in.good());
 	in >> _tnfrDynamics;
 	in >> _nfkbDynamics;
     in >> _il10rDynamics;
@@ -257,6 +260,7 @@ void GrSimulation::deserialize(std::istream& in)
     in >> _tcellRecruitmentBegun;
     in >> _numMolecularPerDiffusion;
     in >> _numDiffusionPerAgent;
+  assert(in.good());
 
 	// deserialize grid
 	_grid.deserialize(in);
@@ -1359,6 +1363,7 @@ void GrSimulation::setRecruitmentMethod(RecruitmentMethod method)
 
 void GrSimulation::deserializeRecruitmentMethod(RecruitmentMethod method, std::istream& in)
 {
+  assert(in.good());
 	if (_pRecruitment)
 		delete _pRecruitment;
 
@@ -1376,6 +1381,7 @@ void GrSimulation::deserializeRecruitmentMethod(RecruitmentMethod method, std::i
 	    std::cerr << "Invalid recruitment method: " << method << std::endl;
 	    exit(1);
   }
+  assert(in.good());
 }
 
 void GrSimulation::setOutcomeMethod(int index, OutcomeMethod method, double alpha,

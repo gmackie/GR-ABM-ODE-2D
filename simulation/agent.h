@@ -9,6 +9,7 @@
 #define AGENT_H
 
 #include "gr.h"
+#include "params.h"
 #include <string>
 #include "numericalMethods.h"
 

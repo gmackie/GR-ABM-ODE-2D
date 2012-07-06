@@ -6,6 +6,7 @@
  */
 
 #include "recruitmentlnodepure.h"
+#include "stat.h"
 
 RecruitmentLnODEPure::RecruitmentLnODEPure(std::istream& in)
 	: RecruitmentLnODE("", "", in)

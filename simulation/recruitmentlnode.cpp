@@ -7,6 +7,7 @@
 
 #include "recruitmentlnode.h"
 #include "serialization.h"
+#include "grsimulation.h"
 #include <stdlib.h>
 #include <fstream>
 

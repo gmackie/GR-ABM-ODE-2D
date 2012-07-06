@@ -10,8 +10,6 @@
 
 #include "gr.h"
 #include "grgrid.h"
-#include "stat.h"
-#include "grsimulation.h"
 
 using namespace std;
 

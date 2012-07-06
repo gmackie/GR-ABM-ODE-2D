@@ -17,7 +17,6 @@
 
 #include "gr.h"
 #include "grgrid.h"
-#include "stat.h"
 #include "recruitmentbase.h"
 #include <string>
 

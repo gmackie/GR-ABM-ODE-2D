@@ -6,6 +6,7 @@
  */
 
 #include "recruitmentlnodeproxy.h"
+#include "stat.h"
 
 using namespace std;
 

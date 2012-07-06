@@ -21,8 +21,8 @@
 #include <utility>
 #include "rand.h"
 #include "pos.h"
-#include "params.h"
 #include "version.h"
+#include "scalar.h"
 #include <valarray>
 #include <boost/mpl/vector.hpp>
 

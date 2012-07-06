@@ -11,6 +11,7 @@
 #include "simulation/grsimulation.h"
 #include <QThread>
 #include <QMutex>
+#include <QAtomicInt>
 
 class Simulation : public QThread
 {
@@ -19,10 +20,10 @@ class Simulation : public QThread
 private:
 	mutable QMutex _mutex;
 	mutable QMutex _modelMutex;
-	int _time;
+	QAtomicInt _time;
 	GrSimulation* _gr;
 	GrGrid _grid;
-	int _delay;
+	QAtomicInt _delay;
 	bool _updated;
 	bool _stopFlag;
 	std::vector<Mac> _macList;
@@ -30,13 +31,10 @@ private:
 	std::vector<Tcyt> _tcytList;
 	std::vector<Treg> _tregList;
 	Stats _stats;
-	int _timeStepsToSimulate;
+	QAtomicInt _timeStepsToSimulate;
 	bool _mtbClearance;
 	double _areaThreshold;
 	OutcomeMethod _outcomeMethod;
-	int _outcomeSamplePeriod;
-	int _outcomeTestPeriod;
-	double _outcomeAlpha;
 
 	bool stopCondition();
 
@@ -128,9 +126,7 @@ inline void Simulation::setAreaThreshold(double areaThreshold)
 
 inline void Simulation::setDelay(int delay)
 {
-	lock();
 	_delay = delay;
-	unlock();
 }
 
 inline void Simulation::setDaysToSimulate(int days)
@@ -140,9 +136,7 @@ inline void Simulation::setDaysToSimulate(int days)
 
 inline void Simulation::setTimeToSimulate(int steps)
 {
-	lock();
 	_timeStepsToSimulate = steps;
-	unlock();
 }
 
 inline void Simulation::setMtbClearance(bool enable)
@@ -179,24 +173,12 @@ inline void Simulation::setUpdated(bool flag)
 
 inline int Simulation::getTime() const
 {
-	int res;
-
-	lock();
-	res = _time;
-	unlock();
-
-	return res;
+  return _time;
 }
 
 inline int Simulation::getTimeToSimulate() const
 {
-	int res;
-
-	lock();
-	res = _timeStepsToSimulate;
-	unlock();
-
-	return res;
+  return _timeStepsToSimulate;
 }
 
 inline DiffusionMethod Simulation::getDiffusionMethod() const

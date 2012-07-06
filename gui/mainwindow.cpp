@@ -646,6 +646,7 @@ void MainWindow::timerEvent(QTimerEvent*)
 		int picInterval = _ui.spinBoxSnapshotPicInterval->value();
 		int csvInterval = _ui.spinBoxSnapshotCsvInterval->value();
 		int stateInterval = _ui.spinBoxSnapshotStateInterval->value();
+    simTime = sim.getTime();  //Get time again since this could have changed
 
 		if (isTimeForAction(picInterval, simTime))
 		{

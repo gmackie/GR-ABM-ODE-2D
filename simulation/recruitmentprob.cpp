@@ -6,6 +6,7 @@
  */
 
 #include "recruitmentprob.h"
+#include "grsimulation.h"
 #include "stat.h"
 
 RecruitmentProb::RecruitmentProb()

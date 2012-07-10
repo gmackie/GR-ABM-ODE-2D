@@ -332,6 +332,7 @@ struct AdaptiveStepper : Stepper {
       if((t - t2)*(t2 - t1) >= 0.0)
         return;
     }
+    assert(!"Took too many steps");
     //Warning! - required too many steps, increase max_steps, safety, or decrease pgrow
   }
   /*virtual*/ size_t order() const { return stepper->order(); }

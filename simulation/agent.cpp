@@ -2407,5 +2407,6 @@ void Agent::adaptiveODE2Cell(Agent* other, GrGrid& grid, double t, double dt, OD
     }
   }
   //Warning! - required too many steps, increase max_steps, safety, or decrease pgrow
+  assert(!"Took too many steps");
 }
 #endif

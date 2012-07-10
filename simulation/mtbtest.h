@@ -18,7 +18,7 @@ public:
 	void update(const int time, const int index, Stats& stats);
 	void evaluate(const int index, Stats& stats, double degressOfFreedom);
 	OutcomeMethod getMethod() const;
-
+  /*virtual*/ TTest* clone() const { return new MtbTest(*this); }
 };
 
 inline OutcomeMethod MtbTest::getMethod() const

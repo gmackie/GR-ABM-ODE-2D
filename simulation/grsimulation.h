@@ -155,10 +155,11 @@ public:
 	Treg* createTreg(int row, int col, int birthtime, Treg::State state);
 
 	static void convertSimTime(const int time, int& rDays, int& rHours, int& rMinutes);
-    void setODEsize();
-    void macODEsize();
-    void tcellODEsize();
-    void timestepSync();
+  void setODEsize();
+  void macODEsize();
+  void tcellODEsize();
+  void timestepSync();
+  GrSimulation* clone() const;
 };
 
 inline bool GrSimulation::getTCellRecruitmentBegun()

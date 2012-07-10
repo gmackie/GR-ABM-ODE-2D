@@ -47,6 +47,7 @@ public:
 	static bool isTcyt(const Agent* pAgent);
 	static bool isTcyt(const Agent* pAgent, Tcyt::State state);
 	void print() const;
+  /*virtual*/ Agent* clone() const { return new Tcyt(*this); }
 	void serialize(std::ostream& out) const;
 	void deserialize(std::istream& in);
 	AgentType getAgentType() const;

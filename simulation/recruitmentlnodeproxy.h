@@ -23,6 +23,8 @@ public:
 	void serialize(std::ostream&) const;
 	void deserialize(std::istream&);
 
+  RecruitmentBase* clone() const { return new RecruitmentLnODEProxy(*this); }
+
 };
 
 inline RecruitmentMethod RecruitmentLnODEProxy::getMethod() const

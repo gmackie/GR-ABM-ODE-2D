@@ -19,6 +19,7 @@ public:
 	GrDiffusionADE_Swap();
 	virtual ~GrDiffusionADE_Swap();
 	void diffuse(GrSimulationGrid& grid) const;
+  /*virtual*/ GrDiffusion* clone() const { return new GrDiffusionADE_Swap(*this); }
 	DiffusionMethod getMethod() const;
 };
 

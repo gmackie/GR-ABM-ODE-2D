@@ -18,6 +18,7 @@ public:
 	virtual ~GrDiffusion();
 	virtual void diffuse(GrSimulationGrid& grid) const = 0;
 	virtual DiffusionMethod getMethod() const = 0;
+  virtual GrDiffusion* clone() const = 0;
 };
 
 #endif /* GRDIFFUSION_H_ */

@@ -32,6 +32,8 @@ public:
 	void serialize(std::ostream& out) const;
 	void deserialize(std::istream& in);
 
+  /*virtual*/ RecruitmentBase* clone() const { return new RecruitmentLnODEPure(*this); }
+
 };
 
 inline RecruitmentMethod RecruitmentLnODEPure::getMethod() const

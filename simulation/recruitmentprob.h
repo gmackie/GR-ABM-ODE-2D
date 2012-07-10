@@ -28,6 +28,8 @@ public:
 	void deserialize(std::istream&);
 
 	void recruit(GrSimulation& sim);
+
+  /*virtual*/ RecruitmentBase* clone() const { return new RecruitmentProb(*this); }
 };
 
 inline RecruitmentMethod RecruitmentProb::getMethod() const

@@ -71,6 +71,7 @@ public:
 	RecruitmentMethod getMethod() const;
 	void serialize(std::ostream& out) const;
 	void deserialize(std::istream& in);
+  virtual RecruitmentBase* clone() const { return new RecruitmentLnODE(*this); }
 
 	void recruit(GrSimulation& sim);
 };

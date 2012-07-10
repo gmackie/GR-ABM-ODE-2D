@@ -210,6 +210,7 @@ public:
 	virtual void print() const = 0;
 	virtual AgentType getAgentType() const = 0;
 	virtual int getState() const = 0;
+  virtual Agent* clone() const = 0;
 	int getRow() const;
 	int getCol() const;
 	bool timeToDie(const int time) const;

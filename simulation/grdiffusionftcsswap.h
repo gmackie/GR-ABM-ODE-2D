@@ -17,9 +17,10 @@ private:
 
 public:
 	GrDiffusionFTCS_Swap();
-	virtual ~GrDiffusionFTCS_Swap();
+	~GrDiffusionFTCS_Swap();
 	void diffuse(GrSimulationGrid& grid) const;
 	DiffusionMethod getMethod() const;
+  /*virtual*/ GrDiffusion* clone() const { return new GrDiffusionFTCS_Swap(*this); }
 };
 
 inline DiffusionMethod GrDiffusionFTCS_Swap::getMethod() const

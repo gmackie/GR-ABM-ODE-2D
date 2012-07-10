@@ -24,8 +24,9 @@ public:
 	virtual void deserialize(std::istream& in) = 0;
 
 	virtual void recruit(GrSimulation& sim) = 0;
+  virtual RecruitmentBase* clone() const = 0;
     
-    static bool intCompareGTEQ(const double param1, const double param2);
+  static bool intCompareGTEQ(const double param1, const double param2);
 
 	static bool MacRecruitmentThreshold(const GrGrid& g, const Pos& pSource);
 	static bool TgamRecruitmentThreshold(const GrGrid& g, const Pos& pSource);

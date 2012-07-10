@@ -43,6 +43,7 @@ public:
 	static bool isTreg(const Agent* pAgent);
 	static bool isTreg(const Agent* pAgent, Treg::State state);
 	void print() const;
+  /*virtual*/ Agent* clone() const { return new Treg(*this); }
 	void serialize(std::ostream& out) const;
 	void deserialize(std::istream& in);
 	AgentType getAgentType() const;

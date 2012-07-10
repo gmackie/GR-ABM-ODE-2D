@@ -50,7 +50,7 @@ public:
   static auto_ptr<ODESolvers::Stepper> stepper;
   static auto_ptr<ODESolvers::DerivativeFunc> deriv;
 
-  virtual ODESolvers::Stepper* getStepper(ODESolvers::ODEMethod method) {
+  /*virtual*/ ODESolvers::Stepper* getStepper(ODESolvers::ODEMethod method) {
     static ODESolvers::ODEMethod initMethod = method;
     if(unlikely(Mac::stepper.get() == NULL || method != initMethod)) {
       Mac::stepper.reset(ODESolvers::StepperFactory(method, _initvector.size()));
@@ -68,13 +68,14 @@ public:
     return d;
   }
 
-  virtual ODESolvers::DerivativeFunc* getDerivFunc() {
+  /*virtual*/ ODESolvers::DerivativeFunc* getDerivFunc() {
     if(deriv.get() == NULL)
       deriv.reset(Mac::buildDerivFunc());
     return deriv.get();
   }
 
   /*virtual*/ bool NFkBCapable() const { return true; }
+  /*virtual*/ Agent* clone() const { return new Mac(*this); }
 	void move(GrGrid& grid);
 	void secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDepletion, bool il10rDynamics, bool il10Depletion, int mdt);
 	void computeNextState(const int time, GrGrid& grid, Stats& stats, bool tnfrDynamics, bool nfkbDynamics, bool il10rDynamics, bool);

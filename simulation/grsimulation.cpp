@@ -58,6 +58,27 @@ GrSimulation::GrSimulation(const Pos& dim)
     _numDiffusionPerAgent = (AGENT_TIME_STEP / _PARAM(PARAM_GR_DT_DIFFUSION)); // Number of diffusion iterations per agent iteration
 }
 
+GrSimulation* GrSimulation::clone() const {
+  GrSimulation* ret = new GrSimulation(*this);
+  for(MacList::iterator begin = ret->_macList.begin(); begin!=ret->_macList.end(); begin++)
+    (*begin) = static_cast<Mac*>((*begin)->clone());
+  for(TgamList::iterator begin = ret->_tgamList.begin(); begin!=ret->_tgamList.end(); begin++)
+    (*begin) = static_cast<Tgam*>((*begin)->clone());
+  for(TregList::iterator begin = ret->_tregList.begin(); begin!=ret->_tregList.end(); begin++)
+    (*begin) = static_cast<Treg*>((*begin)->clone());
+  for(TcytList::iterator begin = ret->_tcytList.begin(); begin!=ret->_tcytList.end(); begin++)
+    (*begin) = static_cast<Tcyt*>((*begin)->clone());
+  if(ret->_pDiffusion)
+    ret->_pDiffusion = ret->_pDiffusion->clone();
+  if(ret->_pRecruitment)
+    ret->_pRecruitment = ret->_pRecruitment->clone();
+  for(size_t i=0;i<NOUTCOMES;i++)
+    if(ret->_pTTest[i])
+      ret->_pTTest[i] = ret->_pTTest[i]->clone();
+  return ret;
+}
+
+
 template<typename T>
 inline void clearPtrList(T& container) {
   typename T::iterator end = container.end();

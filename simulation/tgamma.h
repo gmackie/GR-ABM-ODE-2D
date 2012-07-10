@@ -53,6 +53,7 @@ public:
 	int getDeactivationTime() const;
 	static bool isTgam(const Agent* pAgent);
 	static bool isTgam(const Agent* pAgent, Tgam::State state);
+  /*virtual*/ Agent* clone() const { return new Tgam(*this); }
 	void print() const;
 	void serialize(std::ostream& out) const;
 	void deserialize(std::istream& in);

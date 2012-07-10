@@ -40,6 +40,7 @@ public:
 	virtual void update(const int time, const int index, Stats& stats) = 0;
 	void perform(const int index, Stats& stats);
 	virtual OutcomeMethod getMethod() const = 0;
+  virtual TTest* clone() const = 0;
 	std::string getMethodName() const;
 	void setAlpha(double alpha);
 	void setTestPeriod(int testPeriod);

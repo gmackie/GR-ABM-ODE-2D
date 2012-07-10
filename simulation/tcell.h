@@ -24,7 +24,7 @@ public:
 
 	virtual ~Tcell();
 	void moveTcell(GrGrid& grid, bool ccl2, bool ccl5, bool cxcl9);
-    static void setTcellOdeSize(int odesize);
+  static void setTcellOdeSize(int odesize);
 	static bool isTcell(const Agent* pAgent);
 	virtual void serialize(std::ostream& out) const;
 	virtual void deserialize(std::istream& in);

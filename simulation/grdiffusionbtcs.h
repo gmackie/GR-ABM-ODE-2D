@@ -17,6 +17,7 @@ public:
 	virtual ~GrDiffusionBTCS();
 	void diffuse(GrSimulationGrid& grid) const;
 	DiffusionMethod getMethod() const;
+  GrDiffusion* clone() const { return new GrDiffusionBTCS(*this); }
 };
 
 inline DiffusionMethod GrDiffusionBTCS::getMethod() const

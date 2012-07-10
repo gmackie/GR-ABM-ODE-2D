@@ -1,14 +1,5 @@
 #include "statwidget.h"
 
-StatWidget::StatWidget(QWidget* pParent)
-    : QWidget(pParent)
-{
-	_ui.setupUi(this);
-}
-
-StatWidget::~StatWidget()
-{
-}
 
 template<typename T>
 QString toString(const T& v) {
@@ -19,99 +10,89 @@ QString toString<Scalar>(const Scalar& v) {
   return QString::number(v, 'f', 2);
 }
 
-template<typename InputIterator>
-static void toString(InputIterator start, InputIterator end, QString& s) {
-  s = QString('(');
-  while(start != end)
-    s += toString(*(start++)) + ',';
-  s[s.size()-1] = ')';
+template<typename T, size_t N>
+static QString toString(const boost::array<T, N>& arr) {
+    QString str('(');
+    for(size_t i=0;i<N-1;i++)
+        str += toString(arr[i]) + ',';
+    str += toString(arr[N-1]) + ')';
+    return str;
 }
+
+template<typename E>
+static QString enumstoString(E final) {
+    std::stringstream ss;
+    int i=0;
+    for(i=0;i<final-1;i++)
+        ss<<E(i)<<',';
+    ss<<E(i);
+    return QString::fromStdString(ss.str());
+}
+
+struct StatWidgetNameVisitor {
+  StatWidget& _sw;
+  int iter;
+  StatWidgetNameVisitor(StatWidget& sw) : _sw(sw), iter(0) {}
+  template<typename T>
+  void visit(const char* name, const T& val, const char* desc) {
+    _sw._ui.tableWidget->insertRow(iter);
+    QTableWidgetItem* item = new QTableWidgetItem();
+    item->setText(QString(name));
+    item->setToolTip(QString(desc));
+    _sw._ui.tableWidget->setItem(iter, 0, item);
+    _sw._ui.tableWidget->setItem(iter, 1, new QTableWidgetItem(toString(val)));
+    ++iter;
+  }
+  template<typename T, size_t N, typename E>
+  void visit(const char* name, const boost::array<T, N>& val, const char* desc, E e) {
+    _sw._ui.tableWidget->insertRow(iter);
+    QTableWidgetItem* item = new QTableWidgetItem();
+    item->setText(QString(name));
+    item->setToolTip(QString(desc));
+    _sw._ui.tableWidget->setItem(iter, 0, item);
+    item = new QTableWidgetItem();
+    item->setText(toString(val));
+    item->setToolTip(enumstoString(e));
+    _sw._ui.tableWidget->setItem(iter, 1, item);
+    ++iter;
+  }
+};
+
+struct StatWidgetUpdateVisitor {
+  StatWidget& _sw;
+  int iter;
+  StatWidgetUpdateVisitor(StatWidget& sw) : _sw(sw), iter(0) {}
+  template<typename T>
+  void visit(const char*, const T& val, const char*) {
+    QTableWidgetItem* item = _sw._ui.tableWidget->item(iter, 1);
+    Q_CHECK_PTR(item);
+    item->setText(toString(val));
+    ++iter;
+  }
+  template<typename T, size_t N, typename E>
+  void visit(const char*, const boost::array<T, N>& val, const char*, E) {
+    QTableWidgetItem* item = _sw._ui.tableWidget->item(iter, 1);
+    Q_CHECK_PTR(item);
+    item->setText(toString(val));
+    ++iter;
+  }
+};
+
+StatWidget::StatWidget(const Stats& stats, QWidget* pParent)
+    : QWidget(pParent)
+{
+    _ui.setupUi(this);
+    StatWidgetNameVisitor visitor(*this);
+    stats.visit(visitor);
+    update();
+}
+
+StatWidget::~StatWidget()
+{
+}
+
 void StatWidget::updateLabels(const Stats& stats)
 {
-  QString str;
-  toString(stats.getNrOfMacsArray().begin(), stats.getNrOfMacsArray().end(), str);
-	str = QString("%1 - %2").arg(stats.getNrOfMacs()).arg(str);
-	_ui.labelMac->setText(str);
-
-  toString(stats.getNrOfTgamsArray().begin(), stats.getNrOfTgamsArray().end(), str);
-	str = QString("%1 - %2").arg(stats.getNrOfTgams()).arg(str);
-	_ui.labelTgam->setText(str);
-
-  toString(stats.getNrOfTcytsArray().begin(), stats.getNrOfTcytsArray().end(), str);
-	str = QString("%1 - %2").arg(stats.getNrOfTcyts()).arg(str);
-	_ui.labelTcyt->setText(str);
-
-  toString(stats.getNrOfTregsArray().begin(), stats.getNrOfTregsArray().end(), str);
-	str = QString("%1 - %2").arg(stats.getNrOfTregs()).arg(str);
-	_ui.labelTreg->setText(str);
-
-	str = QString("(%1,%2)").arg(stats.getTotExtMtb(), 0, 'f', 2).
-			arg(stats.getTotIntMtb(), 0, 'f', 2);
-	_ui.labelMtb->setText(str);
-
-	str = QString("(%1,%2)").arg(stats.getNrCaseated()).
-			arg(stats.getTotNonRepExtMtb(), 0, 'f', 2);
-	_ui.labelMtbNonRep->setText(str);
-
-  toString(stats.getMacNFkBArray().begin(), stats.getMacNFkBArray().end(), str);
-	str = QString("%1 - %2").arg(stats.getMacNFkB()).arg(str);
-	_ui.labelMacNFkB->setText(str);
-
-  toString(stats.getMacStat1Array().begin(), stats.getMacStat1Array().end(), str);
-	str = QString("%1 - %2").arg(stats.getMacStat1()).arg(str);
-	_ui.labelMacStat1->setText(str);
-
-  toString(stats.getMacDeactArray().begin(), stats.getMacDeactArray().end(), str);
-	str = QString("%1 - %2").arg(stats.getMacDeact()).arg(str);
-	_ui.labelMacDeact->setText(str);
-
-	str = QString("(%1,%2)").arg(stats.getMacApoptosisTNF()).arg(stats.getApoptosisFasFasL());
-	_ui.labelApoptosis->setText(str);
-
-  toString(stats.getNrSourcesArray().begin(), stats.getNrSourcesArray().end(), str);
-	str = QString("%1 - %2").arg(stats.getTotNrSources()).arg(str);
-	_ui.labelSources->setText(str);
-
-  toString(stats.getNrSourcesActiveArray().begin(), stats.getNrSourcesActiveArray().end(), str);
-	str = QString("%1 - %2").arg(stats.getTotNrSourcesActive()).arg(str);
-	_ui.labelSourcesAct->setText(str);
-
-	str = QString("%1").arg(stats.getTotMacAttractant(), 0, 'f', 2);
-	_ui.labelMacAttractant->setText(str);
-
-	str = QString("%1").arg(stats.getTotTNF(), 0, 'f', 2);
-	_ui.labelTNF->setText(str);
-
-	str = QString("%1").arg(stats.getTotCCL2(), 0, 'f', 2);
-	_ui.labelCCL2->setText(str);
-
-	str = QString("%1").arg(stats.getTotCCL5(), 0, 'f', 2);
-	_ui.labelCCL5->setText(str);
-
-	str = QString("%1").arg(stats.getTotCXCL9(), 0, 'f', 2);
-	_ui.labelCXCL9->setText(str);
-	
-	str = QString("%1").arg(stats.getTotIL10(), 0, 'f', 2);
-	_ui.labelIL10->setText(str);
-
-	// update granuloma area
-	str = QString("%1").arg(stats.getAreaTNF());
-	_ui.labelGranulomaAreaVal->setText(str);
-
-	// update ODE stats
-	str = QString("%1").arg(stats.getMDC());
-	_ui.labeldMDC->setText(str);
-
-	str = QString("(%1,%2,%3)").arg(stats.getNrQueued(TGAM)).
-		arg(stats.getNrQueued(TCYT)).arg(stats.getNrQueued(TREG));
-	_ui.labelTcellQueue->setText(str);
-
-	str = QString("%1").arg(stats.getFlux(TGAM));
-	_ui.labelTgamFlux->setText(str);
-
-	str = QString("%1").arg(stats.getFlux(TCYT));
-	_ui.labelTcytFlux->setText(str);
-
-	str = QString("%1").arg(stats.getFlux(TREG));
-	_ui.labelTregFlux->setText(str);
+    StatWidgetUpdateVisitor visitor(*this);
+    stats.visit(visitor);
 }

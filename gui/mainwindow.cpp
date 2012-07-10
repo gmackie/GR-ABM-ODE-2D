@@ -144,7 +144,7 @@ MainWindow::MainWindow(MainInterface* pItfc, GLWindow* pGLWindow, QWidget* pPara
 	_pMainWindow = this;
 	_ui.setupUi(this);
     _ui.tabStatistics->layout()->addWidget(_pStatWidget);
-    _ui.tabStatistics->layout()->addItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
+    //_ui.tabStatistics->layout()->addItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
     _ui.tabAgents->layout()->addWidget(_pAgentsWidget);
     _ui.tabAgents->layout()->addItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
 

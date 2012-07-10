@@ -9,9 +9,10 @@
 class StatWidget : public QWidget
 {
     Q_OBJECT
-
+    friend struct StatWidgetNameVisitor;
+    friend struct StatWidgetUpdateVisitor;
 public:
-    StatWidget(QWidget* pParent = 0);
+    StatWidget(const Stats& stats, QWidget* pParent = 0);
     ~StatWidget();
     void updateLabels(const Stats& stats);
 

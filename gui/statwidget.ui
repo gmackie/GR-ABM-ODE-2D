@@ -2,6 +2,14 @@
 <ui version="4.0">
  <class>StatWidgetClass</class>
  <widget class="QWidget" name="StatWidgetClass">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>260</width>
+    <height>210</height>
+   </rect>
+  </property>
   <property name="windowTitle">
    <string>StatWidget</string>
   </property>
@@ -20,6 +28,11 @@
       </property>
       <item>
        <widget class="QTableWidget" name="tableWidget">
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
         <property name="editTriggers">
          <set>QAbstractItemView::NoEditTriggers</set>
         </property>

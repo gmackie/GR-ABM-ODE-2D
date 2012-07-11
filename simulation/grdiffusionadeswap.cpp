@@ -144,7 +144,7 @@ static void diffuse_avg_ratio(Scalar* newgrid_u, Scalar* newgrid_v, Scalar* newg
 {
     // NOTE: THE _SEC_RATE_CCL should both be multiplied by the MOLECULAR_DT but since these terms will cancel
     // in the division they are not used to keep the error of the floating point division down.
-    
+
     const Scalar ratioCCL5toCCL2 = _PARAM(PARAM_MAC_SEC_RATE_CCL5) / _PARAM(PARAM_MAC_SEC_RATE_CCL2);
 	const Scalar ratioCXCL9toCCL2 = _PARAM(PARAM_MAC_SEC_RATE_CXCL9) / _PARAM(PARAM_MAC_SEC_RATE_CCL2);
     
@@ -174,6 +174,10 @@ static void diffuse_degrade(GrGrid& nextGrid)
 {
     const Scalar dt = _PARAM(PARAM_GR_DT_DIFFUSION);
 
+    //Degradation equation here is incorrect, the effect is degradation lags
+    //behind diffusion.  We make the assumption diffuse << degrade to 
+    //show degradation is much slower and incurs no stability issues
+    
     Pos p;
     for(p.x = 0; p.x < nextGrid.getRange().x; ++p.x)
         for(p.y = 0; p.y < nextGrid.getRange().y; ++p.y) {

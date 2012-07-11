@@ -30,8 +30,11 @@ static void diffuse(const Scalar* grid, Scalar* newgrid, const Pos& dim, const S
       dn  = grid[Indexer::padInd(dim, i+1,j)];
       Scalar& nc = newgrid[Indexer::padInd(dim, i,j)];
       nc = ct + diffuse * (up + dn + lt + rt - Scalar(4.0) * ct);
-      nc = nc <= cutOff ? Scalar(0.0) : nc;
+      //Degradation equation here is incorrect, the effect is degradation lags
+      //behind diffusion.  We make the assumption diffuse << degrade to 
+      //show degradation is much slower and incurs no stability issues
       nc *= (1.0 - degrade * DT);
+      nc = nc <= cutOff ? Scalar(0.0) : nc;
     }
 }
 /*static void diffuse_recon(const Scalar* u, const Scalar* v, Scalar* grid) {

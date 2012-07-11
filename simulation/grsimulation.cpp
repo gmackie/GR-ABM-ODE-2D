@@ -621,104 +621,31 @@ void GrSimulation::solve()
 		_il10rDynamics = false;
 	}
     
-    // Calculate Diffusion and Molecular events for a 10 min timestep
-    // Agent time step is 600 s (10 min)
-	
+  // Calculate Diffusion and Molecular events for a 10 min timestep
+  // Agent time step is 600 s (10 min)
 	for (int DiffStep = 0; DiffStep < _numDiffusionPerAgent; DiffStep++) 
 	{
-		_pDiffusion->diffuse(_grid);
-                
-#if 0
-        if (_odeSolver == 4) 
-        {
-            secreteFromMacrophages(tnfDepletion, il10Depletion, _PARAM(PARAM_GR_DT_DIFFUSION));
-            secreteFromTcells(tnfDepletion, il10Depletion, _PARAM(PARAM_GR_DT_DIFFUSION));
-            secreteFromCaseations(_PARAM(PARAM_GR_DT_DIFFUSION));
-            
-            if (_nfkbDynamics || _tnfrDynamics || _il10rDynamics)
-            {
-              assert(0 && "NOT IMPLEMENTED");
-                //updateMolecularScaleAdaptive(_PARAM(PARAM_GR_DT_MOLECULAR));
-            }
-            
-            else if (!_il10rDynamics || !_tnfrDynamics)
-            {
-                adjustFauxDegradation(_PARAM(PARAM_GR_DT_DIFFUSION));
-                //adjustTNFDegradation(_PARAM(PARAM_GR_DT_MOLECULAR));
-            }
-        }
-        
-        else
-        {
-#endif
-            for (int MolStep = 0; MolStep < _numMolecularPerDiffusion; MolStep++)
-            {
-                secreteFromMacrophages(tnfDepletion, il10Depletion, _PARAM(PARAM_GR_DT_MOLECULAR));
-                secreteFromTcells(tnfDepletion, il10Depletion, _PARAM(PARAM_GR_DT_MOLECULAR));
-                secreteFromCaseations(_PARAM(PARAM_GR_DT_MOLECULAR));
-
-                if (_nfkbDynamics || _tnfrDynamics || _il10rDynamics)
-                  if(_adaptive)
-                    solveMolecularScaleAdaptive(_PARAM(PARAM_GR_DT_MOLECULAR));
-                  else
-                    solveMolecularScale(_PARAM(PARAM_GR_DT_MOLECULAR));
-                
-#if 0
-                if (_nfkbDynamics || _tnfrDynamics || _il10rDynamics) {
-                    switch (_odeSolver) {
-                        case 0:
-                            updateMolecularScaleFE(_PARAM(PARAM_GR_DT_MOLECULAR));
-                            break;
-                        case 1:
-                            updateMolecularScaleRK4(_PARAM(PARAM_GR_DT_MOLECULAR));
-                            break;
-                        case 2:
-                            updateMolecularScaleRK2(_PARAM(PARAM_GR_DT_MOLECULAR));
-                            break;
-                        case 3:
-                            updateMolecularScaleEPC(_PARAM(PARAM_GR_DT_MOLECULAR));
-                            break;
-                        default:
-                            std::cerr<<"Error: Solver Switch Value Unsupported"<<std::endl;
-                            exit(1);
-                            break;
-                    }
-                }
-#endif
-                //                if (_nfkbDynamics)
-                //                {
-                //                    if (_il10rDynamics) {
-                //                        updateNFkBandTNFandIL10Dynamics(_PARAM(PARAM_GR_DT_MOLECULAR));
-                //                    }
-                //                    else
-                //                    {
-                //                        updateNFkBandTNFDynamics(_PARAM(PARAM_GR_DT_MOLECULAR));
-                //                    }
-                //                }
-                //                else if (_tnfrDynamics && _il10rDynamics)
-                //                {
-                //                    updateTNFandIL10Dynamics(_PARAM(PARAM_GR_DT_MOLECULAR));
-                //                }
-                //                
-                //                else if (_tnfrDynamics && !_il10rDynamics)
-                //                {
-                //                    updateTNFDynamics(_PARAM(PARAM_GR_DT_MOLECULAR));
-                //                }
-                //            
-                //                else if (_il10rDynamics && !_tnfrDynamics)
-                //                {
-                //                    updateIL10Dynamics(_PARAM(PARAM_GR_DT_MOLECULAR));
-                //                }
-                
-                else if (!_il10rDynamics || !_tnfrDynamics)
-                {
-                    adjustFauxDegradation(_PARAM(PARAM_GR_DT_MOLECULAR));
-                    //adjustTNFDegradation(_PARAM(PARAM_GR_DT_MOLECULAR));
-                }
-        }  
-
+    _pDiffusion->diffuse(_grid);
+    secreteFromMacrophages(tnfDepletion, il10Depletion, _PARAM(PARAM_GR_DT_DIFFUSION));
+    secreteFromTcells(tnfDepletion, il10Depletion, _PARAM(PARAM_GR_DT_DIFFUSION));
+    secreteFromCaseations(_PARAM(PARAM_GR_DT_DIFFUSION));
+    if ((_nfkbDynamics || _tnfrDynamics || _il10rDynamics) && _adaptive) {
+     solveMolecularScaleAdaptive(_PARAM(PARAM_GR_DT_DIFFUSION));
+     if (!_il10rDynamics || !_tnfrDynamics)
+       for (int MolStep = 0; MolStep < _numMolecularPerDiffusion; MolStep++)  //Degradation needs to be on molecular timestep
+          adjustFauxDegradation(_PARAM(PARAM_GR_DT_MOLECULAR));
     }
-	
+    else
+    for (int MolStep = 0; MolStep < _numMolecularPerDiffusion; MolStep++)
+    {
+        if (_nfkbDynamics || _tnfrDynamics || _il10rDynamics)
+            solveMolecularScale(_PARAM(PARAM_GR_DT_MOLECULAR));
+        if (!_il10rDynamics || !_tnfrDynamics)
+            adjustFauxDegradation(_PARAM(PARAM_GR_DT_MOLECULAR));
+            //adjustTNFDegradation(_PARAM(PARAM_GR_DT_MOLECULAR));
+    }  
+  }
+
 	// move macrophages
 	moveMacrophages();
 

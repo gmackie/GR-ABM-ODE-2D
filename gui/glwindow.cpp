@@ -1,4 +1,5 @@
 #include "glwindow.h"
+#include <QTreeWidgetItemIterator>
 
 GLWindow::GLWindow(MainInterface* pItfc, QWidget* parent)
     : QWidget(parent)
@@ -8,6 +9,7 @@ GLWindow::GLWindow(MainInterface* pItfc, QWidget* parent)
 	, _selCol(-1)
 	, _printTime(_PRINT_TIME)
 	, _printOutcome(_PRINT_OUTCOME)
+    , _trackid(-1)
 {
 	for (int i = 0; i < NOUTCOMES; i++)
 	{
@@ -17,7 +19,7 @@ GLWindow::GLWindow(MainInterface* pItfc, QWidget* parent)
 	_ui.setupUi(this);
 
     _ui.glWidget->dim = pItfc->getSimulation().getSize();
-	connect(_ui.glWidget, SIGNAL(updateSelection(int, int)), this, SIGNAL(updateSelection(int, int)));
+    connect(_ui.glWidget, SIGNAL(updateSelection(int, int)), this, SIGNAL(updateSelection(int, int)));
 	connect(_ui.glWidget, SIGNAL(visualize(void)), this, SLOT(visualize(void)));
 	connect(_ui.glWidget, SIGNAL(printText(void)), this, SLOT(printText(void)));
 	connect(this, SIGNAL(set2DView(void)), _ui.glWidget, SLOT(set2DView(void)));
@@ -30,12 +32,29 @@ GLWindow::GLWindow(MainInterface* pItfc, QWidget* parent)
   agentInfoWindow->setHeaderLabels(hdrs);
   agentInfoWindow->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
   agentInfoWindow->setWindowTitle("Agent Information");
+  connect(agentInfoWindow, SIGNAL(itemChanged(QTreeWidgetItem*,int)), SLOT(updateTracking(QTreeWidgetItem*)));
 }
 
 GLWindow::~GLWindow()
 {
   agentInfoWindow->close();
   delete agentInfoWindow;
+}
+
+void GLWindow::updateTracking(QTreeWidgetItem* item) {
+    if(item->checkState(0) == Qt::Unchecked && _trackid == item->data(1, Qt::DisplayRole).toInt()) {
+        _trackid = -1;
+        return;
+    } //otherwise...
+    _trackid = item->data(1, Qt::DisplayRole).toInt();
+    agentInfoWindow->blockSignals(true);    //Don't generate any more signals until we update the rest of the gui
+
+    for(QTreeWidgetItemIterator it(agentInfoWindow); *it; it++) {
+        if((*it) == item) continue;
+        (*it)->setCheckState(0, Qt::Unchecked);
+    }
+    agentInfoWindow->blockSignals(false);
+    updateSelectedCellStats();
 }
 
 void GLWindow::setColorMap(ColorMap* pCurrentColorMap)
@@ -97,7 +116,8 @@ inline QTreeWidgetItem* make_item(const char* name, const Pos& val, const char* 
 struct AgentInfoVisitor {
     QTreeWidget* _view;
     QTreeWidgetItem* _curItem;
-    AgentInfoVisitor(QTreeWidget* view) : _view(view), _curItem(NULL) {}
+    const int _trackid;
+    AgentInfoVisitor(QTreeWidget* view, int trackid) : _view(view), _curItem(NULL), _trackid(trackid) {}
     void visit(const Agent* a) {
         if(!a) return;
         std::stringstream ss;
@@ -123,7 +143,10 @@ struct AgentInfoVisitor {
         }
         //a->visitProperties(*this);
         _curItem->setText(0, QString::fromStdString(ss.str()));
+        _curItem->setData(1, Qt::DisplayRole, QVariant::fromValue(a->getid()));
         _curItem->setExpanded(true);
+        _curItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
+        _curItem->setCheckState(0, (a->getid() == _trackid ? Qt::Checked : Qt::Unchecked));
     }
 
     void visit(const Mac* a) { a->visitProperties(*this); }
@@ -138,14 +161,40 @@ struct AgentInfoVisitor {
     }
 };
 
+template<typename AgentType>
+static const Agent* findAgent(const std::vector<AgentType>& v, size_t id) {
+    for(size_t i=0;i<v.size();i++) {
+        const Agent* a = &(v[i]);
+        if(a->getid() == id)
+            return a;
+    }
+    return NULL;
+}
+
 void GLWindow::updateSelectedCellStats()
 {
     if(_selRow != -1 && _selCol != -1)
     {
+        if(_trackid > -1) { //Follow the id...
+            const Agent* a = findAgent(_pItfc->getSimulation().getMacList(), _trackid);
+            if(!a)
+                a = findAgent(_pItfc->getSimulation().getTgamList(), _trackid);
+            if(!a)
+                a = findAgent(_pItfc->getSimulation().getTcytList(), _trackid);
+            if(!a)
+                a = findAgent(_pItfc->getSimulation().getTregList(), _trackid);
+            if(a && (a->getPosition().x != _selRow ||
+               a->getPosition().y != _selCol)) {
+                //Moved, update everything
+                emit updateSelection(a->getPosition().x, a->getPosition().y);
+            }
+        }
+
+
         bool topLevelExpanded[3];
         for(size_t i=0;i<3;i++) //Hacky way to keep expanded information
          topLevelExpanded[i] = (agentInfoWindow->topLevelItem(i) ? agentInfoWindow->topLevelItem(i)->isExpanded() : false);
-
+        agentInfoWindow->blockSignals(true);    //Don't generate any more signals until we update the rest of the gui
         agentInfoWindow->clear();   //Not the most efficient
         const ScalarAgentGrid* pAgentGrid = static_cast<ScalarAgentGrid*>(_pItfc->getScalarAgentGrid());
         const ScalarAgentItem& item
@@ -164,15 +213,18 @@ void GLWindow::updateSelectedCellStats()
         gridInfo->addChild(make_item("shedTNFR2",     item._shedTNFR2,     ""));
         gridInfo->addChild(make_item("il10",          item._il10,          ""));
         gridInfo->addChild(make_item("extMtb",        item._extMtb,        ""));
-        AgentInfoVisitor(agentInfoWindow).visit(item._pAgent[0]);
-        AgentInfoVisitor(agentInfoWindow).visit(item._pAgent[1]);
+        AgentInfoVisitor(agentInfoWindow, _trackid).visit(item._pAgent[0]);
+        AgentInfoVisitor(agentInfoWindow, _trackid).visit(item._pAgent[1]);
 
         for(size_t i=0;i<3;i++) //Hacky way to keep expanded information
          if(agentInfoWindow->topLevelItem(i))
            agentInfoWindow->topLevelItem(i)->setExpanded(topLevelExpanded[i]);
+        agentInfoWindow->blockSignals(false);
     }
-    else
+    else {
       agentInfoWindow->hide();
+      _trackid = -1;
+    }
 	if (_selRow != -1 && _selCol != -1)
 	{
 		const ScalarAgentGrid* pAgentGrid = static_cast<ScalarAgentGrid*>(_pItfc->getScalarAgentGrid());
@@ -354,7 +406,7 @@ void GLWindow::moveSelectionLeft()
 {
 	if (_selRow != -1 && _selCol != -1)
 	{
-		emit updateSelection(_selRow, (_selCol - 1 + _ui.glWidget->dim.x) % _ui.glWidget->dim.x);
+        emit updateSelection(_selRow, (_selCol - 1 + _ui.glWidget->dim.x) % _ui.glWidget->dim.x);
 	}
 }
 

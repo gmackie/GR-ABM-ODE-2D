@@ -13,6 +13,7 @@
 class GLWindow : public QWidget
 {
     Q_OBJECT
+    int _trackid;
 
 public:
     GLWindow(MainInterface* pItfc, QWidget* parent = 0);
@@ -39,6 +40,8 @@ public slots:
 	void setPrintTime(bool value);
 	void setPrintOutcome(bool value);
 
+protected slots:
+    void updateTracking(QTreeWidgetItem*);
 signals:
 	void updateSelection(int row, int col);
 	void set2DView();

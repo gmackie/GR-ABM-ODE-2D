@@ -175,6 +175,7 @@ void GLWindow::updateSelectedCellStats()
 {
     if(_selRow != -1 && _selCol != -1)
     {
+        _pItfc->getSimulation().lock();
         if(_trackid > -1) { //Follow the id...
             const Agent* a = findAgent(_pItfc->getSimulation().getMacList(), _trackid);
             if(!a)
@@ -220,6 +221,7 @@ void GLWindow::updateSelectedCellStats()
          if(agentInfoWindow->topLevelItem(i))
            agentInfoWindow->topLevelItem(i)->setExpanded(topLevelExpanded[i]);
         agentInfoWindow->blockSignals(false);
+        _pItfc->getSimulation().unlock();
     }
     else {
       agentInfoWindow->hide();

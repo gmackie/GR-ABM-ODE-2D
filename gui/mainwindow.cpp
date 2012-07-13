@@ -591,7 +591,6 @@ void MainWindow::timerEvent(QTimerEvent*)
 	
 	// clear update flag
 	sim.setUpdated(false);
-	sim.unlock();
 	/* END CRITICAL SECTION */
 
     //if(simTime % 72 == 0)   //Update every half day
@@ -665,6 +664,7 @@ void MainWindow::timerEvent(QTimerEvent*)
 
 		sim.modelUnlock();
 	}
+	sim.unlock();
 
 }
 

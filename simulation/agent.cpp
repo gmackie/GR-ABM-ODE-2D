@@ -13,7 +13,7 @@ using namespace std;
 
 const std::string Agent::_ClassName = "Agent";
 auto_ptr<ODESolvers::Stepper> Agent::stepper;
-auto_ptr<ODESolvers::DerivativeFunc> Agent::deriv;
+auto_ptr<LungFunc> Agent::deriv;
 
 unsigned long Agent::_nextID = 0;
 
@@ -92,7 +92,7 @@ void Agent::solveMolecularScale(GrGrid& grid, double t, double dt, ODESolvers::O
   params.grid = &grid;
   size_t nsubsteps = (_PARAM(PARAM_NFKBODE_EN) && NFkBCapable()) ? _PARAM(PARAM_GR_NF_KB_TIME_COEFF) : 1;
   ODESolvers::Stepper* stepper = getStepper(method);
-  ODESolvers::DerivativeFunc& fn = *getDerivFunc();
+  LungFunc& fn = *getDerivFunc();
   for(size_t i=0;i<nsubsteps;i++)
     stepper->step(_initvector, fn, t+i*dt/nsubsteps, dt/nsubsteps, error, (void*)&params);
   writeMembersFromValarray(grid, _initvector);
@@ -2339,7 +2339,7 @@ void Agent::adaptiveODE(GrGrid& grid, double t, double dt, ODESolvers::ODEMethod
   params.agent = this;
   params.grid = &grid;
   ODESolvers::Stepper* s1 = getStepper(method); 
-  ODESolvers::DerivativeFunc& fn = *getDerivFunc();
+  LungFunc& fn = *getDerivFunc();
   ODESolvers::AdaptiveStepper stepper(fn.dim(), s1, EPS, TINY, MAXSTEP, PSHRINK, PGROW, SAFETY); // Just use the adaptive stepper from ODESolvers, not very efficient
   stepper.step(_initvector, fn, t, dt, error, (void*)&params);
   writeMembersFromValarray(grid, _initvector);
@@ -2354,8 +2354,8 @@ void Agent::adaptiveODE2Cell(Agent* other, GrGrid& grid, double t, double dt, OD
   params.grid = &grid;
   ODESolvers::Stepper* s1 = getStepper(method);
   ODESolvers::Stepper* s2 = other->getStepper(method);
-  ODESolvers::DerivativeFunc& fn1 = *getDerivFunc();
-  ODESolvers::DerivativeFunc& fn2 = *(other->getDerivFunc());
+  LungFunc& fn1 = *getDerivFunc();
+  LungFunc& fn2 = *(other->getDerivFunc());
   valarray<double> dy1(fn1.dim()), err1(fn1.dim()), yscal1(fn1.dim()), tmp1(_initvector);
   valarray<double> dy2(fn2.dim()), err2(fn2.dim()), yscal2(fn2.dim()), tmp2(other->_initvector);
   const double t1 = t, t2 = t+dt;
@@ -2377,8 +2377,19 @@ void Agent::adaptiveODE2Cell(Agent* other, GrGrid& grid, double t, double dt, OD
       { //stepper->step(tmp, fn, t, h, err, params);
         params.agent = this;
         s1->step(tmp1, fn1, t, h, err1, (void*)&params);
+
+        if(_PARAM(PARAM_TNFODE_EN)) //Copy to the second agent
+          tmp2[fn2.tnfidx()] = tmp1[fn1.tnfidx()];
+        if(_PARAM(PARAM_IL10ODE_EN))
+          tmp2[fn2.il10idx()] = tmp1[fn1.il10idx()];
+
         params.agent = other;
         s2->step(tmp2, fn2, t, h, err2, (void*)&params);
+
+        if(_PARAM(PARAM_TNFODE_EN)) //Copy to the first agent
+          tmp1[fn1.tnfidx()] = tmp2[fn2.tnfidx()];
+        if(_PARAM(PARAM_IL10ODE_EN))
+          tmp1[fn1.il10idx()] = tmp2[fn2.il10idx()];
       }
       const double errmax = max(abs(err1/yscal1).max(), abs(err2/yscal2).max()) / EPS;
       if(errmax > 1.0) {

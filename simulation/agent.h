@@ -125,7 +125,7 @@ public:
 	static void classDeserialize(std::istream& in);
 
   static auto_ptr<ODESolvers::Stepper> stepper;
-  static auto_ptr<ODESolvers::DerivativeFunc> deriv;
+  static auto_ptr<LungFunc> deriv;
 
   virtual ODESolvers::Stepper* getStepper(ODESolvers::ODEMethod method) {
     static ODESolvers::ODEMethod initMethod = method;
@@ -136,11 +136,11 @@ public:
     return stepper.get();
   }
 
-  static ODESolvers::DerivativeFunc* buildDerivFunc(); 
+  static LungFunc* buildDerivFunc(); 
   bool getODEstatus() const;
   void setODEstatus(bool isodesolved);
 
-  virtual ODESolvers::DerivativeFunc* getDerivFunc() {
+  virtual LungFunc* getDerivFunc() {
     if(deriv.get() == NULL) {
       deriv.reset(buildDerivFunc());
     }
@@ -281,6 +281,8 @@ struct LungFunc : ODESolvers::DerivativeFunc {
   virtual void operator()(const ODESolvers::ODEState& vecread, double /*t*/, ODESolvers::Derivative& vecwrite, void* params) const;
   void il10deriv(const ODESolvers::ODEState& vecread, double /*t*/, ODESolvers::Derivative& vecwrite, Params_t* params) const;
   virtual size_t dim() const { return _PARAM(PARAM_TNFODE_EN)*10+_PARAM(PARAM_IL10ODE_EN)*3; }
+  size_t tnfidx() const { return 8; }
+  size_t il10idx() const { return il10offset; }
 };
 
 struct NFKBFunc : LungFunc {
@@ -290,7 +292,7 @@ struct NFKBFunc : LungFunc {
 };
 
 
-inline ODESolvers::DerivativeFunc* Agent::buildDerivFunc() {
+inline LungFunc* Agent::buildDerivFunc() {
   LungFunc* d = new LungFunc(_PARAM(PARAM_TNFODE_EN)*10);
   return d;
 }

@@ -48,7 +48,7 @@ public:
 	~Mac();
 
   static auto_ptr<ODESolvers::Stepper> stepper;
-  static auto_ptr<ODESolvers::DerivativeFunc> deriv;
+  static auto_ptr<LungFunc> deriv;
 
   /*virtual*/ ODESolvers::Stepper* getStepper(ODESolvers::ODEMethod method) {
     static ODESolvers::ODEMethod initMethod = method;
@@ -59,8 +59,8 @@ public:
     return Mac::stepper.get();
   }
 
-  static ODESolvers::DerivativeFunc* buildDerivFunc() {
-    ODESolvers::DerivativeFunc* d = NULL;
+  static LungFunc* buildDerivFunc() {
+    LungFunc* d = NULL;
     if(_PARAM(PARAM_NFKBODE_EN))
       d = new NFKBFunc(36);
     else
@@ -68,7 +68,7 @@ public:
     return d;
   }
 
-  /*virtual*/ ODESolvers::DerivativeFunc* getDerivFunc() {
+  /*virtual*/ LungFunc* getDerivFunc() {
     if(deriv.get() == NULL)
       deriv.reset(Mac::buildDerivFunc());
     return deriv.get();

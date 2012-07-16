@@ -64,7 +64,7 @@ static void diffuse_u(const Scalar* __restrict__ grid_u, Scalar* __restrict__ ne
             ct_u  = grid_u[Indexer::padInd(dim, i,j)];
             rt_u  = grid_u[Indexer::padInd(dim, i,j+1)];
             dn_u  = grid_u[Indexer::padInd(dim, i+1,j)];
-            
+
             Scalar& new_u = newgrid_u[Indexer::padInd(dim, i,j)];
             
             new_u = (coefficient_a * ct_u) + (coefficient_b * (up_u + dn_u)) + (coefficient_c * (lt_u + rt_u));

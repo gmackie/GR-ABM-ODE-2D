@@ -70,9 +70,9 @@ private:
 	void updateStates();
 	void updateT_Test();
 	void computeNextStates();
-	void secreteFromMacrophages(bool tnfDepletion, bool il10Depletion, int mdt);
-	void secreteFromTcells(bool tnfDepletion, bool il10Depletion, int mdt);
-	void secreteFromCaseations(int mdt);
+    void secreteFromMacrophages(bool tnfDepletion, bool il10Depletion, double mdt);
+    void secreteFromTcells(bool tnfDepletion, bool il10Depletion, double mdt);
+    void secreteFromCaseations(double mdt);
 #if 0
     void updateTNFDynamics(double dt);
     void updateIL10Dynamics(double dt);
@@ -96,7 +96,7 @@ private:
 
 public:
 	GrSimulation(const Pos& dim);
-	virtual ~GrSimulation();
+	~GrSimulation();
 	void init();
 	void initMolecularTracking(Scalar molecularTrackingRadius);
 	void initMolecularTracking(const std::vector<size_t>& ids);

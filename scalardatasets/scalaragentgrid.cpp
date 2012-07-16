@@ -8,6 +8,7 @@
 #include "scalaragentgrid.h"
 #include "simulation.h"
 #include "simulation/recruitmentbase.h"
+#include "simulation/recruitmentprob.h"
 #include <fstream>
 
 ScalarAgentGrid::ScalarAgentGrid(size_t _DIM)
@@ -27,7 +28,7 @@ void ScalarAgentGrid::evaluate(const Simulation* pSimulation)
 	_tcytList = pSimulation->getTcytList();
 	_tregList = pSimulation->getTregList();
 
-	const GrGrid& grid = pSimulation->getGrGrid();
+  const GrGrid& grid = pSimulation->getGrGrid();
 
 	for (int i = 0; i < _DIM; i++)
 	{
@@ -60,19 +61,19 @@ void ScalarAgentGrid::evaluate(const Simulation* pSimulation)
 			{
 				item._bitMask |= SET_BIT(_bitSrc);
 
-				if (RecruitmentBase::MacRecruitmentThreshold(grid, p))
+                if (RecruitmentProb::MacThresholdRecNew(grid, p))
 				{
 					item._bitMask |= SET_BIT(_bitSrcMac);
 				}
-				if (RecruitmentBase::TgamRecruitmentThreshold(grid, p))
+                if (RecruitmentProb::TgamThresholdRecNew(grid, p))
 				{
 					item._bitMask |= SET_BIT(_bitSrcTgam);
 				}
-				if (RecruitmentBase::TcytRecruitmentThreshold(grid, p))
+                if (RecruitmentProb::TcytThresholdRecNew(grid, p))
 				{
 					item._bitMask |= SET_BIT(_bitSrcTcyt);
 				}
-				if (RecruitmentBase::TregRecruitmentThreshold(grid, p))
+                if (RecruitmentProb::TregThresholdRecNew(grid, p))
 				{
 					item._bitMask |= SET_BIT(_bitSrcTreg);
 				}

@@ -52,7 +52,7 @@ void Tgam::move(GrGrid& grid)
 	Tcell::moveTcell(grid, true, true, true);
 }
 
-void Tgam::secrete(GrGrid& grid, bool tnfrDynamics, bool, bool tnfDepletion, bool il10rDynamics, bool il10Depletion, int mdt)
+void Tgam::secrete(GrGrid& grid, bool tnfrDynamics, bool, bool tnfDepletion, bool il10rDynamics, bool il10Depletion, double mdt)
 {
 	if (_deactivationTime != -1)
 	{
@@ -100,28 +100,38 @@ void Tgam::secrete(GrGrid& grid, bool tnfrDynamics, bool, bool tnfDepletion, boo
 }
 
 void Tgam::computeNextState(const int time, GrGrid& grid, Stats& stats, bool tnfrDynamics, bool, bool, bool tgammatransition)
-{
-	double tnfBoundFraction = grid.TNF(_pos) / (grid.TNF(_pos) + _PARAM(PARAM_GR_KD1) * 48.16e11);
-    
+{    
 	// check if it is time to die
 	if (timeToDie(time))
 	{
 		_nextState = TGAM_DEAD;
 	}
-	else if (tnfrDynamics && intCompareGT(_intBoundTNFR1, _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR)) &&	
-			 intCompareGT(1 - pow(2.7183, -_PARAM(PARAM_GR_K_APOPTOSIS_MOLECULAR) * (_intBoundTNFR1 - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR))), g_Rand.getReal()))
-	{
-		// TNF induced apoptosis
-		++stats.getTcellApoptosisTNF();
-		_nextState = TGAM_DEAD;
-	}
-	else if (!tnfrDynamics && tnfBoundFraction > _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF) &&
-			 g_Rand.getReal() < 1 - pow(2.7183, -_PARAM(PARAM_GR_K_APOPTOSIS) * (tnfBoundFraction - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF))))
-	{
-		// TNF induced apoptosis
-		++stats.getTcellApoptosisTNF();
-		_nextState = TGAM_DEAD;
-	}
+
+    // Always pass in false for nfkbDynamics for T cell apoptosis since they DO NOT have NFkB dynamics
+    else if (TNFinducedApoptosis(grid, tnfrDynamics, false))
+    {
+        ++stats.getTcellApoptosisTNF();
+        _nextState = TGAM_DEAD;
+        grid.incKillings(_pos);
+    }
+
+//	else if (tnfrDynamics && intCompareGT(_intBoundTNFR1, _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR)) &&
+//			 intCompareGT(1 - pow(2.7183, -_PARAM(PARAM_GR_K_APOPTOSIS_MOLECULAR) * (_intBoundTNFR1 - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR))), g_Rand.getReal()))
+//	{
+//		// TNF induced apoptosis
+//		++stats.getTcellApoptosisTNF();
+//		_nextState = TGAM_DEAD;
+//        grid.incKillings(_pos);
+//	}
+//	else if (!tnfrDynamics && tnfBoundFraction > _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF) &&
+//			 g_Rand.getReal() < 1 - pow(2.7183, -_PARAM(PARAM_GR_K_APOPTOSIS) * (tnfBoundFraction - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF))))
+//	{
+//		// TNF induced apoptosis
+//		++stats.getTcellApoptosisTNF();
+//		_nextState = TGAM_DEAD;
+//        grid.incKillings(_pos);
+//	}
+
     else
 	{
 		switch (_state)
@@ -232,32 +242,77 @@ void Tgam::handleActive(const int time, GrGrid& grid, Stats& stats, bool tgammat
     }
     else
     {
-        if (grid.hasAgentType(MAC, _pos))
+        vector<int> PossibleOrdinal;
+
+        if (g_Rand.getReal() < _PARAM(PARAM_TGAM_PROB_APOPTOSIS_FAS_FASL))
         {
-            // get the macrophage
-            Mac* pMac = dynamic_cast<Mac*>(grid.agent(_pos, 0));
-            if (!pMac) pMac = dynamic_cast<Mac*>(grid.agent(_pos, 1));
-            
+            for (int k=0; k<9; k++)
+            {
+                Pos p(this->compartmentOrdinalToCoordinates(k, grid.getRange()));
+                if(grid.hasAgentType(MAC, p))
+                {
+                    PossibleOrdinal.push_back(k);
+                }
+            }
+
+            // If there are no Macs then do not kill anything
+            if ((int) PossibleOrdinal.size() == 0)
+            {
+                return;
+            }
+
+            int PossibleOrds = PossibleOrdinal.size();
+            int RandNum = g_Rand.getInt(PossibleOrds, 0);
+
+            Pos coord = this->compartmentOrdinalToCoordinates(PossibleOrdinal[RandNum], grid.getRange());
+            Mac* pMac = dynamic_cast<Mac*>(grid.agent(coord, 0));
+            if (!pMac) pMac = dynamic_cast<Mac*>(grid.agent(coord, 1));
+            assert(pMac);
+
             // If the mac died on this time step ignore it.
             if (pMac->getNextState() == Mac::MAC_DEAD)
             {
                 return;
             }
-            
+
             _nextState = TGAM_ACTIVE;
-            
+
             // Fas/FasL induced apoptosis with probability
-            if (pMac &&
-                (pMac->getState() == Mac::MAC_INFECTED || pMac->getState() == Mac::MAC_CINFECTED) &&
-                g_Rand.getReal() < _PARAM(PARAM_TGAM_PROB_APOPTOSIS_FAS_FASL))
+            if (pMac->getState() == Mac::MAC_INFECTED || pMac->getState() == Mac::MAC_CINFECTED)
             {
                 ++stats.getApoptosisFasFasL();
                 pMac->apoptosis(grid);
                 pMac->kill();
-                
-                grid.incKillings(_pos);
+
+                grid.incKillings(coord);
             }
         }
+//        if (grid.hasAgentType(MAC, _pos))
+//        {
+//            // get the macrophage
+//            Mac* pMac = dynamic_cast<Mac*>(grid.agent(_pos, 0));
+//            if (!pMac) pMac = dynamic_cast<Mac*>(grid.agent(_pos, 1));
+            
+//            // If the mac died on this time step ignore it.
+//            if (pMac->getNextState() == Mac::MAC_DEAD)
+//            {
+//                return;
+//            }
+            
+//            _nextState = TGAM_ACTIVE;
+            
+//            // Fas/FasL induced apoptosis with probability
+//            if (pMac &&
+//                (pMac->getState() == Mac::MAC_INFECTED || pMac->getState() == Mac::MAC_CINFECTED) &&
+//                g_Rand.getReal() < _PARAM(PARAM_TGAM_PROB_APOPTOSIS_FAS_FASL))
+//            {
+//                ++stats.getApoptosisFasFasL();
+//                pMac->apoptosis(grid);
+//                pMac->kill();
+                
+//                grid.incKillings(_pos);
+//            }
+//        }
     }
 }
 
@@ -319,22 +374,42 @@ void Tgam::handleInducedReg(const int, GrGrid&, Stats&)
     _nextState = TGAM_INDUCED_REG;
 }
 
-void Tgam::deactivate(const int time)
+void Tgam::deactivate(const int time, Stats& stats)
 {
-    if (_state == TGAM_ACTIVE || _state == TGAM_ACTIVE_DOUBLE) 
+
+    switch (_state)
     {
+    case Tgam::TGAM_INDUCED_REG:
+        break;
+    case Tgam::TGAM_DOWN_REGULATED:
+//        ++stats.getTgamDeactivation(_state);
+//        _nextState = _state = TGAM_DOWN_REGULATED;
+//        _deactivationTime = time;
+        break;
+    case Tgam::TGAM_ACTIVE:
+    case Tgam::TGAM_ACTIVE_DOUBLE:
+        ++stats.getTgamDeactivation(_state);
         _nDownRegulated ++;
+        _nextState = _state = TGAM_DOWN_REGULATED;
+        _deactivationTime = time;
+        break;
+    default:
+        ;
     }
+//    if (_state == TGAM_ACTIVE || _state == TGAM_ACTIVE_DOUBLE)
+//    {
+//        _nDownRegulated ++;
+//    }
     
-    if (_state == TGAM_INDUCED_REG)
-    {
-        _nextState = TGAM_INDUCED_REG;
-    }
-    else
-    {
-    	_nextState = _state = TGAM_DOWN_REGULATED;
-    	_deactivationTime = time;
-    }
+//    if (_state == TGAM_INDUCED_REG)
+//    {
+//        _nextState = TGAM_INDUCED_REG;
+//    }
+//    else
+//    {
+//    	_nextState = _state = TGAM_DOWN_REGULATED;
+//    	_deactivationTime = time;
+//    }
 }
 
 void Tgam::updateState()

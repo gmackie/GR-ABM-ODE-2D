@@ -444,58 +444,60 @@ void GrSimulation::init()
 	PosVector initExtMtb = Params::getInstance()->getInitialExtMtb();
 	const int maxMacAge = _PARAM(PARAM_MAC_AGE);
 
-	// Place initial infected macrophages on the grid
-	for (PosVector::const_iterator it = initMacs.begin(); it != initMacs.end(); it++)
-	{
-		Mac* pMac = createMac(it->x, it->y, g_Rand.getInt(-1, -maxMacAge), Mac::MAC_INFECTED, false, false);
+    // Place initial infected macrophages on the grid
+    for (PosVector::const_iterator it = initMacs.begin(); it != initMacs.end(); it++)
+    {
+        Mac* pMac = createMac(it->x, it->y, g_Rand.getInt(-1, -maxMacAge), Mac::MAC_INFECTED, false, false);
 		
-		if (_nfkbDynamics)
-		{
-			// initialize NF-kB signaling from steady-state (12 hours equilibrium)
-			for (int i = 0; i < 7200*_PARAM(PARAM_GR_NF_KB_TIME_COEFF); ++i)
-				pMac->solveNFkBODEsEquilibrium(6.00/_PARAM(PARAM_GR_NF_KB_TIME_COEFF));
-		}
+        if (_nfkbDynamics)
+        {
+            // initialize NF-kB signaling from steady-state (12 hours equilibrium)
+            for (int i = 0; i < 7200*_PARAM(PARAM_GR_NF_KB_TIME_COEFF); ++i)
+                pMac->solveNFkBODEsEquilibrium(6.00/_PARAM(PARAM_GR_NF_KB_TIME_COEFF));
+        }
 
-		pMac->setIntMtb(1);
-		++_statsPrevious.getTotIntMtb();
-		++_stats.getTotIntMtb();
-	}
+        pMac->setIntMtb(1);
+        ++_statsPrevious.getTotIntMtb();
+        ++_stats.getTotIntMtb();
+    }
 
-	// Place initial extracellular bacteria on the grid
-	for (PosVector::const_iterator it = initExtMtb.begin(); it != initExtMtb.end(); it++)
-	{
-		_grid.getGrid().extMTB(*it) += 1;
-		++_statsPrevious.getTotExtMtb();
-		++_stats.getTotExtMtb();
-	}
+    // Place initial extracellular bacteria on the grid
+    for (PosVector::const_iterator it = initExtMtb.begin(); it != initExtMtb.end(); it++)
+    {
+        _grid.getGrid().extMTB(*it) += 1;
+        ++_statsPrevious.getTotExtMtb();
+        ++_stats.getTotExtMtb();
+    }
 
-	// Add a fixed number (PARAM_MAC_INIT_NUMBER) of resting
-	// macrophages to the grid
-	int count = _PARAM(PARAM_MAC_INIT_NUMBER);
+    // Add a fixed number (PARAM_MAC_INIT_NUMBER) of resting
+    // macrophages to the grid
+    int count = _PARAM(PARAM_MAC_INIT_NUMBER);
 
-	int nrGridCompartments = (_grid.getSize());
-	if (count > nrGridCompartments)
-	{
-		std::cerr << "The number of initial resting macrophages to place on the grid, " << count << ", is > the number of grid compartments, " << nrGridCompartments << "." << std::endl;
-		exit(1);
-	}
+    int nrGridCompartments = (_grid.getSize());
+    if (count > nrGridCompartments)
+    {
+        std::cerr << "The number of initial resting macrophages to place on the grid, " << count << ", is > the number of grid compartments, " << nrGridCompartments << "." << std::endl;
+        exit(1);
+    }
 
-	while (count > 0)
-	{
-		int row = g_Rand.getInt(_grid.getRange().x);
-		int col = g_Rand.getInt(_grid.getRange().y);
-		if (!_grid.getGrid().hasAgentType(MAC, Pos(row, col)))
-		{
-			Mac* newMac = createMac(row, col, g_Rand.getInt(-1, -maxMacAge), Mac::MAC_RESTING, false, false);
-			if (_nfkbDynamics)
-			{
-				// initialize NF-kB signaling from steady-state (12 hours equilibrium)
-				for (int i = 0; i < 7200*_PARAM(PARAM_GR_NF_KB_TIME_COEFF); ++i)
-					newMac->solveNFkBODEsEquilibrium(6.00/_PARAM(PARAM_GR_NF_KB_TIME_COEFF));
-			}
-			count--;
-		}
-	}
+//    _grid.getGrid().setil10(50, 50, 10000);
+
+    while (count > 0)
+    {
+        int row = g_Rand.getInt(_grid.getRange().x);
+        int col = g_Rand.getInt(_grid.getRange().y);
+        if (!_grid.getGrid().hasAgentType(MAC, Pos(row, col)))
+        {
+            Mac* newMac = createMac(row, col, g_Rand.getInt(-1, -maxMacAge), Mac::MAC_RESTING, false, false);
+            if (_nfkbDynamics)
+            {
+                // initialize NF-kB signaling from steady-state (12 hours equilibrium)
+                for (int i = 0; i < 7200*_PARAM(PARAM_GR_NF_KB_TIME_COEFF); ++i)
+                    newMac->solveNFkBODEsEquilibrium(6.00/_PARAM(PARAM_GR_NF_KB_TIME_COEFF));
+            }
+            count--;
+        }
+    }
 
 }
 
@@ -621,8 +623,9 @@ void GrSimulation::solve()
 		_il10rDynamics = false;
 	}
     
-  // Calculate Diffusion and Molecular events for a 10 min timestep
-  // Agent time step is 600 s (10 min)
+    // Calculate Diffusion and Molecular events for a 10 min timestep
+    // Agent time step is 600 s (10 min)
+	
 	for (int DiffStep = 0; DiffStep < _numDiffusionPerAgent; DiffStep++) 
 	{
     _pDiffusion->diffuse(_grid);
@@ -646,6 +649,8 @@ void GrSimulation::solve()
     }  
   }
 
+    }
+	
 	// move macrophages
 	moveMacrophages();
 
@@ -1272,6 +1277,9 @@ void GrSimulation::setDiffusionMethod(DiffusionMethod method)
         break;
                 
 		}
+    if(method != DIFF_ADE_SWAP && _PARAM(PARAM_GR_DT_DIFFUSION) > 12) {
+     std::clog<<("*** WARNING: This diffusion method is unstable for timesteps greater than 12 seconds")<<std::endl;
+    }
 	}
 }
 

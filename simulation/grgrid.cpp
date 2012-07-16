@@ -246,7 +246,11 @@ bool GrGrid::incKillings(const Pos& p) {
   ++_nKillings[Indexer::ind(_dim, p)];
   if(isCaseated(p)) {
     for(unsigned i=0;i<MAX_AGENTS_PER_CELL;i++)
-      if(agent(p, i)) agent(p,i)->kill();
+      if(agent(p, i) && !agent(p,i)->isDead())
+      {
+          agent(p,i)->kill();
+          ++_nKillings[Indexer::ind(_dim, p)];
+      }
     return true;
   }
   return false;

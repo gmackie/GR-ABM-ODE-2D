@@ -30,14 +30,14 @@ public:
 	Treg(int birthtime, int row, int col, Treg::State state);
 	~Treg();
 	void move(GrGrid& grid);
-	void secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDepletion, bool il10rDynamics, bool il10Depletion, int mdt);
+    void secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDepletion, bool il10rDynamics, bool il10Depletion, double mdt);
 	void computeNextState(const int time, GrGrid& grid, Stats& stats, bool tnfrDynamics, bool nfkbDynamics, bool il10Depletion, bool);
 	void updateState();
   void updateStatistics(Stats& s) const;
 	int getState() const;
 	Treg::State getNextState() const;
 	void kill();
-	void deactivate(const int time);
+    void deactivate(const int time, Stats& stats);
 	bool isDead() const;
 	bool isDeadNext();
 	static bool isTreg(const Agent* pAgent);

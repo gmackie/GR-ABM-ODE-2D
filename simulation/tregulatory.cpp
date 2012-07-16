@@ -43,7 +43,7 @@ void Treg::move(GrGrid& grid)
 	Tcell::moveTcell(grid, false, true, false);
 }
 
-void Treg::secrete(GrGrid& grid, bool, bool, bool, bool il10rDynamics, bool il10Depletion, int mdt)
+void Treg::secrete(GrGrid& grid, bool, bool, bool, bool il10rDynamics, bool il10Depletion, double mdt)
 {
     
     _kISynth = _PARAM(PARAM_GR_I_K_SYNTH_TCELL);
@@ -54,33 +54,43 @@ void Treg::secrete(GrGrid& grid, bool, bool, bool, bool il10rDynamics, bool il10
     
 }
 
-void Treg::deactivate(const int)
+void Treg::deactivate(const int, Stats&)
 {
 }
 
 void Treg::computeNextState(const int time, GrGrid& grid, Stats& stats, bool tnfrDynamics, bool, bool, bool)
 {
-	double tnfBoundFraction = grid.TNF(_pos) / (grid.TNF(_pos) + _PARAM(PARAM_GR_KD1) * 48.16e11);
-
 	// check if it is time to die
 	if (timeToDie(time))
 	{
 		_nextState = TREG_DEAD;
 	}
-	else if (tnfrDynamics && intCompareGT(_intBoundTNFR1, _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR)) &&	
-			 intCompareGT(1 - pow(2.7183, -_PARAM(PARAM_GR_K_APOPTOSIS_MOLECULAR) * (_intBoundTNFR1 - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR))), g_Rand.getReal()))
-	{
-		// TNF induced apoptosis
-		++stats.getTcellApoptosisTNF();
-		_nextState = TREG_DEAD;
-	}
-	else if (!tnfrDynamics && tnfBoundFraction > _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF) &&
-			 g_Rand.getReal() < 1 - pow(2.7183, -_PARAM(PARAM_GR_K_APOPTOSIS) * (tnfBoundFraction - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF))))
-	{
-		// TNF induced apoptosis
-		++stats.getTcellApoptosisTNF();
-		_nextState = TREG_DEAD;
-	}
+
+    // Always pass in false for nfkbDynamics for T cell apoptosis since they DO NOT have NFkB dynamics
+    else if (TNFinducedApoptosis(grid, tnfrDynamics, false))
+    {
+        ++stats.getTcellApoptosisTNF();
+        _nextState = TREG_DEAD;
+        grid.incKillings(_pos);
+    }
+
+//	else if (tnfrDynamics && intCompareGT(_intBoundTNFR1, _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR)) &&
+//			 intCompareGT(1 - pow(2.7183, -_PARAM(PARAM_GR_K_APOPTOSIS_MOLECULAR) * (_intBoundTNFR1 - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR))), g_Rand.getReal()))
+//	{
+//		// TNF induced apoptosis
+//		++stats.getTcellApoptosisTNF();
+//		_nextState = TREG_DEAD;
+//        grid.incKillings(_pos);
+//	}
+//	else if (!tnfrDynamics && tnfBoundFraction > _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF) &&
+//			 g_Rand.getReal() < 1 - pow(2.7183, -_PARAM(PARAM_GR_K_APOPTOSIS) * (tnfBoundFraction - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF))))
+//	{
+//		// TNF induced apoptosis
+//		++stats.getTcellApoptosisTNF();
+//		_nextState = TREG_DEAD;
+//        grid.incKillings(_pos);
+//	}
+
 	else
 	{
 		switch (_state)
@@ -105,7 +115,7 @@ void Treg::computeNextState(const int time, GrGrid& grid, Stats& stats, bool tnf
 // loaded then the agent will be deserialized and added to a cell list, but it will fail to be
 // added to its grid compartment because an agent can't be added to a caseated compartment.
 // This will leave the simulation in an inconsistent state.
-void Treg::handleResting(const int time, GrGrid& grid, Stats&)
+void Treg::handleResting(const int time, GrGrid& grid, Stats& stats)
 {
 	for (int i = -1; i <= 1; i++)
 	{
@@ -121,7 +131,7 @@ void Treg::handleResting(const int time, GrGrid& grid, Stats&)
 					  Scalar coinFlip = g_Rand.getReal();
 					  if (coinFlip  <= _PARAM(PARAM_TREG_PROB_DEACTIVATE))
 					  {
-						  grid.agent(p, k)->deactivate(time);
+                          grid.agent(p, k)->deactivate(time, stats);
 					  }
 				  }
 			  }

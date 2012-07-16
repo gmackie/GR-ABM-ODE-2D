@@ -155,10 +155,8 @@ public:
     write("NrCaseated");
     write("MacApoptosisTNF"); write("MrApoptTNF"); write("MiApoptTNF"); write("MciApoptTNF");  write("MaApoptTNF");
     write("TcellApoptTNF");
-    write("MrNFkBActivationTNF");
-    write("MiNFkBActivationTNF");
-    write("MrActivationTNF");
-    write("MiActivationTNF");
+    write("Fas/FasL Killing");
+    write("Cytotoxic Killing");
     write("NrOfMacsFullyInhibited");
     write("TgamQueued"); write("TcytQueued"); write("TregQueued");
     write("TgamQueuedDie"); write("TcytQueuedDie"); write("TregQueuedDie");
@@ -218,12 +216,9 @@ public:
       write(totMacApoptosisTNF[i]);
 
     write(stats.getTcellApoptosisTNF());
+    write(stats.getApoptosisFasFasL());
+    write(stats.getKillCytotoxic());
 
-    write(stats.getRestingMacNFkBTNF());
-    write(stats.getInfMacNFkBTNF());
-
-    write(stats.getRestingMacActivationTNF());
-    write(stats.getInfMacActivationTNF());
     write(stats.getNrOfCellsTnfInhibited()/100);
 
     for(size_t i=TGAM;i<NAGENTS;i++)

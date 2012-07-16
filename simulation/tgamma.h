@@ -40,13 +40,13 @@ public:
 	Tgam(int birthtime, int row, int col, Tgam::State state);
 	~Tgam();
 	void move(GrGrid& grid);
-	void secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDepletion, bool il10rDynamics, bool il10Depletion, int mdt);
+    void secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDepletion, bool il10rDynamics, bool il10Depletion, double mdt);
 	void computeNextState(const int time, GrGrid& grid, Stats& stats, bool tnfrDynamics, bool nfkbDynamics, bool il10rDynamics, bool tgmmatransition);
 	void updateState();
   void updateStatistics(Stats& s) const;
 	int getState() const;
 	Tgam::State getNextState() const;
-	void deactivate(const int time);
+    void deactivate(const int time, Stats& stats);
 	void kill();
 	bool isDead() const;
 	bool isDeadNext();

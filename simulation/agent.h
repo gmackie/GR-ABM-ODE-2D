@@ -150,7 +150,7 @@ public:
   virtual bool NFkBCapable() const { return false; }
 
 	virtual void move(GrGrid& grid) = 0;
-	virtual void secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDepletion, bool il10rDynamics, bool il10Depletion, int mdt) = 0;
+    virtual void secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDepletion, bool il10rDynamics, bool il10Depletion, double mdt) = 0;
 	virtual void computeNextState(const int time, GrGrid& grid, Stats& stats, bool tnfrDynamics, bool nfkbDynamics, bool il10rDynamics, bool tgammatransition) = 0;
 	virtual void updateState() = 0;
   virtual void updateStatistics(Stats& s) const = 0;
@@ -162,6 +162,10 @@ public:
   void solveMolecularScaleAdaptive(GrGrid& grid, double t, double dt, ODESolvers::ODEMethod method);
   void adaptiveODE(GrGrid& grid, double t, double dt, ODESolvers::ODEMethod method);
   void adaptiveODE2Cell(Agent* other, GrGrid& grid, double t, double dt, ODESolvers::ODEMethod method);
+
+  bool TNFinducedApoptosis(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics);
+  bool TNFinducedNFkB(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics);
+
 #if 0
     void solveTNF (GrGrid& grid, double dt);
     void solveIL10 (GrGrid& grid, double dt);
@@ -204,7 +208,7 @@ public:
 	virtual void solveDegradation (GrGrid& grid, double dt, bool tnfrDynamics, bool il10rDynamics, Scalar meanTNFR1, Scalar iIL10R);
 
 	virtual void kill() = 0;
-	virtual void deactivate(const int time) = 0;
+    virtual void deactivate(const int time, Stats& stats) = 0;
 	virtual bool isDead() const = 0;
 	virtual bool isDeadNext() = 0;
 	virtual void print() const = 0;

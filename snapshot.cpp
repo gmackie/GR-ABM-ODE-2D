@@ -239,9 +239,7 @@ void Snapshot::takeSnapshot(const int time, const Stats& stats)
     _outFile<<totMacApoptosisTNF[i]<<',';
   
   _outFile
-  << stats.getTcellApoptosisTNF()	<< ','
-  << stats.getRestingMacActivationTNF()	<< ','
-  << stats.getInfMacActivationTNF();
+  << stats.getTcellApoptosisTNF();
 
 
   _outFile << std::endl;

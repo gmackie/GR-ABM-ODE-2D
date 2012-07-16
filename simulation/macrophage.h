@@ -32,6 +32,8 @@ private:
 	bool _ICOS;
 	int _activationTime;
 	int _deactivationTime;
+    int _stat1Time;
+    int _nfkbTime;
 	
 	void handleResting(const int time, GrGrid& grid, Stats& stats, bool nfkbDynamics);
 	void handleInfected(const int time, GrGrid& grid, Stats& stats, bool nfkbDynamics);
@@ -77,7 +79,7 @@ public:
   /*virtual*/ bool NFkBCapable() const { return true; }
   /*virtual*/ Agent* clone() const { return new Mac(*this); }
 	void move(GrGrid& grid);
-	void secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDepletion, bool il10rDynamics, bool il10Depletion, int mdt);
+    void secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDepletion, bool il10rDynamics, bool il10Depletion, double mdt);
 	void computeNextState(const int time, GrGrid& grid, Stats& stats, bool tnfrDynamics, bool nfkbDynamics, bool il10rDynamics, bool);
   void solveDegradation (GrGrid& grid, double dt, bool tnfrDynamics, bool il10rDynamics);
 	void updateState();
@@ -92,8 +94,10 @@ public:
 	double getIntMtb() const;
 	void setIntMtb(double intMtb);
 	void kill();
-	void deactivate(const int time);
+    void deactivate(const int time, Stats& stats);
 	void apoptosis(GrGrid& grid);
+    bool checkSTAT1(GrGrid& grid, const int time);
+    bool checkNFkB(GrGrid& grid, const int time, bool tnfInducedNFkB);
 	bool isDead() const;
 	bool isDeadNext();
 	static bool isMac(const Agent* pAgent);
@@ -260,6 +264,8 @@ inline void Mac::visitProperties(Visitor& v) {
   v.visit("ICOS", _ICOS, "");
   v.visit("activationTime", _activationTime, "");
   v.visit("deactivationTime", _deactivationTime, "");
+  v.visit("stat1Time", _stat1Time, "");
+  v.visit("nfkbTime", _nfkbTime, "");
   Agent::visitProperties(v);
 }
 template<typename Visitor>
@@ -270,6 +276,8 @@ inline void Mac::visitProperties(Visitor& v) const {
   v.visit("ICOS", _ICOS, "");
   v.visit("activationTime", _activationTime, "");
   v.visit("deactivationTime", _deactivationTime, "");
+  v.visit("stat1Time", _stat1Time, "");
+  v.visit("nfkbTime", _nfkbTime, "");
   Agent::visitProperties(v);
 }
 

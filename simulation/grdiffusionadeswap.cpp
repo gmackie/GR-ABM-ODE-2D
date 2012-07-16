@@ -8,7 +8,7 @@
 #include "grdiffusionadeswap.h"
 
 GrDiffusionADE_Swap::GrDiffusionADE_Swap()
-: _cutOffValue(0.000001)
+: _cutOffValue(0.00000000000001)
 {
 }
 
@@ -38,14 +38,14 @@ static void diffuse_u(const Scalar* __restrict__ grid_u, Scalar* __restrict__ ne
 
     // Diffusion Constants for Grid and Time
     const Scalar dt = _PARAM(PARAM_GR_DT_DIFFUSION); //time step (sec)
-    const Scalar dx = 20e-4;
-    const Scalar dy = 20e-4;
+    const Scalar dx2 = 20e-4*20e-4;
+    const Scalar dy2 = 20e-4*20e-4;
     
     // Diffusion Constants for Any Molecule
-    const Scalar lambda = u_diffuse * dt * ((1/pow(dx,2)) + (1/pow(dy,2)));
+    const Scalar lambda = u_diffuse * dt * ((1.0/dx2) + (1.0/dy2));
     const Scalar coefficient_a = (1-lambda)/(1+lambda);
-    const Scalar coefficient_b = ((u_diffuse * dt)/(pow(dy,2)))/(1+lambda);
-    const Scalar coefficient_c = ((u_diffuse * dt)/(pow(dx,2)))/(1+lambda);
+    const Scalar coefficient_b = ((u_diffuse * dt)/(dy2))/(1+lambda);
+    const Scalar coefficient_c = ((u_diffuse * dt)/(dx2))/(1+lambda);
     
     
     // ADE SCHEME FOR U
@@ -174,31 +174,51 @@ static void diffuse_degrade(GrGrid& nextGrid)
 {
     const Scalar dt = _PARAM(PARAM_GR_DT_DIFFUSION);
 
-    //Degradation equation here is incorrect, the effect is degradation lags
+    const Scalar TNFdegRate = pow(2.7183, (-1.0 *  _PARAM(PARAM_GR_K_DEG) * dt));
+    const Scalar IL10degRate = pow(2.7183, (-1.0 *  _PARAM(PARAM_GR_I_K_DEG) * dt));
+    const Scalar CHEMOKINEdegRate = pow(2.7183, (-1.0 *  _PARAM(PARAM_GR_CHEMOKINE_K_DEG) * dt));
+
+    //Degradation equation here is separated based on operator splitting causing it to lag
     //behind diffusion.  We make the assumption diffuse << degrade to 
-    //show degradation is much slower and incurs no stability issues
-    
+    //show degradation is much slower and incurs no stability issues. This argument should hold for
+    //most degradation rates we use in the code. Please refer to the concept of Thiele Modulus for a mathematical
+    //derivation of this argument.
+
+    // Degradation is solved by the analytical solution to the linear degradation ODE
+    // instead of by a numerical solver. This should vastly increase the accuracy of the
+    // degradation in the ABM code. This is allowed due to the concept of operator splitting
+
     Pos p;
+
     for(p.x = 0; p.x < nextGrid.getRange().x; ++p.x)
-        for(p.y = 0; p.y < nextGrid.getRange().y; ++p.y) {
-            
+        for(p.y = 0; p.y < nextGrid.getRange().y; ++p.y)
+        {
             // Degradation of sTNF
-            nextGrid.incTNF(p, (-1.0 * nextGrid.TNF(p) * _PARAM(PARAM_GR_K_DEG) * dt));
-            
+            nextGrid.setTNF(p, nextGrid.TNF(p) * TNFdegRate);
+//            nextGrid.incTNF(p, (-1.0 * nextGrid.TNF(p) * _PARAM(PARAM_GR_K_DEG) * dt));
+
             // Degradation of il10
-            nextGrid.incil10(p, (-1.0 * nextGrid.il10(p) * _PARAM(PARAM_GR_I_K_DEG) * dt));
+            nextGrid.setil10(p, nextGrid.il10(p) * IL10degRate);
+//            nextGrid.setil10(p, (-1.0 * nextGrid.il10(p) * _PARAM(PARAM_GR_I_K_DEG) * dt));
             
             // Degradation of CCL2
-            nextGrid.incCCL2(p, (-1.0 * nextGrid.CCL2(p) * _PARAM(PARAM_GR_CHEMOKINE_K_DEG) * dt));
-            
+            nextGrid.setCCL2(p, nextGrid.CCL2(p) * CHEMOKINEdegRate);
+//            nextGrid.incCCL2(p, (-1.0 * nextGrid.CCL2(p) * _PARAM(PARAM_GR_CHEMOKINE_K_DEG) * dt));
+
             // Degradation of CCL5
-            nextGrid.incCCL5(p, (-1.0 * nextGrid.CCL5(p) * _PARAM(PARAM_GR_CHEMOKINE_K_DEG) * dt));
+            nextGrid.setCCL5(p, nextGrid.CCL5(p) * CHEMOKINEdegRate);
+//            nextGrid.incCCL5(p, (-1.0 * nextGrid.CCL5(p) * _PARAM(PARAM_GR_CHEMOKINE_K_DEG) * dt));
             
             // Degradation of CXCL9
-            nextGrid.incCXCL9(p, (-1.0 * nextGrid.CXCL9(p) * _PARAM(PARAM_GR_CHEMOKINE_K_DEG) * dt));
+            nextGrid.setCXCL9(p, nextGrid.CXCL9(p) * CHEMOKINEdegRate);
+//            nextGrid.incCXCL9(p, (-1.0 * nextGrid.CXCL9(p) * _PARAM(PARAM_GR_CHEMOKINE_K_DEG) * dt));
             
-            // Degredation of MacAttractant
-            nextGrid.incmacAttractant(p, (-1.0 * nextGrid.macAttractant(p) * _PARAM(PARAM_GR_CHEMOKINE_K_DEG) * dt));
+            if (_PARAM(PARAM_GR_SEC_RATE_ATTRACTANT) != 0)
+            {
+                // Degradation of MacAttractant
+                nextGrid.setmacAttractant(p, nextGrid.macAttractant(p) * CHEMOKINEdegRate);
+//                nextGrid.incmacAttractant(p, (-1.0 * nextGrid.macAttractant(p) * _PARAM(PARAM_GR_CHEMOKINE_K_DEG) * dt));
+            }
             
             // Unbinding of sTNF from ShedTNFR2
             nextGrid.incshedTNFR2(p, (-1.0 * nextGrid.shedTNFR2(p) * _PARAM(PARAM_GR_KD2) * _PARAM(PARAM_GR_K_ON2) * dt));
@@ -233,9 +253,14 @@ void GrDiffusionADE_Swap::diffuse(GrSimulationGrid& grSim) const {
         }
 #pragma omp section
         {
-            ::diffuse_u(grid.u_macAttractant(), nextGrid.u_macAttractant(), grid.getRange(), _PARAM(PARAM_GR_D_CHEMOKINES), _cutOffValue);
-            ::diffuse_v(grid.v_macAttractant(), nextGrid.v_macAttractant(), grid.getRange(), _PARAM(PARAM_GR_D_CHEMOKINES), _cutOffValue);
-            ::diffuse_avg(nextGrid.u_macAttractant(), nextGrid.v_macAttractant(), nextGrid.macAttractant(), grid.getRange());
+            if (_PARAM(PARAM_GR_SEC_RATE_ATTRACTANT) != 0)
+            {
+                std::cout << "Why is this running?!?" << std::endl;
+                ::diffuse_u(grid.u_macAttractant(), nextGrid.u_macAttractant(), grid.getRange(), _PARAM(PARAM_GR_D_CHEMOKINES), _cutOffValue);
+                ::diffuse_v(grid.v_macAttractant(), nextGrid.v_macAttractant(), grid.getRange(), _PARAM(PARAM_GR_D_CHEMOKINES), _cutOffValue);
+                ::diffuse_avg(nextGrid.u_macAttractant(), nextGrid.v_macAttractant(), nextGrid.macAttractant(), grid.getRange());
+            }
+
         }
 #pragma omp section
         {

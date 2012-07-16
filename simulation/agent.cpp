@@ -467,8 +467,8 @@ void Agent::AdaptiveRK2cell(Agent* secondCell, GrGrid& grid, double timestart, d
 //            
 //        }
 //        
-//        (this->*derivs)(_currentsolution, _switchvector,h,grid);
-//        (secondCell->*derivs)(secondCell->_currentsolution, secondCell->_switchvector,h,grid);
+        (this->*derivs)(_currentsolution, _switchvector,h,grid);
+        (secondCell->*derivs)(secondCell->_currentsolution, secondCell->_switchvector,h,grid);
 //        
 //        std::cout << "Derivative Estimate: " << std::endl;
 //        for (int i = 0; i < (int)this->_switchvector.size(); i++) {
@@ -476,8 +476,8 @@ void Agent::AdaptiveRK2cell(Agent* secondCell, GrGrid& grid, double timestart, d
 //            
 //        }
 //        
-//        _switchvector = abs(_currentsolution) + abs(_switchvector);
-//        secondCell->_switchvector = abs(secondCell->_currentsolution) + abs(secondCell->_switchvector);
+        _switchvector = abs(_currentsolution) + abs(_switchvector);
+        secondCell->_switchvector = abs(secondCell->_currentsolution) + abs(secondCell->_switchvector);
 //        
 //        std::cout << "Error Estimate: " << std::endl;
 //        for (int i = 0; i < (int)this->_switchvector.size(); i++) {
@@ -621,11 +621,6 @@ void Agent::RKStepper2cell(Agent* secondCell, GrGrid& grid, double dttry, double
         }
         
     }
-    
-    
-    
-    
-    
 }
 
 
@@ -1989,6 +1984,79 @@ void Agent::solveNFkBODEsEquilibrium(double dt)
 	 std::cout << "Error: Negative Value of Species in NFkB dynamics" << std::endl;
 	 */
 }
+
+
+
+bool Agent::TNFinducedApoptosis(GrGrid &grid, bool tnfrDynamics, bool nfkbDynamics)
+{
+    bool Threshold, Probability;
+
+    if (!nfkbDynamics && tnfrDynamics)
+    {
+        Threshold = intCompareGT(_intBoundTNFR1, _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR));
+        Probability = intCompareGT(1 - pow(2.7183, -_PARAM(PARAM_GR_K_APOPTOSIS_MOLECULAR) * (_intBoundTNFR1 - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR))), g_Rand.getReal());
+
+    }
+    else if (nfkbDynamics)
+    {
+        double nfkb_adjusted_k_apoptosis = _PARAM(PARAM_GR_K_APOPTOSIS_NFKB_MOLECULAR) * (_PARAM(PARAM_GR_K_IAP)/(_PARAM(PARAM_GR_K_IAP) + _normalizedIAP));
+
+        Threshold = intCompareGT(_intBoundTNFR1, _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR));
+        Probability = intCompareGT(1 - pow(2.7183, -nfkb_adjusted_k_apoptosis * (_intBoundTNFR1 - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR))), g_Rand.getReal());
+
+    }
+    else if (!tnfrDynamics)
+    {
+        double tnfBoundFraction = grid.TNF(_pos) / (grid.TNF(_pos) + _PARAM(PARAM_GR_KD1) * 48.16e11);
+
+        Threshold = intCompareGT(tnfBoundFraction, _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF));
+        Probability = intCompareGT(1 - pow(2.7183, -_PARAM(PARAM_GR_K_APOPTOSIS) * (tnfBoundFraction - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF))), g_Rand.getReal());
+
+    }
+    else
+    {
+        throw std::runtime_error("Invalid TNF Induced Apoptosis Calculation -- Criteria Not Met For Molecular/Non-Molecular Options");
+    }
+
+    return Threshold && Probability;
+
+}
+
+bool Agent::TNFinducedNFkB(GrGrid &grid, bool tnfrDynamics, bool nfkbDynamics)
+{
+    bool Threshold, Probability;
+
+    if (!nfkbDynamics && tnfrDynamics)
+    {
+        Threshold = intCompareGT(_surfBoundTNFR1, _PARAM(PARAM_MAC_THRESHOLD_NFKB_TNF_MOLECULAR));
+        Probability = intCompareGT(1 - pow(2.7183, -_PARAM(PARAM_MAC_K_NFKB_MOLECULAR) * (_surfBoundTNFR1 - _PARAM(PARAM_MAC_THRESHOLD_NFKB_TNF_MOLECULAR))), g_Rand.getReal());
+    }
+
+
+    else if (nfkbDynamics)
+    {
+        Threshold = intCompareGT(_normalizedACT, _PARAM(PARAM_GR_ACT_THRESHOLD));
+        Probability = intCompareGT(1 - pow(2.7183, -_PARAM(PARAM_GR_ACT_K) * (_normalizedACT - _PARAM(PARAM_GR_ACT_THRESHOLD))), g_Rand.getReal());
+    }
+
+
+    else if (!tnfrDynamics)
+    {
+        double tnfBoundFraction = grid.TNF(_pos) / (grid.TNF(_pos) + _PARAM(PARAM_GR_KD1) * 48.16e11);
+
+        Threshold = intCompareGT(tnfBoundFraction, _PARAM(PARAM_MAC_THRESHOLD_NFKB_TNF));
+        Probability = intCompareGT(1 - pow(2.7183, -_PARAM(PARAM_MAC_K_NFKB) * (tnfBoundFraction - _PARAM(PARAM_MAC_THRESHOLD_NFKB_TNF))), g_Rand.getReal());
+    }
+
+    else
+    {
+        throw std::runtime_error("Invalid TNF Induced NFkB Calculation -- Criteria Not Met For Molecular/Non-Molecular Options");
+    }
+
+    return Threshold && Probability;
+
+}
+
 
 void Agent::solveDegradation(GrGrid& grid, double dt, bool tnfrDynamics, bool il10rDynamics, Scalar meanTNFR1, Scalar iIL10R)
 {

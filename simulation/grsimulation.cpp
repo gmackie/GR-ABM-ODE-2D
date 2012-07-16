@@ -647,10 +647,8 @@ void GrSimulation::solve()
             adjustFauxDegradation(_PARAM(PARAM_GR_DT_MOLECULAR));
             //adjustTNFDegradation(_PARAM(PARAM_GR_DT_MOLECULAR));
     }  
-  }
-
     }
-	
+
 	// move macrophages
 	moveMacrophages();
 
@@ -794,7 +792,7 @@ void GrSimulation::computeNextStates()
 	} 
 }
 
-void GrSimulation::secreteFromMacrophages(bool tnfDepletion, bool il10Depletion, int mdt)
+void GrSimulation::secreteFromMacrophages(bool tnfDepletion, bool il10Depletion, double mdt)
 {
 	for (MacList::iterator it = _macList.begin(); it != _macList.end(); it++)
 	{
@@ -802,7 +800,7 @@ void GrSimulation::secreteFromMacrophages(bool tnfDepletion, bool il10Depletion,
 	}
 }
 
-void GrSimulation::secreteFromTcells(bool tnfDepletion, bool il10Depletion, int mdt)
+void GrSimulation::secreteFromTcells(bool tnfDepletion, bool il10Depletion, double mdt)
 {
 	for (TgamList::iterator it = _tgamList.begin(); it != _tgamList.end(); it++)
 	{
@@ -818,7 +816,7 @@ void GrSimulation::secreteFromTcells(bool tnfDepletion, bool il10Depletion, int 
 	}
 }
 
-void GrSimulation::secreteFromCaseations(int mdt)
+void GrSimulation::secreteFromCaseations(double mdt)
 {
 	// secrete chemokines from caseated compartments only if infection is not cleared
   Pos p;

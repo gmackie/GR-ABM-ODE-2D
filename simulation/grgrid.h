@@ -262,24 +262,16 @@ inline const std::vector<Pos>& GrGrid::getSources() const
     { set##name(p.x, p.y, v); } \
   inline void GrGrid::set##name (int x, int y, type v)  \
     { _u_##name[Indexer::padInd(_dim, x, y)] += v - _##name[Indexer::padInd(_dim, x, y)];					\
-      _v_##name[Indexer::padInd(_dim, _dim.x - x - 1, _dim.y - y - 1)] += v - _##name[Indexer::padInd(_dim, x, y)];					\
+      _v_##name[Indexer::padInd(_dim, x, y)] += v - _##name[Indexer::padInd(_dim, x, y)];					\
       _##name [Indexer::padInd(_dim, x, y)] = v; \
     }	\
   inline void GrGrid::inc##name (const Pos& p, type v) \
     { inc##name(p.x, p.y, v); } \
   inline void GrGrid::inc##name (int x, int y, type v)  \
     { _u_##name[Indexer::padInd(_dim, x, y)] += v;					\
-      _v_##name[Indexer::padInd(_dim, _dim.x - x - 1, _dim.y - y - 1)] += v;					\
+      _v_##name[Indexer::padInd(_dim, x, y)] += v;					\
       _##name [Indexer::padInd(_dim, x, y)] += v; \
     }
-
-    /*
-	  const type& u_##name (const Pos& p) const;  \
-	  const type& u_##name (int x, int y) const;  \
-			void u_##set##name (const Pos& p, type v);  \
-			void u_##set##name (int x, int y, type v);  \
-
-     */
 
   GRIDS_DEFS
 

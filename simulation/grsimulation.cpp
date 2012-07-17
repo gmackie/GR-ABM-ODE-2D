@@ -54,8 +54,8 @@ GrSimulation::GrSimulation(const Pos& dim)
 		_pTTest[i] = NULL;
     }
 
-    _numMolecularPerDiffusion = _PARAM(PARAM_GR_DT_DIFFUSION)/_PARAM(PARAM_GR_DT_MOLECULAR); // Number of molecular iterations per diffusion iteration
-    _numDiffusionPerAgent = (AGENT_TIME_STEP / _PARAM(PARAM_GR_DT_DIFFUSION)); // Number of diffusion iterations per agent iteration
+    _numMolecularPerDiffusion = (int)(_PARAM(PARAM_GR_DT_DIFFUSION)/_PARAM(PARAM_GR_DT_MOLECULAR)); // Number of molecular iterations per diffusion iteration
+    _numDiffusionPerAgent = (int)(AGENT_TIME_STEP / _PARAM(PARAM_GR_DT_DIFFUSION)); // Number of diffusion iterations per agent iteration
 }
 
 GrSimulation* GrSimulation::clone() const {

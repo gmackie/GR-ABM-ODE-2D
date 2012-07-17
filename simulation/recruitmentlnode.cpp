@@ -126,9 +126,9 @@ void RecruitmentLnODE::updateQueue(const int time, Stats& stats)
 	}
 
 	// Update the statistics
-	stats.setFlux<Tgam>(tcellFlux[TCELL_TYPE_GAM]);
-	stats.setFlux<Tcyt>(tcellFlux[TCELL_TYPE_CYT]);
-	stats.setFlux<Treg>(tcellFlux[TCELL_TYPE_REG]);
+	stats.setFlux<Tgam>(int(tcellFlux[TCELL_TYPE_GAM]));
+	stats.setFlux<Tcyt>(int(tcellFlux[TCELL_TYPE_CYT]));
+	stats.setFlux<Treg>(int(tcellFlux[TCELL_TYPE_REG]));
 
 	// update stats
 	stats.setNrQueued<Tgam>(_tcellQueueCount[TCELL_TYPE_GAM]);

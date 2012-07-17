@@ -719,14 +719,14 @@ bool ParamsBase::readElement(const TiXmlElement* pElement, bool paramsRead[])
 void ParamsBase::computeParams()
 {
   if(_paramsRead[PARAM_MAC_INIT_DENSITY])
-    setParam(PARAM_MAC_INIT_NUMBER, getParam(PARAM_MAC_INIT_DENSITY) * Scalar(_dim.x*_dim.y));
+    setParam(PARAM_MAC_INIT_NUMBER, (int)(getParam(PARAM_MAC_INIT_DENSITY) * Scalar(_dim.x*_dim.y)));
   else if(_paramsRead[PARAM_MAC_INIT_NUMBER])
     setParam(PARAM_MAC_INIT_DENSITY, getParam(PARAM_MAC_INIT_NUMBER) / Scalar(_dim.x*_dim.y));
   else
     throw std::runtime_error("Initial resting macs not specified in parameter file");
 
   if(_paramsRead[PARAM_SOURCE_DENSITY])
-    setParam(PARAM_GR_NR_SOURCES, getParam(PARAM_SOURCE_DENSITY) * Scalar(_dim.x*_dim.y));
+    setParam(PARAM_GR_NR_SOURCES, (int)(getParam(PARAM_SOURCE_DENSITY) * Scalar(_dim.x*_dim.y)));
   else if(_paramsRead[PARAM_GR_NR_SOURCES])
     setParam(PARAM_SOURCE_DENSITY, getParam(PARAM_GR_NR_SOURCES) / Scalar(_dim.x*_dim.y));
   else

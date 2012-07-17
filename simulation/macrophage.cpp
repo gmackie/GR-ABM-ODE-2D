@@ -540,7 +540,7 @@ void Mac::solveDegradation(GrGrid& grid, double dt, bool tnfrDynamics, bool il10
 	Agent::solveDegradation(grid, dt, tnfrDynamics, il10rDynamics, _PARAM(PARAM_GR_MEAN_TNFR1_MAC), _PARAM(PARAM_GR_I_IL10R_MAC));
 }
 
-void Mac::handleResting(const int time, GrGrid& grid, Stats& stats, bool nfkbDynamics)
+void Mac::handleResting(const int time, GrGrid& grid, Stats& stats, bool /*nfkbDynamics*/)
 {
 //	_stat1 |= g_Rand.getReal() < getCountTgam(Tgam::TGAM_ACTIVE, grid) * _PARAM(PARAM_MAC_PROB_STAT1_TGAM);
 
@@ -620,7 +620,7 @@ void Mac::handleResting(const int time, GrGrid& grid, Stats& stats, bool nfkbDyn
 	}
 }
 
-void Mac::handleInfected(const int time, GrGrid& grid, Stats& stats, bool nfkbDynamics)
+void Mac::handleInfected(const int time, GrGrid& grid, Stats& stats, bool /*nfkbDynamics*/)
 {
 	// intracellular bacteria reproduce
 	_intMtb *= getIntMtbGrowthRate(time);

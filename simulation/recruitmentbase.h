@@ -69,8 +69,8 @@ inline bool RecruitmentBase::intCompareGTEQ(const double param1, const double pa
         modf(Store1, &intpart1);
         modf(Store2, &intpart2);
         
-        intpart1Store = intpart1;
-        intpart2Store = intpart2;
+        intpart1Store = (int)intpart1;
+        intpart2Store = (int)intpart2;
         
         if (intpart1Store >= intpart2Store) 
         {

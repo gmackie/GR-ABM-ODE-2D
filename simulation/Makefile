@@ -7,7 +7,7 @@ endif
 SVNREV := $(shell svn info | grep "Last Changed Rev:" | cut -d" " -f4)
 CXX := g++
 
-override CXXFLAGS += -DSVN_VERSION=\"$(SVNREV)\" -Wall -W -I$(BOOST_PREFIX)/include -Wno-strict-aliasing
+override CXXFLAGS += -DSVN_VERSION=\"$(SVNREV)\" -Wall -W -I$(BOOST_PREFIX)/include -Wno-strict-aliasing -Wno-unknown-pragmas
 
 # boost_system needed on Purdue Condor when using boost_filesystem.
 override LDFLAGS += -L$(BOOST_PREFIX)/lib -lm -lboost_program_options -lboost_iostreams -lboost_serialization -lboost_filesystem -lboost_system

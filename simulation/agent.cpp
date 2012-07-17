@@ -1019,7 +1019,7 @@ void Agent::checkTolerance(valarray<double>& veccheck)
             TempStorePower = floor(log10(veccheck[i]));
             TempStoreLarge = (veccheck[i] * (ABS_TOL/(pow(10,TempStorePower))));
             modf(TempStoreLarge, &intpart);
-            intpartStore = intpart;
+            intpartStore = (int)intpart;
 //            if (fracpart >= 0.5) 
 //            {
 //                intpartStore += (int)(ceil(fracpart));
@@ -1059,8 +1059,8 @@ bool Agent::intCompareGT(const double param1, const double param2)
         modf(Store1, &intpart1);
         modf(Store2, &intpart2);
         
-        intpart1Store = intpart1;
-        intpart2Store = intpart2;
+        intpart1Store = (int)intpart1;
+        intpart2Store = (int)intpart2;
         
         if (intpart1Store > intpart2Store) 
         {

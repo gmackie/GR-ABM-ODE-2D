@@ -266,6 +266,7 @@ void Tcyt::deactivate(const int time, Stats& stats)
         break;
     case Tcyt::TCYT_DOWN_REGULATED:
         break;
+    default: assert(0 && "deactivating unknown state"); break;
     }
 
 

@@ -21,14 +21,14 @@ void RecruitmentProb::recruit(GrSimulation &sim)
 {
     GrGrid& grid = sim.getGrid();
     const std::vector<Pos>& sources = grid.getSources();
-    Stats& stats = sim.getStats();
+    //Stats& stats = sim.getStats();
 
 //    std::cout << "Recruit Loop" << std::endl;
 
     for (PosVector::const_iterator it = sources.begin(); it != sources.end(); it++)
     {
 
-        if (grid.getNumberOfAgents(*it) == GrGrid::MAX_AGENTS_PER_CELL || grid.isCaseated(*it))
+        if (grid.getNumberOfAgents(*it) == (int)GrGrid::MAX_AGENTS_PER_CELL || grid.isCaseated(*it))
         {
 //            std::cout << "No Recruitment" << std::endl;
             continue;

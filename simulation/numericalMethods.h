@@ -18,10 +18,11 @@ typedef valarray<double> Derivative;
 struct DerivativeFunc {
   virtual void operator()(const ODEState& /*s*/, double /*t*/, Derivative& /*out*/, void* /*params*/) const {}
   virtual size_t dim() const { return 0; }  //it's own null object
+  virtual ~DerivativeFunc() {}
 };
 
 //*** TESTING METHODS ***///
-
+#if 0
 // Testing Function based on spring constant
 // x'' = -k*x - b*x'
 struct SpringDeriv : DerivativeFunc {
@@ -47,7 +48,7 @@ struct SpringDeriv : DerivativeFunc {
   }
 #endif
 };
-
+#endif
 // Testing Function for dependent variable functions
 // u' = -2*u + t + 4
 struct EqnDeriv : DerivativeFunc {

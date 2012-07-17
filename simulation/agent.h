@@ -282,6 +282,7 @@ struct LungFunc : ODESolvers::DerivativeFunc {
     GrGrid* grid;
   };
   LungFunc(size_t il10) : DerivativeFunc(), il10offset(il10) {}
+  virtual ~LungFunc() {}
   virtual void operator()(const ODESolvers::ODEState& vecread, double /*t*/, ODESolvers::Derivative& vecwrite, void* params) const;
   void il10deriv(const ODESolvers::ODEState& vecread, double /*t*/, ODESolvers::Derivative& vecwrite, Params_t* params) const;
   virtual size_t dim() const { return _PARAM(PARAM_TNFODE_EN)*10+_PARAM(PARAM_IL10ODE_EN)*3; }

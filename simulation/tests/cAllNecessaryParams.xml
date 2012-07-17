@@ -217,6 +217,11 @@
 			rateTGFB = "0.01"
 			rateICOS = "0.01"
 			rateAgDegree = "0.01"
+			maxRecProb = "0.0125315"
+			thresholdRecChemokine = "7.03e-04"
+			thresholdRecTNF = "1.34e-04"
+			recruitmentHalfSatTNF = "1.85e-05"
+			recruitmentHalfSatChemokine = "0.00133478"
 			/>
 		<Tcyt
 			maxTimeReg = "10"
@@ -224,11 +229,21 @@
 			probKillMacCleanly = "0.75"
 			thresholdRec = "0.00302084"
 			probRec = "0.36"
+			maxRecProb = "0.0125315"
+			thresholdRecChemokine = "7.03e-04"
+			thresholdRecTNF = "1.34e-04"
+			recruitmentHalfSatTNF = "1.85e-05"
+			recruitmentHalfSatChemokine = "0.00133478"
 			/>
 		<Treg
 			thresholdRec = "0.00418843"
 			probRec = "0.1"
 			probTregDeactivate = "1"
+			maxRecProb = "0.0521266"
+			thresholdRecChemokine = "7.03e-04"
+			thresholdRecTNF = "1.34e-04"
+			recruitmentHalfSatTNF = "0.10"
+			recruitmentHalfSatChemokine = "2.95914"
 			/>
 	</Tcell>
 	<Mtb

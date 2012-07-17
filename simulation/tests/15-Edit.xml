@@ -7,7 +7,7 @@
 	areaCellDensityStoppingThreshold = "1800"
 	areaCellDensityStopppingTimeStep2 = "29000"
 	areaCellDensityStoppingThreshold2 = "30000"
-	timestepDiffusion = "60"
+	timestepDiffusion = "30"
 	timestepMolecular = "6"
 	muMDC_LN = "0.3"
 	initN4 = "100000"

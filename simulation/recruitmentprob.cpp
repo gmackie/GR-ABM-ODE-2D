@@ -348,7 +348,7 @@ bool RecruitmentProb::PossibleRecruitMac(GrSimulation& sim, const Pos& pSource)
         double macProbValue = 0.0;
         bool macBool = MacThresholdRecNew(grid, pSource, macProbValue);
 
-        std::cout << "Mac: " << pSource  << "  "  << macProbValue  << "  " << macBool << std::endl;
+//        std::cout << "Mac: " << pSource  << "  "  << macProbValue  << "  " << macBool << std::endl;
 
         return (macBool && g_Rand.getReal() < (_PARAM(PARAM_MAC_MAX_RECRUITMENT) * macProbValue));
     }
@@ -376,8 +376,8 @@ bool RecruitmentProb::PossibleRecruitTgam(GrSimulation& sim, const Pos& pSource)
                 TgamBool = g_Rand.getReal() < _PARAM(PARAM_TCELL_PROB_MOVE_TO_TCELL);
         }
 
-        if (pSource == Pos (53,48))
-            std::cout << "Tgam: " << pSource  << "  "  << TgamProbValue  << "  " << TgamBool << std::endl;
+//        if (pSource == Pos (53,48))
+//            std::cout << "Tgam: " << pSource  << "  "  << TgamProbValue  << "  " << TgamBool << std::endl;
 
 
         return (TgamBool && g_Rand.getReal() < (_PARAM(PARAM_TGAM_MAX_RECRUITMENT) * TgamProbValue));
@@ -407,8 +407,8 @@ bool RecruitmentProb::PossibleRecruitTcyt(GrSimulation& sim, const Pos& pSource)
                 TcytBool = g_Rand.getReal() < _PARAM(PARAM_TCELL_PROB_MOVE_TO_TCELL);
         }
 
-        if (pSource == Pos (53,48))
-            std::cout << "Tcyt: " << pSource  << "  "  << TcytProbValue << "  " << TcytBool << std::endl;
+//        if (pSource == Pos (53,48))
+//            std::cout << "Tcyt: " << pSource  << "  "  << TcytProbValue << "  " << TcytBool << std::endl;
 
         return (TcytBool && g_Rand.getReal() < (_PARAM(PARAM_TCYT_MAX_RECRUITMENT) * TcytProbValue));
     }
@@ -435,8 +435,8 @@ bool RecruitmentProb::PossibleRecruitTreg(GrSimulation& sim, const Pos& pSource)
                 TregBool = g_Rand.getReal() < _PARAM(PARAM_TCELL_PROB_MOVE_TO_TCELL);
         }
 
-        if (pSource == Pos (53,48))
-            std::cout << "Treg: " << pSource  << "  "  << TregProbValue << "  " << TregBool << std::endl;
+//        if (pSource == Pos (53,48))
+//            std::cout << "Treg: " << pSource  << "  "  << TregProbValue << "  " << TregBool << std::endl;
 
         return (TregBool && g_Rand.getReal() < (_PARAM(PARAM_TREG_MAX_RECRUITMENT) * TregProbValue));
     }

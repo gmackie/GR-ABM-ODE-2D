@@ -190,11 +190,14 @@ static void diffuse_degrade(GrGrid& nextGrid)
 
     Pos p;
 
+//    double Total=0.0;
+
     for(p.x = 0; p.x < nextGrid.getRange().x; ++p.x)
         for(p.y = 0; p.y < nextGrid.getRange().y; ++p.y)
         {
             // Degradation of sTNF
             nextGrid.setTNF(p, nextGrid.TNF(p) * TNFdegRate);
+//            Total += nextGrid.TNF(p);
 //            nextGrid.incTNF(p, (-1.0 * nextGrid.TNF(p) * _PARAM(PARAM_GR_K_DEG) * dt));
 
             // Degradation of il10
@@ -227,6 +230,8 @@ static void diffuse_degrade(GrGrid& nextGrid)
             nextGrid.incTNF(p, (1.0 * nextGrid.shedTNFR2(p) * _PARAM(PARAM_GR_KD2) * _PARAM(PARAM_GR_K_ON2) * dt));
 
         }
+
+//    std::cout << "Total Conc: " << Total << std::endl;
 }
 
 

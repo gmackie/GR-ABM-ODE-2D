@@ -344,7 +344,8 @@ bool Mac::checkNFkB(GrGrid& grid, const int time, bool tnfInducedNFkB)
         _nfkbTime = -1;
 
 //    //DBG
-//    std::cout << nfkbTime << "   " << nfkbState << "   " << nfkbStim << "   " << nfkbExtMtb <<  std::endl;
+//    if (nfkbStim)
+//        std::cout << nfkbTime << "   " << nfkbState << "   " << nfkbStim << "   " << nfkbExtMtb <<  std::endl;
 //    if (nfkbTime)
 //        std::cout << time << std::endl;
 //    //DBG
@@ -457,7 +458,6 @@ void Mac::computeNextState(const int time, GrGrid& grid, Stats& stats, bool tnfr
             bool tnfInducedNFkB = TNFinducedNFkB(grid, tnfrDynamics, nfkbDynamics);
             if (tnfInducedNFkB)
                 ++stats.getMacNFkBTNF(_state);
-
 
 //            bool threshold = false;
 //            bool prob = false;

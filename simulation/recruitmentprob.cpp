@@ -347,6 +347,9 @@ bool RecruitmentProb::PossibleRecruitMac(GrSimulation& sim, const Pos& pSource)
 
         double macProbValue = 0.0;
         bool macBool = MacThresholdRecNew(grid, pSource, macProbValue);
+
+        std::cout << "Mac: " << pSource  << "  "  << macProbValue  << "  " << macBool << std::endl;
+
         return (macBool && g_Rand.getReal() < (_PARAM(PARAM_MAC_MAX_RECRUITMENT) * macProbValue));
     }
 
@@ -364,6 +367,19 @@ bool RecruitmentProb::PossibleRecruitTgam(GrSimulation& sim, const Pos& pSource)
     {
         double TgamProbValue = 0.0;
         bool TgamBool = TgamThresholdRecNew(grid, pSource, TgamProbValue);
+
+        if (grid.getNumberOfAgents(pSource) == 1)
+        {
+            if (grid.hasAgentType(MAC, pSource))
+                TgamBool = g_Rand.getReal() < _PARAM(PARAM_TCELL_PROB_MOVE_TO_MAC);
+            else
+                TgamBool = g_Rand.getReal() < _PARAM(PARAM_TCELL_PROB_MOVE_TO_TCELL);
+        }
+
+        if (pSource == Pos (53,48))
+            std::cout << "Tgam: " << pSource  << "  "  << TgamProbValue  << "  " << TgamBool << std::endl;
+
+
         return (TgamBool && g_Rand.getReal() < (_PARAM(PARAM_TGAM_MAX_RECRUITMENT) * TgamProbValue));
 
     }
@@ -381,6 +397,19 @@ bool RecruitmentProb::PossibleRecruitTcyt(GrSimulation& sim, const Pos& pSource)
     {
         double TcytProbValue = 0.0;
         bool TcytBool = TcytThresholdRecNew(grid, pSource, TcytProbValue);
+
+
+        if (grid.getNumberOfAgents(pSource) == 1)
+        {
+            if (grid.hasAgentType(MAC, pSource))
+                TcytBool = g_Rand.getReal() < _PARAM(PARAM_TCELL_PROB_MOVE_TO_MAC);
+            else
+                TcytBool = g_Rand.getReal() < _PARAM(PARAM_TCELL_PROB_MOVE_TO_TCELL);
+        }
+
+        if (pSource == Pos (53,48))
+            std::cout << "Tcyt: " << pSource  << "  "  << TcytProbValue << "  " << TcytBool << std::endl;
+
         return (TcytBool && g_Rand.getReal() < (_PARAM(PARAM_TCYT_MAX_RECRUITMENT) * TcytProbValue));
     }
     else
@@ -397,6 +426,18 @@ bool RecruitmentProb::PossibleRecruitTreg(GrSimulation& sim, const Pos& pSource)
     {
         double TregProbValue = 0.0;
         bool TregBool = TregThresholdRecNew(grid, pSource, TregProbValue);
+
+        if (grid.getNumberOfAgents(pSource) == 1)
+        {
+            if (grid.hasAgentType(MAC, pSource))
+                TregBool = g_Rand.getReal() < _PARAM(PARAM_TCELL_PROB_MOVE_TO_MAC);
+            else
+                TregBool = g_Rand.getReal() < _PARAM(PARAM_TCELL_PROB_MOVE_TO_TCELL);
+        }
+
+        if (pSource == Pos (53,48))
+            std::cout << "Treg: " << pSource  << "  "  << TregProbValue << "  " << TregBool << std::endl;
+
         return (TregBool && g_Rand.getReal() < (_PARAM(PARAM_TREG_MAX_RECRUITMENT) * TregProbValue));
     }
 

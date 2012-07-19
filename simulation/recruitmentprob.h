@@ -109,16 +109,16 @@ inline bool RecruitmentProb::MacThresholdRecNew(const GrGrid &grid, const Pos &p
 
     const Scalar ratioCCL5toCCL2 = _PARAM(PARAM_MAC_SEC_RATE_CCL5) / _PARAM(PARAM_MAC_SEC_RATE_CCL2);
 
-    rThreshold = (((VmaxCCL5 * (grid.CCL5(pSource) - (_PARAM(PARAM_TGAM_THRESHOLD_CHEMOKINE_RECRUITMENT) * ratioCCL5toCCL2)))/((grid.CCL5(pSource) - (_PARAM(PARAM_TGAM_THRESHOLD_CHEMOKINE_RECRUITMENT) * ratioCCL5toCCL2)) + (ratioCCL5toCCL2 * _PARAM(PARAM_TGAM_HALF_SAT_CHEMOKINE)))) +
-                         ((VmaxTNF * (grid.TNF(pSource) - _PARAM(PARAM_TGAM_THRESHOLD_TNF_RECRUITMENT)))/((grid.TNF(pSource) - _PARAM(PARAM_TGAM_THRESHOLD_TNF_RECRUITMENT)) + _PARAM(PARAM_TGAM_HALF_SAT_TNF))) +
-                                ((VmaxCCL2 * (grid.CCL2(pSource) - (_PARAM(PARAM_TGAM_THRESHOLD_CHEMOKINE_RECRUITMENT))))/((grid.CCL2(pSource) - (_PARAM(PARAM_TGAM_THRESHOLD_CHEMOKINE_RECRUITMENT))) + (_PARAM(PARAM_TGAM_HALF_SAT_CHEMOKINE)))));
+    rThreshold = (((VmaxCCL5 * (grid.CCL5(pSource) - (_PARAM(PARAM_MAC_THRESHOLD_CHEMOKINE_RECRUITMENT) * ratioCCL5toCCL2)))/((grid.CCL5(pSource) - (_PARAM(PARAM_MAC_THRESHOLD_CHEMOKINE_RECRUITMENT) * ratioCCL5toCCL2)) + (ratioCCL5toCCL2 * _PARAM(PARAM_MAC_HALF_SAT_CHEMOKINE)))) +
+                         ((VmaxTNF * (grid.TNF(pSource) - _PARAM(PARAM_MAC_THRESHOLD_TNF_RECRUITMENT)))/((grid.TNF(pSource) - _PARAM(PARAM_MAC_THRESHOLD_TNF_RECRUITMENT)) + _PARAM(PARAM_MAC_HALF_SAT_TNF))) +
+                                ((VmaxCCL2 * (grid.CCL2(pSource) - (_PARAM(PARAM_MAC_THRESHOLD_CHEMOKINE_RECRUITMENT))))/((grid.CCL2(pSource) - (_PARAM(PARAM_MAC_THRESHOLD_CHEMOKINE_RECRUITMENT))) + (_PARAM(PARAM_MAC_HALF_SAT_CHEMOKINE)))));
 
 //    rThreshold = (((VmaxCCL2 * grid.CCL2(pSource))/(grid.CCL2(pSource) + _PARAM(PARAM_MAC_HALF_SAT_CHEMOKINE))) +
 //                         ((VmaxCCL5 * grid.CCL5(pSource))/(grid.CCL5(pSource) + (ratioCCL5toCCL2 * _PARAM(PARAM_MAC_HALF_SAT_CHEMOKINE)))) +
 //                         ((VmaxTNF * grid.TNF(pSource))/(grid.TNF(pSource) + _PARAM(PARAM_MAC_HALF_SAT_TNF))));
 
 
-    return (intCompareGTEQ(grid.CCL5(pSource), (_PARAM(PARAM_TCYT_THRESHOLD_CHEMOKINE_RECRUITMENT) * ratioCCL5toCCL2)) && intCompareGTEQ(grid.TNF(pSource), _PARAM(PARAM_TCYT_THRESHOLD_TNF_RECRUITMENT)) && intCompareGTEQ(grid.CCL2(pSource), (_PARAM(PARAM_TCYT_THRESHOLD_CHEMOKINE_RECRUITMENT))));
+    return (intCompareGTEQ(grid.CCL5(pSource), (_PARAM(PARAM_MAC_THRESHOLD_CHEMOKINE_RECRUITMENT) * ratioCCL5toCCL2)) && intCompareGTEQ(grid.TNF(pSource), _PARAM(PARAM_MAC_THRESHOLD_TNF_RECRUITMENT)) && intCompareGTEQ(grid.CCL2(pSource), (_PARAM(PARAM_MAC_THRESHOLD_CHEMOKINE_RECRUITMENT))));
 
 //    return intCompareGTEQ(rThreshold, _PARAM(PARAM_MAC_THRESHOLD_RECRUITMENT));
 
@@ -149,7 +149,7 @@ inline bool RecruitmentProb::TgamThresholdRecNew(const GrGrid &grid, const Pos &
 //    std::cout << "Tgam Recruitment" << std::endl;
 //    std::cout << pSource << "   " << rThreshold << std::endl;
 
-    return (intCompareGTEQ(grid.CCL5(pSource), (_PARAM(PARAM_TCYT_THRESHOLD_CHEMOKINE_RECRUITMENT) * ratioCCL5toCCL2)) && intCompareGTEQ(grid.TNF(pSource), _PARAM(PARAM_TCYT_THRESHOLD_TNF_RECRUITMENT)) && intCompareGTEQ(grid.CXCL9(pSource), (_PARAM(PARAM_TCYT_THRESHOLD_CHEMOKINE_RECRUITMENT) * ratioCXCL9toCCL2)) && intCompareGTEQ(grid.CCL2(pSource), (_PARAM(PARAM_TCYT_THRESHOLD_CHEMOKINE_RECRUITMENT))));
+    return (intCompareGTEQ(grid.CCL5(pSource), (_PARAM(PARAM_TGAM_THRESHOLD_CHEMOKINE_RECRUITMENT) * ratioCCL5toCCL2)) && intCompareGTEQ(grid.TNF(pSource), _PARAM(PARAM_TGAM_THRESHOLD_TNF_RECRUITMENT)) && intCompareGTEQ(grid.CXCL9(pSource), (_PARAM(PARAM_TGAM_THRESHOLD_CHEMOKINE_RECRUITMENT) * ratioCXCL9toCCL2)) && intCompareGTEQ(grid.CCL2(pSource), (_PARAM(PARAM_TGAM_THRESHOLD_CHEMOKINE_RECRUITMENT))));
 
 //    return intCompareGTEQ(rThreshold, _PARAM(PARAM_TGAM_THRESHOLD_RECRUITMENT));
 }

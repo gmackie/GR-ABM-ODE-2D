@@ -440,9 +440,9 @@ void GrSimulation::init()
     // initialize the sources
 	_grid.initSources();
 
-	PosVector initMacs = Params::getInstance()->getInitialMacs();
-	PosVector initExtMtb = Params::getInstance()->getInitialExtMtb();
-	const int maxMacAge = _PARAM(PARAM_MAC_AGE);
+    PosVector initMacs = Params::getInstance()->getInitialMacs();
+    PosVector initExtMtb = Params::getInstance()->getInitialExtMtb();
+    const int maxMacAge = _PARAM(PARAM_MAC_AGE);
 
     // Place initial infected macrophages on the grid
     for (PosVector::const_iterator it = initMacs.begin(); it != initMacs.end(); it++)
@@ -480,7 +480,7 @@ void GrSimulation::init()
         exit(1);
     }
 
-//    _grid.getGrid().setil10(50, 50, 10000);
+//    _grid.getGrid().setTNF(200, 200, 10000);
 
     while (count > 0)
     {
@@ -656,8 +656,8 @@ void GrSimulation::solve()
 	moveTcells();
 	
 	// Shuffle the sources and recruit agents from vascular sources every 10 minutes
-	getGrid().shuffleSources();
-	_pRecruitment->recruit(*this);
+        getGrid().shuffleSources();
+        _pRecruitment->recruit(*this);
 
 	// reset statistics
 	_stats.resetAgentStats();

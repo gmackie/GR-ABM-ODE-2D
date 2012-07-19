@@ -321,6 +321,7 @@ void Tgam::handleDownRegulated(const int time, GrGrid&, Stats&)
 	if (time - _deactivationTime >= _PARAM(PARAM_TGAM_TIMESPAN_REGULATED))
 	{
 		_nextState = TGAM_ACTIVE;
+        _deactivationTime = -1;
 	}
 	else
 	{

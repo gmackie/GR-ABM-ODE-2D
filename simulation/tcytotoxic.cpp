@@ -248,6 +248,7 @@ void Tcyt::handleDownRegulated(const int time, GrGrid&, Stats&)
 	if (time - _deactivationTime >= _PARAM(PARAM_TCYT_TIMESPAN_REGULATED))
 	{
 		_nextState = TCYT_ACTIVE;
+        _deactivationTime = -1;
 	}
 	else
 	{

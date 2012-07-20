@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Statistics Time Series Graph</string>
   </property>
   <widget class="QwtPlot" name="centralwidget"/>
   <widget class="QToolBar" name="toolBar">
@@ -34,8 +34,6 @@
    <addaction name="actionShow_Legend"/>
   </widget>
   <action name="actionSave">
-   <property name="icon">
-   </property>
    <property name="text">
     <string>Save</string>
    </property>
@@ -52,8 +50,6 @@
    </property>
    <property name="enabled">
     <bool>false</bool>
-   </property>
-   <property name="icon">
    </property>
    <property name="text">
     <string>Legend</string>

@@ -95,7 +95,8 @@ HEADERS += scalardatasets/scalartotmtbdataset.h \
     maininterface.h \
     simulation.h \
     snapshot.h \
-    gui/graphviewer.h
+    gui/graphviewer.h \
+    gui/agenthistogram.h
 SOURCES += simulation/serialization.cpp \
     simulation/params.cpp \
     simulation/paramsbase.cpp \
@@ -157,13 +158,15 @@ SOURCES += simulation/serialization.cpp \
     maininterface.cpp \
     simulation.cpp \
     snapshot.cpp \
-    gui/graphviewer.cpp
+    gui/graphviewer.cpp \
+    gui/agenthistogram.cpp
 FORMS += gui/agentswidget.ui \
     gui/statwidget.ui \
     gui/paramwindow.ui \
     gui/glwindow.ui \
     gui/mainwindow.ui \
-    gui/graphviewer.ui
+    gui/graphviewer.ui \
+    gui/agenthistogram.ui
 QMAKE_CXXFLAGS_RELEASE -= -O2 -Wno-strict-aliasing
 QMAKE_CXXFLAGS_RELEASE += -O3 -Wno-strict-aliasing
 QMAKE_LFLAGS_RELEASE += -fopenmp -DOPENMP

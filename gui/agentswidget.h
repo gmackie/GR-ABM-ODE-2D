@@ -2,14 +2,15 @@
 #define AGENTSWIDGET_H
 
 #include <QtGui/QWidget>
-#include "visualization/agentsvisualization.h"
 #include "ui_agentswidget.h"
+
+class AgentsVisualization;
 
 class AgentsWidget : public QWidget
 {
     Q_OBJECT
-
 public:
+    enum MacSecondStates { ENBL, STAT1, NFKB, DEACT, OTHER, NUM};
     AgentsWidget(AgentsVisualization* pAgentsVisualization, QWidget* parent = 0);
     ~AgentsWidget();
 
@@ -18,8 +19,15 @@ public slots:
 	void updateAgentsSettings();
 	void setAgentSelection(int row, int col);
 
+private slots:
+    void maGroupActivated(QAbstractButton* b);
+    void mrGroupActivated(QAbstractButton* b);
+    void miGroupActivated(QAbstractButton* b);
+    void mciGroupActivated(QAbstractButton* b);
+
 signals:
 	void updateGL();
+    void agentFilterChanged(int, int, int, bool);
 
 private:
     Ui::AgentsWidgetClass _ui;

@@ -10,15 +10,14 @@
 
 #include "visualization.h"
 #include "scalardatasets/scalaragentgrid.h"
+#include "gui/agentswidget.h"
 
 class AgentsVisualization : public Visualization
 {
-public:
-    enum MacSecondStates { ENBL, STAT1, NFKB, DEACT, OTHER, NUM};
 private:
 	const ScalarAgentGrid* _pScalarAgentGrid;
 	bool _drawGrid;
-    bool _macFilter[Mac::NSTATES][NUM];
+    bool _macFilter[Mac::NSTATES][AgentsWidget::NUM];
 	bool _drawTgam;
 	bool _drawTcyt;
 	bool _drawTreg;
@@ -58,7 +57,7 @@ public:
 	void setPredicates(bool mac, bool tgam, bool tcyt, bool treg);
     void setSelection(int row, int col);
     void setDrawM1M2(int value, double threshold);
-    void setDrawMac(Mac::State s, MacSecondStates s2, bool enable) { _macFilter[s][s2] = enable; }
+    void setDrawMac(Mac::State s, AgentsWidget::MacSecondStates s2, bool enable) { _macFilter[s][s2] = enable; }
 };
 
 inline void AgentsVisualization::setSelection(int row, int col)

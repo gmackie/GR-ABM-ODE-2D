@@ -187,7 +187,7 @@
 		nrExtMtbNFkB = "110"
 		nrIntMtbCInf = "10"
 		nrIntMtbBurstCInf = "20"
-		probStat1Tgam = "0.0075"
+		probStat1Tgam = "0.075"
 		nrExtMtbUptakeAct = "15"
 		thresholdRec = "0.15"
 		probRec = "0.04"
@@ -197,6 +197,8 @@
 		thresholdRecTNF = "0.00045"
 		recruitmentHalfSatTNF = "0.0033963"
 		recruitmentHalfSatChemokine = "0.00160688"
+		stat1ActivationTime = "288"
+		nfkbActivationTime = "10"
 		/>
 	<Tcell
 		mtbRecEnabled = "40"

@@ -117,10 +117,11 @@ const QString MainWindow::_OUTCOME_METHOD_1 = "Method 1";
 const QString MainWindow::_OUTCOME_METHOD_2 = "Method 2";
 
 MainWindow::MainWindow(MainInterface* pItfc, GLWindow* pGLWindow, QWidget* pParamWindow,
-		StatWidget* pStatWidget, QWidget* pAgentsWidget, QWidget* parent)
+        StatWidget* pStatWidget, AgentsWidget* pAgentsWidget, QWidget* parent)
 	: QMainWindow(parent)
 	, _ui()
 	, _pItfc(pItfc)
+    , _pAgentHistogram(new AgentHistogram(pItfc->getSimulation()))
     , _pGraphController(new GraphController(pItfc->getSimulation().getStats(), 144*200))
 	, _pGLWindow(pGLWindow)
 	, _pParamWindow(pParamWindow)
@@ -178,6 +179,8 @@ MainWindow::MainWindow(MainInterface* pItfc, GLWindow* pGLWindow, QWidget* pPara
 	connect(&_pItfc->getSimulation(), SIGNAL(stopConditionMet(void)), this, SLOT(stop(void)));
 	connect(_pAgentsWidget, SIGNAL(updateGL(void)), _pGLWindow, SLOT(updateWindow(void)));
     connect(_ui.newGraphWindowButton, SIGNAL(clicked(void)), _pGraphController, SLOT(showNewTimeGraph(void)));
+    connect(_pAgentHistogram, SIGNAL(closing(bool)), _ui.agentHistButton, SLOT(setChecked(bool)));
+    connect(_pAgentsWidget, SIGNAL(agentFilterChanged(int, int, int, bool)), _pAgentHistogram, SLOT(setAgentFilter(int,int,int,bool)));
 
 	emit updateColorMap(_pCurrentColorMap);
 }
@@ -550,7 +553,8 @@ void MainWindow::getScalarDataSetNames(std::string &names)
 
 MainWindow::~MainWindow()
 {
-  delete _pGraphController;
+    delete _pGraphController;
+    delete _pAgentHistogram;
 	delete _pSnapshot;
 	_pMainWindow = NULL;
 
@@ -595,6 +599,8 @@ void MainWindow::timerEvent(QTimerEvent*)
 
     //if(simTime % 72 == 0)   //Update every half day
         _pGraphController->update(stats, 1.0*simTime);
+    if(!_pAgentHistogram->isHidden())
+        _pAgentHistogram->updatePlot();
 
 	_pItfc->incTime(_stopwatch.restart());
 
@@ -1699,4 +1705,14 @@ void MainWindow::switchStatus(SimStatus newStatus)
 	}
 
 	_simStatus = newStatus;
+}
+
+void MainWindow::on_agentHistButton_clicked(bool checked)
+{
+    if(checked) {
+        _pAgentHistogram->updatePlot();
+        _pAgentHistogram->show();
+    }
+    else
+        _pAgentHistogram->hide();
 }

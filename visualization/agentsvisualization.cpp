@@ -78,10 +78,13 @@ void AgentsVisualization::visualize(bool blend, const Simulation*, const ColorMa
           case MAC:
           {
               const Mac* pMac = static_cast<const Mac*>(grid[i*_DIM+j]._pAgent[k]);
-              if(!_macFilter[pMac->getState()][ENBL]) continue;
-              char state = (pMac->getNFkB() << NFKB) | (pMac->getStat1() << STAT1) | (pMac->isDeactivated() << DEACT);
-              state |= (state == 0) << OTHER;
-              state &= (_macFilter[pMac->getState()][NFKB] << NFKB) | (_macFilter[pMac->getState()][STAT1] << STAT1) | (_macFilter[pMac->getState()][DEACT] << DEACT) | (_macFilter[pMac->getState()][OTHER] << OTHER);
+              if(!_macFilter[pMac->getState()][AgentsWidget::ENBL]) continue;
+              char state = (pMac->getNFkB() << AgentsWidget::NFKB) | (pMac->getStat1() << AgentsWidget::STAT1) | (pMac->isDeactivated() << AgentsWidget::DEACT);
+              state |= (state == 0) << AgentsWidget::OTHER;
+              state &= (_macFilter[pMac->getState()][AgentsWidget::NFKB] << AgentsWidget::NFKB)
+                      | (_macFilter[pMac->getState()][AgentsWidget::STAT1] << AgentsWidget::STAT1)
+                      | (_macFilter[pMac->getState()][AgentsWidget::DEACT] << AgentsWidget::DEACT)
+                      | (_macFilter[pMac->getState()][AgentsWidget::OTHER] << AgentsWidget::OTHER);
               if(!state) continue;
           } break;
           case TGAM: { if(!_drawTreg) continue; } break;
@@ -140,10 +143,13 @@ void AgentsVisualization::visualize(bool blend, const Simulation*, const ColorMa
                   case MAC:
                   {
                       const Mac* pMac = static_cast<const Mac*>(grid[i*_DIM+j]._pAgent[k]);
-                      if(!_macFilter[pMac->getState()][ENBL]) continue;
-                      char state = (pMac->getNFkB() << NFKB) | (pMac->getStat1() << STAT1) | (pMac->isDeactivated() << DEACT);
-                      state |= (state == 0) << OTHER;
-                      state &= (_macFilter[pMac->getState()][NFKB] << NFKB) | (_macFilter[pMac->getState()][STAT1] << STAT1) | (_macFilter[pMac->getState()][DEACT] << DEACT) | (_macFilter[pMac->getState()][OTHER] << OTHER);
+                      if(!_macFilter[pMac->getState()][AgentsWidget::ENBL]) continue;
+                      char state = (pMac->getNFkB() << AgentsWidget::NFKB) | (pMac->getStat1() << AgentsWidget::STAT1) | (pMac->isDeactivated() << AgentsWidget::DEACT);
+                      state |= (state == 0) << AgentsWidget::OTHER;
+                      state &= (_macFilter[pMac->getState()][AgentsWidget::NFKB] << AgentsWidget::NFKB)
+                              | (_macFilter[pMac->getState()][AgentsWidget::STAT1] << AgentsWidget::STAT1)
+                              | (_macFilter[pMac->getState()][AgentsWidget::DEACT] << AgentsWidget::DEACT)
+                              | (_macFilter[pMac->getState()][AgentsWidget::OTHER] << AgentsWidget::OTHER);
                       if(!state) continue;
                   } break;
                   case TGAM: { if(!_drawTreg) continue; } break;
@@ -177,18 +183,21 @@ void AgentsVisualization::visualize(bool blend, const Simulation*, const ColorMa
                         pMac = static_cast<const Mac*>(grid[i*_DIM+j]._pAgent[k]->getAgentType() == MAC ? grid[i*_DIM+j]._pAgent[k] : pMac);
                     }
                 Q_CHECK_PTR(pMac);
-                char state = (pMac->getNFkB() << NFKB) | (pMac->getStat1() << STAT1) | (pMac->isDeactivated() << DEACT);
-                state |= (state == 0) << OTHER;
-                state &= (_macFilter[pMac->getState()][NFKB] << NFKB) | (_macFilter[pMac->getState()][STAT1] << STAT1) | (_macFilter[pMac->getState()][DEACT] << DEACT) | (_macFilter[pMac->getState()][OTHER] << OTHER);
+                char state = (pMac->getNFkB() << AgentsWidget::NFKB) | (pMac->getStat1() << AgentsWidget::STAT1) | (pMac->isDeactivated() << AgentsWidget::DEACT);
+                state |= (state == 0) << AgentsWidget::OTHER;
+                state &= (_macFilter[pMac->getState()][AgentsWidget::NFKB] << AgentsWidget::NFKB)
+                        | (_macFilter[pMac->getState()][AgentsWidget::STAT1] << AgentsWidget::STAT1)
+                        | (_macFilter[pMac->getState()][AgentsWidget::DEACT] << AgentsWidget::DEACT)
+                        | (_macFilter[pMac->getState()][AgentsWidget::OTHER] << AgentsWidget::OTHER);
 
-                if(state && _macFilter[pMac->getState()][ENBL]) {
-                    if (GET_BIT(val, ScalarAgentGrid::_bitMacResting) && _macFilter[Mac::MAC_RESTING][ENBL])
+                if(state && _macFilter[pMac->getState()][AgentsWidget::ENBL]) {
+                    if (GET_BIT(val, ScalarAgentGrid::_bitMacResting) && _macFilter[Mac::MAC_RESTING][AgentsWidget::ENBL])
                       glColor4f(0.0f, 1.0f, 0.0f, _gridAlpha);
-                    else if (GET_BIT(val, ScalarAgentGrid::_bitMacInfected) && _macFilter[Mac::MAC_INFECTED][ENBL])
+                    else if (GET_BIT(val, ScalarAgentGrid::_bitMacInfected) && _macFilter[Mac::MAC_INFECTED][AgentsWidget::ENBL])
                       glColor4f(1.0f, 0.65f, 0.0f, _gridAlpha);
-                    else if (GET_BIT(val, ScalarAgentGrid::_bitMacCInfected) && _macFilter[Mac::MAC_CINFECTED][ENBL])
+                    else if (GET_BIT(val, ScalarAgentGrid::_bitMacCInfected) && _macFilter[Mac::MAC_CINFECTED][AgentsWidget::ENBL])
                       glColor4f(1.0f, 0.0f, 0.0f, _gridAlpha);
-                    else if (GET_BIT(val, ScalarAgentGrid::_bitMacActive) && _macFilter[Mac::MAC_ACTIVE][ENBL])
+                    else if (GET_BIT(val, ScalarAgentGrid::_bitMacActive) && _macFilter[Mac::MAC_ACTIVE][AgentsWidget::ENBL])
                       glColor4f(0.0f, 0.0f, 1.0f, _gridAlpha);
                     else continue;
                 }

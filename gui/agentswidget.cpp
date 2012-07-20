@@ -1,19 +1,15 @@
 #include "agentswidget.h"
+#include "simulation/gr.h"
+#include "simulation/macrophage.h"
+#include "visualization/agentsvisualization.h"
 
 AgentsWidget::AgentsWidget(AgentsVisualization* pAgentsVisualization, QWidget *parent)
     : QWidget(parent)
     , _pAgentsVisualization(pAgentsVisualization)
 {
-	assert(pAgentsVisualization);
+    Q_CHECK_PTR(pAgentsVisualization);
     _ui.setupUi(this);
 
-    connect(_ui.checkBoxDrawAgentMa, SIGNAL(toggled(bool)), this, SLOT(updateAgentsSettings(void)));
-    connect(_ui.checkBoxDrawAgentMci, SIGNAL(toggled(bool)), this, SLOT(updateAgentsSettings(void)));
-    connect(_ui.checkBoxDrawAgentMi, SIGNAL(toggled(bool)), this, SLOT(updateAgentsSettings(void)));
-    connect(_ui.checkBoxDrawAgentMr, SIGNAL(toggled(bool)), this, SLOT(updateAgentsSettings(void)));
-    connect(_ui.checkBoxDrawAgentTgam, SIGNAL(toggled(bool)), this, SLOT(updateAgentsSettings(void)));
-    connect(_ui.checkBoxDrawAgentTcyt, SIGNAL(toggled(bool)), this, SLOT(updateAgentsSettings(void)));
-    connect(_ui.checkBoxDrawAgentTreg, SIGNAL(toggled(bool)), this, SLOT(updateAgentsSettings(void)));
     connect(_ui.checkBoxDrawAgentCaseation, SIGNAL(toggled(bool)), this, SLOT(updateAgentsSettings(void)));
     connect(_ui.checkBoxDrawAgentSources, SIGNAL(toggled(bool)), this, SLOT(updateAgentsSettings(void)));
     connect(_ui.checkBoxDrawAgentExtMtb, SIGNAL(toggled(bool)), this, SLOT(updateAgentsSettings(void)));
@@ -28,35 +24,73 @@ AgentsWidget::AgentsWidget(AgentsVisualization* pAgentsVisualization, QWidget *p
     connect(_ui.comboBoxM1M2, SIGNAL(activated(int)), this, SLOT(updateM1M2Settings(void)));
     connect(_ui.doubleSpinBoxM1M2Threshold, SIGNAL(valueChanged(double)), this, SLOT(updateAgentsSettings(void)));
 
-    connect(_ui.checkBoxMaDeact, SIGNAL(toggled(bool)), this, SLOT(updateAgentsSettings(void)));
-    connect(_ui.checkBoxMaStat1, SIGNAL(toggled(bool)), this, SLOT(updateAgentsSettings(void)));
-    connect(_ui.checkBoxMaNFkB, SIGNAL(toggled(bool)), this, SLOT(updateAgentsSettings(void)));
-    connect(_ui.checkBoxMaOther, SIGNAL(toggled(bool)), this, SLOT(updateAgentsSettings(void)));
-    connect(_ui.checkBoxDrawAgentMa, SIGNAL(toggled(bool)), this, SLOT(updateAgentsSettings(void)));
+    QButtonGroup* group = new QButtonGroup(this);
+    group->setExclusive(false);
+    group->addButton(_ui.checkBoxDrawAgentMa, ENBL);
+    group->addButton(_ui.checkBoxMaStat1, STAT1);
+    group->addButton(_ui.checkBoxMaNFkB, NFKB);
+    group->addButton(_ui.checkBoxMaDeact, DEACT);
+    group->addButton(_ui.checkBoxMaOther, OTHER);
+    connect(group, SIGNAL(buttonClicked(QAbstractButton*)), SLOT(maGroupActivated(QAbstractButton*)));
+    connect(group, SIGNAL(buttonClicked(int)), SLOT(updateAgentsSettings(void)));
 
-    connect(_ui.checkBoxMrDeact, SIGNAL(toggled(bool)), this, SLOT(updateAgentsSettings(void)));
-    connect(_ui.checkBoxMrStat1, SIGNAL(toggled(bool)), this, SLOT(updateAgentsSettings(void)));
-    connect(_ui.checkBoxMrNFkB, SIGNAL(toggled(bool)), this, SLOT(updateAgentsSettings(void)));
-    connect(_ui.checkBoxDrawAgentMr, SIGNAL(toggled(bool)), this, SLOT(updateAgentsSettings(void)));
-    connect(_ui.checkBoxMrOther, SIGNAL(toggled(bool)), this, SLOT(updateAgentsSettings(void)));
+    group = new QButtonGroup(this);
+    group->setExclusive(false);
+    group->addButton(_ui.checkBoxDrawAgentMr, ENBL);
+    group->addButton(_ui.checkBoxMrStat1, STAT1);
+    group->addButton(_ui.checkBoxMrNFkB, NFKB);
+    group->addButton(_ui.checkBoxMrDeact, DEACT);
+    group->addButton(_ui.checkBoxMrOther, OTHER);
+    connect(group, SIGNAL(buttonClicked(QAbstractButton*)), SLOT(mrGroupActivated(QAbstractButton*)));
+    connect(group, SIGNAL(buttonClicked(int)), SLOT(updateAgentsSettings(void)));
 
-    connect(_ui.checkBoxMiDeact, SIGNAL(toggled(bool)), this, SLOT(updateAgentsSettings(void)));
-    connect(_ui.checkBoxMiStat1, SIGNAL(toggled(bool)), this, SLOT(updateAgentsSettings(void)));
-    connect(_ui.checkBoxMiNFkB, SIGNAL(toggled(bool)), this, SLOT(updateAgentsSettings(void)));
-    connect(_ui.checkBoxDrawAgentMi, SIGNAL(toggled(bool)), this, SLOT(updateAgentsSettings(void)));
-    connect(_ui.checkBoxMiOther, SIGNAL(toggled(bool)), this, SLOT(updateAgentsSettings(void)));
+    group = new QButtonGroup(this);
+    group->setExclusive(false);
+    group->addButton(_ui.checkBoxDrawAgentMi, ENBL);
+    group->addButton(_ui.checkBoxMiStat1, STAT1);
+    group->addButton(_ui.checkBoxMiNFkB, NFKB);
+    group->addButton(_ui.checkBoxMiDeact, DEACT);
+    group->addButton(_ui.checkBoxMiOther, OTHER);
+    connect(group, SIGNAL(buttonClicked(QAbstractButton*)), SLOT(miGroupActivated(QAbstractButton*)));
+    connect(group, SIGNAL(buttonClicked(int)), SLOT(updateAgentsSettings(void)));
 
-    connect(_ui.checkBoxMciDeact, SIGNAL(toggled(bool)), this, SLOT(updateAgentsSettings(void)));
-    connect(_ui.checkBoxMciStat1, SIGNAL(toggled(bool)), this, SLOT(updateAgentsSettings(void)));
-    connect(_ui.checkBoxMciNFkB, SIGNAL(toggled(bool)), this, SLOT(updateAgentsSettings(void)));
-    connect(_ui.checkBoxDrawAgentMci, SIGNAL(toggled(bool)), this, SLOT(updateAgentsSettings(void)));
-    connect(_ui.checkBoxMciOther, SIGNAL(toggled(bool)), this, SLOT(updateAgentsSettings(void)));
+    group = new QButtonGroup(this);
+    group->setExclusive(false);
+    group->addButton(_ui.checkBoxDrawAgentMci, ENBL);
+    group->addButton(_ui.checkBoxMciStat1, STAT1);
+    group->addButton(_ui.checkBoxMciNFkB, NFKB);
+    group->addButton(_ui.checkBoxMciDeact, DEACT);
+    group->addButton(_ui.checkBoxMciOther, OTHER);
+    connect(group, SIGNAL(buttonClicked(QAbstractButton*)), SLOT(mciGroupActivated(QAbstractButton*)));
+    connect(group, SIGNAL(buttonClicked(int)), SLOT(updateAgentsSettings(void)));
+
+    connect(_ui.checkBoxDrawAgentTgam, SIGNAL(toggled(bool)), this, SLOT(updateAgentsSettings(void)));
+    connect(_ui.checkBoxDrawAgentTcyt, SIGNAL(toggled(bool)), this, SLOT(updateAgentsSettings(void)));
+    connect(_ui.checkBoxDrawAgentTreg, SIGNAL(toggled(bool)), this, SLOT(updateAgentsSettings(void)));
 
     updateAgentsSettings();
 }
 
 AgentsWidget::~AgentsWidget()
 {
+}
+
+void AgentsWidget::maGroupActivated(QAbstractButton* b) {
+    emit agentFilterChanged(MAC, Mac::MAC_ACTIVE, b->group()->id(b), b->isChecked());
+}
+
+void AgentsWidget::mrGroupActivated(QAbstractButton* b) {
+    QButtonGroup* group = b->group();
+    Q_CHECK_PTR(group);
+    emit agentFilterChanged(MAC, Mac::MAC_RESTING, group->id(b), b->isChecked());
+}
+
+void AgentsWidget::miGroupActivated(QAbstractButton* b) {
+    emit agentFilterChanged(MAC, Mac::MAC_INFECTED, b->group()->id(b), b->isChecked());
+}
+
+void AgentsWidget::mciGroupActivated(QAbstractButton* b) {
+    emit agentFilterChanged(MAC, Mac::MAC_CINFECTED, b->group()->id(b), b->isChecked());
 }
 
 void AgentsWidget::setAgentSelection(int row, int col)
@@ -77,29 +111,29 @@ void AgentsWidget::updateM1M2Settings()
 void AgentsWidget::updateAgentsSettings()
 {
     /// Temporary
-    _pAgentsVisualization->setDrawMac(Mac::MAC_ACTIVE, AgentsVisualization::DEACT, _ui.checkBoxMaDeact->isChecked());
-    _pAgentsVisualization->setDrawMac(Mac::MAC_ACTIVE, AgentsVisualization::STAT1, _ui.checkBoxMaStat1->isChecked());
-    _pAgentsVisualization->setDrawMac(Mac::MAC_ACTIVE, AgentsVisualization::NFKB, _ui.checkBoxMaNFkB->isChecked());
-    _pAgentsVisualization->setDrawMac(Mac::MAC_ACTIVE, AgentsVisualization::OTHER, _ui.checkBoxMaOther->isChecked());
-    _pAgentsVisualization->setDrawMac(Mac::MAC_ACTIVE, AgentsVisualization::ENBL, _ui.checkBoxDrawAgentMa->isChecked());
+    _pAgentsVisualization->setDrawMac(Mac::MAC_ACTIVE, DEACT, _ui.checkBoxMaDeact->isChecked());
+    _pAgentsVisualization->setDrawMac(Mac::MAC_ACTIVE, STAT1, _ui.checkBoxMaStat1->isChecked());
+    _pAgentsVisualization->setDrawMac(Mac::MAC_ACTIVE, NFKB, _ui.checkBoxMaNFkB->isChecked());
+    _pAgentsVisualization->setDrawMac(Mac::MAC_ACTIVE, OTHER, _ui.checkBoxMaOther->isChecked());
+    _pAgentsVisualization->setDrawMac(Mac::MAC_ACTIVE, ENBL, _ui.checkBoxDrawAgentMa->isChecked());
 
-    _pAgentsVisualization->setDrawMac(Mac::MAC_RESTING, AgentsVisualization::DEACT, _ui.checkBoxMrDeact->isChecked());
-    _pAgentsVisualization->setDrawMac(Mac::MAC_RESTING, AgentsVisualization::STAT1, _ui.checkBoxMrStat1->isChecked());
-    _pAgentsVisualization->setDrawMac(Mac::MAC_RESTING, AgentsVisualization::NFKB, _ui.checkBoxMrNFkB->isChecked());
-    _pAgentsVisualization->setDrawMac(Mac::MAC_RESTING, AgentsVisualization::OTHER, _ui.checkBoxMrOther->isChecked());
-    _pAgentsVisualization->setDrawMac(Mac::MAC_RESTING, AgentsVisualization::ENBL, _ui.checkBoxDrawAgentMr->isChecked());
+    _pAgentsVisualization->setDrawMac(Mac::MAC_RESTING, DEACT, _ui.checkBoxMrDeact->isChecked());
+    _pAgentsVisualization->setDrawMac(Mac::MAC_RESTING, STAT1, _ui.checkBoxMrStat1->isChecked());
+    _pAgentsVisualization->setDrawMac(Mac::MAC_RESTING, NFKB, _ui.checkBoxMrNFkB->isChecked());
+    _pAgentsVisualization->setDrawMac(Mac::MAC_RESTING, OTHER, _ui.checkBoxMrOther->isChecked());
+    _pAgentsVisualization->setDrawMac(Mac::MAC_RESTING, ENBL, _ui.checkBoxDrawAgentMr->isChecked());
 
-    _pAgentsVisualization->setDrawMac(Mac::MAC_INFECTED, AgentsVisualization::DEACT, _ui.checkBoxMiDeact->isChecked());
-    _pAgentsVisualization->setDrawMac(Mac::MAC_INFECTED, AgentsVisualization::STAT1, _ui.checkBoxMiStat1->isChecked());
-    _pAgentsVisualization->setDrawMac(Mac::MAC_INFECTED, AgentsVisualization::NFKB, _ui.checkBoxMiNFkB->isChecked());
-    _pAgentsVisualization->setDrawMac(Mac::MAC_INFECTED, AgentsVisualization::OTHER, _ui.checkBoxMiOther->isChecked());
-    _pAgentsVisualization->setDrawMac(Mac::MAC_INFECTED, AgentsVisualization::ENBL, _ui.checkBoxDrawAgentMi->isChecked());
+    _pAgentsVisualization->setDrawMac(Mac::MAC_INFECTED, DEACT, _ui.checkBoxMiDeact->isChecked());
+    _pAgentsVisualization->setDrawMac(Mac::MAC_INFECTED, STAT1, _ui.checkBoxMiStat1->isChecked());
+    _pAgentsVisualization->setDrawMac(Mac::MAC_INFECTED, NFKB, _ui.checkBoxMiNFkB->isChecked());
+    _pAgentsVisualization->setDrawMac(Mac::MAC_INFECTED, OTHER, _ui.checkBoxMiOther->isChecked());
+    _pAgentsVisualization->setDrawMac(Mac::MAC_INFECTED, ENBL, _ui.checkBoxDrawAgentMi->isChecked());
 
-    _pAgentsVisualization->setDrawMac(Mac::MAC_CINFECTED, AgentsVisualization::DEACT, _ui.checkBoxMciDeact->isChecked());
-    _pAgentsVisualization->setDrawMac(Mac::MAC_CINFECTED, AgentsVisualization::STAT1, _ui.checkBoxMciStat1->isChecked());
-    _pAgentsVisualization->setDrawMac(Mac::MAC_CINFECTED, AgentsVisualization::NFKB, _ui.checkBoxMciNFkB->isChecked());
-    _pAgentsVisualization->setDrawMac(Mac::MAC_CINFECTED, AgentsVisualization::OTHER, _ui.checkBoxMciOther->isChecked());
-    _pAgentsVisualization->setDrawMac(Mac::MAC_CINFECTED, AgentsVisualization::ENBL, _ui.checkBoxDrawAgentMci->isChecked());
+    _pAgentsVisualization->setDrawMac(Mac::MAC_CINFECTED, DEACT, _ui.checkBoxMciDeact->isChecked());
+    _pAgentsVisualization->setDrawMac(Mac::MAC_CINFECTED, STAT1, _ui.checkBoxMciStat1->isChecked());
+    _pAgentsVisualization->setDrawMac(Mac::MAC_CINFECTED, NFKB, _ui.checkBoxMciNFkB->isChecked());
+    _pAgentsVisualization->setDrawMac(Mac::MAC_CINFECTED, OTHER, _ui.checkBoxMciOther->isChecked());
+    _pAgentsVisualization->setDrawMac(Mac::MAC_CINFECTED, ENBL, _ui.checkBoxDrawAgentMci->isChecked());
 
     _pAgentsVisualization->setGridAlpha(_ui.horizontalSliderAgentsAlpha->value() / _SLIDER_AGENTS_ALPHA);
     _pAgentsVisualization->setDrawGrid(_ui.checkBoxAgentDrawGrid->isChecked());

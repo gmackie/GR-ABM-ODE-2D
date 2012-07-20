@@ -408,6 +408,7 @@ int main(int argc, char *argv[])
     gr.setAreaThreshold(_AREA_THRESHOLD);
   }
   itfc.getSimulation().update();
+  itfc.updateGrids();   //Should not have to do this... should be done in simulation via signal
 
 	// This must come after any load of a saved state so that the loaded
 	// seed will be used as part of the file name, not a random seed or

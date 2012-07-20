@@ -12,6 +12,7 @@
 #include "gui/statwidget.h"
 #include "gui/agentswidget.h"
 #include "gui/graphcontroller.h"
+#include "gui/agenthistogram.h"
 #include "maininterface.h"
 #include "snapshot.h"
 #include "colormaps/colormap.h"
@@ -26,7 +27,7 @@ class MainWindow : public QMainWindow
 
 public:
     MainWindow(MainInterface* pItfc, GLWindow* pGLWindow, QWidget* pParamWindow,
-    		StatWidget* pStatWidget, QWidget* pAgentsWidget, QWidget* parent = 0);
+            StatWidget* pStatWidget, AgentsWidget* pAgentsWidget, QWidget* parent = 0);
     ~MainWindow();
     Ui::MainWindowClass& getUI();
     void setScriptingMode(bool scriptingMode);
@@ -155,6 +156,9 @@ protected:
 	void timerEvent(QTimerEvent* pEvent);
 	void closeEvent(QCloseEvent* pEvent);
 
+private slots:
+    void on_agentHistButton_clicked(bool checked);
+
 private:
 	void initVisualizationTab();
 	void initSimulationTab();
@@ -179,11 +183,12 @@ private:
 
 	Ui::MainWindowClass _ui;
 	MainInterface* _pItfc;
+    AgentHistogram* _pAgentHistogram;
     GraphController* _pGraphController;
 	GLWindow* _pGLWindow;
 	QWidget* _pParamWindow;
 	StatWidget* _pStatWidget;
-	QWidget* _pAgentsWidget;
+    AgentsWidget* _pAgentsWidget;
 	ColorMap* _pCurrentColorMap;
     ScalarNormalizer* _pCurrentNormalizer;
     ScalarGrid* _pCurrentScalarGrid;

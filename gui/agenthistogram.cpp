@@ -5,13 +5,13 @@
 #include <QProgressBar>
 
 #include <qwt_plot_curve.h>
-#include <qwt_plot_picker.h>
 
 #include <QFileDialog>
 #include <qwt_legend.h>
 #include <qwt_legend_item.h>
 #if (QWT_VERSION >> 16) == 0x06
-    #include <qwt_plot_renderer.h>
+  #include <qwt_plot_picker.h>
+  #include <qwt_plot_renderer.h>
   #include <qwt_symbol.h>
 #endif
 
@@ -42,8 +42,10 @@ AgentHistogram::AgentHistogram(const Simulation& _sim, QWidget *parent) :
         pbar->setValue(100);
         ui->toolBar->addWidget(pbar)->setVisible(true);
     }
+#if (QWT_VERSION >> 16) == 0x06
     new QwtPlotPicker(QwtPlot::xBottom, QwtPlot::yLeft, QwtPicker::CrossRubberBand,
                       QwtPlotPicker::AlwaysOn, ui->centralwidget->canvas());
+#endif
 
     QwtLegend* _legend = new QwtLegend();
     _legend->setItemMode(QwtLegend::ClickableItem);
@@ -193,7 +195,11 @@ void AgentHistogram::updatePlot()
             xdata[i].resize(nbuckets);    //resize() will do nothing if vector is the correct size
             ydata[i].resize(nbuckets);
         }
+#if (QWT_VERSION >> 16) == 5
+	curves[i]->setRawData(xdata[i].data(), ydata[i].data(), nbuckets);
+#else
         curves[i]->setRawSamples(xdata[i].data(), ydata[i].data(), nbuckets);
+#endif
         ydata[i].fill(0);
         if(this->min[i] >= this->max[i]) {   //To prevent divide by zero, double the width
             this->max[i] =  this->min[i]+1;

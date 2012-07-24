@@ -8,10 +8,10 @@
 #ifndef SMOKEVISUALIZATION_H_
 #define SMOKEVISUALIZATION_H_
 
-#include "colormaps/colormap.h"
-#include "scalardatasets/scalargrid.h"
-#include "scalardatasets/scalarnormalizer.h"
 #include "visualization.h"
+
+class ScalarNormalizer;
+class ScalarGrid;
 
 class SmokeVisualization : public Visualization
 {

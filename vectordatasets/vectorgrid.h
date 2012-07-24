@@ -10,9 +10,10 @@
 
 #include "grviz.h"
 #include "vector.h"
-#include "vectordataset.h"
 #include "datasets/grid.h"
 #include <fstream>
+
+class VectorDataset;
 
 struct VectorGridItem
 {
@@ -33,24 +34,6 @@ public:
 	const std::vector<VectorGridItem>& getGrid() const;
 	void serialize(std::ofstream& outFile) const;
 };
-
-inline void VectorGrid::evaluate(const Simulation* pSimulation, VectorDataset* pVectorDataset, bool useNN)
-{
-	assert(pVectorDataset);
-
-	for (size_t i = 0; i < _grid.size(); i++)
-	{
-		VectorGridItem& item = _grid[i];
-		if (useNN)
-		{
-			pVectorDataset->getVectorNN(pSimulation, item.origin, item.vector);
-		}
-		else
-		{
-			pVectorDataset->getVectorBL(pSimulation, item.origin, item.vector);
-		}
-	}
-}
 
 inline int VectorGrid::count() const
 {

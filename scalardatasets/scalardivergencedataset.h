@@ -9,8 +9,6 @@
 #define SCALARDIVERGENCEDATASET_H_
 
 #include "scalardataset.h"
-#include "scalardatasets/scalargrid.h"
-#include "datasets/grid.h"
 #include "vectordatasets/vectordataset.h"
 #include "vectordatasets/vector.h"
 

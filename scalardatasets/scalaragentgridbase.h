@@ -8,8 +8,9 @@
 #ifndef SCALARAGENTGRIDBASE_H_
 #define SCALARAGENTGRIDBASE_H_
 
-#include "simulation.h"
 #include "datasets/grid.h"
+
+class Simulation;
 
 class ScalarAgentGridBase : public Grid
 {

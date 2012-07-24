@@ -11,7 +11,8 @@
 #include <QWidget>
 #include <QColor>
 #include <QPair>
-#include "colormaps/colormap.h"
+
+class ColorMap;
 
 typedef std::vector<QColor> ColorVector;
 
@@ -20,10 +21,10 @@ class ColorMapWidget : public QWidget
 	Q_OBJECT
 
 public:
-	ColorMapWidget(QWidget* parent = 0);
-	virtual ~ColorMapWidget();
-	void setColorMap(ColorMap* pColorMap);
-	const ColorMap* getColorMap();
+    ColorMapWidget(QWidget* parent = 0);
+    ~ColorMapWidget();
+    void setColorMap(ColorMap* pColorMap);
+    const ColorMap* getColorMap();
 
 protected:
     void paintEvent(QPaintEvent* event);
@@ -34,13 +35,13 @@ private:
 
 inline const ColorMap* ColorMapWidget::getColorMap()
 {
-	return _pColorMap;
+    return _pColorMap;
 }
 
 inline void ColorMapWidget::setColorMap(ColorMap* pColorMap)
 {
-	_pColorMap = pColorMap;
-	update();
+    _pColorMap = pColorMap;
+    update();
 }
 
 #endif /* COLORMAPWIDGET_H_ */

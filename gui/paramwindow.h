@@ -5,7 +5,8 @@
 #include <QTreeWidgetItem>
 #include "ui_paramwindow.h"
 #include "simulation/params.h"
-#include "maininterface.h"
+
+class MainInterface;
 
 class ParamWindow : public QWidget
 {

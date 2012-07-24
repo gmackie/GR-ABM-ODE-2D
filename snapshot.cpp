@@ -6,9 +6,12 @@
  */
 
 #include "snapshot.h"
+#include "simulation.h"
 #include <QPainter>
 #include <QPen>
 #include <QFont>
+#include <QImage>
+#include <QDir>
 #include <boost/iostreams/device/file.hpp>
 #include <boost/iostreams/filtering_stream.hpp>
 #include <boost/iostreams/filter/gzip.hpp>

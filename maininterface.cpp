@@ -13,6 +13,7 @@
 #include "colormaps/rainbow.h"
 #include "colormaps/coolwarm.h"
 #include "colormaps/fixed.h"
+#include "scalardatasets/scalaragentgridbase.h"
 #include <stdio.h>
 
 MainInterface::MainInterface(const Pos& dim, Visualization* pAgentVisualization, ScalarAgentGridBase* pScalarAgentGrid)

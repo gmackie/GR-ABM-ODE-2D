@@ -1,12 +1,12 @@
 #ifndef GRAPHCONTROLLER_H
 #define GRAPHCONTROLLER_H
 
-#include "maininterface.h"
 #include <QVector>
 #include "graphviewer.h"
 
 struct StatCounterVisitor;
 struct StatUpdateVisitor;
+class Stats;
 
 class GraphController : public QObject {
   Q_OBJECT

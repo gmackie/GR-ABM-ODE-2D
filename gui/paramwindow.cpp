@@ -1,5 +1,6 @@
 #include "paramwindow.h"
 #include "simulation/tinyxml/tinyxml.h"
+#include "maininterface.h"
 #include <QFileDialog>
 #include <QMessageBox>
 

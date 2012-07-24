@@ -37,9 +37,7 @@ inline void GlyphTexture::setDeltaY(float deltaY)
 inline GlyphTexture::GlyphTexture(const QString& fileName)
 	: Glyph()
 {
-	QImage buf;
-	buf.load(fileName);
-	_texture = QGLWidget::convertToGLFormat( buf );
+	_texture = QGLWidget::convertToGLFormat( QImage(fileName) );
 
 	glGenTextures(1, &_texName);
 	glBindTexture(GL_TEXTURE_2D, _texName);

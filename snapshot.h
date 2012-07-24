@@ -9,10 +9,11 @@
 #define SNAPSHOT_H_
 
 #include <fstream>
-#include "simulation.h"
-#include <QImage>
-#include <QDir>
 #include <QString>
+
+class QImage;
+class Stats;
+class Simulation;
 
 class Snapshot
 {

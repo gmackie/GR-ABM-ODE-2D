@@ -6,6 +6,7 @@
  */
 
 #include "scalaragentgrid.h"
+#include "scalardataset.h"
 #include "simulation.h"
 #include "simulation/recruitmentbase.h"
 #include "simulation/recruitmentprob.h"

@@ -1,5 +1,11 @@
 #include "glwindow.h"
+#include "colormaps/colormap.h"
+#include "maininterface.h"
+#include "scalardatasets/scalaragentgrid.h"
+#include <QTreeWidget>
 #include <QTreeWidgetItemIterator>
+#include <QImage>
+#include <QCloseEvent>
 
 GLWindow::GLWindow(MainInterface* pItfc, QWidget* parent)
     : QWidget(parent)

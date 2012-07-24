@@ -9,10 +9,12 @@
 #define SCALARGRID_H_
 
 #include "grviz.h"
-#include "scalardataset.h"
 #include "simulation.h"
 #include "datasets/grid.h"
+#include "vectordatasets/vector.h"
 #include <fstream>
+
+class ScalarDataset;
 
 struct ScalarGridItem
 {
@@ -37,32 +39,6 @@ public:
 	const std::vector<ScalarGridItem>& getGrid() const;
 	void serialize(std::ofstream& outFile) const;
 };
-
-inline void ScalarGrid::evaluate(const Simulation* pSimulation, ScalarDataset* pScalarDataset, bool useNN)
-{
-	assert(pScalarDataset);
-
-	_min = FLT_MAX;
-	_max = FLT_MIN;
-
-	for (size_t i = 0; i < _grid.size(); i++)
-	{
-		ScalarGridItem& item = _grid[i];
-		if (useNN)
-		{
-			item.scalar = pScalarDataset->getScalarNN(pSimulation, item.pos);
-		}
-		else
-		{
-			item.scalar = pScalarDataset->getScalarBL(pSimulation, item.pos);
-		}
-
-		if (item.scalar > _max)
-			_max = item.scalar;
-		else if (item.scalar < _min)
-			_min = item.scalar;
-	}
-}
 
 inline int ScalarGrid::count() const
 {

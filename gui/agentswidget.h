@@ -16,8 +16,8 @@ public:
 
 public slots:
     void updateM1M2Settings();
-	void updateAgentsSettings();
-	void setAgentSelection(int row, int col);
+    void updateAgentsSettings();
+    void setAgentSelection(int row, int col);
     void saveSettings() const;
     void loadSettings();
 
@@ -31,7 +31,7 @@ private slots:
     void tcytFilterChanged(bool en);
 
 signals:
-	void updateGL();
+    void updateGL();
     void agentFilterChanged(int, int, int, bool);
 
 private:

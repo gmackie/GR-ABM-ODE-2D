@@ -34,8 +34,11 @@
 	#define _CRT_SECURE_NO_WARNINGS
 
 	// microsoft's math.h is not C99 compliant, round and roundf are missing
-	#define roundf(x) (((x) - floor((x))) > 0.5f ? ceil((x)) : floor((x)))
-	#define round(x) (((x) - floor((x))) > 0.5 ? ceil((x)) : floor((x)))
+    // Fixed macro issue.
+    template<typename T>
+    inline T roundf(const T& x) { return (x - floor(x)) > 0.5f ? ceil(x) : floor(x); }
+    template<typename T>
+    inline T round(const T& x) { return (x - floor(x)) > 0.5f ? ceil(x) : floor(x); }
 #endif
 
 #ifdef __APPLE__

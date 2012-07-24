@@ -11,7 +11,8 @@
 #include "grviz.h"
 #include "colormaps/colormap.h"
 #include "vectordatasets/vector.h"
-#include "simulation.h"
+
+class Simulation;
 
 class Visualization
 {

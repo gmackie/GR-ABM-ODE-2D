@@ -3,12 +3,15 @@
 
 #include <QtGui/QWidget>
 #include "ui_glwindow.h"
-#include "colormaps/colormap.h"
-#include "maininterface.h"
-#include <QImage>
+#include "simulation/stat.h"
 #include <QString>
-#include <QCloseEvent>
-#include <QTreeWidget>
+
+class ColorMap;
+class MainInterface;
+class QImage;
+class QCloseEvent;
+class QTreeWidget;
+class QTreeWidgetItem;
 
 class GLWindow : public QWidget
 {
@@ -53,12 +56,12 @@ protected:
 private:
     Ui::GLWindowClass _ui;
     MainInterface* _pItfc;
-	int _selRow;
-	int _selCol;
-	GrStatus _status[NOUTCOMES];
-	bool _printTime;
-	bool _printOutcome;
-  QTreeWidget* agentInfoWindow;
+    int _selRow;
+    int _selCol;
+    GrStatus _status[NOUTCOMES];
+    bool _printTime;
+    bool _printOutcome;
+    QTreeWidget* agentInfoWindow;
 
     QString getAgentStr(const Agent* pAgent);
 };

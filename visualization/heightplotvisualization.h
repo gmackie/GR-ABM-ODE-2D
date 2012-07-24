@@ -9,10 +9,10 @@
 #define HEIGHTPLOTVISUALIZATION_H_
 
 #include "colormaps/colormap.h"
-#include "scalardatasets/scalargrid.h"
-#include "scalardatasets/scalarnormalizer.h"
-#include "vectordatasets/vectorgradientdataset.h"
 #include "visualization.h"
+class ScalarNormalizer;
+class ScalarGrid;
+class VectorGradientDataset;
 
 class HeightPlotVisualization : public Visualization
 {
@@ -84,12 +84,6 @@ inline bool HeightPlotVisualization::getDrawGrid() const
 inline void HeightPlotVisualization::setDrawGrid(bool value)
 {
 	_drawGrid = value;
-}
-
-inline void HeightPlotVisualization::setGradientDataset(VectorGradientDataset* pGradientDataset)
-{
-	delete _pGradientDataset;
-	_pGradientDataset = pGradientDataset;
 }
 
 #endif /* HEIGHTPLOTVISUALIZATION_H_ */

@@ -8,8 +8,6 @@
 #ifndef SCALARNORMALIZER_H_
 #define SCALARNORMALIZER_H_
 
-#include "scalardataset.h"
-
 class ScalarNormalizer
 {
 private:

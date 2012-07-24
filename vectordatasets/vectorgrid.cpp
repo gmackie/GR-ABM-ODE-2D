@@ -6,8 +6,8 @@
  */
 
 #include "vectorgrid.h"
+#include "vectordataset.h"
 #include "simulation.h"
-#include "datasets/grid.h"
 
 VectorGrid::VectorGrid(size_t _DIM)
 	: Grid(_DIM)
@@ -64,4 +64,22 @@ void VectorGrid::serialize(std::ofstream& outFile) const
 
 VectorGrid::~VectorGrid()
 {
+}
+
+void VectorGrid::evaluate(const Simulation* pSimulation, VectorDataset* pVectorDataset, bool useNN)
+{
+    assert(pVectorDataset);
+
+    for (size_t i = 0; i < _grid.size(); i++)
+    {
+        VectorGridItem& item = _grid[i];
+        if (useNN)
+        {
+            pVectorDataset->getVectorNN(pSimulation, item.origin, item.vector);
+        }
+        else
+        {
+            pVectorDataset->getVectorBL(pSimulation, item.origin, item.vector);
+        }
+    }
 }

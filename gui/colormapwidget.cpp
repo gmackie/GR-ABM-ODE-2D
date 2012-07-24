@@ -10,6 +10,7 @@
 #include <QPainterPath>
 #include <QPainter>
 #include <QColor>
+#include "colormaps/colormap.h"
 
 ColorMapWidget::ColorMapWidget(QWidget* parent)
 	: QWidget(parent)

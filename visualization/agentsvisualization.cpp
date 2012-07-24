@@ -6,6 +6,7 @@
  */
 
 #include "agentsvisualization.h"
+#include "scalardatasets/scalaragentgrid.h"
 #include <vector>
 #include <assert.h>
 

@@ -5,8 +5,10 @@
  *      Author: s030858
  */
 
-#include "isolinesvisualization.h"
 #include <assert.h>
+#include "isolinesvisualization.h"
+#include "scalardatasets/scalarnormalizer.h"
+#include "scalardatasets/scalargrid.h"
 
 /* Marching triangles
  *

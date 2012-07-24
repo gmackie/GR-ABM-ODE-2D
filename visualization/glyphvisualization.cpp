@@ -8,7 +8,9 @@
 #include "glyphvisualization.h"
 #include <vector>
 #include <iostream>
-#include "gui/mainwindow.h"
+#include "vectordatasets/vectorgrid.h"
+#include "scalardatasets/scalargrid.h"
+#include "scalardatasets/scalarnormalizer.h"
 #include "glyphs/glyphhedgehog.h"
 #include "glyphs/glyphcone.h"
 #include "glyphs/glyphtexture.h"
@@ -83,17 +85,15 @@ void GlyphVisualization::visualize(bool blend, const Simulation*, const ColorMap
 			dest *= (radius / dest.magnitude());
 		}
 
-		/*if (item.origin[0] == 100 && item.origin[1] == 100)
-		{
-		}
-		else
-		{
-			dest *= 0;
-		}*/
-
 		_pGlyph->draw(origin, dest);
 	}
 
 	glDisable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);
+}
+
+void GlyphVisualization::setGlyph(Glyph* pGlyph)
+{
+    delete _pGlyph;
+    _pGlyph = pGlyph;
 }

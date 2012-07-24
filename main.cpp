@@ -5,15 +5,6 @@
 #include "gui/agentswidget.h"
 #include "visualization/agentsvisualization.h"
 #include "scalardatasets/scalaragentgrid.h"
-
-#include <QtGui>
-#include <QApplication>
-#include <QTime>
-#include <QDir>
-#include <QString>
-#include <iostream>
-#include <boost/program_options.hpp>
-#include <string>
 #include "simulation/params.h"
 #include "simulation/recruitmentprob.h"
 #include "simulation/recruitmentlnode.h"
@@ -23,6 +14,15 @@
 #include "simulation.h"
 #include "ui_mainwindow.h"
 #include "snapshot.h"
+
+#include <QtGui>
+#include <QApplication>
+#include <QTime>
+#include <QDir>
+#include <QString>
+#include <iostream>
+#include <boost/program_options.hpp>
+#include <string>
 
 namespace po = boost::program_options;
 

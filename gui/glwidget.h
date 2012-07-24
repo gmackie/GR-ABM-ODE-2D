@@ -2,8 +2,11 @@
 #define GLWIDGET_H
 
 #include <QGLWidget>
-#include "maininterface.h"
 #include "vectordatasets/vector.h"
+#include "simulation/gr.h"
+
+class Simulation;
+class Visualization;
 
 class GLWidget : public QGLWidget
 {

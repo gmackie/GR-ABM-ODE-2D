@@ -6,6 +6,9 @@
  */
 
 #include "heightplotvisualization.h"
+#include "scalardatasets/scalargrid.h"
+#include "scalardatasets/scalarnormalizer.h"
+#include "vectordatasets/vectorgradientdataset.h"
 
 HeightPlotVisualization::HeightPlotVisualization(int DIM, const ScalarNormalizer* pScalarHeightNormalizer,
 		const ScalarNormalizer* pScalarHeightColorNormalizer,
@@ -184,4 +187,10 @@ void HeightPlotVisualization::drawGrid() const
 		glVertex3f(_MAX_X, i * deltaY, _gridHeight);
 	}
 	glEnd();
+}
+
+void HeightPlotVisualization::setGradientDataset(VectorGradientDataset* pGradientDataset)
+{
+    delete _pGradientDataset;
+    _pGradientDataset = pGradientDataset;
 }

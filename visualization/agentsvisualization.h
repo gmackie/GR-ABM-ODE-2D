@@ -9,8 +9,10 @@
 #define AGENTSVISUALIZATION_H_
 
 #include "visualization.h"
-#include "scalardatasets/scalaragentgrid.h"
 #include "gui/agentswidget.h"
+#include "simulation/macrophage.h"  //Needed for Mac::NSTATES
+
+class ScalarAgentGrid;
 
 class AgentsVisualization : public Visualization
 {

@@ -8,25 +8,25 @@
 #ifndef MAININTERFACE_H_
 #define MAININTERFACE_H_
 
-#include "scalardatasets/scalaragentgridbase.h"
 #include "scalardatasets/scalarnormalizer.h"
-#include "scalardatasets/scalardataset.h"
 #include "scalardatasets/scalargrid.h"
-#include "vectordatasets/vectordataset.h"
 #include "vectordatasets/vectorgrid.h"
 #include "vectordatasets/vectorgradientdataset.h"
 #include "vectordatasets/vector.h"
 #include "simulation.h"
-#include "visualization/agentsvisualization.h"
 #include "visualization/invisiblequadvisualisation.h"
 #include "visualization/smokevisualization.h"
 #include "visualization/glyphvisualization.h"
 #include "visualization/isolinesvisualization.h"
 #include "visualization/heightplotvisualization.h"
-#include "glyphs/glyph.h"
-#include "glyphs/glyphhedgehog.h"
 #include "grviz.h"
 #include <fstream>
+
+class ScalarAgentGridBase;
+class ScalarDataset;
+class VectorDataset;
+class ColorMap;
+class Glyph;
 
 class MainInterface
 {

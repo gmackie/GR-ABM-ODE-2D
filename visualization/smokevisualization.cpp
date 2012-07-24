@@ -6,6 +6,8 @@
  */
 
 #include "smokevisualization.h"
+#include "scalardatasets/scalarnormalizer.h"
+#include "scalardatasets/scalargrid.h"
 
 SmokeVisualization::SmokeVisualization(int DIM, const ScalarNormalizer* pScalarNormalizer, const ScalarGrid* pScalarGrid)
 	: Visualization(DIM)

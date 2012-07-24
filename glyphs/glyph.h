@@ -9,7 +9,6 @@
 #define GLYPH_H_
 
 #include "grviz.h"
-#include "colormaps/colormap.h"
 #include "vectordatasets/vector.h"
 
 class Glyph

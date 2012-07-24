@@ -8,14 +8,13 @@
 #ifndef SCALARAGENTGRID_H_
 #define SCALARAGENTGRID_H_
 
-#include "scalardataset.h"
 #include "simulation.h"
 #include "scalaragentgridbase.h"
 
 #define GET_BIT(x, i) (((x) >> (i)) & 1)
 #define SET_BIT(i) ((1) << (i))
 
-typedef struct
+struct ScalarAgentItem
 {
 	int _bitMask;
 	const Agent* _pAgent[2];
@@ -27,10 +26,10 @@ typedef struct
 	double _CCL2;
 	double _CCL5;
 	double _CXCL9;
-  double _shedTNFR2;
-  double _il10;
+	double _shedTNFR2;
+	double _il10;
 	double _extMtb;
-} ScalarAgentItem;
+};
 
 /**
  * reg dead cinf inf act res Treg Tcyt Tgam Mac cas src
@@ -40,7 +39,7 @@ typedef struct
 class ScalarAgentGrid : public ScalarAgentGridBase
 {
 private:
-	std::vector<ScalarAgentItem> _grid;
+  std::vector<ScalarAgentItem> _grid;
   std::vector<Mac> _macList;
   std::vector<Tgam> _tgamList;
   std::vector<Tcyt> _tcytList;

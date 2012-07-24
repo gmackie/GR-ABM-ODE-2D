@@ -39,7 +39,7 @@ inline float ScalarDataset::getScalarNN(const Simulation* pSimulation, float x, 
 	int col = (int)x;
 	int row = (int)y;
 
-  const Pos& dim = pSimulation->getSize();
+	const Pos& dim = pSimulation->getSize();
 
 	if (x - col >= 0.5)
 	{

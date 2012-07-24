@@ -8,13 +8,12 @@
 #ifndef GLYPHVISUALIZATION_H_
 #define GLYPHVISUALIZATION_H_
 
-#include "colormaps/colormap.h"
-#include "vectordatasets/vector.h"
-#include "vectordatasets/vectorgrid.h"
-#include "scalardatasets/scalargrid.h"
-#include "scalardatasets/scalarnormalizer.h"
 #include "visualization.h"
-#include "glyphs/glyph.h"
+
+class ScalarNormalizer;
+class ScalarGrid;
+class VectorGrid;
+class Glyph;
 
 class GlyphVisualization : public Visualization
 {
@@ -45,12 +44,6 @@ inline Glyph* GlyphVisualization::getGlyph() const
 inline void GlyphVisualization::setScaleFactor(int value)
 {
 	_scaleFactor = value;
-}
-
-inline void GlyphVisualization::setGlyph(Glyph* pGlyph)
-{
-	delete _pGlyph;
-	_pGlyph = pGlyph;
 }
 
 inline void GlyphVisualization::setClamping(bool clamp)

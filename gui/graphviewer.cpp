@@ -3,6 +3,8 @@
 #include "ui_graphviewer.h"
 
 #include <QFileDialog>
+#include <qwt_plot.h>
+#include <qwt_plot_curve.h>
 #include <qwt_legend.h>
 #include <qwt_legend_item.h>
 #if (QWT_VERSION >> 16) == 0x06

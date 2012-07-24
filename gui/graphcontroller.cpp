@@ -1,4 +1,5 @@
 #include "gui/graphcontroller.h"
+#include "simulation/stat.h"
 
 struct StatCounterVisitor {
   GraphController& _gc;

@@ -9,6 +9,7 @@
 #define SCALAREXTMTBDATASET_H_
 
 #include "scalardataset.h"
+#include "simulation.h"
 
 class ScalarExtMtbDataset : public ScalarDataset
 {

@@ -3,7 +3,6 @@
 
 #include <QtGui/QWidget>
 #include "ui_statwidget.h"
-#include "maininterface.h"
 #include "simulation/gr.h"
 
 class StatWidget : public QWidget

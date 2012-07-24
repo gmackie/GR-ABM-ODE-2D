@@ -10,8 +10,9 @@
 
 #include "visualization.h"
 #include "vectordatasets/vector.h"
-#include "scalardatasets/scalarnormalizer.h"
-#include "scalardatasets/scalargrid.h"
+
+class ScalarNormalizer;
+class ScalarGrid;
 
 class IsolinesVisualization: public Visualization
 {

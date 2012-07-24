@@ -2,12 +2,13 @@
 #define GRAPHVIEWER_H
 
 #include <QMainWindow>
-#include <qwt_plot.h>
-#include <qwt_plot_curve.h>
 
 namespace Ui {
 class GraphViewer;
 }
+
+class QwtPlotCurve;
+class QwtPlotItem;
 
 class GraphController;
 

@@ -6,6 +6,7 @@
  */
 
 #include "scalarnormalizer.h"
+#include <assert.h>
 
 ScalarNormalizer::ScalarNormalizer(float min, float max)
 	: _min(min)

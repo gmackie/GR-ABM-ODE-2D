@@ -15,7 +15,7 @@ class InvisibleQuadVisualisation: public Visualization
 public:
 	InvisibleQuadVisualisation(int DIM);
 	virtual ~InvisibleQuadVisualisation();
-	void visualize(bool blend, const Simulation* pSimulation, const ColorMap* pColorMap) const;;
+    void visualize(bool blend, const Simulation* pSimulation, const ColorMap* pColorMap) const;
 };
 
 #endif /* INVISIBLEQUADVISUALISATION_H_ */

@@ -7,17 +7,15 @@
 #include <QString>
 #include "ui_mainwindow.h"
 
-#include "gui/glwindow.h"
-#include "gui/paramwindow.h"
-#include "gui/statwidget.h"
-#include "gui/agentswidget.h"
-#include "gui/graphcontroller.h"
 #include "gui/agenthistogram.h"
 #include "maininterface.h"
-#include "snapshot.h"
-#include "colormaps/colormap.h"
-#include "scalardatasets/scalarnormalizer.h"
-#include "scalardatasets/scalargrid.h"
+
+
+class GLWindow;
+class StatWidget;
+class AgentsWidget;
+class GraphController;
+class Snapshot;
 
 typedef enum { SIM_RUNNING, SIM_PAUSED, SIM_STOPPED } SimStatus;
 
@@ -322,12 +320,6 @@ inline Ui::MainWindowClass& MainWindow::getUI()
 inline void MainWindow::setScriptingMode(bool scriptingMode)
 {
 	_scriptingMode = scriptingMode;
-}
-
-inline void MainWindow::setSnapshot(Snapshot* pSnapshot)
-{
-	delete _pSnapshot;
-	_pSnapshot = pSnapshot;
 }
 
 #endif // MAINWINDOW_H

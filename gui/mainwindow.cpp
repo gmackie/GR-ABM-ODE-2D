@@ -12,6 +12,8 @@
 #include <list>
 #include <limits>
 
+//TODO: Clean this up...
+
 #include "simulation.h"
 #include "colormaps/rainbow.h"
 #include "colormaps/blackwhite.h"
@@ -40,6 +42,15 @@
 #include "vectordatasets/vector.h"
 #include "gui/glwidget.h"
 #include "gui/paramwindow.h"
+#include "snapshot.h"
+#include "colormaps/colormap.h"
+#include "scalardatasets/scalarnormalizer.h"
+#include "scalardatasets/scalargrid.h"
+#include "gui/glwindow.h"
+#include "gui/paramwindow.h"
+#include "gui/statwidget.h"
+#include "gui/agentswidget.h"
+#include "gui/graphcontroller.h"
 
 #include <boost/iostreams/device/file.hpp>
 #include <boost/iostreams/filtering_stream.hpp>
@@ -1795,4 +1806,10 @@ void MainWindow::loadSettings()
     settings.beginGroup("Scalars");
     _ui.comboBoxSmokeDataset->setCurrentIndex(settings.value("smokeDataset", _ui.comboBoxSmokeDataset->currentIndex()).toInt());
     settings.endGroup();
+}
+
+void MainWindow::setSnapshot(Snapshot* pSnapshot)
+{
+	delete _pSnapshot;
+	_pSnapshot = pSnapshot;
 }

@@ -1,4 +1,5 @@
 #include "statwidget.h"
+#include "simulation/stat.h"
 
 
 template<typename T>

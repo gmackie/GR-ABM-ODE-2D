@@ -192,6 +192,13 @@
 		thresholdRec = "0.00210957"
 		probRec = "0.04"
 		thresholdICOS = "25"
+		maxRecProb = "0.0107879"
+		thresholdRecChemokine = "0.00015"
+		thresholdRecTNF = "0.00045"
+		recruitmentHalfSatTNF = "0.0033963"
+		recruitmentHalfSatChemokine = "0.00160688"
+		stat1ActivationTime = "288"
+		nfkbActivationTime = "10"
 		/>
 	<Tcell
 		mtbRecEnabled = "35"

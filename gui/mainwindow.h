@@ -145,6 +145,8 @@ public slots:
 	void loadState();
 	void saveState();
 	void takePictureSnapshot();
+    void saveSettings() const;
+    void loadSettings();
 
 signals:
 	void updateGL();

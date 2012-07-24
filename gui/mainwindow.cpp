@@ -7,6 +7,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QShortcut>
+#include <QSettings>
 #include <vector>
 #include <list>
 #include <limits>
@@ -1715,4 +1716,83 @@ void MainWindow::on_agentHistButton_clicked(bool checked)
     }
     else
         _pAgentHistogram->hide();
+}
+
+void MainWindow::saveSettings() const
+{
+  QSettings settings(QApplication::applicationDirPath() + "/.config", QSettings::IniFormat);
+  settings.beginGroup("Simulation");
+  settings.setValue("diffusion", _ui.comboBoxDiffusion->currentIndex());
+  settings.setValue("delay", _ui.spinBoxDelay->value());
+  settings.setValue("seed", _ui.spinBoxSeed->value());
+  settings.setValue("stopClearance", _ui.checkBoxStopClearance->isChecked());
+  settings.setValue("stopTime", _ui.checkBoxStopDays->isChecked());
+  settings.setValue("stopTimeStep", _ui.spinBoxStopTime->value());
+  settings.endGroup();
+  settings.beginGroup("Output");
+  settings.setValue("enableOutput", _ui.checkBoxOutput->isChecked());
+  settings.setValue("outputFilename", _ui.lineEditOutput->text());
+  settings.setValue("csvInterval", _ui.spinBoxSnapshotCsvInterval->value());
+  settings.setValue("pngInterval", _ui.spinBoxSnapshotPicInterval->value());
+  settings.setValue("stateInterval", _ui.spinBoxSnapshotStateInterval->value());
+  settings.endGroup();
+  settings.beginGroup("Visualization");
+  settings.setValue("blend", _ui.checkBoxBlend->isChecked());
+  settings.setValue("drawAgents", _ui.checkBoxDrawAgents->isChecked());
+  settings.setValue("drawGlyphs", _ui.checkBoxDrawGlyphs->isChecked());
+  settings.setValue("drawHeightPlot", _ui.checkBoxDrawHeightPlot->isChecked());
+  settings.setValue("drawIsolines", _ui.checkBoxDrawIsolines->isChecked());
+  settings.setValue("drawOutcomes", _ui.checkBoxDrawOutcomes->isChecked());
+  settings.setValue("drawSmoke", _ui.checkBoxDrawSmoke->isChecked());
+  settings.setValue("drawTime", _ui.checkBoxDrawTime->isChecked());
+      settings.beginGroup("Granuloma");
+      settings.setValue("drawGranulomaBorder", _ui.checkBoxDrawGranulomaBorder->isChecked());
+      settings.setValue("granulomaDataset", _ui.comboBoxGranulomaDataset->currentIndex());
+      settings.setValue("threshold", _ui.horizontalSliderGranulomaBorderThreshold->value());
+      settings.endGroup();
+  settings.endGroup();
+  settings.beginGroup("Agents");
+  _pAgentsWidget->saveSettings();
+  settings.endGroup();
+  settings.beginGroup("Scalars");
+  settings.setValue("smokeDataset", _ui.comboBoxSmokeDataset->currentIndex());
+  settings.endGroup();
+}
+void MainWindow::loadSettings()
+{
+    QSettings settings(QApplication::applicationDirPath() + "/.config", QSettings::IniFormat);
+    settings.beginGroup("Simulation");
+    _ui.comboBoxDiffusion->setCurrentIndex(settings.value("diffusion", _ui.comboBoxDiffusion->currentIndex()).toInt());
+    _ui.spinBoxDelay->setValue(settings.value("delay", _ui.spinBoxDelay->value()).toInt());
+    _ui.spinBoxSeed->setValue(settings.value("seed", _ui.spinBoxSeed->value()).toInt());
+    _ui.checkBoxStopClearance->setChecked(settings.value("stopClearance", _ui.checkBoxStopClearance->isChecked()).toBool());
+    _ui.checkBoxStopDays->setChecked(settings.value("stopTime", _ui.checkBoxStopDays->isChecked()).toBool());
+    _ui.spinBoxStopTime->setValue(settings.value("stopTimeStep", _ui.spinBoxStopTime->value()).toBool());
+    settings.endGroup();
+    settings.beginGroup("Output");
+    _ui.checkBoxOutput->setChecked(settings.value("enableOutput", _ui.checkBoxOutput->isChecked()).toBool());
+    _ui.lineEditOutput->setText(settings.value("outputFilename", _ui.lineEditOutput->text()).toString());
+    _ui.spinBoxSnapshotCsvInterval->setValue(settings.value("csvInterval", _ui.spinBoxSnapshotCsvInterval->value()).toInt());
+    _ui.spinBoxSnapshotPicInterval->setValue(settings.value("pngInterval", _ui.spinBoxSnapshotPicInterval->value()).toInt());
+    _ui.spinBoxSnapshotStateInterval->setValue(settings.value("stateInterval", _ui.spinBoxSnapshotStateInterval->value()).toInt());
+    settings.endGroup();
+    settings.beginGroup("Visualization");
+    _ui.checkBoxBlend->setChecked(settings.value("blend", _ui.checkBoxBlend->isChecked()).toBool());
+    _ui.checkBoxDrawAgents->setChecked(settings.value("drawAgents", _ui.checkBoxDrawAgents->isChecked()).toBool());
+    _ui.checkBoxDrawGlyphs->setChecked(settings.value("drawGlyphs", _ui.checkBoxDrawGlyphs->isChecked()).toBool());
+    _ui.checkBoxDrawHeightPlot->setChecked(settings.value("drawHeightPlot", _ui.checkBoxDrawHeightPlot->isChecked()).toBool());
+    _ui.checkBoxDrawIsolines->setChecked(settings.value("drawIsolines", _ui.checkBoxDrawIsolines->isChecked()).toBool());
+    _ui.checkBoxDrawOutcomes->setChecked(settings.value("drawOutcomes", _ui.checkBoxDrawOutcomes->isChecked()).toBool());
+    _ui.checkBoxDrawSmoke->setChecked(settings.value("drawSmoke", _ui.checkBoxDrawSmoke->isChecked()).toBool());
+    _ui.checkBoxDrawTime->setChecked(settings.value("drawTime", _ui.checkBoxDrawTime->isChecked()).toBool());
+        settings.beginGroup("Granuloma");
+        _ui.checkBoxDrawGranulomaBorder->setChecked(settings.value("drawGranulomaBorder", _ui.checkBoxDrawGranulomaBorder->isChecked()).toBool());
+        _ui.comboBoxGranulomaDataset->setCurrentIndex(settings.value("granulomaDataset", _ui.comboBoxGranulomaDataset->currentIndex()).toInt());
+        _ui.horizontalSliderGranulomaBorderThreshold->setValue(settings.value("threshold", _ui.horizontalSliderGranulomaBorderThreshold->value()).toDouble());
+        settings.endGroup();
+    settings.endGroup();
+    _pAgentsWidget->loadSettings();
+    settings.beginGroup("Scalars");
+    _ui.comboBoxSmokeDataset->setCurrentIndex(settings.value("smokeDataset", _ui.comboBoxSmokeDataset->currentIndex()).toInt());
+    settings.endGroup();
 }

@@ -2,6 +2,7 @@
 #include "simulation/gr.h"
 #include "simulation/macrophage.h"
 #include "visualization/agentsvisualization.h"
+#include <QSettings>
 
 AgentsWidget::AgentsWidget(AgentsVisualization* pAgentsVisualization, QWidget *parent)
     : QWidget(parent)
@@ -139,7 +140,7 @@ void AgentsWidget::updateAgentsSettings()
     _pAgentsVisualization->setDrawMac(Mac::MAC_CINFECTED, OTHER, _ui.checkBoxMciOther->isChecked());
     _pAgentsVisualization->setDrawMac(Mac::MAC_CINFECTED, ENBL, _ui.checkBoxDrawAgentMci->isChecked());
 
-    _pAgentsVisualization->setGridAlpha(_ui.horizontalSliderAgentsAlpha->value() / _SLIDER_AGENTS_ALPHA);
+    _pAgentsVisualization->setGridAlpha((1.0*_ui.horizontalSliderAgentsAlpha->value()) / _ui.horizontalSliderAgentsAlpha->maximum());
     _pAgentsVisualization->setDrawGrid(_ui.checkBoxAgentDrawGrid->isChecked());
     _pAgentsVisualization->setDrawTgam(_ui.checkBoxDrawAgentTgam->isChecked());
     _pAgentsVisualization->setDrawTreg(_ui.checkBoxDrawAgentTreg->isChecked());
@@ -161,3 +162,97 @@ void AgentsWidget::updateAgentsSettings()
 void AgentsWidget::tgamFilterChanged(bool en) { emit agentFilterChanged(TGAM, 0, ENBL, en); }
 void AgentsWidget::tregFilterChanged(bool en) { emit agentFilterChanged(TREG, 0, ENBL, en); }
 void AgentsWidget::tcytFilterChanged(bool en) { emit agentFilterChanged(TCYT, 0, ENBL, en); }
+
+void AgentsWidget::saveSettings() const {
+    QSettings settings(QApplication::applicationDirPath() + "/.config", QSettings::IniFormat);
+    settings.beginGroup("AgentSettings");
+    settings.setValue("caseation", _ui.checkBoxDrawAgentCaseation->isChecked());
+    settings.setValue("sources", _ui.checkBoxDrawAgentSources->isChecked() );
+    settings.setValue("extmtb", _ui.checkBoxDrawAgentExtMtb->isChecked() );
+    settings.setValue("grid", _ui.checkBoxAgentDrawGrid->isChecked() );
+    settings.setValue("alpha", _ui.horizontalSliderAgentsAlpha->value() );
+    settings.setValue("gridHeight", _ui.doubleSpinBoxAgentsGridHeight->value() );
+    settings.setValue("MacSrcs", _ui.checkBoxDrawAgentSourcesMac->isChecked() );
+    settings.setValue("TgamSrcs", _ui.checkBoxDrawAgentSourcesTgam->isChecked() );
+    settings.setValue("TcytSrcs", _ui.checkBoxDrawAgentSourcesTcyt->isChecked() );
+    settings.setValue("TregSrcs", _ui.checkBoxDrawAgentSourcesTreg->isChecked() );
+    settings.setValue("M1M2", _ui.comboBoxM1M2->currentIndex() );
+    settings.setValue("M1M2Thres", _ui.doubleSpinBoxM1M2Threshold->value() );
+
+    settings.setValue("MaENBL", _ui.checkBoxDrawAgentMa->isChecked());
+    settings.setValue("MaSTAT1", _ui.checkBoxMaStat1->isChecked());
+    settings.setValue("MaNFkB", _ui.checkBoxMaNFkB->isChecked());
+    settings.setValue("MaDEACT", _ui.checkBoxMaDeact->isChecked());
+    settings.setValue("MaOTHER", _ui.checkBoxMaOther->isChecked());
+
+    settings.setValue("MrENBL", _ui.checkBoxDrawAgentMr->isChecked());
+    settings.setValue("MrSTAT1", _ui.checkBoxMrStat1->isChecked());
+    settings.setValue("MrNFkB", _ui.checkBoxMrNFkB->isChecked());
+    settings.setValue("MrDEACT", _ui.checkBoxMrDeact->isChecked());
+    settings.setValue("MrOTHER", _ui.checkBoxMrOther->isChecked());
+
+    settings.setValue("MiENBL", _ui.checkBoxDrawAgentMi->isChecked());
+    settings.setValue("MiSTAT1", _ui.checkBoxMiStat1->isChecked());
+    settings.setValue("MiNFkB", _ui.checkBoxMiNFkB->isChecked());
+    settings.setValue("MiDEACT", _ui.checkBoxMiDeact->isChecked());
+    settings.setValue("MiOTHER", _ui.checkBoxMiOther->isChecked());
+
+    settings.setValue("MciENBL", _ui.checkBoxDrawAgentMci->isChecked());
+    settings.setValue("MciSTAT1", _ui.checkBoxMciStat1->isChecked());
+    settings.setValue("MciNFkB", _ui.checkBoxMciNFkB->isChecked());
+    settings.setValue("MciDEACT", _ui.checkBoxMciDeact->isChecked());
+    settings.setValue("MciOTHER", _ui.checkBoxMciOther->isChecked());
+
+    settings.setValue("TgamENBL", _ui.checkBoxDrawAgentTgam->isChecked());
+    settings.setValue("TcytENBL", _ui.checkBoxDrawAgentTcyt->isChecked());
+    settings.setValue("TregENBL", _ui.checkBoxDrawAgentTreg->isChecked());
+    settings.endGroup();
+}
+void AgentsWidget::loadSettings() {
+    blockSignals(true); //Prevent updates to glwindow until all is done
+    QSettings settings(QApplication::applicationDirPath() + "/.config", QSettings::IniFormat);
+    settings.beginGroup("AgentSettings");
+    _ui.checkBoxDrawAgentCaseation->setChecked(  settings.value("caseation", _ui.checkBoxDrawAgentCaseation->isChecked()).toBool());
+    _ui.checkBoxDrawAgentSources->setChecked(    settings.value("sources",   _ui.checkBoxDrawAgentSources->isChecked() ).toBool());
+    _ui.checkBoxDrawAgentExtMtb->setChecked(     settings.value("extmtb",    _ui.checkBoxDrawAgentExtMtb->isChecked() ).toBool());
+    _ui.checkBoxAgentDrawGrid->setChecked(       settings.value("grid",      _ui.checkBoxAgentDrawGrid->isChecked() ).toBool());
+    _ui.horizontalSliderAgentsAlpha->setValue(   settings.value("alpha",     _ui.horizontalSliderAgentsAlpha->value() ).toInt());
+    _ui.doubleSpinBoxAgentsGridHeight->setValue( settings.value("gridHeight", _ui.doubleSpinBoxAgentsGridHeight->value() ).toBool());
+    _ui.checkBoxDrawAgentSourcesMac->setChecked( settings.value("MacSrcs",   _ui.checkBoxDrawAgentSourcesMac->isChecked() ).toBool());
+    _ui.checkBoxDrawAgentSourcesTgam->setChecked(settings.value("TgamSrcs",  _ui.checkBoxDrawAgentSourcesTgam->isChecked() ).toBool());
+    _ui.checkBoxDrawAgentSourcesTcyt->setChecked(settings.value("TcytSrcs",  _ui.checkBoxDrawAgentSourcesTcyt->isChecked() ).toBool());
+    _ui.checkBoxDrawAgentSourcesTreg->setChecked(settings.value("TregSrcs",  _ui.checkBoxDrawAgentSourcesTreg->isChecked() ).toBool());
+    _ui.comboBoxM1M2->setCurrentIndex(           settings.value("M1M2",      _ui.comboBoxM1M2->currentIndex() ).toInt());
+    _ui.doubleSpinBoxM1M2Threshold->setValue(    settings.value("M1M2Thres", _ui.doubleSpinBoxM1M2Threshold->value() ).toDouble());
+
+    _ui.checkBoxDrawAgentMa->setChecked(settings.value("MaENBL",  _ui.checkBoxDrawAgentMa->isChecked()).toBool());
+    _ui.checkBoxMaStat1->setChecked(    settings.value("MaSTAT1", _ui.checkBoxMaStat1->isChecked()).toBool());
+    _ui.checkBoxMaNFkB->setChecked(     settings.value("MaNFkB",  _ui.checkBoxMaNFkB->isChecked()).toBool());
+    _ui.checkBoxMaDeact->setChecked(    settings.value("MaDEACT", _ui.checkBoxMaDeact->isChecked()).toBool());
+    _ui.checkBoxMaOther->setChecked(    settings.value("MaOTHER", _ui.checkBoxMaOther->isChecked()).toBool());
+
+    _ui.checkBoxDrawAgentMr->setChecked(settings.value("MrENBL",  _ui.checkBoxDrawAgentMr->isChecked()).toBool());
+    _ui.checkBoxMrStat1->setChecked(    settings.value("MrSTAT1", _ui.checkBoxMrStat1->isChecked()).toBool());
+    _ui.checkBoxMrNFkB->setChecked(     settings.value("MrNFkB",  _ui.checkBoxMrNFkB->isChecked()).toBool());
+    _ui.checkBoxMrDeact->setChecked(    settings.value("MrDEACT", _ui.checkBoxMrDeact->isChecked()).toBool());
+    _ui.checkBoxMrOther->setChecked(    settings.value("MrOTHER", _ui.checkBoxMrOther->isChecked()).toBool());
+
+    _ui.checkBoxDrawAgentMi->setChecked(settings.value("MiENBL",  _ui.checkBoxDrawAgentMi->isChecked()).toBool());
+    _ui.checkBoxMiStat1->setChecked(    settings.value("MiSTAT1", _ui.checkBoxMiStat1->isChecked()).toBool());
+    _ui.checkBoxMiNFkB->setChecked(     settings.value("MiNFkB",  _ui.checkBoxMiNFkB->isChecked()).toBool());
+    _ui.checkBoxMiDeact->setChecked(    settings.value("MiDEACT", _ui.checkBoxMiDeact->isChecked()).toBool());
+    _ui.checkBoxMiOther->setChecked(    settings.value("MiOTHER", _ui.checkBoxMiOther->isChecked()).toBool());
+
+    _ui.checkBoxDrawAgentMci->setChecked(settings.value("MciENBL",  _ui.checkBoxDrawAgentMci->isChecked()).toBool());
+    _ui.checkBoxMciStat1->setChecked(    settings.value("MciSTAT1", _ui.checkBoxMciStat1->isChecked()).toBool());
+    _ui.checkBoxMciNFkB->setChecked(     settings.value("MciNFkB",  _ui.checkBoxMciNFkB->isChecked()).toBool());
+    _ui.checkBoxMciDeact->setChecked(    settings.value("MciDEACT", _ui.checkBoxMciDeact->isChecked()).toBool());
+    _ui.checkBoxMciOther->setChecked(    settings.value("MciOTHER", _ui.checkBoxMciOther->isChecked()).toBool());
+
+    _ui.checkBoxDrawAgentTgam->setChecked(settings.value("TgamENBL", _ui.checkBoxDrawAgentTgam->isChecked()).toBool());
+    _ui.checkBoxDrawAgentTcyt->setChecked(settings.value("TcytENBL", _ui.checkBoxDrawAgentTcyt->isChecked()).toBool());
+    _ui.checkBoxDrawAgentTreg->setChecked(settings.value("TregENBL", _ui.checkBoxDrawAgentTreg->isChecked()).toBool());
+    settings.endGroup();
+    blockSignals(false);
+    emit updateGL();
+}

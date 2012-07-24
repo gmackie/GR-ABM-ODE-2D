@@ -30,7 +30,7 @@
     <item row="0" column="0">
      <widget class="QToolBox" name="toolBoxSimulation">
       <property name="currentIndex">
-       <number>0</number>
+       <number>3</number>
       </property>
       <widget class="QWidget" name="tabStatistics">
        <property name="geometry">

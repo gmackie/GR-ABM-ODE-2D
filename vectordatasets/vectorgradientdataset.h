@@ -15,70 +15,70 @@
 class VectorGradientDataset : public VectorDataset
 {
 private:
-	ScalarDataset* _pScalarDataset;
-	bool _shallow;
+  ScalarDataset* _pScalarDataset;
+  bool _shallow;
 
 public:
-	VectorGradientDataset(ScalarDataset* pScalarDataset, bool shallow = false);
-	virtual void getVector(const Simulation* pSimulation, int row, int col, vec2f& res) const;
-	virtual void getVectorNN(const Simulation* pSimulation, const vec2f& pos, vec2f& res) const;
-	virtual void getVectorBL(const Simulation* pSimulation, const vec2f& pos, vec2f& res) const;
-	virtual ~VectorGradientDataset();
+  VectorGradientDataset(ScalarDataset* pScalarDataset, bool shallow = false);
+  virtual void getVector(const Simulation* pSimulation, int row, int col, vec2f& res) const;
+  virtual void getVectorNN(const Simulation* pSimulation, const vec2f& pos, vec2f& res) const;
+  virtual void getVectorBL(const Simulation* pSimulation, const vec2f& pos, vec2f& res) const;
+  virtual ~VectorGradientDataset();
 };
 
 inline VectorGradientDataset::VectorGradientDataset(ScalarDataset* pScalarDataset, bool shallow)
-	: VectorDataset()
-	, _pScalarDataset(pScalarDataset)
-	, _shallow(shallow)
+  : VectorDataset()
+  , _pScalarDataset(pScalarDataset)
+  , _shallow(shallow)
 {
 }
 
 inline VectorGradientDataset::~VectorGradientDataset()
 {
-	if (!_shallow)
-		delete _pScalarDataset;
+  if (!_shallow)
+    delete _pScalarDataset;
 }
 
 inline void VectorGradientDataset::getVector(const Simulation* pSimulation, int row, int col, vec2f& res) const
 {
   const Pos& dim = pSimulation->getSize();
-	row = moduloDIM(row, dim.x);
-	col = moduloDIM(col, dim.y);
+  row = moduloDIM(row, dim.x);
+  col = moduloDIM(col, dim.y);
 
-	float scalarLeft = _pScalarDataset->getScalar(pSimulation, row, moduloDIM(col - 1, dim.x));
-	float scalarRight = _pScalarDataset->getScalar(pSimulation, row, moduloDIM(col + 1, dim.x));
+  float scalarLeft = _pScalarDataset->getScalar(pSimulation, row, moduloDIM(col - 1, dim.x));
+  float scalarRight = _pScalarDataset->getScalar(pSimulation, row, moduloDIM(col + 1, dim.x));
 
-	float scalarDown = _pScalarDataset->getScalar(pSimulation, moduloDIM(row - 1, dim.y), col);
-	float scalarUp = _pScalarDataset->getScalar(pSimulation, moduloDIM(row + 1, dim.y), col);
+  float scalarDown = _pScalarDataset->getScalar(pSimulation, moduloDIM(row - 1, dim.y), col);
+  float scalarUp = _pScalarDataset->getScalar(pSimulation, moduloDIM(row + 1, dim.y), col);
 
-	res[0] = 0.5f * (scalarRight - scalarLeft);
-	res[1] = 0.5f * (scalarUp - scalarDown);
+  res[0] = 0.5f * (scalarRight - scalarLeft);
+  res[1] = 0.5f * (scalarUp - scalarDown);
 }
 
 inline void VectorGradientDataset::getVectorNN(const Simulation* pSimulation, const vec2f& pos, vec2f& res) const
 {
   const Pos& dim = pSimulation->getSize();
-	float scalarLeft = _pScalarDataset->getScalarNN(pSimulation, moduloDIM(pos[0] - 1, dim.x), pos[1]);
-	float scalarRight = _pScalarDataset->getScalarNN(pSimulation, moduloDIM(pos[0] + 1, dim.x), pos[1]);
+  float scalarLeft = _pScalarDataset->getScalarNN(pSimulation, moduloDIM(pos[0] - 1, dim.x), pos[1]);
+  float scalarRight = _pScalarDataset->getScalarNN(pSimulation, moduloDIM(pos[0] + 1, dim.x), pos[1]);
 
-	float scalarDown = _pScalarDataset->getScalarNN(pSimulation, pos[0], moduloDIM(pos[1] - 1, dim.y));
-	float scalarUp = _pScalarDataset->getScalarNN(pSimulation, pos[0], moduloDIM(pos[1] + 1, dim.y));
+  float scalarDown = _pScalarDataset->getScalarNN(pSimulation, pos[0], moduloDIM(pos[1] - 1, dim.y));
+  float scalarUp = _pScalarDataset->getScalarNN(pSimulation, pos[0], moduloDIM(pos[1] + 1, dim.y));
 
-	res[0] = (scalarRight - scalarLeft) / 2.0f;
-	res[1] = (scalarUp - scalarDown) / 2.0f;
+  res[0] = (scalarRight - scalarLeft) / 2.0f;
+  res[1] = (scalarUp - scalarDown) / 2.0f;
 }
 
 inline void VectorGradientDataset::getVectorBL(const Simulation* pSimulation, const vec2f& pos, vec2f& res) const
 {
   const Pos& dim = pSimulation->getSize();
-	float scalarLeft = _pScalarDataset->getScalarBL(pSimulation, moduloDIM(pos[0] - 1, dim.x), pos[1]);
-	float scalarRight = _pScalarDataset->getScalarBL(pSimulation, moduloDIM(pos[0] + 1, dim.x), pos[1]);
+  float scalarLeft = _pScalarDataset->getScalarBL(pSimulation, moduloDIM(pos[0] - 1, dim.x), pos[1]);
+  float scalarRight = _pScalarDataset->getScalarBL(pSimulation, moduloDIM(pos[0] + 1, dim.x), pos[1]);
 
-	float scalarDown = _pScalarDataset->getScalarBL(pSimulation, pos[0], moduloDIM(pos[1] -	1, dim.y));
-	float scalarUp = _pScalarDataset->getScalarBL(pSimulation, pos[0], moduloDIM(pos[1] + 1, dim.y));
+  float scalarDown = _pScalarDataset->getScalarBL(pSimulation, pos[0], moduloDIM(pos[1] -	1, dim.y));
+  float scalarUp = _pScalarDataset->getScalarBL(pSimulation, pos[0], moduloDIM(pos[1] + 1, dim.y));
 
-	res[0] = (scalarRight - scalarLeft) / 2.0f;
-	res[1] = (scalarUp - scalarDown) / 2.0f;
+  res[0] = (scalarRight - scalarLeft) / 2.0f;
+  res[1] = (scalarUp - scalarDown) / 2.0f;
 }
 
 #endif /* VECTORGRADIENTDATASET_H_ */

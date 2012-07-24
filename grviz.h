@@ -18,35 +18,41 @@
 #include <float.h>
 
 #ifdef _MSC_VER
-	// with MSVC it is required to include <windows.h> prior to including OpenGL headers
-	#define WIN32_LEAN_AND_MEAN
-	#include <windows.h>
+// with MSVC it is required to include <windows.h> prior to including OpenGL headers
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
 
-	// now get rid of the ugly min and max macros that microsoft wants to force upon us,
-	// as they conflict with std::min and std::max
-	#undef min
-	#undef max
+// now get rid of the ugly min and max macros that microsoft wants to force upon us,
+// as they conflict with std::min and std::max
+#undef min
+#undef max
 
-	// get rid of warning C4351
-	#pragma warning(disable : 4351)
+// get rid of warning C4351
+#pragma warning(disable : 4351)
 
-	// get rid of silly warnings about sscanf being unsafe
-	#define _CRT_SECURE_NO_WARNINGS
+// get rid of silly warnings about sscanf being unsafe
+#define _CRT_SECURE_NO_WARNINGS
 
-	// microsoft's math.h is not C99 compliant, round and roundf are missing
-    // Fixed macro issue.
-    template<typename T>
-    inline T roundf(const T& x) { return (x - floor(x)) > 0.5f ? ceil(x) : floor(x); }
-    template<typename T>
-    inline T round(const T& x) { return (x - floor(x)) > 0.5f ? ceil(x) : floor(x); }
+// microsoft's math.h is not C99 compliant, round and roundf are missing
+// Fixed macro issue.
+template<typename T>
+inline T roundf(const T& x)
+{
+  return (x - floor(x)) > 0.5f ? ceil(x) : floor(x);
+}
+template<typename T>
+inline T round(const T& x)
+{
+  return (x - floor(x)) > 0.5f ? ceil(x) : floor(x);
+}
 #endif
 
 #ifdef __APPLE__
-	#include <OpenGL/gl.h>
-	#include <OpenGL/glu.h>
+#include <OpenGL/gl.h>
+#include <OpenGL/glu.h>
 #else
-	#include <GL/gl.h>
-	#include <GL/glu.h>
+#include <GL/gl.h>
+#include <GL/glu.h>
 #endif
 
 #define _MIN_CLAMP_VALUE 0.0f

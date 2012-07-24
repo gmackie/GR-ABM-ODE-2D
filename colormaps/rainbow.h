@@ -14,15 +14,15 @@
 class ColorMapRainbow : public ColorMap
 {
 public:
-	ColorMapRainbow();
-	virtual ~ColorMapRainbow();
-	virtual void map(float value, float& R, float& G, float& B) const;
-	virtual QString getName() const;
+  ColorMapRainbow();
+  virtual ~ColorMapRainbow();
+  virtual void map(float value, float& R, float& G, float& B) const;
+  virtual QString getName() const;
 };
 
 inline QString ColorMapRainbow::getName() const
 {
-	return QString("Rainbow");
+  return QString("Rainbow");
 }
 
 #endif /* RAINBOW_H_ */

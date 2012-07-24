@@ -11,13 +11,13 @@
 class ScalarAttractantDataset : public ScalarDataset
 {
 public:
-	ScalarAttractantDataset();
-	virtual ~ScalarAttractantDataset();
-	virtual float getScalar(const Simulation* pSimulation, int row, int col) const;
+  ScalarAttractantDataset();
+  virtual ~ScalarAttractantDataset();
+  virtual float getScalar(const Simulation* pSimulation, int row, int col) const;
 };
 
 inline ScalarAttractantDataset::ScalarAttractantDataset()
-	: ScalarDataset()
+  : ScalarDataset()
 {
 }
 
@@ -27,7 +27,7 @@ inline ScalarAttractantDataset::~ScalarAttractantDataset()
 
 inline float ScalarAttractantDataset::getScalar(const Simulation* pSimulation, int row, int col) const
 {
-	return pSimulation->getGrGrid().macAttractant(row, col);
+  return pSimulation->getGrGrid().macAttractant(row, col);
 }
 
 

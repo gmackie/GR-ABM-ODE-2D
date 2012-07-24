@@ -13,15 +13,15 @@
 class Grid
 {
 protected:
-	const int _DIM;
+  const int _DIM;
 
 public:
-	Grid(const int DIM);
-	virtual ~Grid();
+  Grid(const int DIM);
+  virtual ~Grid();
 };
 
 inline Grid::Grid(const int DIM)
-	: _DIM(DIM)
+  : _DIM(DIM)
 {
 }
 

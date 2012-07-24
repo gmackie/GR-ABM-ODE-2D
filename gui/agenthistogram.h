@@ -6,7 +6,8 @@
 #include "agentswidget.h"
 #include "simulation/macrophage.h"
 
-namespace Ui {
+namespace Ui
+{
 class AgentHistogram;
 }
 
@@ -20,41 +21,46 @@ struct HistogramAgentPropVisitor;
 
 class AgentHistogram : public QMainWindow
 {
-    Q_OBJECT
-    friend struct MinMaxAgentPropVisitor;
-    friend struct HistogramAgentPropVisitor;
+  Q_OBJECT
+  friend struct MinMaxAgentPropVisitor;
+  friend struct HistogramAgentPropVisitor;
 
-    QProgressBar* pbar;
+  QProgressBar* pbar;
 
-    size_t nbuckets;
-    bool _macFilter[Mac::NSTATES][AgentsWidget::NUM];
-    bool _drawTgam;
-    bool _drawTcyt;
-    bool _drawTreg;
-    QVector<QwtPlotCurve*> curves;
-    QVector<QVector<double> > xdata;
-    QVector<QVector<double> > ydata;
-    QVector<double> min;
-    QVector<double> max;
-    const Simulation& sim;
-    
+  size_t nbuckets;
+  bool _macFilter[Mac::NSTATES][AgentsWidget::NUM];
+  bool _drawTgam;
+  bool _drawTcyt;
+  bool _drawTreg;
+  QVector<QwtPlotCurve*> curves;
+  QVector<QVector<double> > xdata;
+  QVector<QVector<double> > ydata;
+  QVector<double> min;
+  QVector<double> max;
+  const Simulation& sim;
+
 public:
-    explicit AgentHistogram(const Simulation& _sim, QWidget *parent=0);
-    ~AgentHistogram();
-    /*virtual*/ void closeEvent(QCloseEvent * e) { emit closing(false); QMainWindow::closeEvent(e); }
+  explicit AgentHistogram(const Simulation& _sim, QWidget *parent=0);
+  ~AgentHistogram();
+  /*virtual*/
+  void closeEvent(QCloseEvent * e)
+  {
+    emit closing(false);
+    QMainWindow::closeEvent(e);
+  }
 public slots:
-    void updatePlot(int);
-    void updatePlot();
-    void setAgentFilter(int agentType, int state, int secondaryState, bool enabled);
+  void updatePlot(int);
+  void updatePlot();
+  void setAgentFilter(int agentType, int state, int secondaryState, bool enabled);
 private slots:
-    void on_actionSave_triggered();
-    void showCurve(QwtPlotItem*);
+  void on_actionSave_triggered();
+  void showCurve(QwtPlotItem*);
 
 signals:
-    void closing(bool);
+  void closing(bool);
 
 private:
-    Ui::AgentHistogram *ui;
+  Ui::AgentHistogram *ui;
 };
 
 #endif // AGENTHISTOGRAM_H

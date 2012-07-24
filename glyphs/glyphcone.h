@@ -14,44 +14,44 @@
 class GlyphCone: public Glyph
 {
 private:
-	GLUquadric* _pConeQuadric;
-	GLUquadric* _pConeDiscQuadric;
+  GLUquadric* _pConeQuadric;
+  GLUquadric* _pConeDiscQuadric;
 
 public:
-	GlyphCone();
-	virtual ~GlyphCone();
-	virtual void draw(const vec2f& origin, const vec2f& vec) const;
+  GlyphCone();
+  virtual ~GlyphCone();
+  virtual void draw(const vec2f& origin, const vec2f& vec) const;
 };
 
 inline GlyphCone::GlyphCone()
-	: Glyph()
-	, _pConeQuadric(gluNewQuadric())
-	, _pConeDiscQuadric(gluNewQuadric())
+  : Glyph()
+  , _pConeQuadric(gluNewQuadric())
+  , _pConeDiscQuadric(gluNewQuadric())
 {
 }
 
 inline GlyphCone::~GlyphCone()
 {
-	gluDeleteQuadric(_pConeQuadric);
-	gluDeleteQuadric(_pConeDiscQuadric);
+  gluDeleteQuadric(_pConeQuadric);
+  gluDeleteQuadric(_pConeDiscQuadric);
 }
 
 inline void GlyphCone::draw(const vec2f& origin, const vec2f& vec) const
 {
-	glEnable(GL_COLOR_MATERIAL);
-	glEnable(GL_LIGHTING);
-    glEnable(GL_LIGHT0);
+  glEnable(GL_COLOR_MATERIAL);
+  glEnable(GL_LIGHTING);
+  glEnable(GL_LIGHT0);
 
-    glPushMatrix();
-    float magVec = vec.magnitude();
-    setTransAndRotateMatrix(origin, vec);
-    gluCylinder(_pConeQuadric, magVec*0.3, 0.0, magVec, 5, 1);
-    gluDisk(_pConeDiscQuadric,0,magVec*0.3,5,1);
-	glPopMatrix();
+  glPushMatrix();
+  float magVec = vec.magnitude();
+  setTransAndRotateMatrix(origin, vec);
+  gluCylinder(_pConeQuadric, magVec*0.3, 0.0, magVec, 5, 1);
+  gluDisk(_pConeDiscQuadric,0,magVec*0.3,5,1);
+  glPopMatrix();
 
-	glDisable(GL_COLOR_MATERIAL);
-	glDisable(GL_LIGHTING);
-    glDisable(GL_LIGHT0);
+  glDisable(GL_COLOR_MATERIAL);
+  glDisable(GL_LIGHTING);
+  glDisable(GL_LIGHT0);
 }
 
 #endif /* GLYPHCONE_H_ */

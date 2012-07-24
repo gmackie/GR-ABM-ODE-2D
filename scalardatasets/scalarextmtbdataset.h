@@ -14,13 +14,13 @@
 class ScalarExtMtbDataset : public ScalarDataset
 {
 public:
-	ScalarExtMtbDataset();
-	virtual ~ScalarExtMtbDataset();
-	virtual float getScalar(const Simulation* pSimulation, int row, int col) const;
+  ScalarExtMtbDataset();
+  virtual ~ScalarExtMtbDataset();
+  virtual float getScalar(const Simulation* pSimulation, int row, int col) const;
 };
 
 inline ScalarExtMtbDataset::ScalarExtMtbDataset()
-	: ScalarDataset()
+  : ScalarDataset()
 {
 }
 
@@ -30,7 +30,7 @@ inline ScalarExtMtbDataset::~ScalarExtMtbDataset()
 
 inline float ScalarExtMtbDataset::getScalar(const Simulation* pSimulation, int row, int col) const
 {
-	return pSimulation->getGrGrid().extMTB(row, col);
+  return pSimulation->getGrGrid().extMTB(row, col);
 }
 
 #endif /* SCALAREXTMTBDATASET_H_ */

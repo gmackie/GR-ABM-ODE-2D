@@ -19,13 +19,13 @@ ColorMapBlackWhite::~ColorMapBlackWhite()
 
 void ColorMapBlackWhite::map(float value, float& R, float& G, float& B) const
 {
-	if (_invert)
-	{
-		invert(value);
-	}
-	bin(value);
+  if (_invert)
+    {
+      invert(value);
+    }
+  bin(value);
 
-	R = G = B = value;
+  R = G = B = value;
 
-	applyDeltas(R, G, B);
+  applyDeltas(R, G, B);
 }

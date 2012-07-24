@@ -18,22 +18,22 @@ class Simulation;
 class Snapshot
 {
 private:
-	std::ofstream _outFile;
-	const QString _dirName;
+  std::ofstream _outFile;
+  const QString _dirName;
 
 public:
-	Snapshot(const QString& dirName, const QString& fileName);
-	~Snapshot();
-	bool isGood() const;
-	void takePicture(const int time, const QImage& image, int slice=-1, const QString prefix=QString());
-	void takePicture(const int time, const QImage& image, const QString prefix);
-	void takeSnapshot(const int time, const Stats& stats);
-	void takeStateSnapshot(const int time, const Simulation& sim);
+  Snapshot(const QString& dirName, const QString& fileName);
+  ~Snapshot();
+  bool isGood() const;
+  void takePicture(const int time, const QImage& image, int slice=-1, const QString prefix=QString());
+  void takePicture(const int time, const QImage& image, const QString prefix);
+  void takeSnapshot(const int time, const Stats& stats);
+  void takeStateSnapshot(const int time, const Simulation& sim);
 };
 
 inline bool Snapshot::isGood() const
 {
-	return _outFile.good();
+  return _outFile.good();
 }
 
 #endif /* SNAPSHOT_H_ */

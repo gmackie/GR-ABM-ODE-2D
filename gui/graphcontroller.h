@@ -8,7 +8,8 @@ struct StatCounterVisitor;
 struct StatUpdateVisitor;
 class Stats;
 
-class GraphController : public QObject {
+class GraphController : public QObject
+{
   Q_OBJECT
 
   friend struct StatCounterVisitor;
@@ -23,13 +24,22 @@ class GraphController : public QObject {
   QList<GraphViewer*> _windows;
 
 public:
-  
+
   GraphController(const Stats& stats, size_t maxSamples);
   ~GraphController();
 
-  const QVector<double>& getYdata(size_t i) { return _ydata[i]; }
-  const QVector<double>& getXdata() { return _xdata; }
-  QString& getName(size_t i) { return _names[i]; }
+  const QVector<double>& getYdata(size_t i)
+  {
+    return _ydata[i];
+  }
+  const QVector<double>& getXdata()
+  {
+    return _xdata;
+  }
+  QString& getName(size_t i)
+  {
+    return _names[i];
+  }
 
   void update(const Stats& stats, double t);
 

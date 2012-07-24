@@ -17,32 +17,32 @@ class VectorDataset;
 
 struct VectorGridItem
 {
-	vec2f origin;
-	vec2f vector;
+  vec2f origin;
+  vec2f vector;
 };
 
 class VectorGrid : public Grid
 {
 private:
-	std::vector<VectorGridItem> _grid;
+  std::vector<VectorGridItem> _grid;
 
 public:
-	VectorGrid(size_t dim);
-	~VectorGrid();
-	void evaluate(const Simulation* pSimulation, VectorDataset* pVectorDataset, bool useNN);
-	int count() const;
-	const std::vector<VectorGridItem>& getGrid() const;
-	void serialize(std::ofstream& outFile) const;
+  VectorGrid(size_t dim);
+  ~VectorGrid();
+  void evaluate(const Simulation* pSimulation, VectorDataset* pVectorDataset, bool useNN);
+  int count() const;
+  const std::vector<VectorGridItem>& getGrid() const;
+  void serialize(std::ofstream& outFile) const;
 };
 
 inline int VectorGrid::count() const
 {
-	return (int)_grid.size();
+  return (int)_grid.size();
 }
 
 inline const std::vector<VectorGridItem>& VectorGrid::getGrid() const
 {
-	return _grid;
+  return _grid;
 }
 
 #endif /* VECTORGRID_H_ */

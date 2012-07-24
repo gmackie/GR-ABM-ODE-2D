@@ -7,16 +7,16 @@
 
 class StatWidget : public QWidget
 {
-    Q_OBJECT
-    friend struct StatWidgetNameVisitor;
-    friend struct StatWidgetUpdateVisitor;
+  Q_OBJECT
+  friend struct StatWidgetNameVisitor;
+  friend struct StatWidgetUpdateVisitor;
 public:
-    StatWidget(const Stats& stats, QWidget* pParent = 0);
-    ~StatWidget();
-    void updateLabels(const Stats& stats);
+  StatWidget(const Stats& stats, QWidget* pParent = 0);
+  ~StatWidget();
+  void updateLabels(const Stats& stats);
 
 private:
-    Ui::StatWidgetClass _ui;
+  Ui::StatWidgetClass _ui;
 };
 
 #endif // STATWIDGET_H

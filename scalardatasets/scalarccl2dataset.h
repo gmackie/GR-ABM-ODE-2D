@@ -13,13 +13,13 @@
 class ScalarCcl2Dataset : public ScalarDataset
 {
 public:
-	ScalarCcl2Dataset();
-	virtual ~ScalarCcl2Dataset();
-	virtual float getScalar(const Simulation* pSimulation, int row, int col) const;
+  ScalarCcl2Dataset();
+  virtual ~ScalarCcl2Dataset();
+  virtual float getScalar(const Simulation* pSimulation, int row, int col) const;
 };
 
 inline ScalarCcl2Dataset::ScalarCcl2Dataset()
-	: ScalarDataset()
+  : ScalarDataset()
 {
 }
 
@@ -29,7 +29,7 @@ inline ScalarCcl2Dataset::~ScalarCcl2Dataset()
 
 inline float ScalarCcl2Dataset::getScalar(const Simulation* pSimulation, int row, int col) const
 {
-	return pSimulation->getGrGrid().CCL2(row, col);
+  return pSimulation->getGrGrid().CCL2(row, col);
 }
 
 #endif /* SCALARCCL2DATASET_H_ */

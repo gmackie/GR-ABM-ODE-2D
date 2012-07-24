@@ -14,14 +14,14 @@
 class ColorMapGreenRed : public ColorMap
 {
 public:
-	ColorMapGreenRed();
-	virtual ~ColorMapGreenRed();
-	virtual void map(float value, float& R, float& G, float& B) const;
-	virtual QString getName() const;
+  ColorMapGreenRed();
+  virtual ~ColorMapGreenRed();
+  virtual void map(float value, float& R, float& G, float& B) const;
+  virtual QString getName() const;
 };
 
 inline QString ColorMapGreenRed::getName() const
 {
-	return QString("Green/Red");
+  return QString("Green/Red");
 }
 #endif /* GREENRED_H_ */

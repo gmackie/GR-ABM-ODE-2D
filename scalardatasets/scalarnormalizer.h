@@ -11,51 +11,51 @@
 class ScalarNormalizer
 {
 private:
-	float _min;
-	float _max;
-	bool _clamping;
+  float _min;
+  float _max;
+  bool _clamping;
 
 public:
-	ScalarNormalizer(float min, float max);
-	float normalize(float value) const;
-	float denormalize(float normalizedValue) const;
-	float getMin() const;
-	float getMax() const;
-	bool getClamping() const;
-	void setMin(float f);
-	void setMax(float f);
-	void setClamping(bool clamping);
-	virtual ~ScalarNormalizer();
+  ScalarNormalizer(float min, float max);
+  float normalize(float value) const;
+  float denormalize(float normalizedValue) const;
+  float getMin() const;
+  float getMax() const;
+  bool getClamping() const;
+  void setMin(float f);
+  void setMax(float f);
+  void setClamping(bool clamping);
+  virtual ~ScalarNormalizer();
 };
 
 inline float ScalarNormalizer::getMin() const
 {
-	return _min;
+  return _min;
 }
 
 inline float ScalarNormalizer::getMax() const
 {
-	return _max;
+  return _max;
 }
 
 inline bool ScalarNormalizer::getClamping() const
 {
-	return _clamping;
+  return _clamping;
 }
 
 inline void ScalarNormalizer::setMin(float f)
 {
-	_min = f;
+  _min = f;
 }
 
 inline void ScalarNormalizer::setMax(float f)
 {
-	_max = f;
+  _max = f;
 }
 
 inline void ScalarNormalizer::setClamping(bool clamping)
 {
-	_clamping = clamping;
+  _clamping = clamping;
 }
 
 #endif /* SCALARNORMALIZER_H_ */

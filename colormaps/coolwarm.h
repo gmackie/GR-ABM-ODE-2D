@@ -14,15 +14,15 @@
 class ColorMapCoolWarm : public ColorMap
 {
 public:
-	ColorMapCoolWarm();
-	virtual ~ColorMapCoolWarm();
-	virtual void map(float value, float& R, float& G, float& B) const;
-	virtual QString getName() const;
+  ColorMapCoolWarm();
+  virtual ~ColorMapCoolWarm();
+  virtual void map(float value, float& R, float& G, float& B) const;
+  virtual QString getName() const;
 };
 
 inline QString ColorMapCoolWarm::getName() const
 {
-	return QString("Cool/warm");
+  return QString("Cool/warm");
 }
 
 #endif /* COOLWARM_H_ */

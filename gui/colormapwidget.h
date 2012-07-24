@@ -18,30 +18,30 @@ typedef std::vector<QColor> ColorVector;
 
 class ColorMapWidget : public QWidget
 {
-	Q_OBJECT
+  Q_OBJECT
 
 public:
-    ColorMapWidget(QWidget* parent = 0);
-    ~ColorMapWidget();
-    void setColorMap(ColorMap* pColorMap);
-    const ColorMap* getColorMap();
+  ColorMapWidget(QWidget* parent = 0);
+  ~ColorMapWidget();
+  void setColorMap(ColorMap* pColorMap);
+  const ColorMap* getColorMap();
 
 protected:
-    void paintEvent(QPaintEvent* event);
+  void paintEvent(QPaintEvent* event);
 
 private:
-    ColorMap* _pColorMap;
+  ColorMap* _pColorMap;
 };
 
 inline const ColorMap* ColorMapWidget::getColorMap()
 {
-    return _pColorMap;
+  return _pColorMap;
 }
 
 inline void ColorMapWidget::setColorMap(ColorMap* pColorMap)
 {
-    _pColorMap = pColorMap;
-    update();
+  _pColorMap = pColorMap;
+  update();
 }
 
 #endif /* COLORMAPWIDGET_H_ */

@@ -17,73 +17,73 @@ class VectorGradientDataset;
 class HeightPlotVisualization : public Visualization
 {
 public:
-	HeightPlotVisualization(int DIM, const ScalarNormalizer* pScalarHeightNormalizer,
-			const ScalarNormalizer* pScalarHeightColorNormalizer,
-			const ScalarGrid* pScalarHeightGrid, const ScalarGrid* pScalarHeightColorGrid,
-			VectorGradientDataset* pGradientDataset);
-	virtual ~HeightPlotVisualization();
-	void visualize(bool blend, const Simulation* pSimulation, const ColorMap* pColorMap) const;
-	float getMaxHeight() const;
-	void setMaxHeight(float value);
-	float getGridHeight() const;
-	void setGridHeight(float value);
-	bool getDrawGrid() const;
-	void setDrawGrid(bool value);
-	void setGradientDataset(VectorGradientDataset* pGradientDataset);
-	float getGridAlpha() const;
-	void setGridAlpha(float alpha);
+  HeightPlotVisualization(int DIM, const ScalarNormalizer* pScalarHeightNormalizer,
+                          const ScalarNormalizer* pScalarHeightColorNormalizer,
+                          const ScalarGrid* pScalarHeightGrid, const ScalarGrid* pScalarHeightColorGrid,
+                          VectorGradientDataset* pGradientDataset);
+  virtual ~HeightPlotVisualization();
+  void visualize(bool blend, const Simulation* pSimulation, const ColorMap* pColorMap) const;
+  float getMaxHeight() const;
+  void setMaxHeight(float value);
+  float getGridHeight() const;
+  void setGridHeight(float value);
+  bool getDrawGrid() const;
+  void setDrawGrid(bool value);
+  void setGradientDataset(VectorGradientDataset* pGradientDataset);
+  float getGridAlpha() const;
+  void setGridAlpha(float alpha);
 
 private:
-	const ScalarNormalizer* _pScalarHeightNormalizer;
-	const ScalarNormalizer* _pScalarHeightColorNormalizer;
-	const ScalarGrid* _pScalarHeightGrid;
-	const ScalarGrid* _pScalarHeightColorGrid;
-	float _maxHeight;
-	bool _drawGrid;
-	float _gridHeight;
-	float _gridAlpha;
-	VectorGradientDataset* _pGradientDataset;
-	void drawGrid() const;
+  const ScalarNormalizer* _pScalarHeightNormalizer;
+  const ScalarNormalizer* _pScalarHeightColorNormalizer;
+  const ScalarGrid* _pScalarHeightGrid;
+  const ScalarGrid* _pScalarHeightColorGrid;
+  float _maxHeight;
+  bool _drawGrid;
+  float _gridHeight;
+  float _gridAlpha;
+  VectorGradientDataset* _pGradientDataset;
+  void drawGrid() const;
 };
 
 inline float HeightPlotVisualization::getGridAlpha() const
 {
-	return _gridAlpha;
+  return _gridAlpha;
 }
 
 inline void HeightPlotVisualization::setGridAlpha(float alpha)
 {
-	_gridAlpha = alpha;
+  _gridAlpha = alpha;
 }
 
 inline float HeightPlotVisualization::getMaxHeight() const
 {
-	return _maxHeight;
+  return _maxHeight;
 }
 
 inline void HeightPlotVisualization::setMaxHeight(float value)
 {
-	_maxHeight = value;
+  _maxHeight = value;
 }
 
 inline float HeightPlotVisualization::getGridHeight() const
 {
-	return _gridHeight;
+  return _gridHeight;
 }
 
 inline void HeightPlotVisualization::setGridHeight(float value)
 {
-	_gridHeight = value;
+  _gridHeight = value;
 }
 
 inline bool HeightPlotVisualization::getDrawGrid() const
 {
-	return _drawGrid;
+  return _drawGrid;
 }
 
 inline void HeightPlotVisualization::setDrawGrid(bool value)
 {
-	_drawGrid = value;
+  _drawGrid = value;
 }
 
 #endif /* HEIGHTPLOTVISUALIZATION_H_ */

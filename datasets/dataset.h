@@ -13,12 +13,12 @@
 class Dataset
 {
 protected:
-	int moduloDIM(int value, int dim) const;
-	float moduloDIM(float value, int dim) const;
+  int moduloDIM(int value, int dim) const;
+  float moduloDIM(float value, int dim) const;
 
 public:
-	Dataset();
-	virtual ~Dataset();
+  Dataset();
+  virtual ~Dataset();
 
 };
 
@@ -32,33 +32,33 @@ inline Dataset::~Dataset()
 
 inline int Dataset::moduloDIM(int value, int dim) const
 {
-	if (value < 0)
-	{
-		value += (value * -1 / dim + 1) * dim;
-		return value;
-	}
-	else if (value >= dim)
-	{
-		return value % dim;
-	}
-	else
-	{
-		return value;
-	}
+  if (value < 0)
+    {
+      value += (value * -1 / dim + 1) * dim;
+      return value;
+    }
+  else if (value >= dim)
+    {
+      return value % dim;
+    }
+  else
+    {
+      return value;
+    }
 }
 
 inline float Dataset::moduloDIM(float value, int dim) const
 {
-	while (value < 0.0f)
-	{
-		value += dim;
-	}
-	while (value >= dim)
-	{
-		value -= dim;
-	}
+  while (value < 0.0f)
+    {
+      value += dim;
+    }
+  while (value >= dim)
+    {
+      value -= dim;
+    }
 
-	return value;
+  return value;
 }
 
 #endif /* DATASET_H_ */

@@ -13,13 +13,13 @@
 class ScalarTnfDataset : public ScalarDataset
 {
 public:
-	ScalarTnfDataset();
-	virtual ~ScalarTnfDataset();
-	virtual float getScalar(const Simulation* pSimulation, int row, int col) const;
+  ScalarTnfDataset();
+  virtual ~ScalarTnfDataset();
+  virtual float getScalar(const Simulation* pSimulation, int row, int col) const;
 };
 
 inline ScalarTnfDataset::ScalarTnfDataset()
-	: ScalarDataset()
+  : ScalarDataset()
 {
 }
 
@@ -29,7 +29,7 @@ inline ScalarTnfDataset::~ScalarTnfDataset()
 
 inline float ScalarTnfDataset::getScalar(const Simulation* pSimulation, int row, int col) const
 {
-	return pSimulation->getGrGrid().TNF(row, col);
+  return pSimulation->getGrGrid().TNF(row, col);
 }
 
 #endif /* SCALARTNFDATASET_H_ */

@@ -27,15 +27,16 @@
 
 #include "scalardataset.h"
 
-class ScalarTnfAttrExtMtb: public ScalarDataset {
+class ScalarTnfAttrExtMtb: public ScalarDataset
+{
 public:
-	ScalarTnfAttrExtMtb();
-	virtual ~ScalarTnfAttrExtMtb();
-	virtual float getScalar(const Simulation* pSimulation, int row, int col) const;
+  ScalarTnfAttrExtMtb();
+  virtual ~ScalarTnfAttrExtMtb();
+  virtual float getScalar(const Simulation* pSimulation, int row, int col) const;
 };
 
 inline ScalarTnfAttrExtMtb::ScalarTnfAttrExtMtb()
-	: ScalarDataset()
+  : ScalarDataset()
 {
 }
 
@@ -45,9 +46,9 @@ inline ScalarTnfAttrExtMtb::~ScalarTnfAttrExtMtb()
 
 inline float ScalarTnfAttrExtMtb::getScalar(const Simulation* pSimulation, int row, int col) const
 {
-	return pSimulation->getGrGrid().TNF(row, col)
-           + pSimulation->getGrGrid().macAttractant(row, col)
-           + pSimulation->getGrGrid().extMTB(row, col);
+  return pSimulation->getGrGrid().TNF(row, col)
+         + pSimulation->getGrGrid().macAttractant(row, col)
+         + pSimulation->getGrGrid().extMTB(row, col);
 }
 
 #endif /* SCALARTNFATTREXTMTB_H_ */

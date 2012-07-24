@@ -14,18 +14,18 @@
 class ColorMapFixed : public ColorMap
 {
 private:
-	QColor _color;
+  QColor _color;
 
 public:
-	ColorMapFixed(const QColor& color);
-	virtual ~ColorMapFixed();
-	virtual void map(float value, float& R, float& G, float& B) const;
-	virtual QString getName() const;
+  ColorMapFixed(const QColor& color);
+  virtual ~ColorMapFixed();
+  virtual void map(float value, float& R, float& G, float& B) const;
+  virtual QString getName() const;
 };
 
 inline QString ColorMapFixed::getName() const
 {
-	return QString("Fixed");
+  return QString("Fixed");
 }
 
 #endif /* FIXED_H_ */

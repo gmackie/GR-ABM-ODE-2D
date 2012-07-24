@@ -10,11 +10,11 @@
 #include "scalardatasets/scalargrid.h"
 
 SmokeVisualization::SmokeVisualization(int DIM, const ScalarNormalizer* pScalarNormalizer, const ScalarGrid* pScalarGrid)
-	: Visualization(DIM)
-	, _pScalarNormalizer(pScalarNormalizer)
-	, _pScalarGrid(pScalarGrid)
+  : Visualization(DIM)
+  , _pScalarNormalizer(pScalarNormalizer)
+  , _pScalarGrid(pScalarGrid)
 {
-	assert(pScalarNormalizer && pScalarGrid);
+  assert(pScalarNormalizer && pScalarGrid);
 }
 
 SmokeVisualization::~SmokeVisualization()
@@ -23,70 +23,70 @@ SmokeVisualization::~SmokeVisualization()
 
 void SmokeVisualization::visualize(bool blend, const Simulation*, const ColorMap* pColorMap) const
 {
-	if (blend)
-	{
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-	}
+  if (blend)
+    {
+      glEnable(GL_BLEND);
+      glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+    }
 
-	const std::vector<ScalarGridItem>& grid = _pScalarGrid->getGrid();
+  const std::vector<ScalarGridItem>& grid = _pScalarGrid->getGrid();
 
-	assert(pColorMap);
+  assert(pColorMap);
 
-	double px, py;
-	float value;
+  double px, py;
+  float value;
 
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+  glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-	for (int i = 0; i < _DIM - 1; i++) //draw smoke
-	{
-		glBegin(GL_TRIANGLE_STRIP);
+  for (int i = 0; i < _DIM - 1; i++) //draw smoke
+    {
+      glBegin(GL_TRIANGLE_STRIP);
 
-		// . .
-		// * .
-		ScalarGridItem gridItem = grid[i * _DIM];
-		px = gridItem.pos[0] * _deltaX;
-		py = gridItem.pos[1] * _deltaY;
+      // . .
+      // * .
+      ScalarGridItem gridItem = grid[i * _DIM];
+      px = gridItem.pos[0] * _deltaX;
+      py = gridItem.pos[1] * _deltaY;
 
-		value = _pScalarNormalizer->normalize(gridItem.scalar);
+      value = _pScalarNormalizer->normalize(gridItem.scalar);
 
-		applyColorMap(pColorMap, value);
-		glVertex2f(px, py);
+      applyColorMap(pColorMap, value);
+      glVertex2f(px, py);
 
-		for (int j = 0; j < _DIM - 1; j++)
-		{
-			// * .
-			// . .
-			gridItem = grid[j + (i+1) * _DIM];
+      for (int j = 0; j < _DIM - 1; j++)
+        {
+          // * .
+          // . .
+          gridItem = grid[j + (i+1) * _DIM];
 
-			value = _pScalarNormalizer->normalize(gridItem.scalar);
-			px = gridItem.pos[0] * _deltaX;
-			py = gridItem.pos[1] * _deltaY;
-			applyColorMap(pColorMap, value);
-			glVertex2f(px, py);
+          value = _pScalarNormalizer->normalize(gridItem.scalar);
+          px = gridItem.pos[0] * _deltaX;
+          py = gridItem.pos[1] * _deltaY;
+          applyColorMap(pColorMap, value);
+          glVertex2f(px, py);
 
-			// . .
-			// . *
-			gridItem = grid[j + 1 + (i) * _DIM];
+          // . .
+          // . *
+          gridItem = grid[j + 1 + (i) * _DIM];
 
-			value = _pScalarNormalizer->normalize(gridItem.scalar);
-			px = gridItem.pos[0] * _deltaX;
-			py = gridItem.pos[1] * _deltaY;
-			applyColorMap(pColorMap, value);
-			glVertex2f(px, py);
-		}
+          value = _pScalarNormalizer->normalize(gridItem.scalar);
+          px = gridItem.pos[0] * _deltaX;
+          py = gridItem.pos[1] * _deltaY;
+          applyColorMap(pColorMap, value);
+          glVertex2f(px, py);
+        }
 
-		// . *
-		// . .
-		gridItem = grid[_DIM - 1 + (i + 1) * _DIM];
+      // . *
+      // . .
+      gridItem = grid[_DIM - 1 + (i + 1) * _DIM];
 
-		value = _pScalarNormalizer->normalize(gridItem.scalar);
-		px = gridItem.pos[0] * _deltaX;
-		py = gridItem.pos[1] * _deltaY;
-		applyColorMap(pColorMap, value);
-		glVertex2f(px, py);
-		glEnd();
-	}
+      value = _pScalarNormalizer->normalize(gridItem.scalar);
+      px = gridItem.pos[0] * _deltaX;
+      py = gridItem.pos[1] * _deltaY;
+      applyColorMap(pColorMap, value);
+      glVertex2f(px, py);
+      glEnd();
+    }
 
-	glDisable(GL_BLEND);
+  glDisable(GL_BLEND);
 }

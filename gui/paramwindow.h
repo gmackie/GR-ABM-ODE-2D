@@ -10,24 +10,24 @@ class MainInterface;
 
 class ParamWindow : public QWidget
 {
-    Q_OBJECT
+  Q_OBJECT
 
 public:
-    ParamWindow(MainInterface* pItfc, QWidget* parent = 0);
-    ~ParamWindow();
-    void update();
+  ParamWindow(MainInterface* pItfc, QWidget* parent = 0);
+  ~ParamWindow();
+  void update();
 
 public slots:
-	void loadParams();
-	void saveParams();
+  void loadParams();
+  void saveParams();
 
 private:
-	MainInterface* _pItfc;
-    Ui::ParamWindowClass _ui;
+  MainInterface* _pItfc;
+  Ui::ParamWindowClass _ui;
 
-    void newItem(QTreeWidgetItem* pParentItem, ParamDoubleType param);
-    void newItem(QTreeWidgetItem* pParentItem, ParamIntType param);
-    void processElement(const TiXmlElement* pElement, QTreeWidgetItem* pParentTreeWidgetItem);
+  void newItem(QTreeWidgetItem* pParentItem, ParamDoubleType param);
+  void newItem(QTreeWidgetItem* pParentItem, ParamIntType param);
+  void processElement(const TiXmlElement* pElement, QTreeWidgetItem* pParentTreeWidgetItem);
 };
 
 #endif // PARAMWINDOW_H

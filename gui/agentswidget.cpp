@@ -68,6 +68,10 @@ AgentsWidget::AgentsWidget(AgentsVisualization* pAgentsVisualization, QWidget *p
     connect(_ui.checkBoxDrawAgentTcyt, SIGNAL(toggled(bool)), this, SLOT(updateAgentsSettings(void)));
     connect(_ui.checkBoxDrawAgentTreg, SIGNAL(toggled(bool)), this, SLOT(updateAgentsSettings(void)));
 
+    connect(_ui.checkBoxDrawAgentTgam, SIGNAL(toggled(bool)), this, SLOT(tgamFilterChanged(bool)));
+    connect(_ui.checkBoxDrawAgentTcyt, SIGNAL(toggled(bool)), this, SLOT(tcytFilterChanged(bool)));
+    connect(_ui.checkBoxDrawAgentTreg, SIGNAL(toggled(bool)), this, SLOT(tregFilterChanged(bool)));
+
     updateAgentsSettings();
 }
 
@@ -153,3 +157,7 @@ void AgentsWidget::updateAgentsSettings()
 
 	emit updateGL();
 }
+
+void AgentsWidget::tgamFilterChanged(bool en) { emit agentFilterChanged(TGAM, 0, ENBL, en); }
+void AgentsWidget::tregFilterChanged(bool en) { emit agentFilterChanged(TREG, 0, ENBL, en); }
+void AgentsWidget::tcytFilterChanged(bool en) { emit agentFilterChanged(TCYT, 0, ENBL, en); }

@@ -24,6 +24,9 @@ private slots:
     void mrGroupActivated(QAbstractButton* b);
     void miGroupActivated(QAbstractButton* b);
     void mciGroupActivated(QAbstractButton* b);
+    void tgamFilterChanged(bool en);
+    void tregFilterChanged(bool en);
+    void tcytFilterChanged(bool en);
 
 signals:
 	void updateGL();

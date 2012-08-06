@@ -157,6 +157,7 @@ public:
     write("TcellApoptTNF");
     write("Fas/FasL Killing");
     write("Cytotoxic Killing");
+    write("Mci Bursting");
     write("NrOfMacsFullyInhibited");
     write("TgamQueued"); write("TcytQueued"); write("TregQueued");
     write("TgamQueuedDie"); write("TcytQueuedDie"); write("TregQueuedDie");
@@ -218,6 +219,7 @@ public:
     write(stats.getTcellApoptosisTNF());
     write(stats.getApoptosisFasFasL());
     write(stats.getKillCytotoxic());
+    write(stats.getBurstMci());
 
     write(stats.getNrOfCellsTnfInhibited()/100);
 

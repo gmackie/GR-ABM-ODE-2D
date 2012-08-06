@@ -96,7 +96,8 @@ HEADERS += scalardatasets/scalartotmtbdataset.h \
     simulation.h \
     snapshot.h \
     gui/graphviewer.h \
-    gui/agenthistogram.h
+    gui/agenthistogram.h \
+    simulation/numericalMethods.h
 SOURCES += simulation/serialization.cpp \
     simulation/params.cpp \
     simulation/paramsbase.cpp \

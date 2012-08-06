@@ -1993,8 +1993,11 @@ bool Agent::TNFinducedApoptosis(GrGrid &grid, bool tnfrDynamics, bool nfkbDynami
 
     if (!nfkbDynamics && tnfrDynamics)
     {
+
+        Scalar testintBoundTNFR1 = std::min(_intBoundTNFR1, _PARAM(PARAM_GR_TNF_APOPTOSIS_SAT));
+
         Threshold = intCompareGT(_intBoundTNFR1, _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR));
-        Probability = intCompareGT(1 - pow(2.7183, -_PARAM(PARAM_GR_K_APOPTOSIS_MOLECULAR) * (_intBoundTNFR1 - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR))), g_Rand.getReal());
+        Probability = intCompareGT(1 - pow(2.7183, -_PARAM(PARAM_GR_K_APOPTOSIS_MOLECULAR) * (testintBoundTNFR1 - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR))), g_Rand.getReal());
 
     }
     else if (nfkbDynamics)
@@ -2028,8 +2031,12 @@ bool Agent::TNFinducedNFkB(GrGrid &grid, bool tnfrDynamics, bool nfkbDynamics)
 
     if (!nfkbDynamics && tnfrDynamics)
     {
+        Scalar testsurfBoundTNFR1;
+
+        testsurfBoundTNFR1 = std::min(_surfBoundTNFR1, (_PARAM(PARAM_MAC_TNF_NFKB_SAT_FRACTION) * (_surfTNFR1 + _surfBoundTNFR1)));
+
         Threshold = intCompareGT(_surfBoundTNFR1, _PARAM(PARAM_MAC_THRESHOLD_NFKB_TNF_MOLECULAR));
-        Probability = intCompareGT(1 - pow(2.7183, -_PARAM(PARAM_MAC_K_NFKB_MOLECULAR) * (_surfBoundTNFR1 - _PARAM(PARAM_MAC_THRESHOLD_NFKB_TNF_MOLECULAR))), g_Rand.getReal());
+        Probability = intCompareGT(1 - pow(2.7183, -_PARAM(PARAM_MAC_K_NFKB_MOLECULAR) * (testsurfBoundTNFR1 - _PARAM(PARAM_MAC_THRESHOLD_NFKB_TNF_MOLECULAR))), g_Rand.getReal());
     }
 
 

@@ -117,7 +117,10 @@ void Treg::computeNextState(const int time, GrGrid& grid, Stats& stats, bool tnf
 // This will leave the simulation in an inconsistent state.
 void Treg::handleResting(const int time, GrGrid& grid, Stats& stats)
 {
-	for (int i = -1; i <= 1; i++)
+    Scalar currentTNF = grid.TNF(_pos); // Get TNF concentration for scaling Treg deactivation
+    Scalar currentIL10 = grid.il10(_pos); // Get IL10 concentration for scaling Treg deactivation
+
+    for (int i = -1; i <= 1; i++)
 	{
 		for (int j = -1; j <= 1; j++)
 		{
@@ -129,7 +132,27 @@ void Treg::handleResting(const int time, GrGrid& grid, Stats& stats)
 				  if(pAgent && !pAgent->isDead() && !pAgent->isDeadNext())
 				  {
 					  Scalar coinFlip = g_Rand.getReal();
-					  if (coinFlip  <= _PARAM(PARAM_TREG_PROB_DEACTIVATE))
+
+                      // Scale Treg deactivation by TNF concentration (only monitor molecule we have) as a proxy for
+                      // feedback to TGF-b cell-cell contact mechanism
+                      Scalar scaledProbTNF = ((_PARAM(PARAM_TREG_PROB_DEACTIVATE) * currentTNF)/(currentTNF + 8000)); // THIS NEEDS TO BE NON-HARD CODED!!!!! FIXXXXXXXXXXX
+
+//                      Scalar scaledProb = (_PARAM(PARAM_TREG_PROB_DEACTIVATE)*(1.0/_PARAM(PARAM_TREG_DEACTIVATE_HALF_SAT))*currentTNF);
+
+//                      Scalar scaledProb = (_PARAM(PARAM_TREG_PROB_DEACTIVATE)*(1.0/(_PARAM(PARAM_TREG_DEACTIVATE_HALF_SAT) * _PARAM(PARAM_TREG_DEACTIVATE_HALF_SAT)))*currentTNF*currentTNF);
+
+//                      Scalar scaledProb = _PARAM(PARAM_TREG_PROB_DEACTIVATE) - ((1.0/_PARAM(PARAM_TREG_DEACTIVATE_HALF_SAT)) * currentIL10);
+                      Scalar scaledProbIL10 = _PARAM(PARAM_TREG_PROB_DEACTIVATE) * pow(2.7183, -_PARAM(PARAM_TREG_DEACTIVATE_HALF_SAT) * currentIL10);
+
+//                      Scalar scaledProb = _PARAM(PARAM_TREG_PROB_DEACTIVATE);
+
+
+//                      scaledProb = std::min(scaledProb, _PARAM(PARAM_TREG_PROB_DEACTIVATE));
+//                      scaledProb = std::max(scaledProb, 0.0);
+                      Scalar scaledProb = std::min((scaledProbTNF + scaledProbIL10), _PARAM(PARAM_TREG_PROB_DEACTIVATE));
+
+//                      std::cout << "Pos :" << _pos << "  IL10: " << grid.il10(_pos) << "  TNF: " << grid.TNF(_pos) << "  Scaled Prob: " << scaledProb << std::endl;
+                      if (coinFlip  <= scaledProb)
 					  {
                           grid.agent(p, k)->deactivate(time, stats);
 					  }

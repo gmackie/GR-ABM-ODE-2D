@@ -298,6 +298,7 @@ void Mac::apoptosis(GrGrid& grid)
 	{
 		// disperse bacteria to the Moore neighborhood
 		// (half of the intracellular bacteria dies, the other half is dispersed)
+//        std::cout << "Apoptosis" << std::endl;
 		disperseMtb(grid, 0.5);
 		_intMtb = 0;
 	}
@@ -440,11 +441,20 @@ void Mac::computeNextState(const int time, GrGrid& grid, Stats& stats, bool tnfr
             // Reset deactivation time since the cell in no-longer deactivated
             _deactivationTime = -1;
 
-            // Switch Active Macs to Resting Macs when they come out of deactivation
+            // Switch Active Macs to Resting Macs or Infected Macs (if the have _intMtb) when they come out of deactivation
             if (_nextState != Mac::MAC_DEAD && _state == Mac::MAC_ACTIVE)
             {
+
+                if (_intMtb > 0.0)
+                {
+                    _state = Mac::MAC_INFECTED;
+                    _deathTime = _birthTime + _PARAM(PARAM_MAC_AGE);
+                }
+                else
+                {
                 _state = Mac::MAC_RESTING;
                 _deathTime = _birthTime + _PARAM(PARAM_MAC_AGE);
+                }
 //                // DBG
 //                std::cout << "State Switch - Active to Resting" << std::endl;
 //                std::cout << _state << "  " << _nextState << std::endl;
@@ -546,6 +556,12 @@ void Mac::handleResting(const int time, GrGrid& grid, Stats& stats, bool /*nfkbD
 
     _stat1 = checkSTAT1(grid, time);
 
+    double killProb = _PARAM(PARAM_MAC_PROB_KILL_R_EXTMTB);
+    if (_stat1 || _NFkB)
+        killProb = _PARAM(PARAM_MAC_PROB_KILL_R_EXTMTB) + _PARAM(PARAM_MAC_PROB_KILL_R_EXTMTB);
+
+    killProb = std::min(killProb, 1.0); // Make sure killProb never goes over unity
+
 	/* You can get infected from only 1 bacteria;
 	 * there should always be a probability associated with getting infected.
 	 *
@@ -560,7 +576,7 @@ void Mac::handleResting(const int time, GrGrid& grid, Stats& stats, bool /*nfkbD
 		grid.extMTB(_pos) = (0);
 		_nextState = Mac::MAC_RESTING;
 	}
-	else if (g_Rand.getReal() < _PARAM(PARAM_MAC_PROB_KILL_R_EXTMTB))
+    else if (g_Rand.getReal() < killProb)
 	{
 		// there are too many extracellular bacteria, but we can kill some of those
 		// with probability PARAM_MAC_PROB_KILL_R_EXTMTB
@@ -611,7 +627,7 @@ void Mac::handleResting(const int time, GrGrid& grid, Stats& stats, bool /*nfkbD
 
     if (_stat1 && _NFkB)
 	{
-		_intMtb = 0;
+        _intMtb = 0;
 		_activationTime = time;
 		_deathTime = time + _PARAM(PARAM_MAC_A_AGE);
         _nextState = Mac::MAC_ACTIVE;
@@ -679,7 +695,7 @@ void Mac::handleInfected(const int time, GrGrid& grid, Stats& stats, bool /*nfkb
 
         if (_stat1 && _NFkB)
         {
-            _intMtb = 0;
+//            _intMtb = 0;
             _activationTime = time;
             _deathTime = time + _PARAM(PARAM_MAC_A_AGE);
             _nextState = Mac::MAC_ACTIVE;
@@ -694,7 +710,7 @@ void Mac::handleInfected(const int time, GrGrid& grid, Stats& stats, bool /*nfkb
 	}
 }
 
-void Mac::handleChronicallyInfected(const int time, GrGrid& grid, Stats&)
+void Mac::handleChronicallyInfected(const int time, GrGrid& grid, Stats& stats)
 {
 	// intracellular bacteria reproduce
 	_intMtb *= getIntMtbGrowthRate(time);
@@ -702,11 +718,13 @@ void Mac::handleChronicallyInfected(const int time, GrGrid& grid, Stats&)
 	if (_intMtb >= _PARAM(PARAM_MAC_THRESHOLD_BURST_CI_INTMTB))
 	{
 		// burst, all intracellular bacteria disperse to the Moore neighborhood
-		disperseMtb(grid, 1.0);
+//        std::cout << "Burst" << std::endl;
+        disperseMtb(grid, 1.0);
 		_intMtb = 0;
 
 		// increment number of killings
 		grid.incKillings(_pos);
+        ++stats.getBurstMci();
 
 		_nextState = Mac::MAC_DEAD;
 	}
@@ -718,7 +736,16 @@ void Mac::handleChronicallyInfected(const int time, GrGrid& grid, Stats&)
 
 void Mac::handleActivated(const int, GrGrid& grid, Stats&)
 {
-	// kill extracellular bacteria in the compartment the macrophage resides
+
+    if (_intMtb > 0.0)
+    {
+//        std::cout << "Killing IntMtb - Active Mac - Before:  " << _intMtb << std::endl;
+        double dintMtb = std::min(1.0, _intMtb);
+        _intMtb += (-1.0 * dintMtb);
+//        std::cout << "Killing IntMtb - Active Mac - After:  " << _intMtb << std::endl;
+    }
+
+    // kill extracellular bacteria in the compartment the macrophage resides
 	grid.extMTB(_pos) += (-1 * std::min(grid.extMTB(_pos), _PARAM(PARAM_MAC_NR_UPTAKE_A_EXTMTB)));
 
 	_nextState = Mac::MAC_ACTIVE;
@@ -920,6 +947,9 @@ void Mac::disperseMtb(GrGrid& grid, double fraction)
     double dMtb = mtb / std::min(minCompartments, static_cast<double>(permutation.size()));
 
     size_t n = std::min(static_cast<size_t>(minCompartments), permutation.size());
+
+//    std::cout << "Disperse Mtb: " << dMtb << "  Compartments: " << n << std::endl;
+
     if (n < permutation.size())
         std::random_shuffle(permutation.begin(), permutation.end(), g_Rand);
 

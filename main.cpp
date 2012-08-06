@@ -319,7 +319,6 @@ int main(int argc, char *argv[])
   GLWindow glWindow(&itfc);
   ParamWindow paramWindow(&itfc);
   MainWindow w(&itfc, &glWindow, &paramWindow, new StatWidget(itfc.getSimulation().getStats()), new AgentsWidget(&agentsVisualization));
-  w.loadSettings();
 
   /* set recruitment method */
   // Parameters must be loaded, since since the base lymph ODE class, RecruitmentLnODE, uses parameters in its constructor.

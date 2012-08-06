@@ -172,6 +172,7 @@ MainWindow::MainWindow(MainInterface* pItfc, GLWindow* pGLWindow, QWidget* pPara
   initIsolinesTab();
   initHeightTab();
   initShortcuts();
+  loadSettings();
 
   _ui.labelTransparency->setEnabled(_ui.checkBoxBlend->isChecked());
   _ui.labelHeightGridTransparency->setEnabled(_ui.checkBoxBlend->isChecked());
@@ -1739,7 +1740,6 @@ void MainWindow::saveSettings() const
   settings.beginGroup("Simulation");
   settings.setValue("diffusion", _ui.comboBoxDiffusion->currentIndex());
   settings.setValue("delay", _ui.spinBoxDelay->value());
-  settings.setValue("seed", _ui.spinBoxSeed->value());
   settings.setValue("stopClearance", _ui.checkBoxStopClearance->isChecked());
   settings.setValue("stopTime", _ui.checkBoxStopDays->isChecked());
   settings.setValue("stopTimeStep", _ui.spinBoxStopTime->value());
@@ -1779,7 +1779,6 @@ void MainWindow::loadSettings()
   settings.beginGroup("Simulation");
   _ui.comboBoxDiffusion->setCurrentIndex(settings.value("diffusion", _ui.comboBoxDiffusion->currentIndex()).toInt());
   _ui.spinBoxDelay->setValue(settings.value("delay", _ui.spinBoxDelay->value()).toInt());
-  _ui.spinBoxSeed->setValue(settings.value("seed", _ui.spinBoxSeed->value()).toInt());
   _ui.checkBoxStopClearance->setChecked(settings.value("stopClearance", _ui.checkBoxStopClearance->isChecked()).toBool());
   _ui.checkBoxStopDays->setChecked(settings.value("stopTime", _ui.checkBoxStopDays->isChecked()).toBool());
   _ui.spinBoxStopTime->setValue(settings.value("stopTimeStep", _ui.spinBoxStopTime->value()).toBool());

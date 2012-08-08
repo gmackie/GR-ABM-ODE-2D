@@ -114,8 +114,8 @@ int main(int argc, char *argv[])
   ("dim,d", po::value(&dim)->default_value(100))
   ("diffusion", po::value<int>(&diffMethod)->default_value(4),
    "Diffusion method:\n0 - FTCS\n1 - BTCS (SOR, correct)\n2 - BTCS (SOR, wrong)\n3 - FTCS Grid Swap\n4 - ADE Grid Swap")
-  ("odesolver", po::value(&odeSolver)->default_value(0),
-   "ODE Solver Method:\n0 - Forward Euler\n1 - Euler Predictor-Corrector\n2 - Runge-Kutta 3rd Order\n3 - Runge-Kutta 4th Order\n4 - HuenEuler\n5 - Runge-Kutta Cache-Karp\n6 - Runge-Kutta Fehlberg\n7 - Bogacki-Shampine")
+  ("odesolver", po::value(&odeSolver)->default_value(4),
+   "ODE Solver Method:\n0 - Forward Euler\n1 - Euler Predictor-Corrector\n2 - Runge-Kutta 2nd Order\n3 - Runge-Kutta 3rd Order\n4 - Runge-Kutta 4th Order\n5 - Huen-Euler\n6 - Runge-Kutta Cash-Karp\n7 - Runge-Kutta Fehlberg\n8 - Bogacki-Shampine")
   ("timesteps,t", po::value<int>(&timesteps), "Number of time steps to simulate\nTakes precedence over --days")
   ("days", po::value<int>(&nDays)->default_value(200), "Number of days to simulate")
   ("script,c", "Scripting mode")

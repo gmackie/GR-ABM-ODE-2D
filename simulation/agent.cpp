@@ -94,7 +94,7 @@ void Agent::solveMolecularScale(GrGrid& grid, double t, double dt, ODESolvers::O
   ODESolvers::Stepper* stepper = getStepper(method);
   LungFunc& fn = *getDerivFunc();
   for(size_t i=0;i<nsubsteps;i++)
-    stepper->step(_initvector, fn, t+i*dt/nsubsteps, dt/nsubsteps, error, (void*)&params);
+    stepper->step(_initvector, fn, t+i*dt/nsubsteps, dt/nsubsteps, _lasttimestep, error, (void*)&params);
   writeMembersFromValarray(grid, _initvector);
 }
 
@@ -815,7 +815,8 @@ void Agent::writeValarrayFromMembers(GrGrid& grid, valarray<double>& inputVector
     if (vectorsize == 3) 
     {
         // sIL10
-        inputVector[0] = grid.il10(_pos) / (NAV * VOL);
+        inputVector[0] = grid.il10(_pos);
+//        inputVector[0] = grid.il10(_pos) / (NAV * VOL);
         // surfIL10R
         inputVector[1] = _surfIL10R;
         // surfBoundIL10R
@@ -842,14 +843,17 @@ void Agent::writeValarrayFromMembers(GrGrid& grid, valarray<double>& inputVector
         // intBoundTNFR2
         inputVector[7] = _intBoundTNFR2;
         // sTNF
-        inputVector[8] = grid.TNF(_pos) / (NAV * VOL);
+        inputVector[8] = grid.TNF(_pos);
+//        inputVector[8] = grid.TNF(_pos) / (NAV * VOL);
         // shedTNFR2
-        inputVector[9] = grid.shedTNFR2(_pos) / (NAV * VOL);
+        inputVector[9] = grid.shedTNFR2(_pos);
+//        inputVector[9] = grid.shedTNFR2(_pos) / (NAV * VOL);
         
         if (vectorsize == 13) 
         {
             // sIL10
-            inputVector[10] = grid.il10(_pos) / (NAV * VOL);
+            inputVector[10] = grid.il10(_pos);
+//            inputVector[10] = grid.il10(_pos) / (NAV * VOL);
             // surfIL10R
             inputVector[11] = _surfIL10R;
             // surfBoundIL10R
@@ -892,7 +896,8 @@ void Agent::writeValarrayFromMembers(GrGrid& grid, valarray<double>& inputVector
             if (vectorsize == 39) 
             {
                 // sIL10
-                inputVector[36] = grid.il10(_pos) / (NAV * VOL);
+                inputVector[36] = grid.il10(_pos);
+//                inputVector[36] = grid.il10(_pos) / (NAV * VOL);
                 // surfIL10R
                 inputVector[37] = _surfIL10R;
                 // surfBoundIL10R
@@ -912,7 +917,8 @@ void Agent::writeMembersFromValarray(GrGrid& grid, const valarray<double>& input
     if (vectorsize == 3) 
     {
         // sIL10
-        grid.setil10(_pos, (NAV * VOL * inputVector[0]));
+        grid.setil10(_pos, (inputVector[0]));
+//        grid.setil10(_pos, (NAV * VOL * inputVector[0]));
         // surfIL10R
         _surfIL10R = inputVector[1];
         // surfBoundIL10R
@@ -939,14 +945,17 @@ void Agent::writeMembersFromValarray(GrGrid& grid, const valarray<double>& input
         // intBoundTNFR2
         _intBoundTNFR2 = inputVector[7];
         // sTNF
-        grid.setTNF(_pos, (NAV * VOL * inputVector[8]));
+        grid.setTNF(_pos, (inputVector[8]));
+//        grid.setTNF(_pos, (NAV * VOL * inputVector[8]));
         // shedTNFR2
-        grid.setshedTNFR2(_pos, (NAV * VOL * inputVector[9]));
+        grid.setshedTNFR2(_pos, (inputVector[9]));
+//        grid.setshedTNFR2(_pos, (NAV * VOL * inputVector[9]));
 
         if (vectorsize == 13) 
         {
             // sIL10
-            grid.setil10(_pos, (NAV * VOL * inputVector[10]));
+            grid.setil10(_pos, (inputVector[10]));
+//            grid.setil10(_pos, (NAV * VOL * inputVector[10]));
             // surfIL10R
             _surfIL10R = inputVector[11];
             // surfBoundIL10R
@@ -996,7 +1005,8 @@ void Agent::writeMembersFromValarray(GrGrid& grid, const valarray<double>& input
             if (vectorsize == 39) 
             {
                 // sIL10
-                grid.setil10(_pos, (NAV * VOL * inputVector[36]));
+                grid.setil10(_pos, (inputVector[36]));
+//                grid.setil10(_pos, (NAV * VOL * inputVector[36]));
                 // surfIL10R
                 _surfIL10R = inputVector[37];
                 // surfBoundIL10R
@@ -2296,21 +2306,21 @@ void Agent::deserialize(std::istream& in)
     // mTNF
     vecwrite[1] = (_PARAM(PARAM_GR_K_TRANS) * vecread[0] - agent->getkTACE() * vecread[1]);
     // surfTNFR1
-    vecwrite[2] = (agent->getvTNFR1() - _PARAM(PARAM_GR_K_ON1) * vecread[8] * vecread[2] + koff1 * vecread[4] - _PARAM(PARAM_GR_K_T1) * vecread[2] + _PARAM(PARAM_GR_K_REC1) * vecread[6]);
+    vecwrite[2] = (agent->getvTNFR1() - _PARAM(PARAM_GR_K_ON1) * (vecread[8]/(NAV * VOL)) * vecread[2] + koff1 * vecread[4] - _PARAM(PARAM_GR_K_T1) * vecread[2] + _PARAM(PARAM_GR_K_REC1) * vecread[6]);
     // surfTNFR2
-    vecwrite[3] = (agent->getvTNFR2() - _PARAM(PARAM_GR_K_ON2) * vecread[8] * vecread[3] + koff2 * vecread[5] - _PARAM(PARAM_GR_K_T2) * vecread[3] + _PARAM(PARAM_GR_K_REC2) * vecread[7]);
+    vecwrite[3] = (agent->getvTNFR2() - _PARAM(PARAM_GR_K_ON2) * (vecread[8]/(NAV * VOL)) * vecread[3] + koff2 * vecread[5] - _PARAM(PARAM_GR_K_T2) * vecread[3] + _PARAM(PARAM_GR_K_REC2) * vecread[7]);
     // surfBoundTNFR1
-    vecwrite[4] = (_PARAM(PARAM_GR_K_ON1) * vecread[8] * vecread[2] - koff1 * vecread[4] - _PARAM(PARAM_GR_K_INT1) * vecread[4]);
+    vecwrite[4] = (_PARAM(PARAM_GR_K_ON1) * (vecread[8]/(NAV * VOL)) * vecread[2] - koff1 * vecread[4] - _PARAM(PARAM_GR_K_INT1) * vecread[4]);
     // surfBoundTNFR2
-    vecwrite[5] = (_PARAM(PARAM_GR_K_ON2) * vecread[8] * vecread[3] - koff2 * vecread[5] - _PARAM(PARAM_GR_K_INT2) * vecread[5] - _PARAM(PARAM_GR_K_SHED) * vecread[5]);
+    vecwrite[5] = (_PARAM(PARAM_GR_K_ON2) * (vecread[8]/(NAV * VOL)) * vecread[3] - koff2 * vecread[5] - _PARAM(PARAM_GR_K_INT2) * vecread[5] - _PARAM(PARAM_GR_K_SHED) * vecread[5]);
     // intBoundTNFR1 
     vecwrite[6] = (_PARAM(PARAM_GR_K_INT1) * vecread[4] - _PARAM(PARAM_GR_K_DEG1) * vecread[6] - _PARAM(PARAM_GR_K_REC1) * vecread[6]);
     // intBoundTNFR2
     vecwrite[7] = (_PARAM(PARAM_GR_K_INT2) * vecread[5] - _PARAM(PARAM_GR_K_DEG2) * vecread[7] - _PARAM(PARAM_GR_K_REC2) * vecread[7]);
     // sTNF
-    vecwrite[8] = ((DENSITY/NAV) * (agent->getkTACE() * vecread[1] - _PARAM(PARAM_GR_K_ON1) * vecread[8] * vecread[2] + koff1 * vecread[4] - _PARAM(PARAM_GR_K_ON2) * vecread[8] * vecread[3] + koff2 * vecread[5]));
+    vecwrite[8] = (((DENSITY/NAV) * (agent->getkTACE() * vecread[1] - _PARAM(PARAM_GR_K_ON1) * (vecread[8]/(NAV * VOL)) * vecread[2] + koff1 * vecread[4] - _PARAM(PARAM_GR_K_ON2) * (vecread[8]/(NAV * VOL)) * vecread[3] + koff2 * vecread[5]))) * (NAV * VOL);
     // shedTNFR2
-    vecwrite[9] = ((DENSITY/NAV) * _PARAM(PARAM_GR_K_SHED) * vecread[5]);
+    vecwrite[9] = (((DENSITY/NAV) * _PARAM(PARAM_GR_K_SHED) * vecread[5])) * (NAV * VOL);
   }
   if(_PARAM(PARAM_IL10ODE_EN))
     il10deriv(vecread, t, vecwrite, ((Params_t*)params));
@@ -2320,11 +2330,11 @@ inline void LungFunc::il10deriv(const ODESolvers::ODEState& vecread, double /*t*
   const double Ikoff = _PARAM(PARAM_GR_I_K_ON) * _PARAM(PARAM_GR_I_KD);
   // IL10 Ordinary Differential Equations
   // sIL10
-  vecwrite[il10offset+0] = (((DENSITY/NAV) * params->agent->getkISynth()) + ((DENSITY/NAV) * (Ikoff * vecread[il10offset+2] - _PARAM(PARAM_GR_I_K_ON) * vecread[il10offset+1] * vecread[il10offset+0])));
+  vecwrite[il10offset+0] = ((((DENSITY/NAV) * params->agent->getkISynth()) + ((DENSITY/NAV) * (Ikoff * vecread[il10offset+2] - _PARAM(PARAM_GR_I_K_ON) * vecread[il10offset+1] * (vecread[il10offset+0]/(NAV * VOL)))))) * (NAV * VOL);
   // surfIL10R
-  vecwrite[il10offset+1] = (params->agent->getvIL10R() - _PARAM(PARAM_GR_I_K_ON) * vecread[il10offset+1] * vecread[il10offset+0] + _PARAM(PARAM_GR_I_K_OFF) * vecread[il10offset+2] - _PARAM(PARAM_GR_I_K_T) * vecread[il10offset+1]);
+  vecwrite[il10offset+1] = (params->agent->getvIL10R() - _PARAM(PARAM_GR_I_K_ON) * vecread[il10offset+1] * (vecread[il10offset+0]/(NAV * VOL)) + _PARAM(PARAM_GR_I_K_OFF) * vecread[il10offset+2] - _PARAM(PARAM_GR_I_K_T) * vecread[il10offset+1]);
   // surfBoundIL10R
-  vecwrite[il10offset+2] = (_PARAM(PARAM_GR_I_K_ON) * vecread[il10offset+1] * vecread[il10offset+0] - _PARAM(PARAM_GR_I_K_OFF) * vecread[il10offset+2] - _PARAM(PARAM_GR_I_K_INT) * vecread[il10offset+2]);
+  vecwrite[il10offset+2] = (_PARAM(PARAM_GR_I_K_ON) * vecread[il10offset+1] * (vecread[il10offset+0]/(NAV * VOL)) - _PARAM(PARAM_GR_I_K_OFF) * vecread[il10offset+2] - _PARAM(PARAM_GR_I_K_INT) * vecread[il10offset+2]);
 }
 
 void NFKBFunc::operator()(const ODESolvers::ODEState& vecread, double t, ODESolvers::Derivative& vecwrite, void* params) const {
@@ -2337,14 +2347,14 @@ void NFKBFunc::operator()(const ODESolvers::ODEState& vecread, double t, ODESolv
   assert(agent->NFkBCapable() && "NFKB ON NON-NFKB CAPABLE AGENT");
   vecwrite[0] = 0; // CURRENTLY NOT LINKED WITH IL10 SINCE NFKB DYNAMICS HAVE NOT BEEN LOOKED AT
   vecwrite[1] = (_PARAM(PARAM_GR_e3TNF)*agent->getTNF() - agent->getkTACE() * vecread[1]);
-  vecwrite[2] = (agent->getvTNFR1() - _PARAM(PARAM_GR_K_ON1) * vecread[8] * vecread[2] + (koff1+KDEG) * vecread[4] - _PARAM(PARAM_GR_K_T1) * vecread[2] + _PARAM(PARAM_GR_K_REC1) * vecread[6]);
-  vecwrite[3] = (agent->getvTNFR2() - _PARAM(PARAM_GR_K_ON2) * vecread[8] * vecread[3] + (koff2+KDEG) * vecread[5] - _PARAM(PARAM_GR_K_T2) * vecread[3] + _PARAM(PARAM_GR_K_REC2) * vecread[7]);
-  vecwrite[4] = (_PARAM(PARAM_GR_K_ON1) * vecread[8] * vecread[2] - (koff1+KDEG) * vecread[4] - _PARAM(PARAM_GR_K_INT1) * vecread[4]);
-  vecwrite[5] = (_PARAM(PARAM_GR_K_ON2) * vecread[8] * vecread[3] - (koff2+KDEG) * vecread[5] - _PARAM(PARAM_GR_K_INT2) * vecread[5] - _PARAM(PARAM_GR_K_SHED) * vecread[5]);    
+  vecwrite[2] = (agent->getvTNFR1() - _PARAM(PARAM_GR_K_ON1) * (vecread[8]/(NAV * VOL)) * vecread[2] + (koff1+KDEG) * vecread[4] - _PARAM(PARAM_GR_K_T1) * vecread[2] + _PARAM(PARAM_GR_K_REC1) * vecread[6]);
+  vecwrite[3] = (agent->getvTNFR2() - _PARAM(PARAM_GR_K_ON2) * (vecread[8]/(NAV * VOL)) * vecread[3] + (koff2+KDEG) * vecread[5] - _PARAM(PARAM_GR_K_T2) * vecread[3] + _PARAM(PARAM_GR_K_REC2) * vecread[7]);
+  vecwrite[4] = (_PARAM(PARAM_GR_K_ON1) * (vecread[8]/(NAV * VOL)) * vecread[2] - (koff1+KDEG) * vecread[4] - _PARAM(PARAM_GR_K_INT1) * vecread[4]);
+  vecwrite[5] = (_PARAM(PARAM_GR_K_ON2) * (vecread[8]/(NAV * VOL)) * vecread[3] - (koff2+KDEG) * vecread[5] - _PARAM(PARAM_GR_K_INT2) * vecread[5] - _PARAM(PARAM_GR_K_SHED) * vecread[5]);
   vecwrite[6] = (_PARAM(PARAM_GR_K_INT1) * vecread[4] - _PARAM(PARAM_GR_K_DEG1) * vecread[6] - _PARAM(PARAM_GR_K_REC1) * vecread[6]);    
   vecwrite[7] = (_PARAM(PARAM_GR_K_INT2) * vecread[5] - _PARAM(PARAM_GR_K_DEG2) * vecread[7] - _PARAM(PARAM_GR_K_REC2) * vecread[7]);    
-  vecwrite[8] = ((DENSITY/NAV) * (agent->getkTACE() * vecread[1] - _PARAM(PARAM_GR_K_ON1) * vecread[8] * vecread[2] + koff1 * vecread[4] - _PARAM(PARAM_GR_K_ON2) * vecread[8] * vecread[3] + koff2 * vecread[5]));
-  vecwrite[9] = ((DENSITY/NAV) * _PARAM(PARAM_GR_K_SHED) * vecread[5]);
+  vecwrite[8] = (((DENSITY/NAV) * (agent->getkTACE() * vecread[1] - _PARAM(PARAM_GR_K_ON1) * (vecread[8]/(NAV * VOL)) * vecread[2] + koff1 * vecread[4] - _PARAM(PARAM_GR_K_ON2) * (vecread[8]/(NAV * VOL)) * vecread[3] + koff2 * vecread[5]))) * (NAV * VOL);
+  vecwrite[9] = (((DENSITY/NAV) * _PARAM(PARAM_GR_K_SHED) * vecread[5])) * (NAV * VOL);
   // NF-kB dynamics model equations
   vecwrite[10] = (_PARAM(PARAM_GR_ka)*vecread[4]*(_PARAM(PARAM_GR_KN)-vecread[10])*_PARAM(PARAM_GR_kA20)/(_PARAM(PARAM_GR_kA20)+vecread[18])-_PARAM(PARAM_GR_ki)*vecread[10]);
   vecwrite[11] = (_PARAM(PARAM_GR_k4)*(_PARAM(PARAM_GR_KNN)-vecread[11]-vecread[12]-vecread[13])-_PARAM(PARAM_GR_k1)*pow(vecread[10],2.0)*vecread[11]);
@@ -2393,7 +2403,7 @@ void Agent::solveMolecularScaleAdaptive(GrGrid& grid, double t, double dt, ODESo
   setODEstatus(true);
 }
 
-#define SAFETY (0.9)
+#define SAFETY (0.95)
 #define PGROW (-0.2)
 #define PSHRINK (-0.25)
 #define ERRCON (1.89e-4)
@@ -2407,16 +2417,21 @@ void Agent::solveMolecularScaleAdaptive(GrGrid& grid, double t, double dt, ODESo
 
 #define EPS (1e-5)
 
+#define ABSTOL (1e-6)
+#define RELTOL (1e-5)
+#define MAXSCALE (10.0)
+#define MINSCALE (0.2)
+
 void Agent::adaptiveODE(GrGrid& grid, double t, double dt, ODESolvers::ODEMethod method) {
   writeValarrayFromMembers(grid, _initvector);  //With some pointer magic, should be able to remove this...
-  static valarray<double> error(0); //For adaptive only, not needed atm
+  LungFunc& fn = *getDerivFunc();
+  valarray<double> error(fn.dim());
   static LungFunc::Params_t params;
   params.agent = this;
   params.grid = &grid;
-  ODESolvers::Stepper* s1 = getStepper(method); 
-  LungFunc& fn = *getDerivFunc();
-  ODESolvers::AdaptiveStepper stepper(fn.dim(), s1, EPS, TINY, MAXSTEP, PSHRINK, PGROW, SAFETY); // Just use the adaptive stepper from ODESolvers, not very efficient
-  stepper.step(_initvector, fn, t, dt, error, (void*)&params);
+  ODESolvers::Stepper* s1 = getStepper(method);
+  ODESolvers::AdaptiveStepper stepper(fn.dim(), s1, EPS, TINY, MAXSTEP, PSHRINK, PGROW, SAFETY, ABSTOL, RELTOL, MAXSCALE, MINSCALE); // Just use the adaptive stepper from ODESolvers, not very efficient
+  stepper.step(_initvector, fn, t, dt, _lasttimestep, error, (void*)&params);
   writeMembersFromValarray(grid, _initvector);
 }
 
@@ -2451,7 +2466,7 @@ void Agent::adaptiveODE2Cell(Agent* other, GrGrid& grid, double t, double dt, OD
     for(;;) {
       { //stepper->step(tmp, fn, t, h, err, params);
         params.agent = this;
-        s1->step(tmp1, fn1, t, h, err1, (void*)&params);
+        s1->step(tmp1, fn1, t, h, _lasttimestep, err1, (void*)&params);
 
         if(_PARAM(PARAM_TNFODE_EN)) //Copy to the second agent
           tmp2[fn2.tnfidx()] = tmp1[fn1.tnfidx()];
@@ -2459,7 +2474,7 @@ void Agent::adaptiveODE2Cell(Agent* other, GrGrid& grid, double t, double dt, OD
           tmp2[fn2.il10idx()] = tmp1[fn1.il10idx()];
 
         params.agent = other;
-        s2->step(tmp2, fn2, t, h, err2, (void*)&params);
+        s2->step(tmp2, fn2, t, h, _lasttimestep, err2, (void*)&params);
 
         if(_PARAM(PARAM_TNFODE_EN)) //Copy to the first agent
           tmp1[fn1.tnfidx()] = tmp2[fn2.tnfidx()];

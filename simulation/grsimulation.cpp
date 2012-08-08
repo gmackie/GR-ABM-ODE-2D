@@ -459,7 +459,14 @@ void GrSimulation::init()
         pMac->setIntMtb(1);
         ++_statsPrevious.getTotIntMtb();
         ++_stats.getTotIntMtb();
+
+//        // Place Treg in Mac Compartment for ODE Testing
+//        //DBG
+//        createTreg(it->x, it->y, g_Rand.getInt(-1, _PARAM(PARAM_TCELL_AGE), Treg::TREG_ACTIVE);
+//        //DBG
+
     }
+
 
     // Place initial extracellular bacteria on the grid
     for (PosVector::const_iterator it = initExtMtb.begin(); it != initExtMtb.end(); it++)
@@ -649,13 +656,13 @@ void GrSimulation::solve()
     }  
     }
 
-	// move macrophages
-	moveMacrophages();
+    // move macrophages
+    moveMacrophages();
 
-	// move T cells every 10 minutes
-	moveTcells();
+    // move T cells every 10 minutes
+    moveTcells();
 	
-	// Shuffle the sources and recruit agents from vascular sources every 10 minutes
+    // Shuffle the sources and recruit agents from vascular sources every 10 minutes
         getGrid().shuffleSources();
         _pRecruitment->recruit(*this);
 

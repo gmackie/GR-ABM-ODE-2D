@@ -75,7 +75,7 @@ struct EqnDeriv : DerivativeFunc {
 //Stepper interface
 struct Stepper {
   Stepper(size_t /*dim*/) {}
-  virtual void step(ODEState& i, DerivativeFunc& fn, double t, double dt, Derivative& error, void* params=0) = 0;
+  virtual void step(ODEState& i, DerivativeFunc& fn, double t, double dt, double& lasttimestep, Derivative& error, void* params=0) = 0;
   virtual size_t order() const = 0;
   virtual Stepper* clone() const = 0;
   virtual ~Stepper() {}
@@ -89,7 +89,7 @@ struct RK2Stepper : Stepper {
      a(dim),
      b(dim) {}
 
-  /*virtual*/ void step(ODEState& i, DerivativeFunc& fn, double t, double dt, Derivative& /*error*/, void* params=0) {
+  /*virtual*/ void step(ODEState& i, DerivativeFunc& fn, double t, double dt, double& /*lasttimestep*/, Derivative& /*error*/, void* params=0) {
     fn(i, t, a, params);
     a*=dt;
     fn(i+0.5*a, t+dt*0.5, b, params);
@@ -109,7 +109,7 @@ struct RK3Stepper : Stepper {
      b(dim),
      c(dim) {}
 
-  /*virtual*/ void step(ODEState& i, DerivativeFunc& fn, double t, double dt, Derivative& /*error*/, void* params=0) {
+  /*virtual*/ void step(ODEState& i, DerivativeFunc& fn, double t, double dt, double& /*lasttimestep*/, Derivative& /*error*/, void* params=0) {
     fn(i, t, a, params);
     a*=dt;
     fn(i+0.5*a, t+dt*0.5, b, params);
@@ -133,7 +133,7 @@ struct RK4Stepper : Stepper {
      d(dim),
      tmp(dim) {}
 
-  /*virtual*/ void step(ODEState& i, DerivativeFunc& fn, double t, double dt, Derivative& /*error*/, void* params=0) {
+  /*virtual*/ void step(ODEState& i, DerivativeFunc& fn, double t, double dt, double& /*lasttimestep*/, Derivative& /*error*/, void* params=0) {
     fn(i, t+0.0, a, params);
     a*=dt;
     tmp=i+0.5*a;
@@ -146,6 +146,13 @@ struct RK4Stepper : Stepper {
     fn(tmp, t+dt, d, params);
     d*=dt;
     i += (1.0 / 6.0) * (a + 2.0 * (b + c) + d);
+
+//    for (size_t j=0; j<fn.dim();j++) {
+//        std::cout << i[j] << ",";
+//    }
+
+//    std::cout << dt << std::endl;
+
   }
   /*virtual*/ size_t order() const { return 4; }
   /*virtual*/ Stepper* clone() const { return new RK4Stepper(*this); }
@@ -158,7 +165,7 @@ struct ForwardEulerStepper : Stepper {
     : Stepper(dim), 
      a(dim) {}
 
-  /*virtual*/ void step(ODEState& i, DerivativeFunc& fn, double t, double dt, Derivative& /*error*/, void* params=0) {
+  /*virtual*/ void step(ODEState& i, DerivativeFunc& fn, double t, double dt, double& /*lasttimestep*/, Derivative& /*error*/, void* params=0) {
     fn(i, t+0.0, a, params);
     a *= dt;  //Multiply itself here to prevent temporary variable creation
     i += a;
@@ -174,7 +181,7 @@ struct EulerPCStepper : Stepper {
     : Stepper(dim),
      a(dim),
      b(dim) {}
-  /*virtual*/ void step(ODEState& i, DerivativeFunc& fn, double t, double dt, Derivative& /*error*/, void* params=0) {
+  /*virtual*/ void step(ODEState& i, DerivativeFunc& fn, double t, double dt, double& /*lasttimestep*/, Derivative& /*error*/, void* params=0) {
     fn(i, t, a, params);
     a*=dt;
     fn(i+a, t, b, params);
@@ -192,7 +199,7 @@ struct HEStepper : Stepper {
     : Stepper(dim),
      a(dim),
      b(dim) {}
-  /*virtual*/ void step(ODEState& i, DerivativeFunc& fn, double t, double dt, Derivative& error, void* params=0) {
+  /*virtual*/ void step(ODEState& i, DerivativeFunc& fn, double t, double dt, double& /*lasttimestep*/, Derivative& error, void* params=0) {
     fn(i, t, a, params);
     a*=dt;
     fn(i+a, t+dt, b, params);
@@ -216,9 +223,17 @@ struct RKCKStepper : Stepper {
      d(dim),
      e(dim),
      f(dim) {}
-  /*virtual*/ void step(ODEState& i, DerivativeFunc& fn, double t, double dt, Derivative& error, void* params=0) {
-    fn(i, t, a, params);
+  /*virtual*/ void step(ODEState& i, DerivativeFunc& fn, double t, double dt, double& /*lasttimestep*/, Derivative& error, void* params=0) {
+    fn(i, t+0.0, a, params);
     a*=dt;
+
+//    std::cout<< "A Vector:" << std::endl;
+
+//    for (size_t j=0; j<fn.dim();j++) {
+//        std::cout << a[j] << std::endl;
+//    }
+
+
     fn(i+(1.0/5.0)*a, t+dt*(1.0/5.0), b, params);
     b*=dt;
     fn(i+(3.0/40.0)*a + (9.0/40.0)*b, t+dt*(3.0/10.0), c, params);
@@ -230,6 +245,12 @@ struct RKCKStepper : Stepper {
     fn(i+(1631.0/55296.0)*a + (175.0/512.0)*b + (575.0 / 13824.0)*c + (44275.0 / 110592.0)*d + (253.0/4096.0)*e, t+dt*(7.0/8.0), f, params);
     f*=dt;
     i += ((37.0/378.0) * a /*+ 0*b */ + (250.0/621.0) * c + (125.0/594.0)*d /*+ 0*e */ + (512.0/1771.0)*f);
+
+//    for (size_t j=0; j<fn.dim();j++) {
+//        std::cout << i[j] << std::endl;
+//    }
+//    std::cin.get();
+
     /* 4th order - 5th order */
     error = ((37.0/378.0 - 2825.0 / 27648.0) * a /*+ 0*b */ + (250.0/621.0 - 18575.0 / 48384.0) * c + (125.0/594.0 - 13525.0 / 55296.0)*d + (0-277.0/14336.0)*e  + (512.0/1771.0 - 0.25)*f);
   }
@@ -248,7 +269,7 @@ struct RKFStepper : Stepper {
      d(dim),
      e(dim),
      f(dim) {}
-  /*virtual*/ void step(ODEState& i, DerivativeFunc& fn, double t, double dt, Derivative& error, void* params=0) {
+  /*virtual*/ void step(ODEState& i, DerivativeFunc& fn, double t, double dt, double& /*lasttimestep*/, Derivative& error, void* params=0) {
     fn(i, t+0.0, a, params);
     a*=dt;
     fn(i+0.25*a, t+dt*0.25, b, params);
@@ -278,7 +299,7 @@ struct BSStepper : Stepper {
      b(dim),
      c(dim),
      d(dim) {}
-  /*virtual*/ void step(ODEState& i, DerivativeFunc& fn, double t, double dt, Derivative& error, void* params=0) {
+  /*virtual*/ void step(ODEState& i, DerivativeFunc& fn, double t, double dt, double& /*lasttimestep*/, Derivative& error, void* params=0) {
     fn(i, t+0.0, a, params);
     a*=dt;
     fn(i+0.5*a, t+dt*0.5, b, params);
@@ -288,7 +309,7 @@ struct BSStepper : Stepper {
     fn(i+(2.0/9.0)*a + (1.0/3.0)*b + (4.0/9.0)*c, t+dt, d, params);
     d*=dt;
     i += (2.0/9.0) * a + (1.0/3.0)*b  + (4.0/9.0) * c;
-    /* 4th order - 5th order */
+    /* 3rd order - 2nd order */
     error = (2.0/9.0 - 7.0/24.0) * a + (1.0/3.0 - 1.0/4.0)*b  + (4.0/9.0 - 1.0/3.0) * c + (0 - 1.0/8.0) * d;
   }
   /*virtual*/ size_t order() const { return 3; }
@@ -296,45 +317,214 @@ struct BSStepper : Stepper {
 };
 
 #if 1
-//TODO: Verify the adaptive stepper
+////TODO: Verify the adaptive stepper
+//struct AdaptiveStepper : Stepper {
+//  Stepper* stepper;
+//  valarray<double> dy, yscal, tmp;
+//  double TINY, MAX_STEPS, PSHRINK, PGROW, EPS, SAFETY, ERRCON;
+//  //~AdaptiveStepper() { delete stepper; }
+//  AdaptiveStepper(size_t dim, Stepper* _s, double _EPS, double _TINY=std::numeric_limits<double>::min(), double _MAX_STEPS=10000, double _PSHRINK=-0.25, double _PGROW=-0.2, double _SAFETY=0.9)
+//    : Stepper(dim), stepper(_s), dy(dim), yscal(dim), tmp(dim),
+//      TINY(_TINY), MAX_STEPS(_MAX_STEPS), PSHRINK(_PSHRINK), PGROW(_PGROW), EPS(_EPS), SAFETY(_SAFETY), ERRCON(pow(5.0/_SAFETY, 1.0/_PGROW))
+//      {}
+//  /*virtual*/ void step(ODEState& i, DerivativeFunc& fn, double t, double dt, Derivative& err, void* params=0) {
+//    tmp = i;
+//    const double t1 = t, t2 = t+dt;
+//    for(size_t st=0;st<MAX_STEPS;st++) {
+//      fn(i, t, dy, params);
+
+//      for (int j=0; j <= (int)dy.size(); j++)
+//      {
+//          std::cout << "i: " << i[j] << std::endl;
+//      }
+
+//      for (int j=0; j <= (int)dy.size(); j++)
+//      {
+//          std::cout << "dy: " << dy[j] << std::endl;
+//      }
+
+////      yscal = abs(i) + abs(dy)*dt + TINY;
+//      yscal = abs(i) + abs(dy)*dt;
+
+
+//      for (int j=0; j <= (int)yscal.size(); j++)
+//      {
+//          std::cout << "yscal: " << yscal[j] << std::endl;
+//      }
+
+//      if((t+dt - t2) * (t+dt - t1) > 0.0) //Finish up the last timestep
+//        dt = t2 - t;
+//      for(double h=dt;;) {
+//          std::cout << "CurrentStep: " << h << std::endl;
+//        stepper->step(tmp, fn, t, h, err, params);
+
+//        for (int j=0; j <= (int)err.size(); j++)
+//        {
+//            std::cout << "err: " << err[j] << std::endl;
+//        }
+
+//        const double errmax = abs(err/yscal).max() / EPS;
+
+//        std::cout << "Max Error: " << errmax << std::endl;
+
+//        std::cin.get();
+
+//        if(errmax > 1.0) {
+//          double htmp = SAFETY*h*pow(errmax, PSHRINK);
+//          h = (h > 0.0 ? max(htmp, 0.1*h) : min(htmp, 0.1*h));
+//          tmp = i;
+//        }
+//        else {
+//          if(errmax > ERRCON) dt = SAFETY*h*pow(errmax, PGROW);
+//          else dt = 5.0*h;
+//          t += h;
+//          i = tmp;
+//          std::cout << "NExtStep: " << dt << std::endl;
+//          break;
+//        }
+//      }
+//      if((t - t2)*(t2 - t1) >= 0.0)
+//        return;
+//    }
+//    assert(!"Took too many steps");
+//    //Warning! - required too many steps, increase max_steps, safety, or decrease pgrow
+//  }
+//  /*virtual*/ size_t order() const { return stepper->order(); }
+//  /*virtual*/ Stepper* clone() const {
+//    AdaptiveStepper* ret = new AdaptiveStepper(*this);
+//    ret->stepper = stepper->clone();
+//    return ret;
+//  }
+
+//};
+
+
 struct AdaptiveStepper : Stepper {
   Stepper* stepper;
   valarray<double> dy, yscal, tmp;
-  double TINY, MAX_STEPS, PSHRINK, PGROW, EPS, SAFETY, ERRCON;
+  double TINY, MAX_STEPS, PSHRINK, PGROW, EPS, SAFETY, ERRCON, ABSTOL, RELTOL, MAXSCALE, MINSCALE;
   //~AdaptiveStepper() { delete stepper; }
-  AdaptiveStepper(size_t dim, Stepper* _s, double _EPS, double _TINY=std::numeric_limits<double>::min(), double _MAX_STEPS=10000, double _PSHRINK=-0.25, double _PGROW=-0.2, double _SAFETY=0.9)
+  AdaptiveStepper(size_t dim, Stepper* _s, double _EPS, double _TINY=std::numeric_limits<double>::min(), double _MAX_STEPS=10000, double _PSHRINK=-0.25,
+                  double _PGROW=-0.2, double _SAFETY=0.95, double _ABSTOL=1e-6, double _RELTOL = 1e-5, double _MAXSCALE = 10.0, double _MINSCALE = 0.2)
     : Stepper(dim), stepper(_s), dy(dim), yscal(dim), tmp(dim),
-      TINY(_TINY), MAX_STEPS(_MAX_STEPS), PSHRINK(_PSHRINK), PGROW(_PGROW), EPS(_EPS), SAFETY(_SAFETY), ERRCON(pow(5.0/_SAFETY, 1.0/_PGROW))
+      TINY(_TINY), MAX_STEPS(_MAX_STEPS), PSHRINK(_PSHRINK), PGROW(_PGROW), EPS(_EPS), SAFETY(_SAFETY), ERRCON(pow(5.0/_SAFETY, 1.0/_PGROW)), ABSTOL(_ABSTOL),
+      RELTOL(_RELTOL), MAXSCALE(_MAXSCALE), MINSCALE(_MINSCALE)
       {}
-  /*virtual*/ void step(ODEState& i, DerivativeFunc& fn, double t, double dt, Derivative& err, void* params=0) {
-    tmp = i;
-    const double t1 = t, t2 = t+dt;
+  /*virtual*/ void step(ODEState& i, DerivativeFunc& fn, double t, double dt, double& lasttimestep, Derivative& err, void* params=0) {
+    tmp = i; // Write initial to tmp
+
+    const double t1 = t, t2 = t+dt; // define start time and end time
+    const double maxlasttimestep = (2.0/3.0)*dt;
+
+    dt = lasttimestep;
+//    std::cout << "New Diffusion Step" << std::endl;
+
     for(size_t st=0;st<MAX_STEPS;st++) {
-      fn(i, t, dy, params);
-      yscal = abs(i) + abs(dy)*dt + TINY;
-      if((t+dt - t2) * (t+dt - t1) > 0.0) //Finish up the last timestep
-        dt = t2 - t;
-      for(double h=dt;;) {
-        stepper->step(tmp, fn, t, h, err, params);
-        const double errmax = abs(err/yscal).max() / EPS;
-        if(errmax > 1.0) {
-          double htmp = SAFETY*h*pow(errmax, PSHRINK);
-          h = (h > 0.0 ? max(htmp, 0.1*h) : min(htmp, 0.1*h));
-          tmp = i;
+
+        bool reject=false;
+
+//        std::cout << "New Step" << std::endl;
+//        for (size_t j=0; j<fn.dim(); j++) {
+//            std::cout << "Init: " << i[j] << std::endl;
+//        }
+
+        if((t+dt - t2) * (t+dt - t1) > 0.0) //Finish up the last timestep
+            dt = t2 - t;
+
+        for(;;) {
+
+            double h=dt; // Set the temperary timestep to its intial value passed in from function call
+//            std::cout << "Timestep: " << h << " Total Time: " << t << std::endl;
+            stepper->step(tmp, fn, t, h, lasttimestep, err, params); // Attempt a step
+
+//            for (size_t j=0; j<fn.dim(); j++) {
+//                std::cout << "Tmp: " << tmp[j] << std::endl;
+//            }
+
+//            for (size_t j=0; j<fn.dim(); j++) {
+//                std::cout << "Err: " << err[j] << std::endl;
+//            }
+
+//            std::cin.get();
+
+
+            // Evaluate accuracy of attempted step
+            // Ignore absolute tolerance since we have vast differences in magnitude
+            double sk, error=0.0, errornorm, scale;
+            for (size_t j=0; j<fn.dim(); j++) {
+                sk = ABSTOL + (RELTOL*std::max(abs(i[j]+TINY),abs(tmp[j]+TINY)));
+                error += (err[j]/sk)*(err[j]/sk);
+//                std::cout << "Error: " << error << std::endl;
+            }
+
+            // Compute the norm of the error
+            errornorm = sqrt(error/fn.dim());
+
+//            std::cout << "Normal Error: " << errornorm << std::endl;
+
+            // Do not use PI error control
+            if (errornorm <= 1.0) {
+                if (errornorm == 1.0) {
+                    scale = MAXSCALE;
+                }
+                else {
+                    scale = SAFETY*pow(errornorm,PGROW);
+//                    std::cout << "Scale: " << scale << std::endl;
+                    scale = scale < MINSCALE ? MINSCALE : scale;
+                    scale = scale > MAXSCALE ? MAXSCALE : scale;
+                }
+
+//                std::cout << "Scale: " << scale << std::endl;
+
+                if (reject)
+                    dt = h*std::min(scale,1.0);
+                else
+                    dt = h*scale;
+                reject=false;
+                t += h;
+                i = tmp;
+
+//                std::cout<< "I Vector:" << std::endl;
+
+//                for (size_t j=0; j<fn.dim();j++) {
+//                    std::cout << i[j] << ",";
+//                }
+
+//                std::cout << h << std::endl;
+
+                lasttimestep = std::min(dt, maxlasttimestep);
+//                std::cin.get();
+                break;
+            }
+            else {
+                scale = std::max(SAFETY*pow(errornorm,PGROW), MINSCALE);
+                dt = h*scale;
+
+//                std::cout<< "Tmp Vector:" << std::endl;
+
+//                for (size_t j=0; j<fn.dim();j++) {
+//                    std::cout << tmp[j] << std::endl;
+//                }
+
+//                std::cin.get();
+
+                tmp = i;
+                reject=true;
+
+
+
+            }
+//            std::cout << "Reject: " << reject << std::endl;
+//            std::cin.get();
         }
-        else {
-          if(errmax > ERRCON) dt = SAFETY*h*pow(errmax, PGROW);
-          else dt = 5.0*h;
-          t += h;
-          i = tmp;
-          break;
+        if((t - t2)*(t2 - t1) >= 0.0)
+          {
+//            std::cout << "Last Written Timestep: " << lasttimestep << std::endl;
+            return;
         }
-      }
-      if((t - t2)*(t2 - t1) >= 0.0)
-        return;
+
     }
-    assert(!"Took too many steps");
-    //Warning! - required too many steps, increase max_steps, safety, or decrease pgrow
+        assert(!"Took too many steps");
   }
   /*virtual*/ size_t order() const { return stepper->order(); }
   /*virtual*/ Stepper* clone() const {
@@ -344,6 +534,9 @@ struct AdaptiveStepper : Stepper {
   }
 
 };
+
+
+
 #endif
 
 enum ODEMethod {

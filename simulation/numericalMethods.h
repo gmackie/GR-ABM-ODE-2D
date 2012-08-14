@@ -194,15 +194,17 @@ struct EulerPCStepper : Stepper {
 
 //Heun-Euler. http://en.wikipedia.org/wiki/List_of_Runge%E2%80%93Kutta_methods#Heun.E2.80.93Euler
 struct HEStepper : Stepper {
-  Derivative a, b;
+  Derivative a, b, tmp;
   HEStepper(size_t dim)
     : Stepper(dim),
      a(dim),
-     b(dim) {}
+     b(dim),
+     tmp(dim) {}
   /*virtual*/ void step(ODEState& i, DerivativeFunc& fn, double t, double dt, double& /*lasttimestep*/, Derivative& error, void* params=0) {
     fn(i, t, a, params);
     a*=dt;
-    fn(i+a, t+dt, b, params);
+    tmp=i+a;
+    fn(tmp, t+dt, b, params);
     b*=dt;
     i += ((1.0/2.0) * a + (1.0/2.0)*b );
     /* 1st order - 2nd order */
@@ -214,7 +216,7 @@ struct HEStepper : Stepper {
 
 //Runge-Kutta Cash-Karp. \ref http://en.wikipedia.org/wiki/List_of_Runge%E2%80%93Kutta_methods#Cash-Karp
 struct RKCKStepper : Stepper {
-  Derivative a, b, c, d, e, f;
+  Derivative a, b, c, d, e, f, tmp;
   RKCKStepper(size_t dim)
     : Stepper(dim),
      a(dim),
@@ -222,37 +224,30 @@ struct RKCKStepper : Stepper {
      c(dim),
      d(dim),
      e(dim),
-     f(dim) {}
+     f(dim),
+     tmp(dim) {}
   /*virtual*/ void step(ODEState& i, DerivativeFunc& fn, double t, double dt, double& /*lasttimestep*/, Derivative& error, void* params=0) {
     fn(i, t+0.0, a, params);
     a*=dt;
-
-//    std::cout<< "A Vector:" << std::endl;
-
-//    for (size_t j=0; j<fn.dim();j++) {
-//        std::cout << a[j] << std::endl;
-//    }
-
-
-    fn(i+(1.0/5.0)*a, t+dt*(1.0/5.0), b, params);
+    tmp = i+(1.0/5.0)*a;
+    fn(tmp, t+dt*(1.0/5.0), b, params);
     b*=dt;
-    fn(i+(3.0/40.0)*a + (9.0/40.0)*b, t+dt*(3.0/10.0), c, params);
+    tmp = i+(3.0/40.0)*a + (9.0/40.0)*b;
+    fn(tmp, t+dt*(3.0/10.0), c, params);
     c*=dt;
-    fn(i+(3.0/10.0)*a + (-9.0/10.0)*b + (6.0 / 5.0)*c, t+dt*(3.0/5.0), d, params);
+    tmp = i+(3.0/10.0)*a + (-9.0/10.0)*b + (6.0 / 5.0)*c;
+    fn(tmp, t+dt*(3.0/5.0), d, params);
     d*=dt;
-    fn(i+(-11.0/54.0)*a + (5.0/2.0)*b + (-70.0 / 27.0)*c + (35.0 / 27.0)*d, t+dt, e, params);
+    tmp = i+(-11.0/54.0)*a + (5.0/2.0)*b + (-70.0 / 27.0)*c + (35.0 / 27.0)*d;
+    fn(tmp, t+dt, e, params);
     e*=dt;
-    fn(i+(1631.0/55296.0)*a + (175.0/512.0)*b + (575.0 / 13824.0)*c + (44275.0 / 110592.0)*d + (253.0/4096.0)*e, t+dt*(7.0/8.0), f, params);
+    tmp = i+(1631.0/55296.0)*a + (175.0/512.0)*b + (575.0 / 13824.0)*c + (44275.0 / 110592.0)*d + (253.0/4096.0)*e;
+    fn(tmp, t+dt*(7.0/8.0), f, params);
     f*=dt;
     i += ((37.0/378.0) * a /*+ 0*b */ + (250.0/621.0) * c + (125.0/594.0)*d /*+ 0*e */ + (512.0/1771.0)*f);
 
-//    for (size_t j=0; j<fn.dim();j++) {
-//        std::cout << i[j] << std::endl;
-//    }
-//    std::cin.get();
-
     /* 4th order - 5th order */
-    error = ((37.0/378.0 - 2825.0 / 27648.0) * a /*+ 0*b */ + (250.0/621.0 - 18575.0 / 48384.0) * c + (125.0/594.0 - 13525.0 / 55296.0)*d + (0-277.0/14336.0)*e  + (512.0/1771.0 - 0.25)*f);
+    error = ((37.0/378.0 - 2825.0 / 27648.0) * a /*+ 0*b */ + (250.0/621.0 - 18575.0 / 48384.0) * c + (125.0/594.0 - 13525.0 / 55296.0)*d + (-277.0/14336.0)*e  + (512.0/1771.0 - 0.25)*f);
   }
   /*virtual*/ size_t order() const { return 4; }
   /*virtual*/ Stepper* clone() const { return new RKCKStepper(*this); }
@@ -292,21 +287,25 @@ struct RKFStepper : Stepper {
 
 //Bogacki-Shampine. \ref http://en.wikipedia.org/wiki/List_of_Runge%E2%80%93Kutta_methods#Bogacki.E2.80.93Shampine
 struct BSStepper : Stepper {
-  Derivative a, b, c, d;
+  Derivative a, b, c, d, tmp;
   BSStepper(size_t dim)
     : Stepper(dim),
      a(dim),
      b(dim),
      c(dim),
-     d(dim) {}
+     d(dim),
+     tmp(dim) {}
   /*virtual*/ void step(ODEState& i, DerivativeFunc& fn, double t, double dt, double& /*lasttimestep*/, Derivative& error, void* params=0) {
     fn(i, t+0.0, a, params);
     a*=dt;
-    fn(i+0.5*a, t+dt*0.5, b, params);
+    tmp = i+0.5*a;
+    fn(tmp, t+dt*0.5, b, params);
     b*=dt;
-    fn(i+(3.0/4.0)*b, t+dt*(3.0/4.0), c, params);
+    tmp = i+(3.0/4.0)*b;
+    fn(tmp, t+dt*(3.0/4.0), c, params);
     c*=dt;
-    fn(i+(2.0/9.0)*a + (1.0/3.0)*b + (4.0/9.0)*c, t+dt, d, params);
+    tmp = i+(2.0/9.0)*a + (1.0/3.0)*b + (4.0/9.0)*c;
+    fn(tmp, t+dt, d, params);
     d*=dt;
     i += (2.0/9.0) * a + (1.0/3.0)*b  + (4.0/9.0) * c;
     /* 3rd order - 2nd order */

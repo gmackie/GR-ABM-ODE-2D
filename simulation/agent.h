@@ -58,6 +58,8 @@ protected:
   P(Scalar, surfBoundIL10R, 0.0, "No. of bound cell surface IL10R") \
   P(Scalar, kISynth, 0.0, "")  \
   P(Scalar, meanIL10R, 0.0, "") \
+  \
+  P(Scalar, M1M2Ratio, 0.0, "surfBoundTNFR1 / max(surfBoundIL10R1, 1) - updated in grsimulation") \
 	/* NF-kB signaling pathway components  */ \
 	P(Scalar, IKKKa, 0.0, "(IKKK in active state)") \
 	P(Scalar, IKKn, (_PARAM(PARAM_GR_KNN)), "(IKK in neutral state)") \
@@ -154,6 +156,8 @@ public:
 	virtual void computeNextState(const int time, GrGrid& grid, Stats& stats, bool tnfrDynamics, bool nfkbDynamics, bool il10rDynamics, bool tgammatransition) = 0;
 	virtual void updateState() = 0;
   virtual void updateStatistics(Stats& s) const = 0;
+  void updateM1M2Ratio()
+    { _M1M2Ratio = getsurfBoundTNFR1() / std::max(getsurfBoundIL10R(), 1.0); }
   void writeValarrayFromMembers(GrGrid& grid, valarray<double>& inputVector);
   void writeMembersFromValarray(GrGrid& grid, const valarray<double>& inputVector);
 

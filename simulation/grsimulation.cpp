@@ -784,6 +784,7 @@ void GrSimulation::computeNextStates()
 	for (MacList::iterator it = _macList.begin(); it != _macList.end(); it++)
 	{
 		(*it)->computeNextState(_time, _grid.getGrid(), _stats, _tnfrDynamics, _nfkbDynamics, _il10rDynamics, _tgammatransition);
+		(*it)->updateM1M2Ratio(); //Only for macs... should refactor this better...
 	}
 	for (TgamList::iterator it = _tgamList.begin(); it != _tgamList.end(); it++)
 	{

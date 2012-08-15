@@ -302,8 +302,6 @@ void AgentHistogram::showCurve(QwtPlotItem* curve)
       QwtPlotCurve* c = curves[i];
       if(c != curve)
         c->hide();
-      else
-        ui->centralwidget->setAxisScale(QwtPlot::xBottom, this->min[i], this->max[i]);
     }
   ui->centralwidget->setTitle(curve->title());
   ui->centralwidget->replot();

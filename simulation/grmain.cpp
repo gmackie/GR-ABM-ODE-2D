@@ -235,8 +235,9 @@ public:
 };
 
 class MolecularTrackingStats : public oCSVStream {
+  bool trackAll;
 public:
-	MolecularTrackingStats(std::ostream* s) : oCSVStream(s) { outputHeader(); }
+	MolecularTrackingStats(std::ostream* s, bool _trackAll=false) : oCSVStream(s), trackAll(_trackAll) { outputHeader(); }
 
 	void outputHeader() {
 		write("time");
@@ -254,6 +255,8 @@ public:
 		// IL10 associated attributes
 		write("surfIL10R"); write("vIL10R"); write("surfBoundIL10R"); write("kISynth");
 
+    write("M1M2Ratio");
+
 		endRow();
 	}
 
@@ -264,7 +267,7 @@ public:
 		MacList macList = sim.getMacList();
 		for (MacList::iterator it = macList.begin(); it != macList.end(); it++)
 		{
-			if ((*it)->gettrackMolecularDynamics())
+			if (trackAll || (*it)->gettrackMolecularDynamics())
 			{
 				saveAgentRow(sim.getTime(), **it);
 			}
@@ -285,7 +288,7 @@ public:
 
 		if (agent.getAgentType() == MAC)
 		{
-			Mac& m = dynamic_cast<Mac&>(agent);
+			Mac& m = static_cast<Mac&>(agent);
 			write(m.getIntMtb());
 		}
 		else
@@ -314,6 +317,8 @@ public:
 		write(agent.getvIL10R());
 		write(agent.getsurfBoundIL10R());
 		write(agent.getkISynth());
+
+    write(agent.getM1M2Ratio());
 
 		oCSVStream::endRow();
   }
@@ -571,7 +576,8 @@ int main(int argc, char** argv)
   ("csv-interval", po::value<unsigned>()->default_value(1), "CSV update interval (10 min timesteps)")
   ("molecular-track-radius", po::value(&molecularTrackingRadius)->default_value(0.0), "Radius from center of grid of initial cells to track molecular dynamics. 0 means don't track any cells.")
   ("molecular-track-ids", po::value(&track_ids), "Comma-seperated list of ids to track")
-  ("molecular-track-file", po::value<std::string>(&molecularTrackingFileName), "File name to hold molecular dynamics cell tracking data");
+  ("molecular-track-file", po::value<std::string>(&molecularTrackingFileName), "File name to hold molecular dynamics cell tracking data")
+  ("trackAll", "Track all agents at all times for molecular tracking");
 
   po::options_description sim_opts("Simulation");
   sim_opts.add_options()
@@ -780,15 +786,12 @@ int main(int argc, char** argv)
     csvStreams.push_back(new GeneralStats(f));
   }
 
-  if(molecularTrackingRadius > 0 || ids.size() > 0)
+  if (!molecularTrackingFileName.empty())
   {
-	  if (!molecularTrackingFileName.empty())
-	  {
-		stringstream ss;
-		ss << outputDir << molecularTrackingFileName << g_Rand.getSeed() <<".csv";
-		ofstream* f = new ofstream(ss.str().c_str());
-		csvStreams.push_back(new MolecularTrackingStats(f));
-	  }
+    stringstream ss;
+    ss << outputDir << molecularTrackingFileName << g_Rand.getSeed() <<".csv";
+    ofstream* f = new ofstream(ss.str().c_str());
+    csvStreams.push_back(new MolecularTrackingStats(f, vm.count("trackAll")));
   }
 
   run(pSim, vm["state-interval"].as<unsigned>(), vm["csv-interval"].as<unsigned>(),

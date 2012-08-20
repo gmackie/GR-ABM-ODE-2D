@@ -413,115 +413,60 @@ struct AdaptiveStepper : Stepper {
     tmp = i; // Write initial to tmp
 
     const double t1 = t, t2 = t+dt; // define start time and end time
-    const double maxlasttimestep = (2.0/3.0)*dt;
-
+    const double maxlasttimestep = (2.0/3.0)*dt; // Don't be too greedy
+    const size_t dim = fn.dim(); // Use fn.dim() as little as possible
+    double sk,error=0.0, errornorm, scale;
     dt = lasttimestep;
-//    std::cout << "New Diffusion Step" << std::endl;
 
     for(size_t st=0;st<MAX_STEPS;st++) {
 
         bool reject=false;
 
-//        std::cout << "New Step" << std::endl;
-//        for (size_t j=0; j<fn.dim(); j++) {
-//            std::cout << "Init: " << i[j] << std::endl;
-//        }
-
         if((t+dt - t2) * (t+dt - t1) > 0.0) //Finish up the last timestep
             dt = t2 - t;
 
         for(;;) {
-
-            double h=dt; // Set the temperary timestep to its intial value passed in from function call
-//            std::cout << "Timestep: " << h << " Total Time: " << t << std::endl;
+            double h=dt; // Set the temperary timestep to its intial value passed in from function call or its last value predicted
             stepper->step(tmp, fn, t, h, lasttimestep, err, params); // Attempt a step
-
-//            for (size_t j=0; j<fn.dim(); j++) {
-//                std::cout << "Tmp: " << tmp[j] << std::endl;
-//            }
-
-//            for (size_t j=0; j<fn.dim(); j++) {
-//                std::cout << "Err: " << err[j] << std::endl;
-//            }
-
-//            std::cin.get();
-
 
             // Evaluate accuracy of attempted step
             // Ignore absolute tolerance since we have vast differences in magnitude
-            double sk, error=0.0, errornorm, scale;
-            for (size_t j=0; j<fn.dim(); j++) {
+
+            for (size_t j=0; j<dim; j++) {
                 sk = ABSTOL + (RELTOL*std::max(abs(i[j]+TINY),abs(tmp[j]+TINY)));
                 error += (err[j]/sk)*(err[j]/sk);
-//                std::cout << "Error: " << error << std::endl;
             }
 
             // Compute the norm of the error
-            errornorm = sqrt(error/fn.dim());
-
-//            std::cout << "Normal Error: " << errornorm << std::endl;
+            errornorm = sqrt(error/dim);
 
             // Do not use PI error control
             if (errornorm <= 1.0) {
-                if (errornorm == 1.0) {
-                    scale = MAXSCALE;
-                }
-                else {
-                    scale = SAFETY*pow(errornorm,PGROW);
-//                    std::cout << "Scale: " << scale << std::endl;
-                    scale = scale < MINSCALE ? MINSCALE : scale;
-                    scale = scale > MAXSCALE ? MAXSCALE : scale;
-                }
-
-//                std::cout << "Scale: " << scale << std::endl;
+                scale = SAFETY*pow(errornorm,PGROW);
+                scale = scale < MINSCALE ? MINSCALE : scale;
+                scale = scale > MAXSCALE ? MAXSCALE : scale;
 
                 if (reject)
                     dt = h*std::min(scale,1.0);
                 else
+                {
                     dt = h*scale;
-                reject=false;
-                t += h;
-                i = tmp;
-
-//                std::cout<< "I Vector:" << std::endl;
-
-//                for (size_t j=0; j<fn.dim();j++) {
-//                    std::cout << i[j] << ",";
-//                }
-
-//                std::cout << h << std::endl;
-
-                lasttimestep = std::min(dt, maxlasttimestep);
-//                std::cin.get();
+                    reject=false;
+                    t += h;
+                    i = tmp;
+                    lasttimestep = std::min(dt, maxlasttimestep);
                 break;
+                }
             }
             else {
                 scale = std::max(SAFETY*pow(errornorm,PGROW), MINSCALE);
                 dt = h*scale;
-
-//                std::cout<< "Tmp Vector:" << std::endl;
-
-//                for (size_t j=0; j<fn.dim();j++) {
-//                    std::cout << tmp[j] << std::endl;
-//                }
-
-//                std::cin.get();
-
                 tmp = i;
                 reject=true;
-
-
-
             }
-//            std::cout << "Reject: " << reject << std::endl;
-//            std::cin.get();
         }
         if((t - t2)*(t2 - t1) >= 0.0)
-          {
-//            std::cout << "Last Written Timestep: " << lasttimestep << std::endl;
             return;
-        }
-
     }
         assert(!"Took too many steps");
   }

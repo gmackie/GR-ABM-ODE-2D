@@ -632,7 +632,6 @@ void GrSimulation::solve()
     
     // Calculate Diffusion and Molecular events for a 10 min timestep
     // Agent time step is 600 s (10 min)
-	
 	for (int DiffStep = 0; DiffStep < _numDiffusionPerAgent; DiffStep++) 
 	{
     _pDiffusion->diffuse(_grid);

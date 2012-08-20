@@ -163,7 +163,7 @@ void Tcyt::handleActive(const int, GrGrid& grid, Stats& stats)
             pMac->kill();
             ++stats.getKillCytotoxic();
             // contribute to caseation
-//            if (!grid.incKillings(coord))
+            if (!grid.incKillings(coord))
                 _nextState = TCYT_ACTIVE;
         }
         else if (pMac->getState() == Mac::MAC_CINFECTED)
@@ -174,7 +174,7 @@ void Tcyt::handleActive(const int, GrGrid& grid, Stats& stats)
                 pMac->setIntMtb(0);
                 pMac->kill();
                 ++stats.getKillCytotoxic();
-//                if (!grid.incKillings(coord))
+                if (!grid.incKillings(coord))
                     _nextState = TCYT_ACTIVE;
             }
             else

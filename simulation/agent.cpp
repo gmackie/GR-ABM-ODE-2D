@@ -2425,12 +2425,13 @@ void Agent::solveMolecularScaleAdaptive(GrGrid& grid, double t, double dt, ODESo
 void Agent::adaptiveODE(GrGrid& grid, double t, double dt, ODESolvers::ODEMethod method) {
   writeValarrayFromMembers(grid, _initvector);  //With some pointer magic, should be able to remove this...
   LungFunc& fn = *getDerivFunc();
-  valarray<double> error(fn.dim());
+  const size_t  dim = fn.dim(); // Avoid calling fn.dim() at all costs
+  valarray<double> error(dim);
   static LungFunc::Params_t params;
   params.agent = this;
   params.grid = &grid;
   ODESolvers::Stepper* s1 = getStepper(method);
-  ODESolvers::AdaptiveStepper stepper(fn.dim(), s1, EPS, TINY, MAXSTEP, PSHRINK, PGROW, SAFETY, ABSTOL, RELTOL, MAXSCALE, MINSCALE); // Just use the adaptive stepper from ODESolvers, not very efficient
+  ODESolvers::AdaptiveStepper stepper(dim, s1, EPS, TINY, MAXSTEP, PSHRINK, PGROW, SAFETY, ABSTOL, RELTOL, MAXSCALE, MINSCALE); // Just use the adaptive stepper from ODESolvers, not very efficient
   stepper.step(_initvector, fn, t, dt, _lasttimestep, error, (void*)&params);
   writeMembersFromValarray(grid, _initvector);
 }

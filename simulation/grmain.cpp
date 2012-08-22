@@ -51,6 +51,9 @@ public:
   void endRow() { (*f)<<std::endl; }
   virtual void saveRow(const GrSimulation& sim) = 0;
 };
+
+template<>
+void oCSVStream::operator<<(const bool& data) { (*f)<<data<<','; }
 template<>
 void oCSVStream::operator<<(const unsigned& data) { (*f)<<data<<','; }
 
@@ -244,6 +247,9 @@ public:
 		write("cellID");
 		write("cellType");
 		write("cellState");
+    write("stat1");
+    write("deact");
+    write("nfkb");
 
 		write("intMtb"); // 0 for T cells
 
@@ -289,12 +295,17 @@ public:
 		if (agent.getAgentType() == MAC)
 		{
 			Mac& m = static_cast<Mac&>(agent);
+      write(m.getStat1());
+      write(m.isDeactivated());
+      write(m.getNFkB());
 			write(m.getIntMtb());
 		}
-		else
+		else  //Tcell and others
 		{
+      write(false);
+      write(false);
+      write(false);
 			write(0);
-			write(0.0);
 		}
 
 		// TNF associated attributes

@@ -1,16 +1,19 @@
 OS := $(shell grep -E 'Ubuntu|Red Hat' /etc/issue)
 
-ifndef BOOST_PREFIX
-BOOST_PREFIX := /usr
-endif
-
 SVNREV := $(shell svn info | grep "Last Changed Rev:" | cut -d" " -f4)
 CXX := g++
 
+
+ifndef BOOST_PREFIX
+BOOST_PREFIX := /usr
+endif
 override CXXFLAGS += -DSVN_VERSION=\"$(SVNREV)\" -Wall -W -I$(BOOST_PREFIX)/include -Wno-strict-aliasing -Wno-unknown-pragmas
 
-# boost_system needed on Purdue Condor when using boost_filesystem.
-override LDFLAGS += -L$(BOOST_PREFIX)/lib -lm -lboost_program_options -lboost_iostreams -lboost_serialization -lboost_filesystem -lboost_system
+BOOST_LIBS := boost_program_options boost_iostreams boost_serialization boost_filesystem boost_system
+ifneq ($(wildcard ${BOOST_PREFIX}/lib/*boost_program_options*-mt*), )
+  BOOST_LIBS := $(addsuffix -mt, ${BOOST_LIBS})
+endif
+override LDFLAGS += -lm -lz -L${BOOST_PREFIX}/lib $(addprefix -l, $(BOOST_LIBS))
 
 all: release
 

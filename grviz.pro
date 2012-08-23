@@ -172,19 +172,22 @@ QMAKE_CXXFLAGS_RELEASE -= -O2 -Wno-strict-aliasing
 QMAKE_CXXFLAGS_RELEASE += -O3 -Wno-strict-aliasing
 QMAKE_LFLAGS_RELEASE += -fopenmp -DOPENMP
 
+BOOST_PREFIX=$$(BOOST_PREFIX) #Grab the environment variable
+isEmpty(BOOST_PREFIX) {
+  warning("BOOST_PREFIX not defined, defaulting to /usr")
+  BOOST_PREFIX=/usr
+}
 INCLUDEPATH *= $$quote($(BOOST_PREFIX)/include)
 
-unix:system(grep -qE \"Ubuntu|Red Hat\" /etc/issue) {
-  LIBS *= -lboost_program_options -lboost_iostreams -lboost_serialization
-  QMAKE_LIBDIR = ${BOOST_PREFIX}/lib  $${QMAKE_LIBDIR}
-} else:unix|macx {
-  LIBS *= -lboost_program_options -lboost_iostreams -lboost_serialization
-  QMAKE_LIBDIR = ${BOOST_PREFIX}/lib  $${QMAKE_LIBDIR}
+BOOST_LIBS=boost_program_options boost_iostreams boost_serialization
+LIBS *= -L$${BOOST_PREFIX}/lib
+for(lib, BOOST_LIBS) {
+  !exists($${BOOST_PREFIX}/lib/*$${lib}*):error("Unable to find boost library:" $${lib})
+  exists($${BOOST_PREFIX}/lib/*$${lib}*-mt*):lib=$${lib}-mt
+  LIBS *= -l$${lib}
 }
 
-unix:!macx {
-  LIBS *= -lGLU
-}
+unix:!macx:LIBS *= -lGLU
 
 exists( .git/ ) {
       VERSION = $$quote($$system(git svn find-rev HEAD))
@@ -222,5 +225,3 @@ release {
 
 # This is for g++ code only.  Use this if you are compiling the executable for ONE MACHINE only
 # DO NOT move the generated executable to another machine with this option on
-
-#unix|win32: LIBS += -lqwt5

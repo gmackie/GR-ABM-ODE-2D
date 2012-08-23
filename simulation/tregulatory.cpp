@@ -133,22 +133,15 @@ void Treg::handleResting(const int time, GrGrid& grid, Stats& stats)
 				  {
 					  Scalar coinFlip = g_Rand.getReal();
 
-                      // Scale Treg deactivation by TNF concentration (only monitor molecule we have) as a proxy for
+                      // Scale Treg deactivation by TNF and IL10 concentration (only monitor molecules we have) as a proxy for
                       // feedback to TGF-b cell-cell contact mechanism
-                      Scalar scaledProbTNF = ((_PARAM(PARAM_TREG_PROB_DEACTIVATE) * currentTNF)/(currentTNF + 8000)); // THIS NEEDS TO BE NON-HARD CODED!!!!! FIXXXXXXXXXXX
+                      // TNF is a MM type eqn
+                      // IL10 is an exponential decay
+                      // These are inverse equations of each other since TNF would upregulate the 'Monitor Molecule' while IL10 would
+                      // downregulate the 'Monitor Molecule'
+                      Scalar scaledProbTNF = ((_PARAM(PARAM_TREG_PROB_DEACTIVATE) * currentTNF)/(currentTNF + _PARAM(PARAM_TREG_DEACTIVATE_HALF_SAT_TNF)));
+                      Scalar scaledProbIL10 = _PARAM(PARAM_TREG_PROB_DEACTIVATE) * pow(2.7183, -_PARAM(PARAM_TREG_DEACTIVATE_HALF_SAT_IL10) * currentIL10);
 
-//                      Scalar scaledProb = (_PARAM(PARAM_TREG_PROB_DEACTIVATE)*(1.0/_PARAM(PARAM_TREG_DEACTIVATE_HALF_SAT))*currentTNF);
-
-//                      Scalar scaledProb = (_PARAM(PARAM_TREG_PROB_DEACTIVATE)*(1.0/(_PARAM(PARAM_TREG_DEACTIVATE_HALF_SAT) * _PARAM(PARAM_TREG_DEACTIVATE_HALF_SAT)))*currentTNF*currentTNF);
-
-//                      Scalar scaledProb = _PARAM(PARAM_TREG_PROB_DEACTIVATE) - ((1.0/_PARAM(PARAM_TREG_DEACTIVATE_HALF_SAT)) * currentIL10);
-                      Scalar scaledProbIL10 = _PARAM(PARAM_TREG_PROB_DEACTIVATE) * pow(2.7183, -_PARAM(PARAM_TREG_DEACTIVATE_HALF_SAT) * currentIL10);
-
-//                      Scalar scaledProb = _PARAM(PARAM_TREG_PROB_DEACTIVATE);
-
-
-//                      scaledProb = std::min(scaledProb, _PARAM(PARAM_TREG_PROB_DEACTIVATE));
-//                      scaledProb = std::max(scaledProb, 0.0);
                       Scalar scaledProb = std::min((scaledProbTNF + scaledProbIL10), _PARAM(PARAM_TREG_PROB_DEACTIVATE));
 
 //                      std::cout << "Pos :" << _pos << "  IL10: " << grid.il10(_pos) << "  TNF: " << grid.TNF(_pos) << "  Scaled Prob: " << scaledProb << std::endl;

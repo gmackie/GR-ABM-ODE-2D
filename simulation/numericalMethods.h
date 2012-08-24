@@ -10,13 +10,28 @@
 using namespace std;
 
 namespace ODESolvers {
+
 typedef valarray<double> ODEState;
 typedef valarray<double> Derivative;
 
-//typedef void (*DerivativeFunc)(const ODEState& i, double t, double dt, const Derivative& d, Derivative& out);
-
+/**
+* @brief Base class for defining derivative functions
+*/
 struct DerivativeFunc {
+  /**
+  * @brief 
+  *
+  * @param[in] s initial state (i.e. x)
+  * @param[in] t time
+  * @param[out] output derivative (i.e. dy/dt)
+  * @param[in] params Constant parameters over the integration
+  */
   virtual void operator()(const ODEState& /*s*/, double /*t*/, Derivative& /*out*/, void* /*params*/) const {}
+  /**
+  * @brief Dimension of ode
+  *
+  * @return number of variables needed for ode (default=0)
+  */
   virtual size_t dim() const { return 0; }  //it's own null object
   virtual ~DerivativeFunc() {}
 };
@@ -48,7 +63,6 @@ struct SpringDeriv : DerivativeFunc {
   }
 #endif
 };
-#endif
 // Testing Function for dependent variable functions
 // u' = -2*u + t + 4
 struct EqnDeriv : DerivativeFunc {
@@ -65,23 +79,41 @@ struct EqnDeriv : DerivativeFunc {
     return 0.25*(2*t - 3*exp(-2*t) + 7);
   }
 };
-
+#endif
 ///*** END TESTING METHODS ***///
 
 // ************
 // * Steppers *
 // ************
 
-//Stepper interface
+/**
+* @brief Stepper base class for defining new stepping integration methods
+*/
 struct Stepper {
   Stepper(size_t /*dim*/) {}
+  /**
+  * @brief Calculates y_t+1 given y_t and y'_t = f(y_t, t)
+  *
+  * @param[out] i Initial state of odes (aka y_t).  After the call, this will be y_t+1
+  * @param fn DerivativeFunc that defines f(y_t,t)
+  * @param t Initial time point
+  * @param dt Step size
+  * @param lasttimestep Last time step used (only used for adaptive methods)
+  * @param[out] error Estimated error (only used for adaptive methods)
+  * @param params Constant extra parameters used in f(y_t,t)
+  */
   virtual void step(ODEState& i, DerivativeFunc& fn, double t, double dt, double& lasttimestep, Derivative& error, void* params=0) = 0;
+  /**
+  * @brief Order or accuracy of the method
+  *
+  * @return 
+  */
   virtual size_t order() const = 0;
   virtual Stepper* clone() const = 0;
   virtual ~Stepper() {}
 };
 
-//Runge-Kutta 3rd order. \ref http://en.wikipedia.org/wiki/List_of_Runge%E2%80%93Kutta_methods#Kutta.27s_third-order_method
+///Runge-Kutta 2nd order. <a href="http://en.wikipedia.org/wiki/List_of_Runge%E2%80%93Kutta_methods#Kutta.27s_third-order_method">Reference</a>
 struct RK2Stepper : Stepper {
   Derivative a, b;
   RK2Stepper(size_t dim)
@@ -100,7 +132,7 @@ struct RK2Stepper : Stepper {
   /*virtual*/ Stepper* clone() const { return new RK2Stepper(*this); }
 };
 
-//Runge-Kutta 3rd order. \ref http://en.wikipedia.org/wiki/List_of_Runge%E2%80%93Kutta_methods#Kutta.27s_third-order_method
+///Runge-Kutta 3rd order. <a href="http://en.wikipedia.org/wiki/List_of_Runge%E2%80%93Kutta_methods#Kutta.27s_third-order_method">Reference</a>
 struct RK3Stepper : Stepper {
   Derivative a, b, c;
   RK3Stepper(size_t dim)
@@ -122,7 +154,7 @@ struct RK3Stepper : Stepper {
   /*virtual*/ Stepper* clone() const { return new RK3Stepper(*this); }
 };
 
-//Runge-Kutta 4th order. \ref http://en.wikipedia.org/wiki/List_of_Runge%E2%80%93Kutta_methods#Classic_fourth-order_method
+///Runge-Kutta 4th order. <a href="http://en.wikipedia.org/wiki/List_of_Runge%E2%80%93Kutta_methods#Classic_fourth-order_method">Reference</a>
 struct RK4Stepper : Stepper {
   Derivative a, b, c, d, tmp;
   RK4Stepper(size_t dim)
@@ -146,19 +178,12 @@ struct RK4Stepper : Stepper {
     fn(tmp, t+dt, d, params);
     d*=dt;
     i += (1.0 / 6.0) * (a + 2.0 * (b + c) + d);
-
-//    for (size_t j=0; j<fn.dim();j++) {
-//        std::cout << i[j] << ",";
-//    }
-
-//    std::cout << dt << std::endl;
-
   }
   /*virtual*/ size_t order() const { return 4; }
   /*virtual*/ Stepper* clone() const { return new RK4Stepper(*this); }
 };
 
-//Forward-Euler. \ref http://en.wikipedia.org/wiki/List_of_Runge%E2%80%93Kutta_methods#Forward_Euler
+///Forward-Euler. <a href="http://en.wikipedia.org/wiki/List_of_Runge%E2%80%93Kutta_methods#Forward_Euler">Reference</a>
 struct ForwardEulerStepper : Stepper {
   Derivative a;
   ForwardEulerStepper(size_t dim)
@@ -174,7 +199,7 @@ struct ForwardEulerStepper : Stepper {
   /*virtual*/ Stepper* clone() const { return new ForwardEulerStepper(*this); }
 };
 
-//Runge-Kutta 2nd order (x=1). \ref http://en.wikipedia.org/wiki/List_of_Runge%E2%80%93Kutta_methods#Generic_second-order_method
+///Runge-Kutta 2nd order (x=1). <a href="http://en.wikipedia.org/wiki/List_of_Runge%E2%80%93Kutta_methods#Generic_second-order_method">Reference</a>
 struct EulerPCStepper : Stepper {
   Derivative a, b;
   EulerPCStepper(size_t dim)
@@ -192,7 +217,7 @@ struct EulerPCStepper : Stepper {
   /*virtual*/ Stepper* clone() const { return new EulerPCStepper(*this); }
 };
 
-//Heun-Euler. http://en.wikipedia.org/wiki/List_of_Runge%E2%80%93Kutta_methods#Heun.E2.80.93Euler
+///Heun-Euler. <a href="http://en.wikipedia.org/wiki/List_of_Runge%E2%80%93Kutta_methods#Heun.E2.80.93Euler">Reference</a>
 struct HEStepper : Stepper {
   Derivative a, b, tmp;
   HEStepper(size_t dim)
@@ -214,7 +239,7 @@ struct HEStepper : Stepper {
   /*virtual*/ Stepper* clone() const { return new HEStepper(*this); }
 };
 
-//Runge-Kutta Cash-Karp. \ref http://en.wikipedia.org/wiki/List_of_Runge%E2%80%93Kutta_methods#Cash-Karp
+///Runge-Kutta Cash-Karp. <a href="http://en.wikipedia.org/wiki/List_of_Runge%E2%80%93Kutta_methods#Cash-Karp">Reference</a>
 struct RKCKStepper : Stepper {
   Derivative a, b, c, d, e, f, tmp;
   RKCKStepper(size_t dim)
@@ -253,7 +278,7 @@ struct RKCKStepper : Stepper {
   /*virtual*/ Stepper* clone() const { return new RKCKStepper(*this); }
 };
 
-//Runge-Kutta Fehlberg. \ref http://en.wikipedia.org/wiki/List_of_Runge%E2%80%93Kutta_methods#Fehlberg
+///Runge-Kutta Fehlberg. <a href="http://en.wikipedia.org/wiki/List_of_Runge%E2%80%93Kutta_methods#Fehlberg">Reference</a>
 struct RKFStepper : Stepper {
   Derivative a, b, c, d, e, f;
   RKFStepper(size_t dim)
@@ -285,7 +310,7 @@ struct RKFStepper : Stepper {
   /*virtual*/ Stepper* clone() const { return new RKFStepper(*this); }
 };
 
-//Bogacki-Shampine. \ref http://en.wikipedia.org/wiki/List_of_Runge%E2%80%93Kutta_methods#Bogacki.E2.80.93Shampine
+///Bogacki-Shampine. <a href="http://en.wikipedia.org/wiki/List_of_Runge%E2%80%93Kutta_methods#Bogacki.E2.80.93Shampine">Reference</a>
 struct BSStepper : Stepper {
   Derivative a, b, c, d, tmp;
   BSStepper(size_t dim)
@@ -316,88 +341,11 @@ struct BSStepper : Stepper {
 };
 
 #if 1
-////TODO: Verify the adaptive stepper
-//struct AdaptiveStepper : Stepper {
-//  Stepper* stepper;
-//  valarray<double> dy, yscal, tmp;
-//  double TINY, MAX_STEPS, PSHRINK, PGROW, EPS, SAFETY, ERRCON;
-//  //~AdaptiveStepper() { delete stepper; }
-//  AdaptiveStepper(size_t dim, Stepper* _s, double _EPS, double _TINY=std::numeric_limits<double>::min(), double _MAX_STEPS=10000, double _PSHRINK=-0.25, double _PGROW=-0.2, double _SAFETY=0.9)
-//    : Stepper(dim), stepper(_s), dy(dim), yscal(dim), tmp(dim),
-//      TINY(_TINY), MAX_STEPS(_MAX_STEPS), PSHRINK(_PSHRINK), PGROW(_PGROW), EPS(_EPS), SAFETY(_SAFETY), ERRCON(pow(5.0/_SAFETY, 1.0/_PGROW))
-//      {}
-//  /*virtual*/ void step(ODEState& i, DerivativeFunc& fn, double t, double dt, Derivative& err, void* params=0) {
-//    tmp = i;
-//    const double t1 = t, t2 = t+dt;
-//    for(size_t st=0;st<MAX_STEPS;st++) {
-//      fn(i, t, dy, params);
 
-//      for (int j=0; j <= (int)dy.size(); j++)
-//      {
-//          std::cout << "i: " << i[j] << std::endl;
-//      }
-
-//      for (int j=0; j <= (int)dy.size(); j++)
-//      {
-//          std::cout << "dy: " << dy[j] << std::endl;
-//      }
-
-////      yscal = abs(i) + abs(dy)*dt + TINY;
-//      yscal = abs(i) + abs(dy)*dt;
-
-
-//      for (int j=0; j <= (int)yscal.size(); j++)
-//      {
-//          std::cout << "yscal: " << yscal[j] << std::endl;
-//      }
-
-//      if((t+dt - t2) * (t+dt - t1) > 0.0) //Finish up the last timestep
-//        dt = t2 - t;
-//      for(double h=dt;;) {
-//          std::cout << "CurrentStep: " << h << std::endl;
-//        stepper->step(tmp, fn, t, h, err, params);
-
-//        for (int j=0; j <= (int)err.size(); j++)
-//        {
-//            std::cout << "err: " << err[j] << std::endl;
-//        }
-
-//        const double errmax = abs(err/yscal).max() / EPS;
-
-//        std::cout << "Max Error: " << errmax << std::endl;
-
-//        std::cin.get();
-
-//        if(errmax > 1.0) {
-//          double htmp = SAFETY*h*pow(errmax, PSHRINK);
-//          h = (h > 0.0 ? max(htmp, 0.1*h) : min(htmp, 0.1*h));
-//          tmp = i;
-//        }
-//        else {
-//          if(errmax > ERRCON) dt = SAFETY*h*pow(errmax, PGROW);
-//          else dt = 5.0*h;
-//          t += h;
-//          i = tmp;
-//          std::cout << "NExtStep: " << dt << std::endl;
-//          break;
-//        }
-//      }
-//      if((t - t2)*(t2 - t1) >= 0.0)
-//        return;
-//    }
-//    assert(!"Took too many steps");
-//    //Warning! - required too many steps, increase max_steps, safety, or decrease pgrow
-//  }
-//  /*virtual*/ size_t order() const { return stepper->order(); }
-//  /*virtual*/ Stepper* clone() const {
-//    AdaptiveStepper* ret = new AdaptiveStepper(*this);
-//    ret->stepper = stepper->clone();
-//    return ret;
-//  }
-
-//};
-
-
+/**
+* @brief Wrapper stepper for using a temporal adaptive stepping method
+* @todo Need reference
+*/
 struct AdaptiveStepper : Stepper {
   Stepper* stepper;
   valarray<double> dy, yscal, tmp;

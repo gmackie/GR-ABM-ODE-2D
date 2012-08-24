@@ -14,6 +14,34 @@
 
 using namespace std;
 
+/*!
+Macrophage agent class.  The state machine is given below:
+\dot
+digraph macrophage {
+  edge [fontsize="10.0"];
+
+  Resting [label="Resting, Mr" URL="\ref Mac::handleResting"];
+  Infected [label="Infected, Mi" URL="\ref Mac::handleInfected"];
+  Activated [label="Activated, Ma" URL="\ref Mac::handleActivated"];
+  CInfected [label="Chronically Infected, Mci" URL="\ref Mac::handleCInfected"];
+  DEAD [label="DEAD" URL="\ref Mac::handleDead"];
+
+  Resting:n -> Resting:n [label="Killing of 1 Be IF (Be<=1)\nOR (Be>1 AND prob<25%)"];
+  Resting -> Infected [label="Uptake of 1 Be IF Be>1 AND prob>25% then Bi=1"];
+  Resting -> Activated [label="Mr activation induced by IFN-&gamma;\n(1 active T&gamma; cell in moore neighborhood)\n and TNF or Be"];
+  Resting -> DEAD [label="Apoptosis (only TNF) OR Age"];
+
+  Infected -> Infected [label="Uptake of Be IF (Be > 0 AND prob>(10-Bi)/100)"];
+  Infected -> CInfected [label="Bi>10"];
+  Infected -> Activated [label="Mi Activation (same as Mr)"];
+  Infected -> DEAD [label="Apoptosis, Age OR CTL killing"];
+
+  Activated -> DEAD [label="Apoptosis (only TNF) or Age"];
+
+  CInfected -> DEAD [label="Apoptosis, Age, CTL killing OR bursting"];
+}
+\enddot
+*/
 class Mac : public Agent
 {
 public:
@@ -35,9 +63,40 @@ private:
     int _stat1Time;
     int _nfkbTime;
 	
+  /**
+  * @brief 
+  * The probabilty for becoming infected is based on the following formula:
+  * \f$\frac{Bi}{10} + \frac{prob}{1-25\%} = 1\f$
+  * @param time
+  * @param grid
+  * @param stats
+  * @param nfkbDynamics
+  */
 	void handleResting(const int time, GrGrid& grid, Stats& stats, bool nfkbDynamics);
+  /**
+  * @brief 
+  *
+  * @param time
+  * @param grid
+  * @param stats
+  * @param nfkbDynamics
+  */
 	void handleInfected(const int time, GrGrid& grid, Stats& stats, bool nfkbDynamics);
+  /**
+  * @brief 
+  *
+  * @param time
+  * @param grid
+  * @param stats
+  */
 	void handleChronicallyInfected(const int time, GrGrid& grid, Stats& stats);
+  /**
+  * @brief 
+  *
+  * @param time
+  * @param grid
+  * @param stats
+  */
 	void handleActivated(const int time, GrGrid& grid, Stats& stats);
 	int getCountTgam(Tgam::State state, const GrGrid& grid) const;
 	double getExtMtbInMoore(const GrGrid& grid) const;
@@ -79,7 +138,18 @@ public:
   /*virtual*/ bool NFkBCapable() const { return true; }
   /*virtual*/ Agent* clone() const { return new Mac(*this); }
 	void move(GrGrid& grid);
-    void secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDepletion, bool il10rDynamics, bool il10Depletion, double mdt);
+  /**
+  * @copydoc Agent::secrete
+  * The rules for secreting chemokines based on states and phenotype are as follows:
+  * <table>
+  * <tr><th></th><th>Nothing</th><th>NFkB</th><th>De-act</th></tr>
+  * <tr><td>Mr</td><td>No TNF<br/>No IL10<br/>No CCs<br/></td><td>TNF 1/2<br/>No IL10<br/>CCs 1/2</td><td>No TNF<br/>No IL10<br/>No CCs</td></tr>
+  * <tr><td>Mi</td><td>TNF 1/2<br/>IL10<br/>CCs 1/2<br/></td><td>TNF<br/>IL10<br/>CCs</td><td>TNF 1/2<br/>IL10<br/>CCs 1/2</td></tr>
+  * <tr><td>Mci</td><td></td><td>TNF<br/>2x IL10<br/>CCs</td><td></td></tr>
+  * <tr><td>Ma</td><td></td><td>TNF<br/>IL10 1/10<br/>CCs</td><td>No TNF<br/>No IL10<br/>No CCs</td></tr>
+  * </table>
+  */
+  void secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDepletion, bool il10rDynamics, bool il10Depletion, double mdt);
 	void computeNextState(const int time, GrGrid& grid, Stats& stats, bool tnfrDynamics, bool nfkbDynamics, bool il10rDynamics, bool);
   void solveDegradation (GrGrid& grid, double dt, bool tnfrDynamics, bool il10rDynamics);
 	void updateState();

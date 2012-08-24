@@ -570,6 +570,11 @@ int main(int argc, char** argv)
 	 *
 	 * */
 	
+  std::ostringstream odestream;
+  odestream << "ODE Solver Method (* = embedded):" << std::endl;
+  for(size_t i=0;i<ODESolvers::NMethods;i++)
+    odestream << i << " - " << (ODESolvers::ODEMethod)i << (i>=ODESolvers::HeunEuler ? "*" : "")<< std::endl;
+
 	po::options_description general("General");
 	general.add_options()
 	("help,h", "Help message")
@@ -610,8 +615,7 @@ int main(int argc, char** argv)
     ("il10r-dynamics", "Use molecular level IL10/IL10R dynamics in the model")
     ("NFkB-dynamics", "Use molecular level intracellular NFkB dynamics in the model")
     ("adaptive", "Use adaptive time-step ODE Solvers")
-    ("odesolver", po::value<int>()->default_value(4),
-     "ODE Solver Method:\n0 - Forward Euler\n1 - Euler Predictor-Corrector\n2 - Runge-Kutta 2nd Order\n3 - Runge-Kutta 3rd Order\n4 - Runge-Kutta 4th Order\n5 - Huen-Euler\n6 - Runge-Kutta Cash-Karp\n7 - Runge-Kutta Fehlberg\n8 - Bogacki-Shampine")
+    ("odesolver", po::value<size_t>()->default_value(4), odestream.str().c_str())
     ("Treg-induction", "Allow Tregs to be induced from Tgams in the model")
     ("tnf-depletion", po::value<int>()->default_value(-1), "The time step at which to stop secreting tnf, including by tnfr dynamics. -1: no depletion")
     ("il10-depletion", po::value<int>()->default_value(-1), "The time step at which to stop secreting il10, including by il10r dynamics. -1: no depletion");

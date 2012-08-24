@@ -1,4 +1,3 @@
-#pragma once
 #ifndef NUMERICALMETHODS_H
 #define NUMERICALMETHODS_H
 #include <valarray>
@@ -7,6 +6,7 @@
 #include <stdarg.h>
 #include <stdexcept>
 #include <limits>
+#include <iostream>
 using namespace std;
 
 namespace ODESolvers {
@@ -467,15 +467,15 @@ inline Stepper* StepperFactory(ODEMethod method, size_t dim, bool adaptive=false
 
 inline std::ostream& operator<<(std::ostream& s, ODEMethod method) {
   switch(method) {
-  case FEuler:    s<<"FEuler"; break;
-  case EulerPC:   s<<"EulerPC"; break;
-  case RK2:       s<<"RK2"; break;
-  case RK3:       s<<"RK3"; break;
-  case RK4:       s<<"RK4"; break;
-  case HeunEuler: s<<"HeunEuler"; break;
-  case RKCK:      s<<"RKCK"; break;
-  case RKF:       s<<"RKF"; break;
-  case BogShamp:  s<<"BogShamp"; break;
+  case FEuler:    s<<"Forward Euler"; break;
+  case EulerPC:   s<<"Euler Predictor-Corrector"; break;
+  case RK2:       s<<"Runge-Kutta 2"; break;
+  case RK3:       s<<"Runge-Kutta 3"; break;
+  case RK4:       s<<"Runge-Kutta 4"; break;
+  case HeunEuler: s<<"Heun-Euler"; break;
+  case RKCK:      s<<"Runge-Kutta Cash-Karp"; break;
+  case RKF:       s<<"Runge-Kutta Fehlberg"; break;
+  case BogShamp:  s<<"Bogacki-Shampine"; break;
   default:
     throw std::runtime_error("Unknown method");
   }

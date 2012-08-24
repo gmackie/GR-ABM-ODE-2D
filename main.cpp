@@ -106,6 +106,11 @@ int main(int argc, char *argv[])
   // For loading a saved state.
   std::string stateFileName;
 
+  std::ostringstream odestream;
+  odestream << "ODE Solver Method (* = embedded):" << std::endl;
+  for(size_t i=0;i<ODESolvers::NMethods;i++)
+    odestream << i << " - " << (ODESolvers::ODEMethod)i << (i>=ODESolvers::HeunEuler ? "*" : "")<< std::endl;
+
   po::options_description desc("Allowed options");
   desc.add_options()
   ("help,h", "Help message")
@@ -114,8 +119,7 @@ int main(int argc, char *argv[])
   ("dim,d", po::value(&dim)->default_value(100))
   ("diffusion", po::value<int>(&diffMethod)->default_value(4),
    "Diffusion method:\n0 - FTCS\n1 - BTCS (SOR, correct)\n2 - BTCS (SOR, wrong)\n3 - FTCS Grid Swap\n4 - ADE Grid Swap")
-  ("odesolver", po::value(&odeSolver)->default_value(4),
-   "ODE Solver Method:\n0 - Forward Euler\n1 - Euler Predictor-Corrector\n2 - Runge-Kutta 2nd Order\n3 - Runge-Kutta 3rd Order\n4 - Runge-Kutta 4th Order\n5 - Huen-Euler\n6 - Runge-Kutta Cash-Karp\n7 - Runge-Kutta Fehlberg\n8 - Bogacki-Shampine")
+  ("odesolver", po::value<size_t>()->default_value(4), odestream.str().c_str())
   ("timesteps,t", po::value<int>(&timesteps), "Number of time steps to simulate\nTakes precedence over --days")
   ("days", po::value<int>(&nDays)->default_value(200), "Number of days to simulate")
   ("script,c", "Scripting mode")

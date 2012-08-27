@@ -167,6 +167,7 @@
 	>
 	<Mac
 		initNumber = "106"
+		initDensity = "0.0105"
 		maxAge = "14400"
 		maxAgeAct = "1440"
 		maxTimeReg = "71"
@@ -253,6 +254,7 @@
 			thresholdRecTNF = "1.34e-04"
 			recruitmentHalfSatTNF = "0.10"
 			recruitmentHalfSatChemokine = "2.95914"
+			recruitmentHalfSatChemokine = "1"
 			/>
 	</Tcell>
 	<Mtb

@@ -606,8 +606,8 @@ int main(int argc, char** argv)
 	("recr", po::value<unsigned>()->default_value(0), "recruitment:\n0 - probability\n1 - lymph node ode proxy\n2 - lymph node ode pure")
 	("diffusion", po::value<unsigned>()->default_value(4),
 	 "Diffusion method:\n0 - FTCS\n1 - BTCS (SOR, correct)\n2 - BTCS (SOR, wrong)\n3 - FTCS Grid Swap\n4 - ADE Grid Swap")
-	("area-tnf-threshold", po::value<float>()->default_value(0.5),"Threshold for granuloma area defined by TNF, in the range [0.0, 1.0]\n")
-	("area-cell-density-threshold", po::value<float>()->default_value(0.5),"Threshold for granuloma area defined by cell density, in the range [0.0, 1.0]");
+	("area-tnf-threshold", po::value<float>()->default_value(0.5f),"Threshold for granuloma area defined by TNF, in the range [0.0, 1.0]\n")
+	("area-cell-density-threshold", po::value<float>()->default_value(0.5f),"Threshold for granuloma area defined by cell density, in the range [0.0, 1.0]");
 
   po::options_description simdyn_opts("Simulation Dynamics");
   simdyn_opts.add_options()
@@ -755,7 +755,7 @@ int main(int argc, char** argv)
     pSim->deserialize(in);
   }
 
-  buildSim(pSim, diffMethodEnum, recrMethod, vm["odesolver"].as<int>(), vm.count("tnfr-dynamics"), vm.count("il10r-dynamics"), vm.count("NFkB-dynamics"), vm.count("adaptive"), 
+  buildSim(pSim, diffMethodEnum, recrMethod, vm["odesolver"].as<size_t>(), vm.count("tnfr-dynamics"), vm.count("il10r-dynamics"), vm.count("NFkB-dynamics"), vm.count("adaptive"), 
            vm["tnf-depletion"].as<int>(), vm["il10-depletion"].as<int>(),vm.count("Treg-induction"), vm["area-tnf-threshold"].as<float>(),
               vm["area-cell-density-threshold"].as<float>());
 

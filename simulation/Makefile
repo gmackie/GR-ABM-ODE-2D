@@ -13,7 +13,7 @@ BOOST_LIBS := boost_program_options boost_iostreams boost_serialization boost_fi
 ifneq ($(wildcard ${BOOST_PREFIX}/lib/*boost_program_options*-mt*), )
   BOOST_LIBS := $(addsuffix -mt, ${BOOST_LIBS})
 endif
-override LDFLAGS += -lm -L${BOOST_PREFIX}/lib $(addprefix -l, $(BOOST_LIBS))
+override LDFLAGS += -lm -lz -L${BOOST_PREFIX}/lib $(addprefix -l, $(BOOST_LIBS))
 
 all: release
 

@@ -248,12 +248,12 @@
 			thresholdRec = "0.00418843"
 			probRec = "0.1"
 			probTregDeactivate = "1"
-			halfSatTregDeactivate = "0.023"
+			halfSatTregDeactivateIL10 = "0.023"
+			halfSatTregDeactivateTNF = "8000"
 			maxRecProb = "0.0521266"
 			thresholdRecChemokine = "7.03e-04"
 			thresholdRecTNF = "1.34e-04"
 			recruitmentHalfSatTNF = "0.10"
-			recruitmentHalfSatChemokine = "2.95914"
 			recruitmentHalfSatChemokine = "1"
 			/>
 	</Tcell>

@@ -20,20 +20,18 @@ struct LungFunc;
 /**
 * @brief Base agent class
 * Abstract parent of all agent classes
+* @note If the data members change then the serialize and deserialize functions need to be updated !!!
 */
 class Agent
 {
 private:
+  /// Fake RTTI for serialization purposes
 	static const std::string _ClassName;
 
 	/// A global ID counter for assigning a unique ID to an agent.
 	static unsigned long _nextID;
 
 protected:
-	/*
-	 * !!! If the data members change then the serialize and deserialize functions need to be updated !!!
-	 */
-    
   /**
   * @brief Creates an unique identifier for the agent
   *
@@ -120,7 +118,7 @@ protected:
   * These variables are serialized and have accessor methods associated
   * @{
   */
-#define P(type, name, ival, desc) type _##name; 
+#define P(type, name, ival, desc) type _##name;
   AGENT_PROPS
 #undef P
   /**
@@ -155,16 +153,20 @@ protected:
   * @param bonusFactor Bonus weight for moving in the correct direction
   *
   * @return Calculated ordinial direction to move to based on chemotaxis
+  * @see compartmentOrdinalToCoordinates
   */
 	int getDestinationOrdinal(GrGrid& grid, bool ccl2, bool ccl5, bool cxcl9, bool attractant, double bonusFactor);
   /**
   * @brief Converts an ordinal to a grid position based on the agent's current position
-  *
-  * @param ordinal 
   * The possible values for the ordinal are:
-  *  0  1  2
-  *  3  4  5
-  *  6  7  8
+  *
+  *  |   |   |   |
+  *  | - | - | - |
+  *  | 0 | 1 | 2 |
+  *  | 3 | 4 | 5 |
+  *  | 6 | 7 | 8 |
+  *
+  * @param ordinal Ordinal direction given by table above
   * @param dim Dimensions of the grid (to handle grid boundaries)
   *
   * @return Global position of indicated direction wrt to agent
@@ -182,6 +184,7 @@ public:
 	Agent();
   /**
   * @brief Standard constructor, must be used outside of serialization
+  * @todo Finish documentation of these functions
   * @note This function uses the RNG to calculate internal variables.
   * @param birthtime
   * @param deathtime
@@ -208,7 +211,7 @@ public:
 			// IL10 components
 			, Scalar iIL10R
 			, Scalar stdIL10R
-            , int odesize
+      , int odesize
 		);
 
 	virtual ~Agent();
@@ -294,8 +297,21 @@ public:
   * @param tgammatransition Account for T\gamma transitions
   */
 	virtual void computeNextState(const int time, GrGrid& grid, Stats& stats, bool tnfrDynamics, bool nfkbDynamics, bool il10rDynamics, bool tgammatransition) = 0;
+  /**
+  * @brief Updates the current state of the agent to be the calculated next state \see computeNextState
+  */
 	virtual void updateState() = 0;
+  /**
+  * @brief Updates the statistics object with the final state of the agent
+  *
+  * @param s Statistics object to update
+  */
   virtual void updateStatistics(Stats& s) const = 0;
+  /**
+  * @details Updates the M1M2Ratio based on it's internal SBTNFR1 and SBIL10R
+  * using the following formula:
+  * \f$M1M2ratio = \frac{IL10R1_{surfBound}}{\max (TNFR1_{surfBound}, 1)}\f$
+  */
   void updateM1M2Ratio()
     { _M1M2Ratio = getsurfBoundTNFR1() / std::max(getsurfBoundIL10R(), 1.0); }
   /**
@@ -313,6 +329,11 @@ public:
   */
   void writeMembersFromValarray(GrGrid& grid, const valarray<double>& inputVector);
 
+  /**
+  * @brief Solve internal ODEs for a preset time determined to give equilibrium
+  *
+  * @param dt Size of step to take in seconds
+  */
   void solveNFkBODEsEquilibrium (double dt);
   /**
   * @brief Solves agent odes for 1 dt timestep using the given ode method
@@ -326,6 +347,8 @@ public:
   /**
   * @brief Solves agent odes for 1 dt timestep using the given ode method + adaptive algorithm
   * @note May be inaccurate due to coupled nature of multiple agents in a single grid space
+  * @see adaptiveODE
+  * @see adaptiveODE2Cell
   *
   * @param grid
   * @param t Time of the simulation (in seconds since infection)
@@ -339,42 +362,6 @@ public:
   bool TNFinducedApoptosis(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics);
   bool TNFinducedNFkB(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics);
 
-#if 0
-    void solveTNF (GrGrid& grid, double dt);
-    void solveIL10 (GrGrid& grid, double dt);
-    void solveTNFandIL10(GrGrid& grid, double dt);
-    void solveNFkBandTNF (GrGrid& grid, double dt);
-    void solveTNFandIL10andNFkB (GrGrid& grid, double dt);
-    
-    void derivativeTNF(const valarray<double>& vecread, valarray<double>& vecwrite, double dt, GrGrid& grid);
-    void derivativeIL10(const valarray<double>& vecread, valarray<double>& vecwrite, double dt, GrGrid& grid);
-    void derivativeTNFandIL10(const valarray<double>& vecread, valarray<double>& vecwrite, double dt, GrGrid& grid);
-    void derivativeTNFandNFKB(const valarray<double>& vecread, valarray<double>& vecwrite, double dt, GrGrid& grid);
-    void derivativeTNFandIL10andNFKB(const valarray<double>& vecread, valarray<double>& vecwrite, double dt, GrGrid& grid);
-    
-    void solveRK2(GrGrid& grid, double dt, void(Agent::*derivativeType)(const valarray<double>& vecread, valarray<double>& vecwrite, double dt, GrGrid& grid));
-    void solveRK4(GrGrid& grid, double dt, void(Agent::*derivativeType)(const valarray<double>& vecread, valarray<double>& vecwrite, double dt, GrGrid& grid));
-    void solveForwardEuler(GrGrid& grid, double dt, void(Agent::*derivativeType)(const valarray<double>& vecread, valarray<double>& vecwrite, double dt, GrGrid& grid));
-    void solveEulerPC(GrGrid& grid, double dt, void(Agent::*derivativeType)(const valarray<double>& vecread, valarray<double>& vecwrite, double dt, GrGrid& grid));
-
-    void solveRKCK(GrGrid& grid, double dt, void(Agent::*derivativeType)(const valarray<double>& vecread, valarray<double>& vecwrite, double dt, GrGrid& grid));
-    
-    void RKStepper(GrGrid& grid, double dttry, double accuracy, double& dtnext, double& dtdid, double& currenttime, const double& starttime, const double& endtime, valarray<double> yscal, void(Agent::*derivativeType)(const valarray<double>& vecread, valarray<double>& vecwrite, double dt, GrGrid& grid));
-    
-    
-    void AdaptiveRK(GrGrid& grid, double timestart, double timeend, double accuracy, double stepguess, double minstep, void(Agent::*derivs)(const valarray<double>& vecread, valarray<double>& vecwrite, double dt, GrGrid& grid));
-    
-    void RKStepper2cell(Agent* secondCell, GrGrid& grid, double dttry, double accuracy, double& dtnext, double& dtdid, double& currenttime, const double& starttime, const double& endtime, valarray<double> yscal, valarray<double> yscal2nd, void(Agent::*derivativeType)(const valarray<double>& vecread, valarray<double>& vecwrite, double dt, GrGrid& grid));
-    
-    
-    void AdaptiveRK2cell(Agent* secondCell, GrGrid& grid, double timestart, double timeend, double accuracy, double stepguess, double minstep, void(Agent::*derivs)(const valarray<double>& vecread, valarray<double>& vecwrite, double dt, GrGrid& grid));
-    
-    void solveMolecularScaleFE(GrGrid& grid, double dt, bool nfkbDynamics, bool tnfrDynamics, bool il10rDynamics);
-    void solveMolecularScaleRK2(GrGrid& grid, double dt, bool nfkbDynamics, bool tnfrDynamics, bool il10rDynamics);
-    void solveMolecularScaleRK4(GrGrid& grid, double dt, bool nfkbDynamics, bool tnfrDynamics, bool il10rDynamics);
-    void solveMolecularScaleRKadaptive(GrGrid& grid, double dt, bool nfkbDynamics, bool tnfrDynamics, bool il10rDynamics, double diffusionlength);
-    void solveMolecularScaleEPC(GrGrid& grid, double dt, bool nfkbDynamics, bool tnfrDynamics, bool il10rDynamics);
-#endif
   void checkTolerance(valarray<double>& veccheck);
 
 	virtual void solveDegradation (GrGrid& grid, double dt, bool tnfrDynamics, bool il10rDynamics) = 0;
@@ -454,7 +441,17 @@ public:
 	void setTrackMolecularDynamics(bool val) { _trackMolecularDynamics = val; }
   const Pos& getPosition() const { return _pos; } //Backwards compat
   unsigned long getID() const { return _id; }   //Backwards compat
+  /**
+  * @brief Saves a serialized version of the agent to out \see deserialize
+  *
+  * @param out Output stream to save to
+  */
 	virtual void serialize(std::ostream& out) const;
+  /**
+  * @brief Loads an agent from the stream that was serialized \see serialize
+  *
+  * @param in Input stream to load from
+  */
 	virtual void deserialize(std::istream& in);
   /**
   * @brief visits all the properties of the agent class

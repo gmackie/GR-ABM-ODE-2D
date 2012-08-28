@@ -10,6 +10,11 @@
 
 #include "grdiffusion.h"
 
+/**
+* @brief Do not use this method, it is not updated, nor was it
+* mathematically correct to begin with
+* @deprecated
+*/
 class GrDiffusionWrongBTCS: public GrDiffusion
 {
 public:

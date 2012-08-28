@@ -10,9 +10,14 @@
 
 #include "grdiffusion.h"
 
+/**
+* @brief Forward-Time Central-Space method for the heat equation [Reference](http://en.wikipedia.org/wiki/FTCS_scheme)
+*/
 class GrDiffusionFTCS_Swap: public GrDiffusion
 {
 private:
+  /// Lower bound on when a chemical should be considered non-existent
+  /// (to keep from going negative).
 	const double _cutOffValue;
 
 public:

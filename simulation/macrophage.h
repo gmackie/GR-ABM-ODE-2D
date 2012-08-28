@@ -15,7 +15,9 @@
 using namespace std;
 
 /*!
-Macrophage agent class.  The state machine is given below:
+@brief Macrophage agent class.
+@detail
+The state machine is given below:
 \dot
 digraph macrophage {
   edge [fontsize="10.0"];
@@ -141,13 +143,12 @@ public:
   /**
   * @copydoc Agent::secrete
   * The rules for secreting chemokines based on states and phenotype are as follows:
-  * <table>
-  * <tr><th></th><th>Nothing</th><th>NFkB</th><th>De-act</th></tr>
-  * <tr><td>Mr</td><td>No TNF<br/>No IL10<br/>No CCs<br/></td><td>TNF 1/2<br/>No IL10<br/>CCs 1/2</td><td>No TNF<br/>No IL10<br/>No CCs</td></tr>
-  * <tr><td>Mi</td><td>TNF 1/2<br/>IL10<br/>CCs 1/2<br/></td><td>TNF<br/>IL10<br/>CCs</td><td>TNF 1/2<br/>IL10<br/>CCs 1/2</td></tr>
-  * <tr><td>Mci</td><td></td><td>TNF<br/>2x IL10<br/>CCs</td><td></td></tr>
-  * <tr><td>Ma</td><td></td><td>TNF<br/>IL10 1/10<br/>CCs</td><td>No TNF<br/>No IL10<br/>No CCs</td></tr>
-  * </table>
+  * |     |              Nothing          |               NFkB              |            De-act             |
+  * | --- | ----------------------------- | ------------------------------- | ----------------------------- |
+  * | Mr  | No TNF<br/>No IL10<br/>No CCs | TNF 1/2<br/>No IL10<br/>CCs 1/2 | No TNF<br/>No IL10<br/>No CCs |
+  * | Mi  | TNF 1/2<br/>IL10<br/>CCs 1/2  | TNF<br/>IL10<br/>CCs            | TNF 1/2<br/>IL10<br/>CCs 1/2  |
+  * | Mci |                               | TNF<br/>2x IL10<br/>CCs         |                               |
+  * | Ma  |                               | TNF<br/>IL10 1/10<br/>CCs       | No TNF<br/>No IL10<br/>No CCs |
   */
   void secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDepletion, bool il10rDynamics, bool il10Depletion, double mdt);
 	void computeNextState(const int time, GrGrid& grid, Stats& stats, bool tnfrDynamics, bool nfkbDynamics, bool il10rDynamics, bool);

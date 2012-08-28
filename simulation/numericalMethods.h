@@ -80,7 +80,7 @@ struct EqnDeriv : DerivativeFunc {
   }
 };
 #endif
-///*** END TESTING METHODS ***///
+/*** END TESTING METHODS ***/
 
 // ************
 // * Steppers *
@@ -113,7 +113,7 @@ struct Stepper {
   virtual ~Stepper() {}
 };
 
-///Runge-Kutta 2nd order. <a href="http://en.wikipedia.org/wiki/List_of_Runge%E2%80%93Kutta_methods#Kutta.27s_third-order_method">Reference</a>
+///Runge-Kutta 2nd order. [Reference](http://en.wikipedia.org/wiki/List_of_Runge%E2%80%93Kutta_methods#Kutta.27s_third-order_method)
 struct RK2Stepper : Stepper {
   Derivative a, b;
   RK2Stepper(size_t dim)
@@ -132,7 +132,7 @@ struct RK2Stepper : Stepper {
   /*virtual*/ Stepper* clone() const { return new RK2Stepper(*this); }
 };
 
-///Runge-Kutta 3rd order. <a href="http://en.wikipedia.org/wiki/List_of_Runge%E2%80%93Kutta_methods#Kutta.27s_third-order_method">Reference</a>
+///Runge-Kutta 3rd order. [Reference](http://en.wikipedia.org/wiki/List_of_Runge%E2%80%93Kutta_methods#Kutta.27s_third-order_method)
 struct RK3Stepper : Stepper {
   Derivative a, b, c;
   RK3Stepper(size_t dim)
@@ -154,7 +154,7 @@ struct RK3Stepper : Stepper {
   /*virtual*/ Stepper* clone() const { return new RK3Stepper(*this); }
 };
 
-///Runge-Kutta 4th order. <a href="http://en.wikipedia.org/wiki/List_of_Runge%E2%80%93Kutta_methods#Classic_fourth-order_method">Reference</a>
+///Runge-Kutta 4th order. [Reference](http://en.wikipedia.org/wiki/List_of_Runge%E2%80%93Kutta_methods#Classic_fourth-order_method)
 struct RK4Stepper : Stepper {
   Derivative a, b, c, d, tmp;
   RK4Stepper(size_t dim)
@@ -183,7 +183,7 @@ struct RK4Stepper : Stepper {
   /*virtual*/ Stepper* clone() const { return new RK4Stepper(*this); }
 };
 
-///Forward-Euler. <a href="http://en.wikipedia.org/wiki/List_of_Runge%E2%80%93Kutta_methods#Forward_Euler">Reference</a>
+///Forward-Euler. [Reference](http://en.wikipedia.org/wiki/List_of_Runge%E2%80%93Kutta_methods#Forward_Euler)
 struct ForwardEulerStepper : Stepper {
   Derivative a;
   ForwardEulerStepper(size_t dim)
@@ -199,7 +199,7 @@ struct ForwardEulerStepper : Stepper {
   /*virtual*/ Stepper* clone() const { return new ForwardEulerStepper(*this); }
 };
 
-///Runge-Kutta 2nd order (x=1). <a href="http://en.wikipedia.org/wiki/List_of_Runge%E2%80%93Kutta_methods#Generic_second-order_method">Reference</a>
+///Runge-Kutta 2nd order (x=1). [Reference](http://en.wikipedia.org/wiki/List_of_Runge%E2%80%93Kutta_methods#Generic_second-order_method)
 struct EulerPCStepper : Stepper {
   Derivative a, b;
   EulerPCStepper(size_t dim)
@@ -217,7 +217,7 @@ struct EulerPCStepper : Stepper {
   /*virtual*/ Stepper* clone() const { return new EulerPCStepper(*this); }
 };
 
-///Heun-Euler. <a href="http://en.wikipedia.org/wiki/List_of_Runge%E2%80%93Kutta_methods#Heun.E2.80.93Euler">Reference</a>
+///Heun-Euler. [Reference](http://en.wikipedia.org/wiki/List_of_Runge%E2%80%93Kutta_methods#Heun.E2.80.93Euler)
 struct HEStepper : Stepper {
   Derivative a, b, tmp;
   HEStepper(size_t dim)
@@ -239,7 +239,7 @@ struct HEStepper : Stepper {
   /*virtual*/ Stepper* clone() const { return new HEStepper(*this); }
 };
 
-///Runge-Kutta Cash-Karp. <a href="http://en.wikipedia.org/wiki/List_of_Runge%E2%80%93Kutta_methods#Cash-Karp">Reference</a>
+///Runge-Kutta Cash-Karp. [Reference](http://en.wikipedia.org/wiki/List_of_Runge%E2%80%93Kutta_methods#Cash-Karp)
 struct RKCKStepper : Stepper {
   Derivative a, b, c, d, e, f, tmp;
   RKCKStepper(size_t dim)
@@ -278,7 +278,7 @@ struct RKCKStepper : Stepper {
   /*virtual*/ Stepper* clone() const { return new RKCKStepper(*this); }
 };
 
-///Runge-Kutta Fehlberg. <a href="http://en.wikipedia.org/wiki/List_of_Runge%E2%80%93Kutta_methods#Fehlberg">Reference</a>
+///Runge-Kutta Fehlberg. [Reference](http://en.wikipedia.org/wiki/List_of_Runge%E2%80%93Kutta_methods#Fehlberg)
 struct RKFStepper : Stepper {
   Derivative a, b, c, d, e, f;
   RKFStepper(size_t dim)
@@ -310,7 +310,7 @@ struct RKFStepper : Stepper {
   /*virtual*/ Stepper* clone() const { return new RKFStepper(*this); }
 };
 
-///Bogacki-Shampine. <a href="http://en.wikipedia.org/wiki/List_of_Runge%E2%80%93Kutta_methods#Bogacki.E2.80.93Shampine">Reference</a>
+///Bogacki-Shampine. [Reference](http://en.wikipedia.org/wiki/List_of_Runge%E2%80%93Kutta_methods#Bogacki.E2.80.93Shampine)
 struct BSStepper : Stepper {
   Derivative a, b, c, d, tmp;
   BSStepper(size_t dim)

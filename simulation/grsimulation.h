@@ -22,86 +22,112 @@
 
 using namespace std;
 
+/**
+* @brief Simulation class that holds all information about the simulation.
+* This includes interacting agents, simulation options, diffusing chemicals,
+* etc.
+*
+* @note If data members change, serialization must also change to be consistent
+*/
 class GrSimulation
 {
 private:
 	static const std::string _ClassName;
 
-	/*
-	 * !!! If the data members change then the serialize and deserialize functions need to be updated !!!
-	 */
 	int _time;
 	GrSimulationGrid _grid;
+  /**
+  * @name Agent Lists
+  * @TODO Replace this with a templated(?) map in order to decouple agent type from grsimulation
+  * @brief These lists hold pointers to each agent type.
+  * @{
+  */
 	MacList _macList;
 	TgamList _tgamList;
 	TcytList _tcytList;
 	TregList _tregList;
+  /**@}*/
 
-	Stats _statsPrevious; // The stats at the start of a time step - from the end of the previous time step.
+	Stats _statsPrevious; /// The stats at the start of a time step - from the end of the previous time step.
 	Stats _stats;
 
+  /// @TODO Documentation
 	double _areaThreshold;
-	double _areaThresholdCellDensity;
+  /// @TODO Documentation
+  double _areaThresholdCellDensity;
+  /// Diffusion method to use
 	GrDiffusion* _pDiffusion;
+  /// @TODO Documentation
 	TTest* _pTTest[NOUTCOMES];
+  /// Recruitment method to use
 	RecruitmentBase* _pRecruitment;
+  /// Enable TNFR Dynamics?
 	bool _tnfrDynamics;
+  /// Enable NFkB Dynamics?
 	bool _nfkbDynamics;
+  /// Enable IL10R Dynamics?
   bool _il10rDynamics;
+  /// @TODO Documentation
   bool _tgammatransition;
+  /// Use the adaptive method?
   bool _adaptive;
 
-    // ODE Solver
-    ODESolvers::ODEMethod _odeSolver;
-    
-	// Inhibits tnf secretion if true and if not using tnfr dynamics.
-	int _tnfDepletionTimeStep;
-    int _il10DepletionTimeStep;
+  /// ODE Solver method to use for agent odes
+  ODESolvers::ODEMethod _odeSolver;
 
-    // Whether or not TCell recruitment has been enabled.
-    // Once enabled it stays enabled even if the criteria by which it became enabled changes.
-    bool _tcellRecruitmentBegun;
-    
-    int _numMolecularPerDiffusion;
-    int _numDiffusionPerAgent;
+  /// Inhibits tnf secretion if true and if not using tnfr dynamics.
+	int _tnfDepletionTimeStep;
+  /// Inhibits il10 secretion if true and if not using il10r dynamics.
+	int _il10DepletionTimeStep;
+
+  /**
+  * Whether or not TCell recruitment has been enabled.
+  * Once enabled it stays enabled even if the criteria by which it became enabled changes.
+  */
+  bool _tcellRecruitmentBegun;
+  /// Number of timesteps of mdt (see \ref Params) for diffusion
+  int _numMolecularPerDiffusion;
+  /// Number of timesteps of dt (see \ref Params) for agent odes
+  int _numDiffusionPerAgent;
 
 	void moveTcells();
 	void moveMacrophages();
 	void updateStates();
 	void updateT_Test();
 	void computeNextStates();
-    void secreteFromMacrophages(bool tnfDepletion, bool il10Depletion, double mdt);
-    void secreteFromTcells(bool tnfDepletion, bool il10Depletion, double mdt);
-    void secreteFromCaseations(double mdt);
-#if 0
-    void updateTNFDynamics(double dt);
-    void updateIL10Dynamics(double dt);
-    void updateTNFandIL10Dynamics(double dt);
-    void updateNFkBandTNFandIL10Dynamics(double dt);
-    void updateNFkBandTNFDynamics(double dt);
-    void updateMolecularScaleAdaptive(double dt);
-    void updateMolecularScaleRK4(double dt);
-    void updateMolecularScaleRK2(double dt);
-    void updateMolecularScaleFE(double dt);
-    void updateMolecularScaleEPC(double dt);
-#else
-    void solveMolecularScale(double dt);
-    void solveMolecularScaleAdaptive(double dt);
-#endif
+  void secreteFromMacrophages(bool tnfDepletion, bool il10Depletion, double mdt);
+  void secreteFromTcells(bool tnfDepletion, bool il10Depletion, double mdt);
+  void secreteFromCaseations(double mdt);
+  void solveMolecularScale(double dt);
+  void solveMolecularScaleAdaptive(double dt);
 	void adjustTNFDegradation(double dt);
-    void adjustFauxDegradation(double dt);
+  void adjustFauxDegradation(double dt);
 	void growExtMtb();
 	void shuffleCells();
 	void checkTCellRecruitmentStart();
 
 public:
+  /**
+  * @param dim Dimensions of the internal grid to use (in # of 20 micron sectons)
+  */
 	GrSimulation(const Pos& dim);
 	~GrSimulation();
 	void init();
 	void initMolecularTracking(Scalar molecularTrackingRadius);
 	void initMolecularTracking(const std::vector<size_t>& ids);
+  /**
+  * @brief Run the simulation for a 10 minute timestep
+  */
 	void solve();
 	void performT_Test();
+  /**
+  * @name Accessors
+  * @{
+  */
+
+  /**
+  * @return Number of 10 minute timesteps since infection
+  */
 	int getTime() const;
 
 	const Stats& getStats() const;
@@ -146,19 +172,44 @@ public:
 	void getOutcomeParameters(int index, int& samplePeriod, int& testPeriod, double& alpha) const;
 	void setOutcomeMethod(int index, OutcomeMethod method, double alpha, int testPeriod, int samplePeriod);
 	bool getTCellRecruitmentBegun();
+  /**@}*/
+
+  /**
+  * @copydoc GrSimulation::serialize
+  */
 	void serialize(std::ostream& out) const;
+  /**
+  * @copydoc GrSimulation::deserialize
+  */
 	void deserialize(std::istream& in);
 	void deserializeRecruitmentMethod(RecruitmentMethod method, std::istream& in);
+  /**
+  * @name Agent Factory Methods 
+  * @todo Replace with a templated(?) form to decouple agent type
+  * @{
+  */
 	Mac* createMac(int row, int col, int birthtime, Mac::State state, bool NFkB, bool stat1);
 	Tgam* createTgam(int row, int col, int birthtime, Tgam::State state);
 	Tcyt* createTcyt(int row, int col, int birthtime, Tcyt::State state);
 	Treg* createTreg(int row, int col, int birthtime, Treg::State state);
+  /**@}*/
 
+  /**
+  * @brief Converts the time given by getTime() to appropriate days, hours, minutes
+  *
+  * @param[in] time
+  * @param[out] rDays
+  * @param[out] rHours
+  * @param[out] rMinutes
+  */
 	static void convertSimTime(const int time, int& rDays, int& rHours, int& rMinutes);
   void setODEsize();
   void macODEsize();
   void tcellODEsize();
   void timestepSync();
+  /**
+  * @brief Deep-copy of the simulation
+  */
   GrSimulation* clone() const;
 };
 

@@ -73,7 +73,7 @@ public:
 	void deserialize(std::istream& in);
   virtual RecruitmentBase* clone() const { return new RecruitmentLnODE(*this); }
 
-	void recruit(GrSimulation& sim);
+    void recruit(GrSimulation& sim, int time);
 };
 
 inline RecruitmentMethod RecruitmentLnODE::getMethod() const

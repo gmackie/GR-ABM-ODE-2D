@@ -117,8 +117,17 @@ void Treg::computeNextState(const int time, GrGrid& grid, Stats& stats, bool tnf
 // This will leave the simulation in an inconsistent state.
 void Treg::handleResting(const int time, GrGrid& grid, Stats& stats)
 {
-    Scalar currentTNF = grid.TNF(_pos); // Get TNF concentration for scaling Treg deactivation
-    Scalar currentIL10 = grid.il10(_pos); // Get IL10 concentration for scaling Treg deactivation
+//    Scalar currentTNF = grid.TNF(_pos); // Get TNF concentration for scaling Treg deactivation
+//    Scalar currentIL10 = grid.il10(_pos); // Get IL10 concentration for scaling Treg deactivation
+
+    Scalar TNFtoIL10Weight = _PARAM(PARAM_GR_KD1)/_PARAM(PARAM_GR_I_KD); // Comparing Kd allows us to scale the bound receptors such that the numbers do not favor TNFs higher affinity
+    Scalar numberFractionTNF;
+    if (_surfBoundTNFR1 == 0.0 && _surfBoundIL10R == 0.0)
+        numberFractionTNF = 0.0;
+    else
+        numberFractionTNF = (TNFtoIL10Weight * _surfBoundTNFR1)/((TNFtoIL10Weight * _surfBoundTNFR1) + _surfBoundIL10R); // Calculate the scaled number fraction of TNF (Like mol/weight fraction)
+
+//    std::cout << "Pos: " << _pos << "  Xtnf: " << numberFractionTNF << std::endl;
 
     for (int i = -1; i <= 1; i++)
 	{
@@ -139,11 +148,14 @@ void Treg::handleResting(const int time, GrGrid& grid, Stats& stats)
                       // IL10 is an exponential decay
                       // These are inverse equations of each other since TNF would upregulate the 'Monitor Molecule' while IL10 would
                       // downregulate the 'Monitor Molecule'
-                      Scalar scaledProbTNF = ((_PARAM(PARAM_TREG_PROB_DEACTIVATE) * currentTNF)/(currentTNF + _PARAM(PARAM_TREG_DEACTIVATE_HALF_SAT_TNF)));
-                      Scalar scaledProbIL10 = _PARAM(PARAM_TREG_PROB_DEACTIVATE) * pow(2.7183, -_PARAM(PARAM_TREG_DEACTIVATE_HALF_SAT_IL10) * currentIL10);
+//                      Scalar scaledProbTNF = ((_PARAM(PARAM_TREG_PROB_DEACTIVATE) * currentTNF)/(currentTNF + _PARAM(PARAM_TREG_DEACTIVATE_HALF_SAT_TNF)));
+//                      Scalar scaledProbIL10 = _PARAM(PARAM_TREG_PROB_DEACTIVATE) * pow(2.7183, -_PARAM(PARAM_TREG_DEACTIVATE_HALF_SAT_IL10) * currentIL10);
 
-                      Scalar scaledProb = std::min((scaledProbTNF + scaledProbIL10), _PARAM(PARAM_TREG_PROB_DEACTIVATE));
+//                      std::cout << "Scaled Prob: " << scaledProbTNF + scaledProbIL10 << std::endl;
 
+//                      Scalar scaledProb = std::min((scaledProbTNF + scaledProbIL10), _PARAM(PARAM_TREG_PROB_DEACTIVATE));
+
+                      Scalar scaledProb = _PARAM(PARAM_TREG_PROB_DEACTIVATE) * numberFractionTNF;
 //                      std::cout << "Pos :" << _pos << "  IL10: " << grid.il10(_pos) << "  TNF: " << grid.TNF(_pos) << "  Scaled Prob: " << scaledProb << std::endl;
                       if (coinFlip  <= scaledProb)
 					  {

@@ -26,8 +26,8 @@ private:
 public:
 	RecruitmentProb();
 	virtual ~RecruitmentProb();
-    void recruit(GrSimulation& sim);
-    void recruit(GrSimulation& sim, const Pos& pSource);
+    void recruit(GrSimulation& sim, int time);
+    void recruit(GrSimulation& sim, const Pos& pSource, size_t cellRecNum);
 
     static bool intCompareGTEQ(const double param1, const double param2);
     static bool MacThresholdRecNew(const GrGrid& grid, const Pos& pSource, double& rThreshold);
@@ -46,10 +46,10 @@ public:
   /*virtual*/ RecruitmentBase* clone() const { return new RecruitmentProb(*this); }
 protected:
 
-    bool PossibleRecruitMac(GrSimulation& sim, const Pos& pSource);
-    bool PossibleRecruitTgam(GrSimulation& sim, const Pos& pSource);
-    bool PossibleRecruitTcyt(GrSimulation& sim, const Pos& pSource);
-    bool PossibleRecruitTreg(GrSimulation& sim, const Pos& pSource);
+    bool PossibleRecruitMac(GrSimulation& sim, const Pos& pSource, size_t cellRecNum);
+    bool PossibleRecruitTgam(GrSimulation& sim, const Pos& pSource, size_t cellRecNum);
+    bool PossibleRecruitTcyt(GrSimulation& sim, const Pos& pSource, size_t cellRecNum);
+    bool PossibleRecruitTreg(GrSimulation& sim, const Pos& pSource, size_t cellRecNum);
 
 };
 

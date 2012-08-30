@@ -337,7 +337,7 @@ void RecruitmentLnODE::recruitTcells(GrSimulation& sim, Stats& stats,
 	_tcellQueue = newTcellQueue;
 }
 
-void RecruitmentLnODE::recruit(GrSimulation& sim)
+void RecruitmentLnODE::recruit(GrSimulation& sim, int)
 {
 	/* Solve the ODE */
 	const Stats& statsPrevious = sim.getStatsPrevious();

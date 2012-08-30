@@ -663,7 +663,7 @@ void GrSimulation::solve()
 	
     // Shuffle the sources and recruit agents from vascular sources every 10 minutes
         getGrid().shuffleSources();
-        _pRecruitment->recruit(*this);
+        _pRecruitment->recruit(*this, _time);
 
 	// reset statistics
 	_stats.resetAgentStats();

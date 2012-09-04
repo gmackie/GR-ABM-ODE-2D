@@ -1,9 +1,8 @@
-/**
-@page README-Linux Linux build instructions
-@tableofcontents
+Linux Build Instructions      {#readme-linux}
+========================
 
 Ubuntu 12.04
-============
+------------
 
 This also works for Linux Mint 12
 
@@ -14,7 +13,7 @@ For the gui:
     $ sudo apt-get install libqt4-opengl-dev qt4-dev-tools libqwt-dev
 
 Ubuntu 10.04
-============
+------------
 
 -# Run the following:
     $ sudo apt-get install subversion g++ zlib1g-dev
@@ -29,9 +28,9 @@ directory
       $ ./bootstrap.sh --prefix=/usr
       $ sudo ./b2 --without-python --without-mpi --prefix=/usr install
 
-For the gui:
-      $ sudo apt-get install libbz2-dev libqwt5-qt4-dev libqt4-opengl-dev qt4-dev-tools
+  For the gui:
 
+      $ sudo apt-get install libbz2-dev libqwt5-qt4-dev libqt4-opengl-dev qt4-dev-tools
 -# Create the file /usr/share/qt4/mkspecs/features/qwt.prf with the following contents:
 
         QwtVersion = 5.2.1
@@ -40,7 +39,7 @@ For the gui:
         INCLUDEPATH += $${QwtBase}/include/qwt-qt4
 
 Fedora 16
-=========
+---------
 
 **Note:** Fedora uses qmake-qt4 instead of qmake (symlink could be used)
 -# Run the following
@@ -50,7 +49,6 @@ Fedora 16
   For the gui:
 
       $ sudo yum install sudo yum install qt-devel qwt-devel
-
 -# Create the file /usr/lib/qt4/mkspecs/features/qwt.prf with the following contents:
 
         QwtVersion = 5.2.2
@@ -61,7 +59,7 @@ Fedora 16
 
 
 Our code
-========
+--------
 
     $ svn checkout svn://innoculant.micro.med.umich.edu/dev/gr2d/GR-ABM-ODE path/to/my/repo
     $ cd path/to/my/repo
@@ -75,4 +73,3 @@ For the gui version, type the following:
     $ qmake
     $ make
     $ ./grviz-lung --help
-*/

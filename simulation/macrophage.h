@@ -16,7 +16,7 @@ using namespace std;
 
 /*!
 @brief Macrophage agent class.
-@detail
+@details
 The state machine is given below:
 \dot
 digraph macrophage {
@@ -62,8 +62,8 @@ private:
 	bool _ICOS;
 	int _activationTime;
 	int _deactivationTime;
-    int _stat1Time;
-    int _nfkbTime;
+  int _stat1Time;
+  int _nfkbTime;
 	
   /**
   * @brief 
@@ -93,7 +93,13 @@ private:
   */
 	void handleChronicallyInfected(const int time, GrGrid& grid, Stats& stats);
   /**
-  * @brief 
+  * @details The following rules apply to recently activated macs:
+  * -# STAT1 is activated (proxy for IFN-&gamma;) for (Mr)[Mac::handleResting] and (Mi)[Mac::handleInfected] with
+  *    prob < 0.03 * (# T&gamma; in Moore neighborhood) - lifetime(=1.5 days)
+  * -# AND NF-&kappa;B is activated: biologically this means either:
+  *    + TNF > threshold_1 AND prob < (1-exp(boundTNFR1)
+  *    + Bacteria (Be > 100, total in Moore neighborhood) - lifetime(=100minutes)
+  * -# Ma kill internal bacteria (Bi) at a rate of 1 per time step (=10 minutes)
   *
   * @param time
   * @param grid
@@ -101,6 +107,9 @@ private:
   */
 	void handleActivated(const int time, GrGrid& grid, Stats& stats);
 	int getCountTgam(Tgam::State state, const GrGrid& grid) const;
+  /**
+  * @return Number of bacteria in moore neighborhood
+  */
 	double getExtMtbInMoore(const GrGrid& grid) const;
 
 public:

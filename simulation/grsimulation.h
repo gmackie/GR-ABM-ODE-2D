@@ -112,8 +112,21 @@ public:
   */
 	GrSimulation(const Pos& dim);
 	~GrSimulation();
+  /**
+  * @brief Initialize the simulation for t=0 with initial macs, etc
+  */
 	void init();
+  /**
+  * @brief Select all macrophages within the radius to be used in tracking
+  *
+  * @param molecularTrackingRadius defined radius (must be 0<r<DIM)
+  */
 	void initMolecularTracking(Scalar molecularTrackingRadius);
+  /**
+  * @brief Select all macrophages given to be used in tracking
+  *
+  * @param ids list of agent ids
+  */
 	void initMolecularTracking(const std::vector<size_t>& ids);
   /**
   * @brief Run the simulation for a 10 minute timestep
@@ -175,11 +188,13 @@ public:
   /**@}*/
 
   /**
-  * @copydoc GrSimulation::serialize
+  * Write the simulation in ascii form to stream in order to read it again later
+  * @see deserialize
   */
 	void serialize(std::ostream& out) const;
   /**
-  * @copydoc GrSimulation::deserialize
+  * Read the stream to initialize the simulation.  Do not run init() before/after calling this
+  * @see serialize
   */
 	void deserialize(std::istream& in);
 	void deserializeRecruitmentMethod(RecruitmentMethod method, std::istream& in);

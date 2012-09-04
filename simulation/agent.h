@@ -131,6 +131,17 @@ protected:
     
   /**
   * @brief Move an agent based on chemotaxis
+  * @details Agents move with respect to the gradient of chemokines at their
+  * current position.  These are effected in the following way:
+  * - Sensitivity ranges for CCs ([min, max])
+  * - Chemokine gradient define the probabilities (i.e. proportional) of moving
+  *   into different micro-compartments
+  * - CCL2, CCL5, and CXCL9 have different effect for different cell types
+  * 
+  * Each agent type also have crowding rules that relate to the size of the agent:
+  * - Only one macrophage per micro-compartment
+  * - Only one tcell may move to an occupied cell (occupier may be a tcell or macrophage)
+  *     + i.e. only 2 tcells or 1 tcell and 1 macrophage may exist in one micro-compartment
   *
   * @param grid Grid the agent is located on
   * @param ccl2 CCL2 effected?
@@ -426,7 +437,6 @@ public:
   * @return True if param1 > param2
   */
   virtual bool intCompareGT(const double param1, const double param2);
-    
 
   /**
   * @name Property Accessors

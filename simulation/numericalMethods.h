@@ -19,7 +19,7 @@ typedef valarray<double> Derivative;
 */
 struct DerivativeFunc {
   /**
-  * @brief 
+  * @brief given the initial ode state (s) and time (t), produce output f(s,t) = s'(t) / dt
   *
   * @param[in] s initial state (i.e. x)
   * @param[in] t time
@@ -104,9 +104,7 @@ struct Stepper {
   */
   virtual void step(ODEState& i, DerivativeFunc& fn, double t, double dt, double& lasttimestep, Derivative& error, void* params=0) = 0;
   /**
-  * @brief Order or accuracy of the method
-  *
-  * @return 
+  * @return Order or accuracy of the method
   */
   virtual size_t order() const = 0;
   virtual Stepper* clone() const = 0;
@@ -343,8 +341,7 @@ struct BSStepper : Stepper {
 #if 1
 
 /**
-* @brief Wrapper stepper for using a temporal adaptive stepping method
-* @todo Need reference
+* @brief Wrapper stepper for using a temporal adaptive stepping method. [Reference](http://en.wikipedia.org/wiki/Adaptive_stepsize)
 */
 struct AdaptiveStepper : Stepper {
   Stepper* stepper;

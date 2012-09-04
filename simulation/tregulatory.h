@@ -11,6 +11,20 @@
 #include "gr.h"
 #include "tcell.h"
 
+/**
+* @brief 
+* @details Tregs look in their Moore neighborhood and deactivate all cells
+* found with a probability (function of TNF and IL10 concentrations in the 
+* microcompartment).
+* - Mr-: ALL OFF and deactivation time (no interaction with bug).
+* - Mi-: ALL OFF and NO deactivation time (NF&kappa;B gives less TNF synthesis)
+*   Bi still proliferates and Be still uptaken
+* - Ma-: ALL OFF and deactivation time (no interaction with bug). Then the Ma
+*   becomes Mr or Mi, with lifespan back to initial Mr.
+* - Mci cannot be deactivated.
+* - A deactivated cell can be re-activated again by resetting the clock of
+*   deactivation time
+*/
 class Treg : public Tcell
 {
 public:
@@ -30,7 +44,16 @@ public:
 	Treg(int birthtime, int row, int col, Treg::State state);
 	~Treg();
 	void move(GrGrid& grid);
-    void secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDepletion, bool il10rDynamics, bool il10Depletion, double mdt);
+  void secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDepletion, bool il10rDynamics, bool il10Depletion, double mdt);
+  /**
+  * @copydoc Agent::computeNextState
+  * @details Tregs have only two explicit states: Active and Dead
+  * \ref Treg::State.  Tregs can die via the following two mechanisms:
+  * Apoptosis
+  * :    TNF-dependent (through TNFR1 pathway, same as TNF apoptosis for macs)
+  * Age
+  * :    (3 days)
+  */
 	void computeNextState(const int time, GrGrid& grid, Stats& stats, bool tnfrDynamics, bool nfkbDynamics, bool il10Depletion, bool);
 	void updateState();
   void updateStatistics(Stats& s) const;

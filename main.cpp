@@ -313,7 +313,8 @@ int main(int argc, char *argv[])
     }
   catch (std::exception& e)
     {
-      std::cerr << e.what() << std::endl;
+      std::cerr << "Error processing arguments: " << e.what() << std::endl;
+      printUsage(argv[0], desc);
       return 1;
     }
 

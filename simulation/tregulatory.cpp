@@ -155,7 +155,7 @@ void Treg::handleResting(const int time, GrGrid& grid, Stats& stats)
 
 //                      Scalar scaledProb = std::min((scaledProbTNF + scaledProbIL10), _PARAM(PARAM_TREG_PROB_DEACTIVATE));
 
-                      Scalar scaledProb = _PARAM(PARAM_TREG_PROB_DEACTIVATE) * numberFractionTNF;
+                      Scalar scaledProb = _PARAM(PARAM_TREG_PROB_DEACTIVATE) * ((numberFractionTNF * _PARAM(PARAM_TREG_DEACTIVATE_SLOPE)) + _PARAM(PARAM_TREG_DEACTIVATE_INTERCEPT));
 //                      std::cout << "Pos :" << _pos << "  IL10: " << grid.il10(_pos) << "  TNF: " << grid.TNF(_pos) << "  Scaled Prob: " << scaledProb << std::endl;
                       if (coinFlip  <= scaledProb)
 					  {

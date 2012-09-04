@@ -130,7 +130,7 @@ const QString MainWindow::_OUTCOME_METHOD_1 = "Method 1";
 const QString MainWindow::_OUTCOME_METHOD_2 = "Method 2";
 
 MainWindow::MainWindow(MainInterface* pItfc, GLWindow* pGLWindow, QWidget* pParamWindow,
-                       StatWidget* pStatWidget, AgentsWidget* pAgentsWidget, QWidget* parent)
+                       StatWidget* pStatWidget, AgentsWidget* pAgentsWidget, const QDir& dir, QWidget* parent)
   : QMainWindow(parent)
   , _ui()
   , _pItfc(pItfc)
@@ -148,6 +148,7 @@ MainWindow::MainWindow(MainInterface* pItfc, GLWindow* pGLWindow, QWidget* pPara
   , _stopwatch(QTime::currentTime())
   , _pSnapshot(NULL)
   , _scriptingMode(false)
+  , _dir(dir)
 {
   assert(_pItfc);
   assert(_pGLWindow);
@@ -1549,7 +1550,7 @@ void MainWindow::updateOutcomeSettings()
 
 void MainWindow::loadState()
 {
-  QString fileName = QFileDialog::getOpenFileName(this, "Load state", "", "*");
+  QString fileName = QFileDialog::getOpenFileName(this, "Load state", _dir.absolutePath(), "Saved State files (*.state *.state.gz)");
   if (fileName != QString::null)
     {
       loadState(fileName.toLatin1().data());
@@ -1609,7 +1610,7 @@ void MainWindow::saveState()
   if (_simStatus == SIM_RUNNING)
     switchStatus(SIM_PAUSED);
 
-  QString fileName = QFileDialog::getSaveFileName(this, "Save state", "", "*");
+  QString fileName = QFileDialog::getSaveFileName(this, "Save state", _dir.absolutePath(), "Saved State files (*.state *.state.gz)");
   if (fileName != QString::null)
     {
 

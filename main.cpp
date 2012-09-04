@@ -317,12 +317,14 @@ int main(int argc, char *argv[])
       return 1;
     }
 
+  QDir paramDir = QFileInfo(QString::fromStdString(inputFileName)).absoluteDir();
+
   ScalarAgentGrid agentGrid(dim);
   AgentsVisualization agentsVisualization(dim, &agentGrid);
   MainInterface itfc(Pos(dim, dim), &agentsVisualization, &agentGrid);
   GLWindow glWindow(&itfc);
   ParamWindow paramWindow(&itfc);
-  MainWindow w(&itfc, &glWindow, &paramWindow, new StatWidget(itfc.getSimulation().getStats()), new AgentsWidget(&agentsVisualization));
+  MainWindow w(&itfc, &glWindow, &paramWindow, new StatWidget(itfc.getSimulation().getStats()), new AgentsWidget(&agentsVisualization), paramDir);
 
   /* set recruitment method */
   // Parameters must be loaded, since since the base lymph ODE class, RecruitmentLnODE, uses parameters in its constructor.

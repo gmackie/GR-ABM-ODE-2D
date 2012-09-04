@@ -5,6 +5,7 @@
 #include <QtGui/QMainWindow>
 #include <QMessageBox>
 #include <QString>
+#include <QDir>
 #include "ui_mainwindow.h"
 
 #include "gui/agenthistogram.h"
@@ -25,7 +26,7 @@ class MainWindow : public QMainWindow
 
 public:
   MainWindow(MainInterface* pItfc, GLWindow* pGLWindow, QWidget* pParamWindow,
-             StatWidget* pStatWidget, AgentsWidget* pAgentsWidget, QWidget* parent = 0);
+             StatWidget* pStatWidget, AgentsWidget* pAgentsWidget, const QDir& dir, QWidget* parent = 0);
   ~MainWindow();
   Ui::MainWindowClass& getUI();
   void setScriptingMode(bool scriptingMode);
@@ -197,6 +198,7 @@ private:
   QTime _stopwatch;
   Snapshot* _pSnapshot;
   bool _scriptingMode;
+  QDir _dir;
 };
 
 inline void MainWindow::selectSmokeColorMap()

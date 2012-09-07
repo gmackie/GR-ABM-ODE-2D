@@ -23,8 +23,6 @@ void RecruitmentProb::recruit(GrSimulation &sim, int time)
     const std::vector<Pos>& sources = grid.getSources();
     Stats& stats = sim.getStats();
 
-//    std::cout << "Recruit Loop" << std::endl;
-
     for (PosVector::const_iterator it = sources.begin(); it != sources.end(); it++)
     {
 
@@ -39,11 +37,11 @@ void RecruitmentProb::recruit(GrSimulation &sim, int time)
         }
     }
 
-    // Update fluxes
-    stats.getRecFlux<Mac>() = (double)stats.getNrRec(MAC)/time;
-    stats.getRecFlux<Tgam>() = (double)stats.getNrRec(TGAM)/time;
-    stats.getRecFlux<Tcyt>() = (double)stats.getNrRec(TCYT)/time;
-    stats.getRecFlux<Treg>() = (double)stats.getNrRec(TREG)/time;
+    // Update Rates
+    stats.getRecRate<Mac>() = (double)stats.getNrRec(MAC)/time;
+    stats.getRecRate<Tgam>() = (double)stats.getNrRec(TGAM)/time;
+    stats.getRecRate<Tcyt>() = (double)stats.getNrRec(TCYT)/time;
+    stats.getRecRate<Treg>() = (double)stats.getNrRec(TREG)/time;
 }
 
 
@@ -59,12 +57,14 @@ void RecruitmentProb::recruit(GrSimulation &sim, const Pos& pSource, size_t cell
 
     double runningProbability = 0.0;
     const double randomNumber = g_Rand.getReal();
-    const double evenProb = 0.25;
-    const double MacProb = 0.25, TgamProb = 0.50, TcytProb = 0.75, TregProb = 1.0; // Split choice of cell into an even distribution
+//    const double evenProb = 0.25;
+    const double evenProb = 0.50;
+    const double evenProbTcell = (1.0/3.0);
     const bool pmac = PossibleRecruitMac(sim, pSource, cellRecNum)  && !grid.hasAgentType(MAC, pSource);
     const bool ptgam = PossibleRecruitTgam(sim, pSource, cellRecNum) && sim.getTCellRecruitmentBegun();
     const bool ptcyt = PossibleRecruitTcyt(sim, pSource, cellRecNum) && sim.getTCellRecruitmentBegun();
     const bool ptreg = PossibleRecruitTreg(sim, pSource, cellRecNum) && sim.getTCellRecruitmentBegun();
+    const bool ptcell = ptgam || ptcyt || ptreg;
 //    std::cout << "Possible Mac: " << pmac  << "  Possible Tgam: " << ptgam << "  Possible Tcyt: " << ptcyt << "  Possible Treg: " << ptreg << std::endl;
 
     // Update Recruitment Stats - Where cells are actively being recruited from
@@ -73,48 +73,14 @@ void RecruitmentProb::recruit(GrSimulation &sim, const Pos& pSource, size_t cell
     stats.getNrSourcesActive<Tcyt>() += ptcyt;
     stats.getNrSourcesActive<Treg>() += ptreg;
 
-//    if (randomNumber < MacProb)
-//    {
-//        if (pmac)
-//        {
-//            recruitCellMac(sim, pSource);
-//            return;
-//        }
-//    }
-//    else if (randomNumber < TgamProb)
-//    {
-//        if (ptgam)
-//        {
-//            recruitCellTgam(sim, pSource);
-//            return;
-//        }
-//    }
-//    else if (randomNumber < TcytProb)
-//    {
-//        if (ptcyt)
-//        {
-//            recruitCellTcyt(sim, pSource);
-//            return;
-//        }
-//    }
-//    else if (randomNumber <= TregProb)
-//    {
-//        if (ptreg)
-//        {
-//            recruitCellTreg(sim, pSource);
-//            return;
-//        }
-//    }
-//    else
-//        throw std::runtime_error("Something has gone horribly wrong with recruitment probabilities -- Please check recruitment algorithm");
+//    const size_t countPossible = pmac + ptgam + ptcyt + ptreg;
 
+    const size_t countPossible = pmac + ptcell;
 
-    const size_t countPossible = pmac + ptgam + ptcyt + ptreg;
 
     if (pmac)
     {
-        runningProbability += (evenProb * pmac) + (evenProb / countPossible) * (!ptgam +
-                            !ptcyt + !ptreg);
+        runningProbability += (evenProb * pmac) + (evenProb / countPossible) * (!ptcell);
 
         if ((randomNumber < runningProbability))
         {
@@ -126,50 +92,126 @@ void RecruitmentProb::recruit(GrSimulation &sim, const Pos& pSource, size_t cell
 
     }
 
-    if (ptgam)
+    if (ptcell)
     {
-        runningProbability += (evenProb * ptgam) + (evenProb / countPossible) * (!pmac +
-                            !ptcyt + !ptreg);
+        runningProbability += (evenProb * ptcell) + (evenProb / countPossible) * (!pmac);
 
-        if ((randomNumber < runningProbability))
+        if ((randomNumber <= runningProbability))
         {
-            recruitCellTgam(sim, pSource);
-            ++stats.getNrRec(TGAM);
-//            std::cout << "Recruit Tgam and Break" << std::endl;
+
+            double runningProbabilityTcell = 0.0;
+            const size_t countPossibleTcell = ptgam + ptcyt + ptreg;
+            const double randomNumberTcell = g_Rand.getReal();
+
+                if (ptgam)
+                {
+                    runningProbabilityTcell += (evenProbTcell * ptgam) + (evenProbTcell/countPossibleTcell) * (!ptcyt + !ptreg);
+
+                    if ((randomNumberTcell < runningProbabilityTcell))
+                    {
+                        recruitCellTgam(sim, pSource);
+                        ++stats.getNrRec(TGAM);
+            //            std::cout << "Recruit Tgam and Break" << std::endl;
+                        return;
+                    }
+
+                }
+
+
+                if (ptcyt)
+                {
+                    runningProbabilityTcell += (evenProbTcell * ptcyt) + (evenProbTcell / countPossibleTcell) * (!ptgam + !ptreg);
+
+                    if ((randomNumberTcell < runningProbabilityTcell))
+                    {
+                        recruitCellTcyt(sim, pSource);
+                        ++stats.getNrRec(TCYT);
+            //            std::cout << "Recruit Tcyt and Break" << std::endl;
+                        return;
+                    }
+
+                }
+
+
+                if (ptreg)
+                {
+                    runningProbabilityTcell += (evenProbTcell * ptreg) + (evenProbTcell / countPossibleTcell) * (!ptgam + !ptcyt);
+
+                    if ((randomNumberTcell <= runningProbabilityTcell))
+                    {
+                        recruitCellTreg(sim, pSource);
+                        ++stats.getNrRec(TREG);
+            //            std::cout << "Recruit Treg and Break" << std::endl;
+                        return;
+                    }
+
+                }
+
+            throw std::runtime_error("Something has gone horribly wrong with Tcell Recruitment -- Please check recruitment algorithm");
             return;
         }
 
     }
 
-    if (ptcyt)
-    {
-        runningProbability += (evenProb * ptcyt) + (evenProb / countPossible) * (!ptgam +
-                            !pmac + !ptreg);
+//    if (pmac)
+//    {
+//        runningProbability += (evenProb * pmac) + (evenProb / countPossible) * (!ptgam +
+//                            !ptcyt + !ptreg);
 
-        if ((randomNumber < runningProbability))
-        {
-            recruitCellTcyt(sim, pSource);
-            ++stats.getNrRec(TCYT);
-//            std::cout << "Recruit Tcyt and Break" << std::endl;
-            return;
-        }
+//        if ((randomNumber < runningProbability))
+//        {
+//            recruitCellMac(sim, pSource);
+//            ++stats.getNrRec(MAC);
+////            std::cout << "Recruit Mac and Break" << std::endl;
+//            return;
+//        }
 
-    }
+//    }
 
-    if (ptreg)
-    {
-        runningProbability += (evenProb * ptreg) + (evenProb / countPossible) * (!ptgam +
-                            !ptcyt + !ptreg);
+//    if (ptgam)
+//    {
+//        runningProbability += (evenProb * ptgam) + (evenProb / countPossible) * (!pmac +
+//                            !ptcyt + !ptreg);
 
-        if ((randomNumber < runningProbability))
-        {
-            recruitCellTreg(sim, pSource);
-            ++stats.getNrRec(TREG);
-//            std::cout << "Recruit Treg and Break" << std::endl;
-            return;
-        }
+//        if ((randomNumber < runningProbability))
+//        {
+//            recruitCellTgam(sim, pSource);
+//            ++stats.getNrRec(TGAM);
+////            std::cout << "Recruit Tgam and Break" << std::endl;
+//            return;
+//        }
 
-    }
+//    }
+
+//    if (ptcyt)
+//    {
+//        runningProbability += (evenProb * ptcyt) + (evenProb / countPossible) * (!ptgam +
+//                            !pmac + !ptreg);
+
+//        if ((randomNumber < runningProbability))
+//        {
+//            recruitCellTcyt(sim, pSource);
+//            ++stats.getNrRec(TCYT);
+////            std::cout << "Recruit Tcyt and Break" << std::endl;
+//            return;
+//        }
+
+//    }
+
+//    if (ptreg)
+//    {
+//        runningProbability += (evenProb * ptreg) + (evenProb / countPossible) * (!ptgam +
+//                            !ptcyt + !pmac);
+
+//        if ((randomNumber < runningProbability))
+//        {
+//            recruitCellTreg(sim, pSource);
+//            ++stats.getNrRec(TREG);
+////            std::cout << "Recruit Treg and Break" << std::endl;
+//            return;
+//        }
+
+//    }
 
 }
 
@@ -386,19 +428,19 @@ bool RecruitmentProb::PossibleRecruitMac(GrSimulation& sim, const Pos& pSource, 
     GrGrid& grid = sim.getGrid();
     Stats& stats = sim.getStats();
 
+    double macProbValue = 0.0;
+    size_t testNum = 0;
+    bool macBool = MacThresholdRecNew(grid, pSource, macProbValue);
+
+    if (macBool && cellRecNum == testNum)
+        stats.getNrSources<Mac>() += macBool;
+
     if (!grid.isCaseated(pSource) && grid.getNumberOfAgents(pSource) < 2 && !grid.hasAgentType(MAC, pSource))
     {
         // if the number of macrophages on the grid is less than _INITIAL_NUMBER_OF_MACROPHAGES,
         // recruit a resting macrophage
         if (sim.getStats().getNrOfMacs() < _PARAM(PARAM_MAC_INIT_NUMBER))
             return true;
-
-        double macProbValue = 0.0;
-        size_t testNum = 0;
-        bool macBool = MacThresholdRecNew(grid, pSource, macProbValue);
-
-        if (macBool && cellRecNum == testNum)
-            stats.getNrSources<Mac>() += macBool;
 
         return (macBool && g_Rand.getReal() < (_PARAM(PARAM_MAC_MAX_RECRUITMENT) * macProbValue));
     }
@@ -414,12 +456,15 @@ bool RecruitmentProb::PossibleRecruitTgam(GrSimulation& sim, const Pos& pSource,
     GrGrid& grid = sim.getGrid();
     Stats& stats = sim.getStats();
 
+    double TgamProbValue = 0.0;
+    size_t testNum = 0;
+    bool TgamBool = TgamThresholdRecNew(grid, pSource, TgamProbValue);
+
+    if (TgamBool && cellRecNum == testNum)
+        stats.getNrSources<Tgam>() += TgamBool;
+
     if (!grid.isCaseated(pSource) && grid.getNumberOfAgents(pSource) < 2)
     {
-        double TgamProbValue = 0.0;
-        size_t testNum = 0;
-        bool TgamBool = TgamThresholdRecNew(grid, pSource, TgamProbValue);
-
         if (grid.getNumberOfAgents(pSource) == 1)
         {
             if (grid.hasAgentType(MAC, pSource))
@@ -427,9 +472,6 @@ bool RecruitmentProb::PossibleRecruitTgam(GrSimulation& sim, const Pos& pSource,
             else
                 TgamBool = g_Rand.getReal() < _PARAM(PARAM_TCELL_PROB_MOVE_TO_TCELL);
         }
-
-        if (TgamBool && cellRecNum == testNum)
-            stats.getNrSources<Tgam>() += TgamBool;
 
         return (TgamBool && g_Rand.getReal() < (_PARAM(PARAM_TGAM_MAX_RECRUITMENT) * TgamProbValue));
 
@@ -445,13 +487,15 @@ bool RecruitmentProb::PossibleRecruitTcyt(GrSimulation& sim, const Pos& pSource,
     GrGrid& grid = sim.getGrid();
     Stats& stats = sim.getStats();
 
+    double TcytProbValue = 0.0;
+    size_t testNum = 0;
+    bool TcytBool = TcytThresholdRecNew(grid, pSource, TcytProbValue);
+
+    if (TcytBool && cellRecNum == testNum)
+        stats.getNrSources<Tcyt>() += TcytBool;
+
     if (!grid.isCaseated(pSource) && grid.getNumberOfAgents(pSource) < 2)
     {
-        double TcytProbValue = 0.0;
-        size_t testNum = 0;
-        bool TcytBool = TcytThresholdRecNew(grid, pSource, TcytProbValue);
-
-
         if (grid.getNumberOfAgents(pSource) == 1)
         {
             if (grid.hasAgentType(MAC, pSource))
@@ -459,9 +503,6 @@ bool RecruitmentProb::PossibleRecruitTcyt(GrSimulation& sim, const Pos& pSource,
             else
                 TcytBool = g_Rand.getReal() < _PARAM(PARAM_TCELL_PROB_MOVE_TO_TCELL);
         }
-
-        if (TcytBool && cellRecNum == testNum)
-            stats.getNrSources<Tcyt>() += TcytBool;
 
         return (TcytBool && g_Rand.getReal() < (_PARAM(PARAM_TCYT_MAX_RECRUITMENT) * TcytProbValue));
     }
@@ -476,12 +517,15 @@ bool RecruitmentProb::PossibleRecruitTreg(GrSimulation& sim, const Pos& pSource,
     GrGrid& grid = sim.getGrid();
     Stats& stats = sim.getStats();
 
+    double TregProbValue = 0.0;
+    size_t testNum = 0;
+    bool TregBool = TregThresholdRecNew(grid, pSource, TregProbValue);
+
+    if (TregBool && cellRecNum == testNum)
+        stats.getNrSources<Treg>() += TregBool;
+
     if (!grid.isCaseated(pSource) && grid.getNumberOfAgents(pSource) < 2)
     {
-        double TregProbValue = 0.0;
-        size_t testNum = 0;
-        bool TregBool = TregThresholdRecNew(grid, pSource, TregProbValue);
-
         if (grid.getNumberOfAgents(pSource) == 1)
         {
             if (grid.hasAgentType(MAC, pSource))
@@ -489,9 +533,6 @@ bool RecruitmentProb::PossibleRecruitTreg(GrSimulation& sim, const Pos& pSource,
             else
                 TregBool = g_Rand.getReal() < _PARAM(PARAM_TCELL_PROB_MOVE_TO_TCELL);
         }
-
-        if (TregBool && cellRecNum == testNum)
-            stats.getNrSources<Treg>() += TregBool;
 
         return (TregBool && g_Rand.getReal() < (_PARAM(PARAM_TREG_MAX_RECRUITMENT) * TregProbValue));
     }

@@ -102,9 +102,9 @@ inline bool RecruitmentProb::intCompareGTEQ(const double param1, const double pa
 
 inline bool RecruitmentProb::MacThresholdRecNew(const GrGrid &grid, const Pos &pSource, double &rThreshold)
 {
-    const double VmaxCCL2 = (1.0)/(3.0); // Vmax is set by the number of species recruitment is based off so all values scale between 0 and 1
-    const double VmaxCCL5 = (1.0)/(3.0); // Vmax is set by the number of species recruitment is based off so all values scale between 0 and 1
-    const double VmaxTNF = (1.0)/(3.0); // Vmax is set by the number of species recruitment is based off so all values scale between 0 and 1
+    const double VmaxCCL2 = (3.0)/(8.0); // Vmax is set by the number of species recruitment is based off so all values scale between 0 and 1
+    const double VmaxCCL5 = (3.0)/(8.0); // Vmax is set by the number of species recruitment is based off so all values scale between 0 and 1
+    const double VmaxTNF = (1.0)/(4.0); // Vmax is set by the number of species recruitment is based off so all values scale between 0 and 1
 
     const Scalar ratioCCL5toCCL2 = _PARAM(PARAM_MAC_SEC_RATE_CCL5) / _PARAM(PARAM_MAC_SEC_RATE_CCL2);
 
@@ -134,10 +134,10 @@ inline bool RecruitmentProb::MacThresholdRecNew(const GrGrid &grid, const Pos &p
 
 inline bool RecruitmentProb::TgamThresholdRecNew(const GrGrid &grid, const Pos &pSource, double &rThreshold)
 {
-    const double VmaxCCL2 = (1.0)/(4.0); // Vmax is set by the number of species recruitment is based off so all values scale between 0 and 1
-    const double VmaxCCL5 = (1.0)/(4.0); // Vmax is set by the number of species recruitment is based off so all values scale between 0 and 1
-    const double VmaxTNF = (1.0)/(4.0); // Vmax is set by the number of species recruitment is based off so all values scale between 0 and 1
-    const double VmaxCXCL9 = (1.0)/(4.0); // Vmax is set by the number of species recruitment is based off so all values scale between 0 and 1
+    const double VmaxCCL2 = (2.0)/(9.0); // Vmax is set by the number of species recruitment is based off so all values scale between 0 and 1
+    const double VmaxCCL5 = (2.0)/(9.0); // Vmax is set by the number of species recruitment is based off so all values scale between 0 and 1
+    const double VmaxTNF = (1.0)/(3.0); // Vmax is set by the number of species recruitment is based off so all values scale between 0 and 1
+    const double VmaxCXCL9 = (2.0)/(9.0); // Vmax is set by the number of species recruitment is based off so all values scale between 0 and 1
 
     const Scalar ratioCCL5toCCL2 = _PARAM(PARAM_MAC_SEC_RATE_CCL5) / _PARAM(PARAM_MAC_SEC_RATE_CCL2);
     const Scalar ratioCXCL9toCCL2 = _PARAM(PARAM_MAC_SEC_RATE_CXCL9) / _PARAM(PARAM_MAC_SEC_RATE_CCL2);

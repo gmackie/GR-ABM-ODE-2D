@@ -266,7 +266,7 @@ void GLWindow::updateSelectedCellStats()
         = pAgentGrid->getGrid()[_selRow * _ui.glWidget->dim.x + _selCol];
 
       QString str = QString("pos = (%1,%2)").arg(_selCol).arg(_selRow);
-
+#if 0
       if (GET_BIT(item._bitMask, ScalarAgentGrid::_bitCas))
         {
           str += ", caseous";
@@ -318,6 +318,7 @@ void GLWindow::updateSelectedCellStats()
         }
 
       str += QString(", Be = %1").arg(item._extMtb, 0, 'f', 2);
+#endif
 
       glColor3f(1.0f, 0.0f, 0.0f);
       _ui.glWidget->renderText(10, 20, str);

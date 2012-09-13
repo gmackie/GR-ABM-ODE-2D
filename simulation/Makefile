@@ -22,7 +22,7 @@ all: release
 debug:	CXXFLAGS += -DDEBUG -DVERBOSE -O0 -g -Wextra
 debug:	gr
 
-release:	CXXFLAGS += -DNDEBUG -O3
+release:	CXXFLAGS +=-O3
 release:	gr
 
 openmp:  CXXFLAGS += -DNDEBUG -O3 -fopenmp

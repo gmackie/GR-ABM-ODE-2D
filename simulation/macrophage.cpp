@@ -724,6 +724,7 @@ void Mac::handleInfected(const int time, GrGrid& grid, Stats& stats, bool /*nfkb
 	if (_intMtb >= _PARAM(PARAM_MAC_THRESHOLD_BECOME_CI_INTMTB))
 	{
 		_nextState = Mac::MAC_CINFECTED;
+		_NFkB = true;
 	}
 	else
 	{

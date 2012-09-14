@@ -799,6 +799,7 @@ void Mac::handleChronicallyInfected(const int time, GrGrid& grid, Stats& stats)
 	else
 	{
 		_nextState = Mac::MAC_CINFECTED;
+		_NFkB = true;
 	}
 }
 

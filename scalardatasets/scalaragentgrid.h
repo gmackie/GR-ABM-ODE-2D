@@ -20,6 +20,10 @@ struct ScalarAgentItem
   const Agent* _pAgent[2];
   int _nKillings;
   int _nRecruitments;
+  int _nRecruitmentsMac;
+  int _nRecruitmentsTgam;
+  int _nRecruitmentsTcyt;
+  int _nRecruitmentsTreg;
   int _nSecretions;
   double _attractant;
   double _TNF;

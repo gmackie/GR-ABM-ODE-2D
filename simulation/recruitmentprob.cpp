@@ -378,6 +378,7 @@ inline void RecruitmentProb::recruitCellMac(GrSimulation &sim, const Pos &pSourc
     assert(!grid.isCaseated(pSource) && grid.getNumberOfAgents(pSource) < 2 && !grid.hasAgentType(MAC, pSource));
 
     ++grid.nRecruitments(pSource);
+    ++grid.nRecruitmentsMac(pSource);
     Mac* newMac = sim.createMac(pSource.x, pSource.y,
         sim.getTime() - g_Rand.getInt(_PARAM(PARAM_MAC_AGE)), Mac::MAC_RESTING, false, false);
     if (sim.getNfkbDynamics())
@@ -395,6 +396,7 @@ inline void RecruitmentProb::recruitCellTgam(GrSimulation &sim, const Pos &pSour
     assert(!grid.isCaseated(pSource) && grid.getNumberOfAgents(pSource) < 2);
 
     ++grid.nRecruitments(pSource);
+    ++grid.nRecruitmentsTgam(pSource);
     sim.createTgam(pSource.x, pSource.y,
         sim.getTime() - g_Rand.getInt(_PARAM(PARAM_TCELL_AGE), 1), Tgam::TGAM_ACTIVE);
 }
@@ -407,6 +409,7 @@ inline void RecruitmentProb::recruitCellTcyt(GrSimulation &sim, const Pos &pSour
     assert(!grid.isCaseated(pSource) && grid.getNumberOfAgents(pSource) < 2);
 
     ++grid.nRecruitments(pSource);
+    ++grid.nRecruitmentsTcyt(pSource);
     sim.createTcyt(pSource.x, pSource.y,
         sim.getTime() - g_Rand.getInt(_PARAM(PARAM_TCELL_AGE), 1), Tcyt::TCYT_ACTIVE);
 }
@@ -418,6 +421,7 @@ inline void RecruitmentProb::recruitCellTreg(GrSimulation &sim, const Pos &pSour
     assert(!grid.isCaseated(pSource) && grid.getNumberOfAgents(pSource) < 2);
 
     ++grid.nRecruitments(pSource);
+    ++grid.nRecruitmentsTreg(pSource);
     sim.createTreg(pSource.x, pSource.y,
         sim.getTime() - g_Rand.getInt(_PARAM(PARAM_TCELL_AGE), 1), Treg::TREG_ACTIVE);
 }

@@ -373,6 +373,8 @@ public:
   bool TNFinducedApoptosis(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics);
   bool TNFinducedNFkB(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics);
 
+  void calcIkmRNA(GrGrid& grid, double& kmRNA, double ksynth, bool il10rDynamics);
+
   void checkTolerance(valarray<double>& veccheck);
 
 	virtual void solveDegradation (GrGrid& grid, double dt, bool tnfrDynamics, bool il10rDynamics) = 0;

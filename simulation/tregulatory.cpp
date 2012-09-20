@@ -120,12 +120,12 @@ void Treg::handleResting(const int time, GrGrid& grid, Stats& stats)
 //    Scalar currentTNF = grid.TNF(_pos); // Get TNF concentration for scaling Treg deactivation
 //    Scalar currentIL10 = grid.il10(_pos); // Get IL10 concentration for scaling Treg deactivation
 
-    Scalar TNFtoIL10Weight = _PARAM(PARAM_GR_KD1)/_PARAM(PARAM_GR_I_KD); // Comparing Kd allows us to scale the bound receptors such that the numbers do not favor TNFs higher affinity
+    Scalar IL10toTNFWeight = (_PARAM(PARAM_GR_I_K_ON) * (_surfIL10R + _surfBoundIL10R)) / (_PARAM(PARAM_GR_K_ON1) * (_surfBoundTNFR1 + _surfTNFR1)); // Comparing Kd allows us to scale the bound receptors such that the numbers do not favor TNFs higher affinity
     Scalar numberFractionTNF;
     if (_surfBoundTNFR1 == 0.0 && _surfBoundIL10R == 0.0)
         numberFractionTNF = 0.0;
     else
-        numberFractionTNF = (TNFtoIL10Weight * _surfBoundTNFR1)/((TNFtoIL10Weight * _surfBoundTNFR1) + _surfBoundIL10R); // Calculate the scaled number fraction of TNF (Like mol/weight fraction)
+        numberFractionTNF = (IL10toTNFWeight * _surfBoundTNFR1)/((IL10toTNFWeight * _surfBoundTNFR1) + _surfBoundIL10R); // Calculate the scaled number fraction of TNF (Like mol/weight fraction)
 
 //    std::cout << "Pos: " << _pos << "  Xtnf: " << numberFractionTNF << std::endl;
 

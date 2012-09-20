@@ -236,6 +236,10 @@ void GLWindow::updateSelectedCellStats()
       gridInfo->setText(0, "Grid Properties");
       gridInfo->addChild(make_item("nKillings",     item._nKillings,     ""));
       gridInfo->addChild(make_item("nRecruitments", item._nRecruitments, ""));
+      gridInfo->addChild(make_item("nRecruitmentsMac", item._nRecruitmentsMac, ""));
+      gridInfo->addChild(make_item("nRecruitmentsTgam", item._nRecruitmentsTgam, ""));
+      gridInfo->addChild(make_item("nRecruitmentsTcyt", item._nRecruitmentsTcyt, ""));
+      gridInfo->addChild(make_item("nRecruitmentsTreg", item._nRecruitmentsTreg, ""));
       gridInfo->addChild(make_item("nSecretions",   item._nSecretions,   ""));
       gridInfo->addChild(make_item("attractant",    item._attractant,    ""));
       gridInfo->addChild(make_item("TNF",           item._TNF,           ""));

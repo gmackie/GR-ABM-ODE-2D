@@ -46,6 +46,10 @@ typedef Indexer2D Indexer;
 #define GRIDS_DEFS  \
   GRID       (int, nKillings)         \
   GRID       (int, nRecruitments)         \
+  GRID       (int, nRecruitmentsMac)         \
+  GRID       (int, nRecruitmentsTgam)         \
+  GRID       (int, nRecruitmentsTcyt)         \
+  GRID       (int, nRecruitmentsTreg)         \
   GRID       (int, nSecretions)         \
   PADDED_GRID(Scalar, macAttractant)  \
   PADDED_GRID(Scalar, TNF)  \

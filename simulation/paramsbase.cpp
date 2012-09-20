@@ -121,7 +121,8 @@ const ParamDescription ParamsBase::_description[_PARAM_COUNT] =
     // molecular IL10 associated parameters
     { "IkSynthMacInf",                      GR_NODE,	false,	false,	0.0,	0,	"#/cell.s",		    "sIL10 synthesis rate for infected Macs" },	
     { "IkSynthMacAct",                      GR_NODE,	false,	false,	0.0,	0,	"#/cell.s",		    "sIL10 synthesis rate for activated Macs" },	
-    { "IkSynthTcell",                       GR_NODE,	false,	false,	0.0,	0,	"#/cell.s",		    "sIL10 synthesis rate for T cells" },	
+    { "halfSatIL10mRNA",                    GR_NODE,	false,	false,	0.0,	0,	"#/cell",		    "Half Sat for TNF induction of IL10 in activated Macs" },
+    { "IkSynthTcell",                       GR_NODE,	false,	false,	0.0,	0,	"#/cell.s",		    "sIL10 synthesis rate for T cells" },
     { "IkD",                                GR_NODE,	false,	false,	0.0,	0,	"M",		        "sIL10/IL10R equilibrium dissociation rate constant" },	
     { "IkOn",							    GR_NODE,	false,	false,	0.0,	0,	"1/M.s",		    "sIL10/IL10R association rate constant" },
 	{ "IkOff",							    GR_NODE,	false,	false,	0.0,	0,	"1/s",		        "sIL10/IL10R dissociation rate constant" },

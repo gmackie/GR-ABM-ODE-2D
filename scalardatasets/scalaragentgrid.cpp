@@ -41,6 +41,10 @@ void ScalarAgentGrid::evaluate(const Simulation* pSimulation)
           item._bitMask = 0;
           item._nKillings = grid.nKillings(p);
           item._nRecruitments = grid.nRecruitments(p);
+          item._nRecruitmentsMac = grid.nRecruitmentsMac(p);
+          item._nRecruitmentsTgam = grid.nRecruitmentsTgam(p);
+          item._nRecruitmentsTcyt = grid.nRecruitmentsTcyt(p);
+          item._nRecruitmentsTreg = grid.nRecruitmentsTreg(p);
           item._nSecretions = grid.nSecretions(p);
           item._attractant = grid.macAttractant(p);
           item._TNF = grid.TNF(p);

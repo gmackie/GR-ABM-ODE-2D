@@ -54,6 +54,7 @@ void Tcyt::secrete(GrGrid& grid, bool tnfrDynamics, bool, bool tnfDepletion, boo
 	
 	_kSynth = _PARAM(PARAM_GR_K_SYNTH_TCELL)/10;
     _kmRNA = _PARAM(PARAM_GR_K_RNA_TCELL)/10;
+    calcIkmRNA(grid, _kmRNA, _kSynth, il10rDynamics);
     _kISynth = 0.0;
     
 	if (!tnfrDynamics && !tnfDepletion)

@@ -91,6 +91,7 @@ typedef enum {
     // molecular IL10 associated parameters
     PARAM_GR_I_K_SYNTH_MAC_INF,
     PARAM_GR_I_K_SYNTH_MAC_ACT,
+    PARAM_GR_I_HALF_SAT_IL10_MRNA,
     PARAM_GR_I_K_SYNTH_TCELL,
     PARAM_GR_I_KD,
     PARAM_GR_I_K_ON,

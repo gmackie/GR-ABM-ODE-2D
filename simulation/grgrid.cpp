@@ -116,6 +116,10 @@ void GrGrid::serialize(std::ostream& out) const
 		{
 			out << nKillings(p) << endl;
 			out << nRecruitments(p) << endl;
+            out << nRecruitmentsMac(p) << endl;
+            out << nRecruitmentsTgam(p) << endl;
+            out << nRecruitmentsTcyt(p) << endl;
+            out << nRecruitmentsTreg(p) << endl;
 			out << nSecretions(p) << endl;
 			out << macAttractant(p) << endl;
 			out << TNF(p) << endl;
@@ -193,6 +197,10 @@ void GrGrid::deserialize(std::istream& in)
 
 		in >> (int&) nKillings(p);
 		in >> (int&) nRecruitments(p);
+        in >> (int&) nRecruitmentsMac(p);
+        in >> (int&) nRecruitmentsTgam(p);
+        in >> (int&) nRecruitmentsTcyt(p);
+        in >> (int&) nRecruitmentsTreg(p);
 		in >> (int&) nSecretions(p);
 		in >> (Scalar&) macAttractant(p);
 		in >> (Scalar&) TNF(p);

@@ -171,6 +171,7 @@ void Mac::secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDe
 
 				_kSynth = 0.5 * _PARAM(PARAM_GR_K_SYNTH_MAC);
                 _kmRNA = 0.5 * _PARAM(PARAM_GR_K_RNA_MAC);
+                calcIkmRNA(grid, _kmRNA, _kSynth, il10rDynamics);
                 _kISynth = 0.0;
                 
                 if (!tnfrDynamics && !tnfDepletion)
@@ -212,6 +213,7 @@ void Mac::secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDe
 
                 _kSynth = _PARAM(PARAM_GR_K_SYNTH_MAC);
                 _kmRNA = _PARAM(PARAM_GR_K_RNA_MAC);
+                calcIkmRNA(grid, _kmRNA, _kSynth, il10rDynamics);
                 _kISynth = _PARAM(PARAM_GR_I_K_SYNTH_MAC_INF);
                 
                 if (!tnfrDynamics && !tnfDepletion)
@@ -249,6 +251,7 @@ void Mac::secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDe
 
                 _kSynth = 0.5 * _PARAM(PARAM_GR_K_SYNTH_MAC);
                 _kmRNA = 0.5 * _PARAM(PARAM_GR_K_RNA_MAC);
+                calcIkmRNA(grid, _kmRNA, _kSynth, il10rDynamics);
                 _kISynth = _PARAM(PARAM_GR_I_K_SYNTH_MAC_INF);
                 
                 if (!tnfrDynamics && !tnfDepletion)
@@ -291,7 +294,9 @@ void Mac::secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDe
 
 				_kSynth = _PARAM(PARAM_GR_K_SYNTH_MAC);
                 _kmRNA = _PARAM(PARAM_GR_K_RNA_MAC);
-                _kISynth = 2.0 * _PARAM(PARAM_GR_I_K_SYNTH_MAC_INF);
+                calcIkmRNA(grid, _kmRNA, _kSynth, il10rDynamics);
+//                _kISynth = 2.0 * _PARAM(PARAM_GR_I_K_SYNTH_MAC_INF);
+                _kISynth = 1.5 * _PARAM(PARAM_GR_I_K_SYNTH_MAC_INF);
                 
                 if (!tnfrDynamics && !tnfDepletion)
                 {    
@@ -329,7 +334,8 @@ void Mac::secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDe
 
                 _kSynth = _PARAM(PARAM_GR_K_SYNTH_MAC);
                 _kmRNA = _PARAM(PARAM_GR_K_RNA_MAC);
-                _kISynth = _PARAM(PARAM_GR_I_K_SYNTH_MAC_ACT);
+                calcIkmRNA(grid, _kmRNA, _kSynth, il10rDynamics);
+                _kISynth = _PARAM(PARAM_GR_I_K_SYNTH_MAC_ACT) * (_surfBoundTNFR1 / (_surfBoundTNFR1 + _PARAM(PARAM_GR_I_HALF_SAT_IL10_MRNA)));
                 
                 if (!tnfrDynamics && !tnfDepletion)
                 {    
@@ -435,11 +441,13 @@ void Mac::computeNextState(const int time, GrGrid& grid, Stats& stats, bool tnfr
 		grid.extMTB(_pos) += (_intMtb);
 		_intMtb = 0;
 
-		// in case active, death contributes to caseation
-		if (_state == Mac::MAC_ACTIVE)
-		{
-			grid.incKillings(_pos);
-		}
+//		// in case active, death contributes to caseation
+//		if (_state == Mac::MAC_ACTIVE)
+//		{
+//			grid.incKillings(_pos);
+//		}
+
+        grid.incKillings(_pos);
 
 		_nextState = Mac::MAC_DEAD;
 	}
@@ -723,9 +731,9 @@ void Mac::handleInfected(const int time, GrGrid& grid, Stats& stats, bool /*nfkb
 
 	if (_intMtb >= _PARAM(PARAM_MAC_THRESHOLD_BECOME_CI_INTMTB))
 	{
-		_nextState = Mac::MAC_CINFECTED;
-		_NFkB = true;
-	}
+        _nextState = Mac::MAC_CINFECTED;
+        _NFkB = true;
+    }
 	else
 	{
 //		_stat1 |= g_Rand.getReal() <

@@ -947,13 +947,13 @@ void GrSimulation::growExtMtb()
 			else
 			{
 				double dExtMtb = growthRate * extMtb * (1.0 - extMtb / upperBound);
-        extMtb += dExtMtb;
+                extMtb += dExtMtb;
 				_stats.getTotExtMtb() += (extMtb);
 			}
 
 			_stats.getTotMacAttractant() += (g.macAttractant(p));
 			_stats.getTotTNF() += (g.TNF(p));
-      _stats.getTotIL10() += (g.il10(p));
+            _stats.getTotIL10() += (g.il10(p));
 			_stats.getTotCCL2() += (g.CCL2(p));
 			_stats.getTotCCL5() += (g.CCL5(p));
 			_stats.getTotCXCL9() += (g.CXCL9(p));

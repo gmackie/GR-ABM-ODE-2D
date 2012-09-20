@@ -1367,6 +1367,19 @@ bool Agent::TNFinducedNFkB(GrGrid &grid, bool tnfrDynamics, bool nfkbDynamics)
 }
 
 
+void Agent::calcIkmRNA(GrGrid& grid, double& kmRNA, double ksynth, bool il10rDynamics)
+{
+    double eqsurfBoundIL10R;
+
+    if(il10rDynamics)
+      eqsurfBoundIL10R = _surfBoundIL10R;
+    else
+      eqsurfBoundIL10R = ((grid.il10(_pos)/(NAV * VOL)) * _surfIL10R) / (_PARAM(PARAM_GR_I_KD) + (grid.il10(_pos)/(NAV * VOL)));
+
+    kmRNA = (kmRNA) * ((ksynth/(kmRNA)) + ((1.0 - (ksynth/(kmRNA)))/(1.0 + pow(2.7183, ((eqsurfBoundIL10R - _PARAM(PARAM_GR_LINK_RNA_GAMMA))/_PARAM(PARAM_GR_LINK_RNA_DELTA))))));
+
+}
+
 void Agent::solveDegradation(GrGrid& grid, double dt, bool tnfrDynamics, bool il10rDynamics, Scalar meanTNFR1, Scalar iIL10R)
 {
     if (!tnfrDynamics) {
@@ -1587,11 +1600,14 @@ void Agent::deserialize(std::istream& in)
     else 
       eqsurfBoundIL10R = (il10 * agent->getmeanIL10R()) / (_PARAM(PARAM_GR_I_KD) + il10);
 
-    double IkmRNA;
-    if (agent->getkmRNA() > 0)
-        IkmRNA = agent->getkmRNA() * ((agent->getkSynth()/agent->getkmRNA()) + ((1.0 - (agent->getkSynth()/agent->getkmRNA()))/(1.0 + pow(2.7183, ((eqsurfBoundIL10R - _PARAM(PARAM_GR_LINK_RNA_GAMMA))/_PARAM(PARAM_GR_LINK_RNA_DELTA))))));
-    else
-        IkmRNA = 0.0;
+//    double IkmRNA;
+//    if (agent->getkmRNA() > 0)
+//        IkmRNA = agent->getkmRNA() * ((agent->getkSynth()/agent->getkmRNA()) + ((1.0 - (agent->getkSynth()/agent->getkmRNA()))/(1.0 + pow(2.7183, ((eqsurfBoundIL10R - _PARAM(PARAM_GR_LINK_RNA_GAMMA))/_PARAM(PARAM_GR_LINK_RNA_DELTA))))));
+//    else
+//        IkmRNA = 0.0;
+
+    double IkmRNA = agent->getkmRNA();
+
     // TNF Ordinary Differential Equations
     // mTNFRNA
     vecwrite[0] = (IkmRNA - _PARAM(PARAM_GR_K_TRANS) * vecread[0]);

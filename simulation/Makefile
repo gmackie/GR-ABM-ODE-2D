@@ -10,10 +10,11 @@ endif
 override CXXFLAGS += -DSVN_VERSION=\"$(SVNREV)\" -Wall -W -I$(BOOST_PREFIX)/include -Wno-strict-aliasing -Wno-unknown-pragmas
 
 BOOST_LIBS := boost_program_options boost_iostreams boost_serialization boost_filesystem boost_system
-#ifneq ($(wildcard ${BOOST_PREFIX}/lib/*boost_program_options*-mt*), )
-#  BOOST_LIBS := $(addsuffix -mt, ${BOOST_LIBS})
-#endif
-override LDFLAGS += -lm -lz -L${BOOST_PREFIX}/lib $(addprefix -l, $(BOOST_LIBS))
+# So far the best way to eleviate the issues with different distros not properly symlinking boost libraries.
+# If static building, might need to modify to search only .o or .a compiled libraries (kept generic to deal with osx & windows)
+# <- Could completely solve this problem with cmake.... >_>
+BOOST_FOUND_LIBS := $(foreach lib, $(BOOST_LIBS), $(lib)$(if $(wildcard ${BOOST_PREFIX}/lib/*$(lib)*-mt*), -mt))
+override LDFLAGS += -lm -lz -L${BOOST_PREFIX}/lib $(addprefix -l, $(BOOST_FOUND_LIBS))
 
 all: release
 

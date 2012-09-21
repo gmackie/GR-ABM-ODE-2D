@@ -925,7 +925,7 @@ void GrSimulation::moveTcells()
 
 void GrSimulation::growExtMtb()
 {
-	const double growthRate = _PARAM(PARAM_EXTMTB_GROWTH_RATE) - 1;
+    const double growthRate = _PARAM(PARAM_EXTMTB_GROWTH_RATE) - 1;
 	const double upperBound = _PARAM(PARAM_EXTMTB_UPPER_BOUND);
 
   GrGrid& g = _grid.getGrid();
@@ -946,7 +946,38 @@ void GrSimulation::growExtMtb()
 			}
 			else
 			{
-				double dExtMtb = growthRate * extMtb * (1.0 - extMtb / upperBound);
+                // Function to evaluate whether the extMtb is 'trapped' or not... (very basic)
+                // Currently only identifies cells whose Moore neighborhood (minus its own compartment)
+                // is completley caseated
+
+                int caseationCount=0;
+                for (int i=-1; i<=1; i++)
+                {
+                    for (int j=-1; j<=1; j++)
+                    {
+                        Pos modp(g.mod_row(p.x + i), g.mod_col(p.y + j));
+                        if (g.isCaseated(modp))
+                            caseationCount++;
+                    }
+                }
+
+                if (caseationCount == (MOORE_COUNT - 1))
+                    std::cout << "Single Trapped at: " << p << std::endl;
+
+                // Scale growth rate based on local caseation
+                // This mimicks the hypoxic environment in granulomas which causes Mtb to decrease its growth rate
+                // This should also prevent the extMtb that are not caught by the trapped function to stop growing as fast
+
+                double dExtMtb;
+
+                if (extMtb > 0.0 && caseationCount > 0)
+                {
+                    dExtMtb = (growthRate/caseationCount) * extMtb * (1.0 - extMtb / upperBound);
+                    std::cout << "Position: " << p << "  ScaledGrowthRate: " << growthRate/caseationCount << std::endl;
+                }
+                else
+                    dExtMtb = growthRate * extMtb * (1.0 - extMtb / upperBound);
+
                 extMtb += dExtMtb;
 				_stats.getTotExtMtb() += (extMtb);
 			}

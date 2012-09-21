@@ -171,7 +171,7 @@ void Mac::secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDe
 
 				_kSynth = 0.5 * _PARAM(PARAM_GR_K_SYNTH_MAC);
                 _kmRNA = 0.5 * _PARAM(PARAM_GR_K_RNA_MAC);
-                calcIkmRNA(grid, _kmRNA, _kSynth, il10rDynamics);
+//                calcIkmRNA(grid, _kmRNA, _kSynth, il10rDynamics);
                 _kISynth = 0.0;
                 
                 if (!tnfrDynamics && !tnfDepletion)
@@ -213,7 +213,7 @@ void Mac::secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDe
 
                 _kSynth = _PARAM(PARAM_GR_K_SYNTH_MAC);
                 _kmRNA = _PARAM(PARAM_GR_K_RNA_MAC);
-                calcIkmRNA(grid, _kmRNA, _kSynth, il10rDynamics);
+//                calcIkmRNA(grid, _kmRNA, _kSynth, il10rDynamics);
                 _kISynth = _PARAM(PARAM_GR_I_K_SYNTH_MAC_INF);
                 
                 if (!tnfrDynamics && !tnfDepletion)
@@ -251,7 +251,7 @@ void Mac::secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDe
 
                 _kSynth = 0.5 * _PARAM(PARAM_GR_K_SYNTH_MAC);
                 _kmRNA = 0.5 * _PARAM(PARAM_GR_K_RNA_MAC);
-                calcIkmRNA(grid, _kmRNA, _kSynth, il10rDynamics);
+//                calcIkmRNA(grid, _kmRNA, _kSynth, il10rDynamics);
                 _kISynth = _PARAM(PARAM_GR_I_K_SYNTH_MAC_INF);
                 
                 if (!tnfrDynamics && !tnfDepletion)
@@ -294,8 +294,7 @@ void Mac::secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDe
 
 				_kSynth = _PARAM(PARAM_GR_K_SYNTH_MAC);
                 _kmRNA = _PARAM(PARAM_GR_K_RNA_MAC);
-                calcIkmRNA(grid, _kmRNA, _kSynth, il10rDynamics);
-//                _kISynth = 2.0 * _PARAM(PARAM_GR_I_K_SYNTH_MAC_INF);
+//                calcIkmRNA(grid, _kmRNA, _kSynth, il10rDynamics);
                 _kISynth = 1.5 * _PARAM(PARAM_GR_I_K_SYNTH_MAC_INF);
                 
                 if (!tnfrDynamics && !tnfDepletion)
@@ -334,7 +333,7 @@ void Mac::secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDe
 
                 _kSynth = _PARAM(PARAM_GR_K_SYNTH_MAC);
                 _kmRNA = _PARAM(PARAM_GR_K_RNA_MAC);
-                calcIkmRNA(grid, _kmRNA, _kSynth, il10rDynamics);
+//                calcIkmRNA(grid, _kmRNA, _kSynth, il10rDynamics);
                 _kISynth = _PARAM(PARAM_GR_I_K_SYNTH_MAC_ACT) * (_surfBoundTNFR1 / (_surfBoundTNFR1 + _PARAM(PARAM_GR_I_HALF_SAT_IL10_MRNA)));
                 
                 if (!tnfrDynamics && !tnfDepletion)

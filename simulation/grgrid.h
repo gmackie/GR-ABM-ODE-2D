@@ -45,6 +45,7 @@ typedef Indexer2D Indexer;
 
 #define GRIDS_DEFS  \
   GRID       (int, nKillings)         \
+  GRID       (int, trappedCaseation)  \
   GRID       (int, nRecruitments)         \
   GRID       (int, nRecruitmentsMac)         \
   GRID       (int, nRecruitmentsTgam)         \
@@ -163,6 +164,7 @@ public:
   const Agent*  agent         (int x, int y, size_t a) const;
   Agent*&       agent         (int x, int y, size_t a);
   bool incKillings(const Pos& p);
+  int isTrapped(const Pos& p);
 
 // --- Visitor Methods ---
 
@@ -219,7 +221,7 @@ inline bool GrGrid::isOccupied(int row, int col) const {
 inline bool GrGrid::isOccupied(const Pos& p) const { return isOccupied(GETROW(p), GETCOL(p)); }
 
 inline bool GrGrid::isCaseated(int row, int col) const {
-  return nKillings(Pos(row, col)) >= _nCaseation;
+    return ((nKillings(Pos(row, col)) >= _nCaseation) || trappedCaseation(Pos(row,col)) >= 1);
 }
 inline bool GrGrid::isCaseated(const Pos& p) const { return isCaseated(GETROW(p), GETCOL(p)); }
 

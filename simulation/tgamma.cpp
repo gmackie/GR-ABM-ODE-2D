@@ -64,7 +64,7 @@ void Tgam::secrete(GrGrid& grid, bool tnfrDynamics, bool, bool tnfDepletion, boo
 	
 	_kSynth = _PARAM(PARAM_GR_K_SYNTH_TCELL);
     _kmRNA = _PARAM(PARAM_GR_K_RNA_TCELL);
-    calcIkmRNA(grid, _kmRNA, _kSynth, il10rDynamics);
+//    calcIkmRNA(grid, _kmRNA, _kSynth, il10rDynamics);
     
     
     if (_state == TGAM_ACTIVE_DOUBLE) {

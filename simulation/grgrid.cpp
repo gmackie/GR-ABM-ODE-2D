@@ -115,6 +115,7 @@ void GrGrid::serialize(std::ostream& out) const
 		for (p.y = 0; p.y < _dim.y; p.y++)
 		{
 			out << nKillings(p) << endl;
+            out << trappedCaseation(p) << endl;
 			out << nRecruitments(p) << endl;
             out << nRecruitmentsMac(p) << endl;
             out << nRecruitmentsTgam(p) << endl;
@@ -197,6 +198,7 @@ void GrGrid::deserialize(std::istream& in)
 
 		in >> (int&) nKillings(p);
 		in >> (int&) nRecruitments(p);
+        in >> (int&) trappedCaseation(p);
         in >> (int&) nRecruitmentsMac(p);
         in >> (int&) nRecruitmentsTgam(p);
         in >> (int&) nRecruitmentsTcyt(p);
@@ -262,6 +264,36 @@ bool GrGrid::incKillings(const Pos& p) {
     return true;
   }
   return false;
+}
+
+int GrGrid::isTrapped(const Pos& p)
+{
+    assert(inRange(p));
+    int caseationCount = 0;
+    for (int i=-1; i<=1; i++)
+    {
+        for (int j=-1; j<=1; j++)
+        {
+            Pos modp(mod_row(p.x + i), mod_col(p.y + j));
+            if (isCaseated(modp))
+                caseationCount++;
+        }
+    }
+
+    if (caseationCount == (MOORE_COUNT - 1))
+    {
+        ++_trappedCaseation[Indexer::ind(_dim,p)];
+        std::cout << "Trapped Cell to Caseation @: " << p << std::endl;
+
+        // Kill any cell that resides in the trapped compartment
+        for(unsigned i=0;i<MAX_AGENTS_PER_CELL;i++)
+          if(agent(p, i) && !agent(p,i)->isDead())
+          {
+              agent(p,i)->kill();
+              ++_nKillings[Indexer::ind(_dim, p)];
+          }
+    }
+    return caseationCount;
 }
 
 int GrGrid::getOccupiedNeighborCount(int _row, int _col) const 

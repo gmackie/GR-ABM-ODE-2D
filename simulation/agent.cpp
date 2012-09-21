@@ -1597,16 +1597,16 @@ void Agent::deserialize(std::istream& in)
     double eqsurfBoundIL10R;
     if(_PARAM(PARAM_IL10ODE_EN))
       eqsurfBoundIL10R = vecread[il10offset+2];
-    else 
+    else
       eqsurfBoundIL10R = (il10 * agent->getmeanIL10R()) / (_PARAM(PARAM_GR_I_KD) + il10);
 
-//    double IkmRNA;
-//    if (agent->getkmRNA() > 0)
-//        IkmRNA = agent->getkmRNA() * ((agent->getkSynth()/agent->getkmRNA()) + ((1.0 - (agent->getkSynth()/agent->getkmRNA()))/(1.0 + pow(2.7183, ((eqsurfBoundIL10R - _PARAM(PARAM_GR_LINK_RNA_GAMMA))/_PARAM(PARAM_GR_LINK_RNA_DELTA))))));
-//    else
-//        IkmRNA = 0.0;
+    double IkmRNA;
+    if (agent->getkmRNA() > 0)
+        IkmRNA = agent->getkmRNA() * ((agent->getkSynth()/agent->getkmRNA()) + ((1.0 - (agent->getkSynth()/agent->getkmRNA()))/(1.0 + pow(2.7183, ((eqsurfBoundIL10R - _PARAM(PARAM_GR_LINK_RNA_GAMMA))/_PARAM(PARAM_GR_LINK_RNA_DELTA))))));
+    else
+        IkmRNA = 0.0;
 
-    double IkmRNA = agent->getkmRNA();
+//    double IkmRNA = agent->getkmRNA();
 
     // TNF Ordinary Differential Equations
     // mTNFRNA

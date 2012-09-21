@@ -489,6 +489,30 @@ void GrSimulation::init()
 
 //    _grid.getGrid().setTNF(200, 200, 10000);
 
+    // DBG
+    // Testing for trapped extMtb
+
+//    for (int i=-1; i<=1; i++)
+//    {
+//        for (int j=-1; j<=1; j++)
+//        {
+//            Pos modp(_grid.getGrid().mod_row(50 + i), _grid.getGrid().mod_col(50 + j));
+
+//            if (i==0 && j==0)
+//            {
+////                _grid.getGrid().extMTB(modp) += 1;
+//                continue;
+//            }
+//            else
+//                for (int k=1; k<=20; k++)
+//                    _grid.getGrid().incKillings(modp);
+//        }
+//    }
+
+//    // DBG
+
+
+
     while (count > 0)
     {
         int row = g_Rand.getInt(_grid.getRange().x);
@@ -950,31 +974,15 @@ void GrSimulation::growExtMtb()
                 // Currently only identifies cells whose Moore neighborhood (minus its own compartment)
                 // is completley caseated
 
-                int caseationCount=0;
-                for (int i=-1; i<=1; i++)
-                {
-                    for (int j=-1; j<=1; j++)
-                    {
-                        Pos modp(g.mod_row(p.x + i), g.mod_col(p.y + j));
-                        if (g.isCaseated(modp))
-                            caseationCount++;
-                    }
-                }
-
-                if (caseationCount == (MOORE_COUNT - 1))
-                    std::cout << "Single Trapped at: " << p << std::endl;
+                int caseationCount = g.isTrapped(p);
 
                 // Scale growth rate based on local caseation
                 // This mimicks the hypoxic environment in granulomas which causes Mtb to decrease its growth rate
                 // This should also prevent the extMtb that are not caught by the trapped function to stop growing as fast
 
                 double dExtMtb;
-
-                if (extMtb > 0.0 && caseationCount > 0)
-                {
+                if (caseationCount > 4)
                     dExtMtb = (growthRate/caseationCount) * extMtb * (1.0 - extMtb / upperBound);
-                    std::cout << "Position: " << p << "  ScaledGrowthRate: " << growthRate/caseationCount << std::endl;
-                }
                 else
                     dExtMtb = growthRate * extMtb * (1.0 - extMtb / upperBound);
 

@@ -447,7 +447,6 @@ void Mac::computeNextState(const int time, GrGrid& grid, Stats& stats, bool tnfr
 //		}
 
         grid.incKillings(_pos);
-
 		_nextState = Mac::MAC_DEAD;
 	}
     
@@ -787,7 +786,10 @@ void Mac::handleInfected(const int time, GrGrid& grid, Stats& stats, bool /*nfkb
 
 void Mac::handleChronicallyInfected(const int time, GrGrid& grid, Stats& stats)
 {
-	// intracellular bacteria reproduce
+
+    assert(_NFkB);
+
+    // intracellular bacteria reproduce
 	_intMtb *= getIntMtbGrowthRate(time);
 
 	if (_intMtb >= _PARAM(PARAM_MAC_THRESHOLD_BURST_CI_INTMTB))
@@ -812,6 +814,8 @@ void Mac::handleChronicallyInfected(const int time, GrGrid& grid, Stats& stats)
 
 void Mac::handleActivated(const int, GrGrid& grid, Stats&)
 {
+
+    assert(_NFkB && _stat1);
 
     if (_intMtb > 0.0)
     {
@@ -840,13 +844,21 @@ void Mac::deactivate(const int time, Stats& stats)
     case Mac::MAC_CINFECTED:
         break;
     case Mac::MAC_INFECTED:
-        _NFkB = false;
+    {
+        if (_nextState == Mac::MAC_CINFECTED)
+            _NFkB = true;
+        else
+        {
+            _NFkB = false;
+            _nfkbTime = -1;
+        }
         _stat1 = false;
         _ICOS = false;
         _stat1Time = -1;
         _nfkbTime = -1;
         ++stats.getMacDeactivation(_state);
         break;
+    }
     case Mac::MAC_RESTING:
     case Mac::MAC_ACTIVE:
 		_stat1 = false;

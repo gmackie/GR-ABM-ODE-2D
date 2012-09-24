@@ -973,8 +973,12 @@ void GrSimulation::growExtMtb()
                 // Function to evaluate whether the extMtb is 'trapped' or not... (very basic)
                 // Currently only identifies cells whose Moore neighborhood (minus its own compartment)
                 // is completley caseated
+                int caseationCount;
 
-                int caseationCount = g.isTrapped(p);
+                if (extMtb > 0.0)
+                    caseationCount = g.isTrapped(p);
+                else
+                    caseationCount = 0;
 
                 // Scale growth rate based on local caseation
                 // This mimicks the hypoxic environment in granulomas which causes Mtb to decrease its growth rate

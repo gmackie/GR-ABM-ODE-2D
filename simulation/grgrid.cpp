@@ -283,8 +283,7 @@ int GrGrid::isTrapped(const Pos& p)
     if (caseationCount == (MOORE_COUNT - 1))
     {
         ++_trappedCaseation[Indexer::ind(_dim,p)];
-        std::cout << "Trapped Cell to Caseation @: " << p << std::endl;
-
+//        std::cout << "Trapped Cell to Caseation @: " << p << std::endl;
         // Kill any cell that resides in the trapped compartment
         for(unsigned i=0;i<MAX_AGENTS_PER_CELL;i++)
           if(agent(p, i) && !agent(p,i)->isDead())

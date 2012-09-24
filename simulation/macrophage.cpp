@@ -845,19 +845,34 @@ void Mac::deactivate(const int time, Stats& stats)
         break;
     case Mac::MAC_INFECTED:
     {
-        if (_nextState == Mac::MAC_CINFECTED)
-            _NFkB = true;
-        else
+        switch (_nextState)
         {
+        case Mac::MAC_CINFECTED:
+            _stat1 = false;
+            _ICOS = false;
+            _stat1Time = -1;
+            ++stats.getMacDeactivation(_state);
+            break;
+        case Mac::MAC_ACTIVE:
             _NFkB = false;
+            _stat1 = false;
+            _ICOS = false;
+            _stat1Time = -1;
             _nfkbTime = -1;
+            _nextState = Mac::MAC_INFECTED;
+            ++stats.getMacDeactivation(_state);
+            break;
+        case Mac::MAC_INFECTED:
+            _NFkB = false;
+            _stat1 = false;
+            _ICOS = false;
+            _stat1Time = -1;
+            _nfkbTime = -1;
+            ++stats.getMacDeactivation(_state);
+            break;
+        default:
+            ;
         }
-        _stat1 = false;
-        _ICOS = false;
-        _stat1Time = -1;
-        _nfkbTime = -1;
-        ++stats.getMacDeactivation(_state);
-        break;
     }
     case Mac::MAC_RESTING:
     case Mac::MAC_ACTIVE:

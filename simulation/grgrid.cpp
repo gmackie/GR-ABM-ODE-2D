@@ -197,8 +197,8 @@ void GrGrid::deserialize(std::istream& in)
     {
 
 		in >> (int&) nKillings(p);
-		in >> (int&) nRecruitments(p);
         in >> (int&) trappedCaseation(p);
+		in >> (int&) nRecruitments(p);
         in >> (int&) nRecruitmentsMac(p);
         in >> (int&) nRecruitmentsTgam(p);
         in >> (int&) nRecruitmentsTcyt(p);

@@ -14,7 +14,8 @@
 
 
 // Sets up the world geometry
-struct Indexer2D {
+struct Indexer2D
+{
   static inline size_t ind(const Pos& dim, const Pos& idx)
   {
     assert(idx.x >= 0 && idx.y >= 0);
@@ -60,34 +61,34 @@ typedef Indexer2D Indexer;
   PADDED_GRID(Scalar, shedTNFR2)  \
   PADDED_GRID(Scalar, il10)  \
   GRID       (Scalar, extMTB)  \
-
+ 
 
 class GrGrid
 {
 public:
   static const unsigned MAX_AGENTS_PER_CELL = 2;
 private:
-	static const std::string _ClassName;
+  static const std::string _ClassName;
 
-	/*
-	 * !!! If the data members change then the serialize and deserialize functions need to be updated !!!
-	 */
+  /*
+   * !!! If the data members change then the serialize and deserialize functions need to be updated !!!
+   */
   Pos _dim;
   int _nCaseation;
   std::vector<Pos> _sources;
   std::vector<Agent*> _agents;
 
-  #define GRID(type, name) \
+#define GRID(type, name) \
     std::vector<type> _##name;
 
-  #define PADDED_GRID(type, name) \
+#define PADDED_GRID(type, name) \
     std::vector<type> _##name;	\
     std::vector<type> _u_##name;	\
     std::vector<type> _v_##name;	\
-
+ 
   GRIDS_DEFS
-  #undef GRID
-  #undef PADDED_GRID
+#undef GRID
+#undef PADDED_GRID
 
 public:
   GrGrid(const Pos& dim);
@@ -95,9 +96,18 @@ public:
 
   bool inRange(const Pos& pos) const;
   bool inRange(int row, int col) const;
-  const Pos& getRange() const { return _dim; }
-  int getSize() const { return _dim.x*_dim.y; }
-  const Pos getCenter() const { return _dim / 2; }
+  const Pos& getRange() const
+  {
+    return _dim;
+  }
+  int getSize() const
+  {
+    return _dim.x*_dim.y;
+  }
+  const Pos getCenter() const
+  {
+    return _dim / 2;
+  }
 
   const PosVector& getSources() const;
   void initSources();
@@ -127,8 +137,14 @@ public:
   bool addAgent(Agent* a, int row, int col, int index);
   int agentIndex (const Agent* pAgent) const;
   bool removeAgent(const Agent* a);
-  inline int mod_row(int row) const { return (row + _dim.x) % _dim.x; }
-  inline int mod_col(int col) const { return (col + _dim.y) % _dim.y; }
+  inline int mod_row(int row) const
+  {
+    return (row + _dim.x) % _dim.x;
+  }
+  inline int mod_col(int col) const
+  {
+    return (col + _dim.y) % _dim.y;
+  }
 
   /*** Accessors ***/
 #define GRID(type, name) \
@@ -153,7 +169,7 @@ public:
   const type& v_##name (int x, int y) const;  \
   const type* v_##name () const;  \
         type* v_##name ();\
-
+ 
   GRIDS_DEFS
 
 #undef GRID
@@ -173,12 +189,13 @@ public:
   * \param v Visitor that visits each grid
   */
   template<typename Visitor>
-  void visit(Visitor& v) {
-    #define GRID(type, name)                v.visit(#name, _ ## name, "");
-    #define PADDED_GRID(type, name)         v.visit(#name, _ ## name, "");
+  void visit(Visitor& v)
+  {
+#define GRID(type, name)                v.visit(#name, _ ## name, "");
+#define PADDED_GRID(type, name)         v.visit(#name, _ ## name, "");
     GRIDS_DEFS
-    #undef GRID
-    #undef PADDED_GRID
+#undef GRID
+#undef PADDED_GRID
   }
 
   /*! \brief visit each grid
@@ -186,48 +203,64 @@ public:
   * \param v Visitor that visits each grid
   */
   template<typename Visitor>
-  void visit(Visitor& v) const {
-    #define GRID(type, name)                v.visit(#name, _ ## name, "");
-    #define PADDED_GRID(type, name)         v.visit(#name, _ ## name, "");
+  void visit(Visitor& v) const
+  {
+#define GRID(type, name)                v.visit(#name, _ ## name, "");
+#define PADDED_GRID(type, name)         v.visit(#name, _ ## name, "");
     GRIDS_DEFS
-    #undef GRID
-    #undef PADDED_GRID
+#undef GRID
+#undef PADDED_GRID
   }
 };
 
-inline bool GrGrid::isSource(const Pos& p) const {
+inline bool GrGrid::isSource(const Pos& p) const
+{
   return std::find(_sources.begin(), _sources.end(), p) != _sources.end();
 }
 
-inline bool GrGrid::inRange(const Pos& pos) const {
+inline bool GrGrid::inRange(const Pos& pos) const
+{
   return inRange(pos.x, pos.y);
 }
-inline bool GrGrid::inRange(int row, int col) const {
+inline bool GrGrid::inRange(int row, int col) const
+{
   return row < _dim.x && col < _dim.y;
 }
 
-inline int GrGrid::getNumberOfAgents(int row, int col) const {
+inline int GrGrid::getNumberOfAgents(int row, int col) const
+{
   int sum = 0;
-  for(unsigned i=0;i<MAX_AGENTS_PER_CELL;i++)
+  for(unsigned i=0; i<MAX_AGENTS_PER_CELL; i++)
     sum += agent(Pos(row, col), i) != NULL ? 1 : 0;
   return sum;
 }
-inline int GrGrid::getNumberOfAgents(const Pos& p) const { return getNumberOfAgents(GETROW(p), GETCOL(p)); }
+inline int GrGrid::getNumberOfAgents(const Pos& p) const
+{
+  return getNumberOfAgents(GETROW(p), GETCOL(p));
+}
 
-inline bool GrGrid::isOccupied(int row, int col) const {
+inline bool GrGrid::isOccupied(int row, int col) const
+{
   assert(row < _dim.x && col < _dim.y);
   return isCaseated(row, col) || (getNumberOfAgents(row, col) > 0) || (extMTB(Pos(row, col)) > 0.0);
 }
-inline bool GrGrid::isOccupied(const Pos& p) const { return isOccupied(GETROW(p), GETCOL(p)); }
-
-inline bool GrGrid::isCaseated(int row, int col) const {
-    return ((nKillings(Pos(row, col)) >= _nCaseation) || trappedCaseation(Pos(row,col)) >= 1);
+inline bool GrGrid::isOccupied(const Pos& p) const
+{
+  return isOccupied(GETROW(p), GETCOL(p));
 }
-inline bool GrGrid::isCaseated(const Pos& p) const { return isCaseated(GETROW(p), GETCOL(p)); }
+
+inline bool GrGrid::isCaseated(int row, int col) const
+{
+  return ((nKillings(Pos(row, col)) >= _nCaseation) || trappedCaseation(Pos(row,col)) >= 1);
+}
+inline bool GrGrid::isCaseated(const Pos& p) const
+{
+  return isCaseated(GETROW(p), GETCOL(p));
+}
 
 inline const std::vector<Pos>& GrGrid::getSources() const
 {
-	return _sources;
+  return _sources;
 }
 
 #define GRID(type, name) \
@@ -279,14 +312,26 @@ inline const std::vector<Pos>& GrGrid::getSources() const
       _##name [Indexer::padInd(_dim, x, y)] += v; \
     }
 
-  GRIDS_DEFS
+GRIDS_DEFS
 
 #undef GRID
 #undef PADDED_GRID
 
-inline const Agent*  GrGrid::agent         (const Pos& p, size_t a) const { return _agents[Indexer::ind(_dim, p) * MAX_AGENTS_PER_CELL + a]; }
-inline Agent*& GrGrid::agent(const Pos& p, size_t a) { return _agents[Indexer::ind(_dim, p) * MAX_AGENTS_PER_CELL + a]; }
-inline const Agent*  GrGrid::agent         (int x, int y, size_t a) const { return _agents[Indexer::ind(_dim, x, y) * MAX_AGENTS_PER_CELL + a]; }
-inline Agent*& GrGrid::agent(int x, int y, size_t a) { return _agents[Indexer::ind(_dim, x, y) * MAX_AGENTS_PER_CELL + a]; }
+inline const Agent*  GrGrid::agent         (const Pos& p, size_t a) const
+{
+  return _agents[Indexer::ind(_dim, p) * MAX_AGENTS_PER_CELL + a];
+}
+inline Agent*& GrGrid::agent(const Pos& p, size_t a)
+{
+  return _agents[Indexer::ind(_dim, p) * MAX_AGENTS_PER_CELL + a];
+}
+inline const Agent*  GrGrid::agent         (int x, int y, size_t a) const
+{
+  return _agents[Indexer::ind(_dim, x, y) * MAX_AGENTS_PER_CELL + a];
+}
+inline Agent*& GrGrid::agent(int x, int y, size_t a)
+{
+  return _agents[Indexer::ind(_dim, x, y) * MAX_AGENTS_PER_CELL + a];
+}
 
 #endif /* GRID_H */

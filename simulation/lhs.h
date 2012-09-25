@@ -14,37 +14,37 @@
 
 struct LhsDoubleParam
 {
-	bool _isRange; // True if min < max, false if min == max.
-	double _min;
-	double _max;
+  bool _isRange; // True if min < max, false if min == max.
+  double _min;
+  double _max;
 };
 
 struct LhsIntParam
 {
-	bool _isRange; // True if min < max, false if min == max.
-	int _min;
-	int _max;
+  bool _isRange; // True if min < max, false if min == max.
+  int _min;
+  int _max;
 };
 
 class Lhs : public ParamsBase
 {
 private:
 
-	int _nSamples;
-	LhsDoubleParam _lhsDoubleParam[PARAM_DOUBLE_COUNT];
-	LhsIntParam _lhsIntParam[PARAM_INT_COUNT];
+  int _nSamples;
+  LhsDoubleParam _lhsDoubleParam[PARAM_DOUBLE_COUNT];
+  LhsIntParam _lhsIntParam[PARAM_INT_COUNT];
 
-	bool readParam(const TiXmlElement* pElement, const TiXmlAttribute* pAttrib,  ParamDoubleType param);
-	bool readParam(const TiXmlElement* pElement, const TiXmlAttribute* pAttrib,  ParamIntType param);
+  bool readParam(const TiXmlElement* pElement, const TiXmlAttribute* pAttrib,  ParamDoubleType param);
+  bool readParam(const TiXmlElement* pElement, const TiXmlAttribute* pAttrib,  ParamIntType param);
 
-	void updateParamDouble(ParamDoubleType param, double val);
+  void updateParamDouble(ParamDoubleType param, double val);
 
-	bool checkParams() const;
+  bool checkParams() const;
 
 public:
-	Lhs(int nSamples, Pos dim);
-	bool init(const char* filename);
-	void performLhs(bool logscale);
+  Lhs(int nSamples, Pos dim);
+  bool init(const char* filename);
+  void performLhs(bool logscale);
 
 };
 

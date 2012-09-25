@@ -13,23 +13,26 @@
 class RecruitmentLnODEProxy  : public RecruitmentLnODE
 {
 private:
-	virtual void solveODE(const int time, const Stats& statsPrevious, Stats& stats);
+  virtual void solveODE(const int time, const Stats& statsPrevious, Stats& stats);
 
 public:
-	RecruitmentLnODEProxy();
-	virtual ~RecruitmentLnODEProxy();
+  RecruitmentLnODEProxy();
+  virtual ~RecruitmentLnODEProxy();
 
-	RecruitmentMethod getMethod() const;
-	void serialize(std::ostream&) const;
-	void deserialize(std::istream&);
+  RecruitmentMethod getMethod() const;
+  void serialize(std::ostream&) const;
+  void deserialize(std::istream&);
 
-  RecruitmentBase* clone() const { return new RecruitmentLnODEProxy(*this); }
+  RecruitmentBase* clone() const
+  {
+    return new RecruitmentLnODEProxy(*this);
+  }
 
 };
 
 inline RecruitmentMethod RecruitmentLnODEProxy::getMethod() const
 {
-	return RECR_LN_ODE_PROXY;
+  return RECR_LN_ODE_PROXY;
 }
 
 

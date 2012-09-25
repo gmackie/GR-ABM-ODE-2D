@@ -126,174 +126,174 @@ namespace po = boost::program_options;
  */
 
 Lhs::Lhs(int nSamples, Pos dim)
-	: ParamsBase(dim)
-	, _nSamples(nSamples)
-	, _lhsDoubleParam()
-	, _lhsIntParam()
+  : ParamsBase(dim)
+  , _nSamples(nSamples)
+  , _lhsDoubleParam()
+  , _lhsIntParam()
 {
 }
 
 bool Lhs::readParam(const TiXmlElement* pElement, const TiXmlAttribute* pAttrib,  ParamDoubleType param)
 {
-	LhsDoubleParam& range = _lhsDoubleParam[param];
-	const char* str  = pAttrib->Value();
+  LhsDoubleParam& range = _lhsDoubleParam[param];
+  const char* str  = pAttrib->Value();
 
-	char c;
-	if (sscanf(str, "[%lf, %lf]%c", &range._min, &range._max, &c) != 2)
-	{
-		double val;
-		if (sscanf(str, "%lf", &val) == 1)
-		{
-			range._min = val;
-			range._max = val;
-                        
-		}
-		else
-		{
-			std::cerr << "Value '" << str << "' of attribute '" << pElement->Value() << "/@"
-				<< pAttrib->Name() << "' must be a double range ([%lf, %lf])" << std::endl;
-			return false;
-		}
-	}
+  char c;
+  if (sscanf(str, "[%lf, %lf]%c", &range._min, &range._max, &c) != 2)
+    {
+      double val;
+      if (sscanf(str, "%lf", &val) == 1)
+        {
+          range._min = val;
+          range._max = val;
 
-	if (range._min == range._max)
-	{
-		range._isRange = false;
-	}
-	else
-	{
-		range._isRange = true;
-	}
+        }
+      else
+        {
+          std::cerr << "Value '" << str << "' of attribute '" << pElement->Value() << "/@"
+                    << pAttrib->Name() << "' must be a double range ([%lf, %lf])" << std::endl;
+          return false;
+        }
+    }
 
-	if (range._min > range._max)
-	{
-		std::cerr << "Values '" << str << "' of attribute '" << pElement->Value() << "/@"
-			<< pAttrib->Name() << "' have a min of " << range._min << " which is greater than the max of " << range._max << std::endl;
-		return false;
-	}
+  if (range._min == range._max)
+    {
+      range._isRange = false;
+    }
+  else
+    {
+      range._isRange = true;
+    }
 
-	if (_description[param].probPos && !(0 <= range._min && range._min <= 1 && 0 <= range._max && range._max <= 1))
-	{
-		std::cerr << "Values '" << str << "' of attribute '" << pElement->Value() << "/@"
-			<< pAttrib->Name() << "' must be in the range [0,1]" << std::endl;
-		return false;
-	}
+  if (range._min > range._max)
+    {
+      std::cerr << "Values '" << str << "' of attribute '" << pElement->Value() << "/@"
+                << pAttrib->Name() << "' have a min of " << range._min << " which is greater than the max of " << range._max << std::endl;
+      return false;
+    }
 
-	return true;
+  if (_description[param].probPos && !(0 <= range._min && range._min <= 1 && 0 <= range._max && range._max <= 1))
+    {
+      std::cerr << "Values '" << str << "' of attribute '" << pElement->Value() << "/@"
+                << pAttrib->Name() << "' must be in the range [0,1]" << std::endl;
+      return false;
+    }
+
+  return true;
 }
 
 bool Lhs::readParam(const TiXmlElement* pElement, const TiXmlAttribute* pAttrib,  ParamIntType paramIntIndex)
 {
-	LhsIntParam& range = _lhsIntParam[paramIntIndex];
-	const char* str  = pAttrib->Value();
+  LhsIntParam& range = _lhsIntParam[paramIntIndex];
+  const char* str  = pAttrib->Value();
 
-	char c;
-	bool pos = _description[paramIndex(paramIntIndex)].probPos;
+  char c;
+  bool pos = _description[paramIndex(paramIntIndex)].probPos;
 
-	if (sscanf(str, "[%d, %d]%c", &range._min, &range._max, &c) != 2)
-	{
-		int val;
-		if (sscanf(str, "%d", &val) == 1)
-		{
-			range._min = val;
-			range._max = val;
-            
-		}
-		else
-		{
-			std::cerr << "Value '" << str << "' of attribute '" << pElement->Value() << "/@"
-				<< pAttrib->Name() << "' must be a" << (pos ? " positive" : "n") <<
-				" integer in the range ([%d, %d])" << std::endl;
-			return false;
-		}
-	}
+  if (sscanf(str, "[%d, %d]%c", &range._min, &range._max, &c) != 2)
+    {
+      int val;
+      if (sscanf(str, "%d", &val) == 1)
+        {
+          range._min = val;
+          range._max = val;
 
-	if (range._min == range._max)
-	{
-		range._isRange = false;
-	}
-	else
-	{
-		range._isRange = true;
-	}
+        }
+      else
+        {
+          std::cerr << "Value '" << str << "' of attribute '" << pElement->Value() << "/@"
+                    << pAttrib->Name() << "' must be a" << (pos ? " positive" : "n") <<
+                    " integer in the range ([%d, %d])" << std::endl;
+          return false;
+        }
+    }
 
-	if (range._min > range._max)
-	{
-		std::cerr << "Values '" << str << "' of attribute '" << pElement->Value() << "/@"
-			<< pAttrib->Name() << "' have a min of " << range._min << " which is greater than the max of " << range._max << std::endl;
-		return false;
-	}
+  if (range._min == range._max)
+    {
+      range._isRange = false;
+    }
+  else
+    {
+      range._isRange = true;
+    }
 
-	if (pos && !(0 <= range._min && 0 <= range._max))
-	{
-		std::cerr << "Value '" << str << "' of attribute '" << pElement->Value() << "/@"
-			<< pAttrib->Name() << "' must be a positive integer in the range ([%d, %d])" << std::endl;
-		return false;
-	}
+  if (range._min > range._max)
+    {
+      std::cerr << "Values '" << str << "' of attribute '" << pElement->Value() << "/@"
+                << pAttrib->Name() << "' have a min of " << range._min << " which is greater than the max of " << range._max << std::endl;
+      return false;
+    }
 
-	return true;
+  if (pos && !(0 <= range._min && 0 <= range._max))
+    {
+      std::cerr << "Value '" << str << "' of attribute '" << pElement->Value() << "/@"
+                << pAttrib->Name() << "' must be a positive integer in the range ([%d, %d])" << std::endl;
+      return false;
+    }
+
+  return true;
 }
 
 bool Lhs::init(const char* filename)
 {
-	// Need to initialize _isRange here for parameters that don't appear in the LHS parameter file.
-	// They will have a single value defined, from the default value in paramsbase.cpp.
-	for (int i = 0; i < PARAM_DOUBLE_COUNT; ++i)
-	{
-		_lhsDoubleParam[i]._isRange = false;
-	}
+  // Need to initialize _isRange here for parameters that don't appear in the LHS parameter file.
+  // They will have a single value defined, from the default value in paramsbase.cpp.
+  for (int i = 0; i < PARAM_DOUBLE_COUNT; ++i)
+    {
+      _lhsDoubleParam[i]._isRange = false;
+    }
 
-	for (int i = 0; i < PARAM_INT_COUNT; ++i)
-	{
-		_lhsIntParam[i]._isRange = false;
-	}
+  for (int i = 0; i < PARAM_INT_COUNT; ++i)
+    {
+      _lhsIntParam[i]._isRange = false;
+    }
 
-	if (!fromXml(filename))
-	{
-		return false;
-	}
+  if (!fromXml(filename))
+    {
+      return false;
+    }
 
-	// Initialize the range arrays for those parameters that were not present in the parameter file
-	// and for which default values are to be used. Without this parameter checks on a generated
-	// parameter file might fail.
-	for (int i = 0; i < _PARAM_COUNT; i++)
-	{
-		if (_description[i].useDefault && !_paramsRead[i])
-		{
-			if (isDouble(i))
-			{
-				_lhsDoubleParam[i]._min = _description[i].doubleDefault;
-				_lhsDoubleParam[i]._max = _description[i].doubleDefault;
-			}
-			else
-			{
-				_lhsIntParam[intIndex(i)]._min = _description[i].intDefault;
-				_lhsIntParam[intIndex(i)]._max = _description[i].intDefault;
-			}
-		}
-	}
+  // Initialize the range arrays for those parameters that were not present in the parameter file
+  // and for which default values are to be used. Without this parameter checks on a generated
+  // parameter file might fail.
+  for (int i = 0; i < _PARAM_COUNT; i++)
+    {
+      if (_description[i].useDefault && !_paramsRead[i])
+        {
+          if (isDouble(i))
+            {
+              _lhsDoubleParam[i]._min = _description[i].doubleDefault;
+              _lhsDoubleParam[i]._max = _description[i].doubleDefault;
+            }
+          else
+            {
+              _lhsIntParam[intIndex(i)]._min = _description[i].intDefault;
+              _lhsIntParam[intIndex(i)]._max = _description[i].intDefault;
+            }
+        }
+    }
 
-	return true;
+  return true;
 }
 
 // Enforce that the CCL5 secretion rate is the same as the CCL2 secretion rate,
 // and that the CXCL9 secretion rate is twice the CCL2 rate.
 void Lhs::updateParamDouble(ParamDoubleType param, double val)
 {
-	switch (param)
-	{
-	case PARAM_MAC_SEC_RATE_CCL2:
-		setParam(param, val);
-		setParam(PARAM_MAC_SEC_RATE_CCL5, val);
-		setParam(PARAM_MAC_SEC_RATE_CXCL9, 2 * val);
-		break;
-	case PARAM_MAC_SEC_RATE_CCL5:
-	case PARAM_MAC_SEC_RATE_CXCL9:
-		// ignore
-		break;
-	default:
-		setParam(param, val);
-	}
+  switch (param)
+    {
+    case PARAM_MAC_SEC_RATE_CCL2:
+      setParam(param, val);
+      setParam(PARAM_MAC_SEC_RATE_CCL5, val);
+      setParam(PARAM_MAC_SEC_RATE_CXCL9, 2 * val);
+      break;
+    case PARAM_MAC_SEC_RATE_CCL5:
+    case PARAM_MAC_SEC_RATE_CXCL9:
+      // ignore
+      break;
+    default:
+      setParam(param, val);
+    }
 }
 
 /*
@@ -363,263 +363,265 @@ void Lhs::updateParamDouble(ParamDoubleType param, double val)
  */
 void Lhs::performLhs(bool logscale)
 {
-	const int totalParamCount = PARAM_DOUBLE_COUNT + PARAM_INT_COUNT;
+  const int totalParamCount = PARAM_DOUBLE_COUNT + PARAM_INT_COUNT;
 
-	// first index = param index
-	// bins is a vector of vectors. Essentially it is a dynamic 2D array with one row per
-	// parameter and one column per LHS sample. Initialize each element of the bin 2D array
-	// to be its sample ordinal.
-	std::vector<std::vector<int> > bins(totalParamCount, std::vector<int>(_nSamples));
+  // first index = param index
+  // bins is a vector of vectors. Essentially it is a dynamic 2D array with one row per
+  // parameter and one column per LHS sample. Initialize each element of the bin 2D array
+  // to be its sample ordinal.
+  std::vector<std::vector<int> > bins(totalParamCount, std::vector<int>(_nSamples));
 
-	// Initialize the bins for each parameter to the sample ordinal:
-	// bin 0 for a parameter is 0, bin 1 is 1, etc.
-	for (int i = 0; i < PARAM_DOUBLE_COUNT; i++)
-	{
-		for (int j = 0; j < _nSamples; j++)
-		{
-			bins[i][j] = j;
-		}
-	}
+  // Initialize the bins for each parameter to the sample ordinal:
+  // bin 0 for a parameter is 0, bin 1 is 1, etc.
+  for (int i = 0; i < PARAM_DOUBLE_COUNT; i++)
+    {
+      for (int j = 0; j < _nSamples; j++)
+        {
+          bins[i][j] = j;
+        }
+    }
 
-	for (int i = 0; i < PARAM_INT_COUNT; i++)
-	{
-		int paramindex = paramIndex((ParamIntType) i);
+  for (int i = 0; i < PARAM_INT_COUNT; i++)
+    {
+      int paramindex = paramIndex((ParamIntType) i);
 
-		for (int j = 0; j < _nSamples; j++)
-		{
-			if (!_lhsIntParam[i]._isRange)
-			{
-				bins[paramindex][j] = _lhsIntParam[i]._min;
-				continue;
-			}
+      for (int j = 0; j < _nSamples; j++)
+        {
+          if (!_lhsIntParam[i]._isRange)
+            {
+              bins[paramindex][j] = _lhsIntParam[i]._min;
+              continue;
+            }
 
-			int count = _nSamples / (_lhsIntParam[i]._max - _lhsIntParam[i]._min + 1);
-			if (count == 0)
-			{
-				// The number of samples < number of integers in the parameter range.
-				// Divide the parameter range into sub-ranges and pick a random value
-				// from each sub-range. Note that max is one greater than the max
-				// for a sub-range because getInt(max, min) chooses a value in the range [min, max-1].
-				count = (_lhsIntParam[i]._max - _lhsIntParam[i]._min + 1) / _nSamples;
-				int min = j * count + _lhsIntParam[i]._min;
-				int max = (j + 1 == _nSamples) ? _lhsIntParam[i]._max + 1 : (j + 1) * count + _lhsIntParam[i]._min;
+          int count = _nSamples / (_lhsIntParam[i]._max - _lhsIntParam[i]._min + 1);
+          if (count == 0)
+            {
+              // The number of samples < number of integers in the parameter range.
+              // Divide the parameter range into sub-ranges and pick a random value
+              // from each sub-range. Note that max is one greater than the max
+              // for a sub-range because getInt(max, min) chooses a value in the range [min, max-1].
+              count = (_lhsIntParam[i]._max - _lhsIntParam[i]._min + 1) / _nSamples;
+              int min = j * count + _lhsIntParam[i]._min;
+              int max = (j + 1 == _nSamples) ? _lhsIntParam[i]._max + 1 : (j + 1) * count + _lhsIntParam[i]._min;
 
-				bins[paramindex][j] = g_Rand.getInt(max, min);
-			}
-			else
-			{
-				// The number of samples >= number of integers in the parameter range.
-				// Repeat each integer value for count number of samples.
-				int val = j / count + _lhsIntParam[i]._min;
+              bins[paramindex][j] = g_Rand.getInt(max, min);
+            }
+          else
+            {
+              // The number of samples >= number of integers in the parameter range.
+              // Repeat each integer value for count number of samples.
+              int val = j / count + _lhsIntParam[i]._min;
 
-				if (val <= _lhsIntParam[i]._max)
-				{
-					bins[paramindex][j] = val;
-				}
-				else
-				{
-					bins[paramindex][j] =
-						g_Rand.getInt(_lhsIntParam[i]._max + 1, _lhsIntParam[i]._min);
-				}
-			}
-		}
-	}
+              if (val <= _lhsIntParam[i]._max)
+                {
+                  bins[paramindex][j] = val;
+                }
+              else
+                {
+                  bins[paramindex][j] =
+                    g_Rand.getInt(_lhsIntParam[i]._max + 1, _lhsIntParam[i]._min);
+                }
+            }
+        }
+    }
 
-	// Create a parameter file for each sample.
-	for (int i = 0; i < _nSamples; i++)
-	{
-		for (int j = 0; j < totalParamCount; j++)
-		{
-			// pick a random bin, and remove from the vector of available bins
-			int binNr = g_Rand.getInt(bins[j].size());
-			int k = bins[j][binNr];
-            
+  // Create a parameter file for each sample.
+  for (int i = 0; i < _nSamples; i++)
+    {
+      for (int j = 0; j < totalParamCount; j++)
+        {
+          // pick a random bin, and remove from the vector of available bins
+          int binNr = g_Rand.getInt(bins[j].size());
+          int k = bins[j][binNr];
+
 //            std::cout << binNr << "   " << k << std::endl;
-            
-			bins[j].erase(bins[j].begin() + binNr);
 
-			if (j < PARAM_DOUBLE_COUNT)
-			{
-				ParamDoubleType param = (ParamDoubleType) j;
+          bins[j].erase(bins[j].begin() + binNr);
 
-				if (_lhsDoubleParam[j]._isRange)
-				{
-					// A non-integer variable. Pick a random value between the min and max for the sub-range
-					// for the selected bin.
-                    // If the log scale option is on then the random value is chosen on a log scale
-        
-                    
-                    if (logscale) {
-                        
-                        if (_lhsDoubleParam[j]._min <= 0)
-                        {
-                            std::cerr << "Minimum Value of a Paramater is either negative or zero. Log-scale cannot be used in this case " << std::endl;
-                            exit(1);
-                        }
-                        
-                        double log_min = log10(_lhsDoubleParam[j]._min);
-                        double log_max = log10(_lhsDoubleParam[j]._max);
-                        double a = log_min + k * (log_max - log_min) / _nSamples;
-                        double b =log_min + (k + 1) * (log_max - log_min) / _nSamples;
-                        double convert = pow(10,g_Rand.getReal(a, b));
+          if (j < PARAM_DOUBLE_COUNT)
+            {
+              ParamDoubleType param = (ParamDoubleType) j;
 
-                        updateParamDouble(param, convert);
-                    }
-                    
-                    
-                    else
+              if (_lhsDoubleParam[j]._isRange)
+                {
+                  // A non-integer variable. Pick a random value between the min and max for the sub-range
+                  // for the selected bin.
+                  // If the log scale option is on then the random value is chosen on a log scale
+
+
+                  if (logscale)
                     {
-                        double a = _lhsDoubleParam[j]._min + k * (_lhsDoubleParam[j]._max - _lhsDoubleParam[j]._min) / _nSamples;
-                        double b = _lhsDoubleParam[j]._min + (k + 1) * (_lhsDoubleParam[j]._max - _lhsDoubleParam[j]._min) / _nSamples;
-                        
-                        updateParamDouble(param, g_Rand.getReal(a,b));
-                        
+
+                      if (_lhsDoubleParam[j]._min <= 0)
+                        {
+                          std::cerr << "Minimum Value of a Paramater is either negative or zero. Log-scale cannot be used in this case " << std::endl;
+                          exit(1);
+                        }
+
+                      double log_min = log10(_lhsDoubleParam[j]._min);
+                      double log_max = log10(_lhsDoubleParam[j]._max);
+                      double a = log_min + k * (log_max - log_min) / _nSamples;
+                      double b =log_min + (k + 1) * (log_max - log_min) / _nSamples;
+                      double convert = pow(10,g_Rand.getReal(a, b));
+
+                      updateParamDouble(param, convert);
                     }
 
-				}
-				else
-				{
-					// This isn't a range, i.e. min == max, so just use the single value for this parameter.
-					updateParamDouble(param, _lhsDoubleParam[j]._min);
-				}
-			}
-			else
-			{
-				// An integer parameter. Use the integer value from the randomly selected bin.
-				ParamIntType param = (ParamIntType) intIndex(j);
-				setParam(param, k);
-			}
-		}
 
-		bool res = checkParams();
-		if (!res)
-		{
-			std::cerr << "Parameter check failed for generated parameter file " << (i+1) << "." << std::endl;
-		}
+                  else
+                    {
+                      double a = _lhsDoubleParam[j]._min + k * (_lhsDoubleParam[j]._max - _lhsDoubleParam[j]._min) / _nSamples;
+                      double b = _lhsDoubleParam[j]._min + (k + 1) * (_lhsDoubleParam[j]._max - _lhsDoubleParam[j]._min) / _nSamples;
 
-		// Number the generated parameter files from 1, not 0.
-		// Ex. 1.xml, 2.xml,... rather than 0.xml, 1.xml,...
-		char buf[1024];
-		sprintf(buf, "%d.xml", i+1);
-		toXml(buf);
-	}
+                      updateParamDouble(param, g_Rand.getReal(a,b));
+
+                    }
+
+                }
+              else
+                {
+                  // This isn't a range, i.e. min == max, so just use the single value for this parameter.
+                  updateParamDouble(param, _lhsDoubleParam[j]._min);
+                }
+            }
+          else
+            {
+              // An integer parameter. Use the integer value from the randomly selected bin.
+              ParamIntType param = (ParamIntType) intIndex(j);
+              setParam(param, k);
+            }
+        }
+
+      bool res = checkParams();
+      if (!res)
+        {
+          std::cerr << "Parameter check failed for generated parameter file " << (i+1) << "." << std::endl;
+        }
+
+      // Number the generated parameter files from 1, not 0.
+      // Ex. 1.xml, 2.xml,... rather than 0.xml, 1.xml,...
+      char buf[1024];
+      sprintf(buf, "%d.xml", i+1);
+      toXml(buf);
+    }
 }
 
 bool Lhs::checkParams() const
 {
-	bool res = true;
-	res &= ParamsBase::checkParams();
+  bool res = true;
+  res &= ParamsBase::checkParams();
 
-	// Check that each generated parameter value is in its proper range.
-	for (int i = 0; i < _PARAM_COUNT; i++)
-	{
-		if (isDouble(i))
-		{
-			// Don't check parameters calculated in updateParamDouble since they might not match any range specified.
-			if ( ((i != PARAM_MAC_SEC_RATE_CCL5) && (i != PARAM_MAC_SEC_RATE_CXCL9))  && (_doubleParam[i] < _lhsDoubleParam[i]._min || _doubleParam[i] > _lhsDoubleParam[i]._max) )
-			{
-				std::cerr << "Generated value of " << _doubleParam[i] << " for parameter " << _description[i].name
-						  << " is outside the specified range of ["  << _lhsDoubleParam[i]._min << ", " << _lhsDoubleParam[i]._max << "]." << std::endl;
-				res = false;
-			}
-		}
-		else
-		{
-			if ((_intParam[intIndex(i)] < _lhsIntParam[intIndex(i)]._min || _intParam[intIndex(i)] > _lhsIntParam[intIndex(i)]._max))
-			{
-				std::cerr << "Generated value of " << _intParam[intIndex(i)] << " for parameter " << _description[i].name
-						  << " is outside the specified range of ["  << _lhsIntParam[intIndex(i)]._min << ", " << _lhsIntParam[intIndex(i)]._max << "]." << std::endl;
-				res = false;
-			}
-		}
-	}
+  // Check that each generated parameter value is in its proper range.
+  for (int i = 0; i < _PARAM_COUNT; i++)
+    {
+      if (isDouble(i))
+        {
+          // Don't check parameters calculated in updateParamDouble since they might not match any range specified.
+          if ( ((i != PARAM_MAC_SEC_RATE_CCL5) && (i != PARAM_MAC_SEC_RATE_CXCL9))  && (_doubleParam[i] < _lhsDoubleParam[i]._min || _doubleParam[i] > _lhsDoubleParam[i]._max) )
+            {
+              std::cerr << "Generated value of " << _doubleParam[i] << " for parameter " << _description[i].name
+                        << " is outside the specified range of ["  << _lhsDoubleParam[i]._min << ", " << _lhsDoubleParam[i]._max << "]." << std::endl;
+              res = false;
+            }
+        }
+      else
+        {
+          if ((_intParam[intIndex(i)] < _lhsIntParam[intIndex(i)]._min || _intParam[intIndex(i)] > _lhsIntParam[intIndex(i)]._max))
+            {
+              std::cerr << "Generated value of " << _intParam[intIndex(i)] << " for parameter " << _description[i].name
+                        << " is outside the specified range of ["  << _lhsIntParam[intIndex(i)]._min << ", " << _lhsIntParam[intIndex(i)]._max << "]." << std::endl;
+              res = false;
+            }
+        }
+    }
 
-	return res;
+  return res;
 }
 
 void printUsage(char* pArgv0, po::options_description& desc)
 {
-	std::cout << "Usage: " << pArgv0 << " [options]\n" << desc << std::endl;
+  std::cout << "Usage: " << pArgv0 << " [options]\n" << desc << std::endl;
 }
 
 void printVersion()
 {
-	std::cout << "Version: " << GR_VERSION << std::endl;
+  std::cout << "Version: " << GR_VERSION << std::endl;
 }
 
 int main(int argc, char** argv)
 {
-	std::string inputFileName;
-	int nSamples;
-	unsigned long seed;
-	int dim;
-	bool logscale = false;
+  std::string inputFileName;
+  int nSamples;
+  unsigned long seed;
+  int dim;
+  bool logscale = false;
 
-	/* set seed to current time, in case not specified */
-	time_t curTime;
-	time(&curTime);
+  /* set seed to current time, in case not specified */
+  time_t curTime;
+  time(&curTime);
 
-	po::options_description desc("Allowed options");
-	desc.add_options()
-		("help,h", "Help message")
-		("input-file,i", po::value<std::string>(&inputFileName), "Input file name")
-		("seed,s", po::value<unsigned long>(&seed)->default_value((unsigned long) curTime), "Seed")
-		("samples,n", po::value<int>(&nSamples), "Number of samples")
-		("dim,d", po::value(&dim)->default_value(100), "Size of simulation grid")
-		("version,v", "Version number")
-        ("log-scale", "Use log scale intervals for double-type parameters");
+  po::options_description desc("Allowed options");
+  desc.add_options()
+  ("help,h", "Help message")
+  ("input-file,i", po::value<std::string>(&inputFileName), "Input file name")
+  ("seed,s", po::value<unsigned long>(&seed)->default_value((unsigned long) curTime), "Seed")
+  ("samples,n", po::value<int>(&nSamples), "Number of samples")
+  ("dim,d", po::value(&dim)->default_value(100), "Size of simulation grid")
+  ("version,v", "Version number")
+  ("log-scale", "Use log scale intervals for double-type parameters");
 
-	try
-	{
-		po::positional_options_description p;
-		p.add("input-file", -1);
-		po::variables_map vm;
-		po::store(po::command_line_parser(argc, argv).options(desc).positional(p).run(), vm);
-		po::notify(vm);
+  try
+    {
+      po::positional_options_description p;
+      p.add("input-file", -1);
+      po::variables_map vm;
+      po::store(po::command_line_parser(argc, argv).options(desc).positional(p).run(), vm);
+      po::notify(vm);
 
-		if (vm.count("version"))
-		{
-			printVersion();
-			return 0;
-		}
-
-		if (vm.count("help"))
-		{
-			printUsage(argv[0], desc);
-			return 0;
-		}
-
-		if (!vm.count("samples"))
-		{
-			std::cerr << "Missing number of samples" << std::endl;
-			return 1;
-		}
-
-		if (!vm.count("input-file"))
-		{
-			std::cerr << "Missing input file" << std::endl;
-			return 1;
-		}
-        if (vm.count("log-scale")) {
-            logscale = 1;
+      if (vm.count("version"))
+        {
+          printVersion();
+          return 0;
         }
-	}
-	catch (std::exception& e)
-	{
-		std::cerr << "Error processing arguments: " << e.what() << std::endl;
-    printUsage(argv[0], desc);
-		return 1;
-	}
 
-	g_Rand.setSeed(seed);
+      if (vm.count("help"))
+        {
+          printUsage(argv[0], desc);
+          return 0;
+        }
 
-	Lhs lhs(nSamples, Pos(dim, dim));
-	if (!lhs.init(inputFileName.c_str()))
-	{
-		return 1;
-	}
+      if (!vm.count("samples"))
+        {
+          std::cerr << "Missing number of samples" << std::endl;
+          return 1;
+        }
 
-	lhs.performLhs(logscale);
+      if (!vm.count("input-file"))
+        {
+          std::cerr << "Missing input file" << std::endl;
+          return 1;
+        }
+      if (vm.count("log-scale"))
+        {
+          logscale = 1;
+        }
+    }
+  catch (std::exception& e)
+    {
+      std::cerr << "Error processing arguments: " << e.what() << std::endl;
+      printUsage(argv[0], desc);
+      return 1;
+    }
 
-	return 0;
+  g_Rand.setSeed(seed);
+
+  Lhs lhs(nSamples, Pos(dim, dim));
+  if (!lhs.init(inputFileName.c_str()))
+    {
+      return 1;
+    }
+
+  lhs.performLhs(logscale);
+
+  return 0;
 }

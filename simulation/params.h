@@ -17,21 +17,21 @@ class Params : public ParamsBase
 {
 public:
 
-	static Params* getInstance(const Pos& dim);
+  static Params* getInstance(const Pos& dim);
   static Params* getInstance();
-	static bool reinit(const char* filename);
+  static bool reinit(const char* filename);
 
-	bool fromXml(const char* filename);
+  bool fromXml(const char* filename);
 
 protected:
-	Params(const Pos& dim);
-	virtual ~Params();
+  Params(const Pos& dim);
+  virtual ~Params();
 
-	bool readParam(const TiXmlElement* pElement, const TiXmlAttribute* pAttrib,  ParamDoubleType param);
-	bool readParam(const TiXmlElement* pElement, const TiXmlAttribute* pAttrib,  ParamIntType param);
+  bool readParam(const TiXmlElement* pElement, const TiXmlAttribute* pAttrib,  ParamDoubleType param);
+  bool readParam(const TiXmlElement* pElement, const TiXmlAttribute* pAttrib,  ParamIntType param);
 
 private:
-	static Params* _pInstance;
+  static Params* _pInstance;
 
 };
 
@@ -43,12 +43,13 @@ inline Params* Params::getInstance()
 
 inline Params* Params::getInstance(const Pos& dim)
 {
-	if (!_pInstance) {
-    	assert(dim.x>0 && dim.y>0);
-		_pInstance = new Params(dim);
-  }
+  if (!_pInstance)
+    {
+      assert(dim.x>0 && dim.y>0);
+      _pInstance = new Params(dim);
+    }
 
-	return _pInstance;
+  return _pInstance;
 }
 
 #endif /* PARAMS_H_ */

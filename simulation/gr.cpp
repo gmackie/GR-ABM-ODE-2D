@@ -19,11 +19,11 @@ Rand g_Rand = Rand(1);
 // with a higher resolution than we would get just by using seconds.
 unsigned int createTimeSeed()
 {
-	 struct timeval curTimeHiRes;
-	 if (gettimeofday(&curTimeHiRes, NULL) != 0)
-			throw std::runtime_error("Error getting current high resolution time.");
+  struct timeval curTimeHiRes;
+  if (gettimeofday(&curTimeHiRes, NULL) != 0)
+    throw std::runtime_error("Error getting current high resolution time.");
 
-	 unsigned int seed = curTimeHiRes.tv_sec ^ curTimeHiRes.tv_usec;
+  unsigned int seed = curTimeHiRes.tv_sec ^ curTimeHiRes.tv_usec;
 
-	return seed;
+  return seed;
 }

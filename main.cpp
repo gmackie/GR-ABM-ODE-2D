@@ -108,7 +108,7 @@ int main(int argc, char *argv[])
 
   std::ostringstream odestream;
   odestream << "ODE Solver Method (* = embedded):" << std::endl;
-  for(size_t i=0;i<ODESolvers::NMethods;i++)
+  for(size_t i=0; i<ODESolvers::NMethods; i++)
     odestream << i << " - " << (ODESolvers::ODEMethod)i << (i>=ODESolvers::HeunEuler ? "*" : "")<< std::endl;
 
   po::options_description desc("Allowed options");

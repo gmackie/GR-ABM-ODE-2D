@@ -23,62 +23,65 @@
 class RecruitmentLnODE : public RecruitmentBase
 {
 private:
-	static const std::string _ClassName;
+  static const std::string _ClassName;
 
 protected:
 
-	static const int _nrConditions = 43;
+  static const int _nrConditions = 43;
 
-	static const int _idxMDC = 13;
-	static const int _idxNaiveCD4 = 14;
-	static const int _idxNaiveCD8 = 16;
-	static const int _idxEffectorTH1 = 39;
-	static const int _idxEffectorT8 = 41;
-	static const int _idxCTL = 42;
+  static const int _idxMDC = 13;
+  static const int _idxNaiveCD4 = 14;
+  static const int _idxNaiveCD8 = 16;
+  static const int _idxEffectorTH1 = 39;
+  static const int _idxEffectorT8 = 41;
+  static const int _idxCTL = 42;
 
-	double _tcellTable[TCELL_TYPE_COUNT]; // contains lower bounds
+  double _tcellTable[TCELL_TYPE_COUNT]; // contains lower bounds
 
-	int _tcellQueueCount[TCELL_TYPE_COUNT];
-	struct TcellTypePair
-	{
-		TcellTypePair(int birthtime, TcellType type) : _birthtime(birthtime), _type(type) {};
-		int _birthtime;
-		TcellType _type;
-	};
+  int _tcellQueueCount[TCELL_TYPE_COUNT];
+  struct TcellTypePair
+  {
+    TcellTypePair(int birthtime, TcellType type) : _birthtime(birthtime), _type(type) {};
+    int _birthtime;
+    TcellType _type;
+  };
 
-	std::vector<TcellTypePair> _tcellQueue;
+  std::vector<TcellTypePair> _tcellQueue;
 
-	int _prevMiMci;
-	double _odeInitialConditions[_nrConditions];
-	const std::string _odeApp;
-	const std::string _odeTmpFile;
+  int _prevMiMci;
+  double _odeInitialConditions[_nrConditions];
+  const std::string _odeApp;
+  const std::string _odeTmpFile;
 
-	void init();
-	void updateInitialConditions(Stats& stats);
-	virtual void solveODE(const int time, const Stats& statsPrevious, Stats& stats);
-	void updateQueue(const int time, Stats& stats);
-	void recruitMacsGetTcellSources(GrSimulation& sim, Stats& stats,
-			ThresholdPosList tcellSources[TCELL_TYPE_COUNT]);
-	void recruitMac(GrSimulation& sim, const Pos& pSource);
-	void recruitTcells(GrSimulation& sim, Stats& stats,
-			ThresholdPosList tcellSources[TCELL_TYPE_COUNT]);
+  void init();
+  void updateInitialConditions(Stats& stats);
+  virtual void solveODE(const int time, const Stats& statsPrevious, Stats& stats);
+  void updateQueue(const int time, Stats& stats);
+  void recruitMacsGetTcellSources(GrSimulation& sim, Stats& stats,
+                                  ThresholdPosList tcellSources[TCELL_TYPE_COUNT]);
+  void recruitMac(GrSimulation& sim, const Pos& pSource);
+  void recruitTcells(GrSimulation& sim, Stats& stats,
+                     ThresholdPosList tcellSources[TCELL_TYPE_COUNT]);
 
 public:
-	RecruitmentLnODE(const std::string& odeApp, const std::string& odeTmpFile, std::istream& in);
-	RecruitmentLnODE(const std::string& odeApp, const std::string& odeTmpFile);
-	virtual ~RecruitmentLnODE();
+  RecruitmentLnODE(const std::string& odeApp, const std::string& odeTmpFile, std::istream& in);
+  RecruitmentLnODE(const std::string& odeApp, const std::string& odeTmpFile);
+  virtual ~RecruitmentLnODE();
 
-	RecruitmentMethod getMethod() const;
-	void serialize(std::ostream& out) const;
-	void deserialize(std::istream& in);
-  virtual RecruitmentBase* clone() const { return new RecruitmentLnODE(*this); }
+  RecruitmentMethod getMethod() const;
+  void serialize(std::ostream& out) const;
+  void deserialize(std::istream& in);
+  virtual RecruitmentBase* clone() const
+  {
+    return new RecruitmentLnODE(*this);
+  }
 
-    void recruit(GrSimulation& sim, int time);
+  void recruit(GrSimulation& sim, int time);
 };
 
 inline RecruitmentMethod RecruitmentLnODE::getMethod() const
 {
-	return RECR_LN_ODE;
+  return RECR_LN_ODE;
 }
 
 #endif /* RECRUITMENTLNODE_H_ */

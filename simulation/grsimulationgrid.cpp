@@ -9,12 +9,13 @@
 
 GrSimulationGrid::GrSimulationGrid(const Pos& dim)
 {
-	_pCurrentGrid = (new GrGrid(dim));
-	_pNextGrid = (new GrGrid(dim));
+  _pCurrentGrid = (new GrGrid(dim));
+  _pNextGrid = (new GrGrid(dim));
 
 }
 
-GrSimulationGrid::~GrSimulationGrid() {
+GrSimulationGrid::~GrSimulationGrid()
+{
   delete _pCurrentGrid;
   delete _pNextGrid;
 }

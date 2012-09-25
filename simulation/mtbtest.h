@@ -13,17 +13,21 @@
 class MtbTest: public TTest
 {
 public:
-	MtbTest(double alpha, int testPeriod, int samplePeriod);
-	~MtbTest();
-	void update(const int time, const int index, Stats& stats);
-	void evaluate(const int index, Stats& stats, double degressOfFreedom);
-	OutcomeMethod getMethod() const;
-  /*virtual*/ TTest* clone() const { return new MtbTest(*this); }
+  MtbTest(double alpha, int testPeriod, int samplePeriod);
+  ~MtbTest();
+  void update(const int time, const int index, Stats& stats);
+  void evaluate(const int index, Stats& stats, double degressOfFreedom);
+  OutcomeMethod getMethod() const;
+  /*virtual*/
+  TTest* clone() const
+  {
+    return new MtbTest(*this);
+  }
 };
 
 inline OutcomeMethod MtbTest::getMethod() const
 {
-	return OUTCOME_MTB;
+  return OUTCOME_MTB;
 }
 
 #endif /* MTBTEST_H_ */

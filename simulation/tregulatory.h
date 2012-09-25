@@ -12,9 +12,9 @@
 #include "tcell.h"
 
 /**
-* @brief 
+* @brief
 * @details Tregs look in their Moore neighborhood and deactivate all cells
-* found with a probability (function of TNF and IL10 concentrations in the 
+* found with a probability (function of TNF and IL10 concentrations in the
 * microcompartment).
 * - Mr-: ALL OFF and deactivation time (no interaction with bug).
 * - Mi-: ALL OFF and NO deactivation time (NF&kappa;B gives less TNF synthesis)
@@ -30,20 +30,20 @@ class Treg : public Tcell
 public:
   enum State {TREG_ACTIVE, TREG_DEAD, NSTATES};
 private:
-	static const std::string _ClassName;
+  static const std::string _ClassName;
 
-	/*
-	 * !!! If the data members change then the serialize and deserialize functions need to be updated !!!
-	 */
-	Treg::State _state;
-	Treg::State _nextState;
-	void handleResting(const int time, GrGrid& grid, Stats& stats);
+  /*
+   * !!! If the data members change then the serialize and deserialize functions need to be updated !!!
+   */
+  Treg::State _state;
+  Treg::State _nextState;
+  void handleResting(const int time, GrGrid& grid, Stats& stats);
 
 public:
-	Treg();
-	Treg(int birthtime, int row, int col, Treg::State state);
-	~Treg();
-	void move(GrGrid& grid);
+  Treg();
+  Treg(int birthtime, int row, int col, Treg::State state);
+  ~Treg();
+  void move(GrGrid& grid);
   void secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDepletion, bool il10rDynamics, bool il10Depletion, double mdt);
   /**
   * @copydoc Agent::computeNextState
@@ -54,65 +54,69 @@ public:
   * Age
   * :    (3 days)
   */
-	void computeNextState(const int time, GrGrid& grid, Stats& stats, bool tnfrDynamics, bool nfkbDynamics, bool il10Depletion, bool);
-	void updateState();
+  void computeNextState(const int time, GrGrid& grid, Stats& stats, bool tnfrDynamics, bool nfkbDynamics, bool il10Depletion, bool);
+  void updateState();
   void updateStatistics(Stats& s) const;
-	int getState() const;
-	Treg::State getNextState() const;
-	void kill();
-    void deactivate(const int time, Stats& stats);
-	bool isDead() const;
-	bool isDeadNext();
-	static bool isTreg(const Agent* pAgent);
-	static bool isTreg(const Agent* pAgent, Treg::State state);
-	void print() const;
-  /*virtual*/ Agent* clone() const { return new Treg(*this); }
-	void serialize(std::ostream& out) const;
-	void deserialize(std::istream& in);
-	AgentType getAgentType() const;
+  int getState() const;
+  Treg::State getNextState() const;
+  void kill();
+  void deactivate(const int time, Stats& stats);
+  bool isDead() const;
+  bool isDeadNext();
+  static bool isTreg(const Agent* pAgent);
+  static bool isTreg(const Agent* pAgent, Treg::State state);
+  void print() const;
+  /*virtual*/
+  Agent* clone() const
+  {
+    return new Treg(*this);
+  }
+  void serialize(std::ostream& out) const;
+  void deserialize(std::istream& in);
+  AgentType getAgentType() const;
 };
 
 inline AgentType Treg::getAgentType() const
 {
-	return TREG;
+  return TREG;
 }
 
 inline int Treg::getState() const
 {
-	return _state;
+  return _state;
 }
 
 inline Treg::State Treg::getNextState() const
 {
-	return _nextState;
+  return _nextState;
 }
 
 inline bool Treg::isTreg(const Agent* pAgent)
 {
-	return pAgent && pAgent->getAgentType() == TREG;
+  return pAgent && pAgent->getAgentType() == TREG;
 }
 
 inline bool Treg::isTreg(const Agent* pAgent, Treg::State state)
 {
-	if (!isTreg(pAgent))
-	{
-		return false;
-	}
-	else
-	{
-		const Treg* pTreg = static_cast<const Treg*>(pAgent);
-		return pTreg->getState() == state;
-	}
+  if (!isTreg(pAgent))
+    {
+      return false;
+    }
+  else
+    {
+      const Treg* pTreg = static_cast<const Treg*>(pAgent);
+      return pTreg->getState() == state;
+    }
 }
 
 inline bool Treg::isDead() const
 {
-	return _state == TREG_DEAD;
+  return _state == TREG_DEAD;
 }
 
 inline bool Treg::isDeadNext()
 {
-	return _nextState == TREG_DEAD;
+  return _nextState == TREG_DEAD;
 }
 
 std::ostream& operator<<(std::ostream& os, const Treg::State& s);

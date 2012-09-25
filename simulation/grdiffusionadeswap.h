@@ -26,19 +26,23 @@ class GrDiffusionADE_Swap: public GrDiffusion
 private:
   /// Lower bound on when a chemical should be considered non-existent
   /// (to keep from going negative).
-	const double _cutOffValue;
+  const double _cutOffValue;
 
 public:
-	GrDiffusionADE_Swap();
-	virtual ~GrDiffusionADE_Swap();
-	void diffuse(GrSimulationGrid& grid) const;
-  /*virtual*/ GrDiffusion* clone() const { return new GrDiffusionADE_Swap(*this); }
-	DiffusionMethod getMethod() const;
+  GrDiffusionADE_Swap();
+  virtual ~GrDiffusionADE_Swap();
+  void diffuse(GrSimulationGrid& grid) const;
+  /*virtual*/
+  GrDiffusion* clone() const
+  {
+    return new GrDiffusionADE_Swap(*this);
+  }
+  DiffusionMethod getMethod() const;
 };
 
 inline DiffusionMethod GrDiffusionADE_Swap::getMethod() const
 {
-	return DIFF_ADE_SWAP;
+  return DIFF_ADE_SWAP;
 }
 
 

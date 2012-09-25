@@ -19,17 +19,17 @@ const string Treg::_ClassName = "Treg";
 // Avoids the calls to the random number generator in the normal constructor, allowing the random number generator
 // to remain in synch after deserialization.
 Treg::Treg()
-	: Tcell()
-	, _state(TREG_DEAD)
-	, _nextState(TREG_DEAD)
+  : Tcell()
+  , _state(TREG_DEAD)
+  , _nextState(TREG_DEAD)
 {
 }
 
 Treg::Treg(int birthtime, int row, int col, Treg::State state)
 
-	: Tcell(birthtime, row, col, 0.0 /* kSynth */)
-	, _state(state)
-	, _nextState(state)
+  : Tcell(birthtime, row, col, 0.0 /* kSynth */)
+  , _state(state)
+  , _nextState(state)
 
 {
 }
@@ -40,18 +40,19 @@ Treg::~Treg()
 
 void Treg::move(GrGrid& grid)
 {
-	Tcell::moveTcell(grid, false, true, false);
+  Tcell::moveTcell(grid, false, true, false);
 }
 
 void Treg::secrete(GrGrid& grid, bool, bool, bool, bool il10rDynamics, bool il10Depletion, double mdt)
 {
-    
-    _kISynth = _PARAM(PARAM_GR_I_K_SYNTH_TCELL);
-    
-    if (!il10rDynamics && !il10Depletion) {
-        grid.incil10(_pos, (_PARAM(PARAM_TREG_SEC_RATE_IL10) * mdt));
+
+  _kISynth = _PARAM(PARAM_GR_I_K_SYNTH_TCELL);
+
+  if (!il10rDynamics && !il10Depletion)
+    {
+      grid.incil10(_pos, (_PARAM(PARAM_TREG_SEC_RATE_IL10) * mdt));
     }
-    
+
 }
 
 void Treg::deactivate(const int, Stats&)
@@ -60,18 +61,18 @@ void Treg::deactivate(const int, Stats&)
 
 void Treg::computeNextState(const int time, GrGrid& grid, Stats& stats, bool tnfrDynamics, bool, bool, bool)
 {
-	// check if it is time to die
-	if (timeToDie(time))
-	{
-		_nextState = TREG_DEAD;
-	}
-
-    // Always pass in false for nfkbDynamics for T cell apoptosis since they DO NOT have NFkB dynamics
-    else if (TNFinducedApoptosis(grid, tnfrDynamics, false))
+  // check if it is time to die
+  if (timeToDie(time))
     {
-        ++stats.getTcellApoptosisTNF();
-        _nextState = TREG_DEAD;
-        grid.incKillings(_pos);
+      _nextState = TREG_DEAD;
+    }
+
+  // Always pass in false for nfkbDynamics for T cell apoptosis since they DO NOT have NFkB dynamics
+  else if (TNFinducedApoptosis(grid, tnfrDynamics, false))
+    {
+      ++stats.getTcellApoptosisTNF();
+      _nextState = TREG_DEAD;
+      grid.incKillings(_pos);
     }
 
 //	else if (tnfrDynamics && intCompareGT(_intBoundTNFR1, _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR)) &&
@@ -91,20 +92,21 @@ void Treg::computeNextState(const int time, GrGrid& grid, Stats& stats, bool tnf
 //        grid.incKillings(_pos);
 //	}
 
-	else
-	{
-		switch (_state)
-		{
-		case TREG_DEAD:
-			// if dead, stay dead
-			_nextState = TREG_DEAD;
-			break;
-		case TREG_ACTIVE:
-			handleResting(time, grid, stats);
-			break;
-    default: throw std::runtime_error("Unknown Tcyt state");
-		}
-	}
+  else
+    {
+      switch (_state)
+        {
+        case TREG_DEAD:
+          // if dead, stay dead
+          _nextState = TREG_DEAD;
+          break;
+        case TREG_ACTIVE:
+          handleResting(time, grid, stats);
+          break;
+        default:
+          throw std::runtime_error("Unknown Tcyt state");
+        }
+    }
 }
 
 // Don't deactivate an agent that is already dead, either now or for the next time step -
@@ -120,34 +122,34 @@ void Treg::handleResting(const int time, GrGrid& grid, Stats& stats)
 //    Scalar currentTNF = grid.TNF(_pos); // Get TNF concentration for scaling Treg deactivation
 //    Scalar currentIL10 = grid.il10(_pos); // Get IL10 concentration for scaling Treg deactivation
 
-    Scalar IL10toTNFWeight = (_PARAM(PARAM_GR_I_K_ON) * (_surfIL10R + _surfBoundIL10R)) / (_PARAM(PARAM_GR_K_ON1) * (_surfBoundTNFR1 + _surfTNFR1)); // Comparing Kd allows us to scale the bound receptors such that the numbers do not favor TNFs higher affinity
-    Scalar numberFractionTNF;
-    if (_surfBoundTNFR1 == 0.0 && _surfBoundIL10R == 0.0)
-        numberFractionTNF = 0.0;
-    else
-        numberFractionTNF = (IL10toTNFWeight * _surfBoundTNFR1)/((IL10toTNFWeight * _surfBoundTNFR1) + _surfBoundIL10R); // Calculate the scaled number fraction of TNF (Like mol/weight fraction)
+  Scalar IL10toTNFWeight = (_PARAM(PARAM_GR_I_K_ON) * (_surfIL10R + _surfBoundIL10R)) / (_PARAM(PARAM_GR_K_ON1) * (_surfBoundTNFR1 + _surfTNFR1)); // Comparing Kd allows us to scale the bound receptors such that the numbers do not favor TNFs higher affinity
+  Scalar numberFractionTNF;
+  if (_surfBoundTNFR1 == 0.0 && _surfBoundIL10R == 0.0)
+    numberFractionTNF = 0.0;
+  else
+    numberFractionTNF = (IL10toTNFWeight * _surfBoundTNFR1)/((IL10toTNFWeight * _surfBoundTNFR1) + _surfBoundIL10R); // Calculate the scaled number fraction of TNF (Like mol/weight fraction)
 
 //    std::cout << "Pos: " << _pos << "  Xtnf: " << numberFractionTNF << std::endl;
 
-    for (int i = -1; i <= 1; i++)
-	{
-		for (int j = -1; j <= 1; j++)
-		{
-			Pos p(grid.mod_row(_pos.x+i), grid.mod_col(_pos.y+j));
+  for (int i = -1; i <= 1; i++)
+    {
+      for (int j = -1; j <= 1; j++)
+        {
+          Pos p(grid.mod_row(_pos.x+i), grid.mod_col(_pos.y+j));
 
-			  for(unsigned k=0; k<GrGrid::MAX_AGENTS_PER_CELL; k++)
-			  {
-				  Agent* pAgent = grid.agent(p, k);
-				  if(pAgent && !pAgent->isDead() && !pAgent->isDeadNext())
-				  {
-					  Scalar coinFlip = g_Rand.getReal();
+          for(unsigned k=0; k<GrGrid::MAX_AGENTS_PER_CELL; k++)
+            {
+              Agent* pAgent = grid.agent(p, k);
+              if(pAgent && !pAgent->isDead() && !pAgent->isDeadNext())
+                {
+                  Scalar coinFlip = g_Rand.getReal();
 
-                      // Scale Treg deactivation by TNF and IL10 concentration (only monitor molecules we have) as a proxy for
-                      // feedback to TGF-b cell-cell contact mechanism
-                      // TNF is a MM type eqn
-                      // IL10 is an exponential decay
-                      // These are inverse equations of each other since TNF would upregulate the 'Monitor Molecule' while IL10 would
-                      // downregulate the 'Monitor Molecule'
+                  // Scale Treg deactivation by TNF and IL10 concentration (only monitor molecules we have) as a proxy for
+                  // feedback to TGF-b cell-cell contact mechanism
+                  // TNF is a MM type eqn
+                  // IL10 is an exponential decay
+                  // These are inverse equations of each other since TNF would upregulate the 'Monitor Molecule' while IL10 would
+                  // downregulate the 'Monitor Molecule'
 //                      Scalar scaledProbTNF = ((_PARAM(PARAM_TREG_PROB_DEACTIVATE) * currentTNF)/(currentTNF + _PARAM(PARAM_TREG_DEACTIVATE_HALF_SAT_TNF)));
 //                      Scalar scaledProbIL10 = _PARAM(PARAM_TREG_PROB_DEACTIVATE) * pow(2.7183, -_PARAM(PARAM_TREG_DEACTIVATE_HALF_SAT_IL10) * currentIL10);
 
@@ -155,93 +157,96 @@ void Treg::handleResting(const int time, GrGrid& grid, Stats& stats)
 
 //                      Scalar scaledProb = std::min((scaledProbTNF + scaledProbIL10), _PARAM(PARAM_TREG_PROB_DEACTIVATE));
 
-                      Scalar scaledProb = _PARAM(PARAM_TREG_PROB_DEACTIVATE) * ((numberFractionTNF * _PARAM(PARAM_TREG_DEACTIVATE_SLOPE)) + _PARAM(PARAM_TREG_DEACTIVATE_INTERCEPT));
+                  Scalar scaledProb = _PARAM(PARAM_TREG_PROB_DEACTIVATE) * ((numberFractionTNF * _PARAM(PARAM_TREG_DEACTIVATE_SLOPE)) + _PARAM(PARAM_TREG_DEACTIVATE_INTERCEPT));
 //                      std::cout << "Pos :" << _pos << "  IL10: " << grid.il10(_pos) << "  TNF: " << grid.TNF(_pos) << "  Scaled Prob: " << scaledProb << std::endl;
-                      if (coinFlip  <= scaledProb)
-					  {
-                          grid.agent(p, k)->deactivate(time, stats);
-					  }
-				  }
-			  }
-		}
-	}
+                  if (coinFlip  <= scaledProb)
+                    {
+                      grid.agent(p, k)->deactivate(time, stats);
+                    }
+                }
+            }
+        }
+    }
 }
 
 void Treg::updateState()
 {
-	_state = _nextState;
+  _state = _nextState;
 }
 
 void Treg::kill()
 {
-	_nextState = _state = TREG_DEAD;
+  _nextState = _state = TREG_DEAD;
 }
 
 void Treg::print() const
 {
-	std::cout << "Treg - " << _birthTime << " - ";
+  std::cout << "Treg - " << _birthTime << " - ";
 
-	switch (_state)
-	{
-	case TREG_DEAD:
-		std::cout << "dead" << std::endl;
-		break;
-	case TREG_ACTIVE:
-		std::cout << "active" << std::endl;
-		break;
-  default: throw std::runtime_error("Unknown Tcyt state");
-	}
+  switch (_state)
+    {
+    case TREG_DEAD:
+      std::cout << "dead" << std::endl;
+      break;
+    case TREG_ACTIVE:
+      std::cout << "active" << std::endl;
+      break;
+    default:
+      throw std::runtime_error("Unknown Tcyt state");
+    }
 }
 
 void Treg::serialize(std::ostream& out) const
 {
-	assert(out.good());
+  assert(out.good());
 
-	Serialization::writeHeader(out, Treg::_ClassName);
+  Serialization::writeHeader(out, Treg::_ClassName);
 
-	Tcell::serialize(out);
+  Tcell::serialize(out);
 
-	int intVal = (int) _state;
-	out << intVal << std::endl;
+  int intVal = (int) _state;
+  out << intVal << std::endl;
 
-	intVal = (int) _nextState;
-	out << intVal << std::endl;
+  intVal = (int) _nextState;
+  out << intVal << std::endl;
 
-	Serialization::writeFooter(out, Treg::_ClassName);
+  Serialization::writeFooter(out, Treg::_ClassName);
 }
 
 void Treg::deserialize(std::istream& in)
 {
-	assert(in.good());
+  assert(in.good());
 
-	if (!Serialization::readHeader(in, Treg::_ClassName))
-	{
-		exit(1);
-	}
+  if (!Serialization::readHeader(in, Treg::_ClassName))
+    {
+      exit(1);
+    }
 
-	int intVal;
+  int intVal;
 
-	Tcell::deserialize(in);
+  Tcell::deserialize(in);
 
-	in >> intVal;
-	_state = (Treg::State) intVal;
+  in >> intVal;
+  _state = (Treg::State) intVal;
 
-	in >> intVal;
-	_nextState = (Treg::State) intVal;
+  in >> intVal;
+  _nextState = (Treg::State) intVal;
 
-	if (!Serialization::readFooter(in, Treg::_ClassName))
-	{
-		exit(1);
-	}
+  if (!Serialization::readFooter(in, Treg::_ClassName))
+    {
+      exit(1);
+    }
 }
 
-void Treg::updateStatistics(Stats& s) const {
+void Treg::updateStatistics(Stats& s) const
+{
   ++s.getNrOfAgents(TREG);
   ++s.getNrOfTregs((Treg::State)getState());
 }
 
 const char* _tregStrings[] = { "Active", "Dead" };
 
-std::ostream& operator<<(std::ostream& os, const Treg::State& s) {
+std::ostream& operator<<(std::ostream& os, const Treg::State& s)
+{
   return os << _tregStrings[s];
 }

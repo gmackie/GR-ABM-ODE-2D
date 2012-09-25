@@ -121,23 +121,24 @@
  *
  */
 
-class Serialization {
+class Serialization
+{
 public:
-	Serialization();
-	virtual ~Serialization();
+  Serialization();
+  virtual ~Serialization();
 
-	static const std::string _HeaderSuffix;
-	static const std::string _FooterSuffix;
+  static const std::string _HeaderSuffix;
+  static const std::string _FooterSuffix;
 
-	static void writeHeader(std::ostream& out, std::string className);
-	static void writeFooter(std::ostream& out, std::string className);
-	static bool readHeader(std::istream& in, std::string className);
-	static bool readFooter(std::istream& in, std::string className);
+  static void writeHeader(std::ostream& out, std::string className);
+  static void writeFooter(std::ostream& out, std::string className);
+  static bool readHeader(std::istream& in, std::string className);
+  static bool readFooter(std::istream& in, std::string className);
 
 
 protected:
 
-	static bool readHeaderFooter(std::istream& in, std::string className, std::string header, std::string type);
+  static bool readHeaderFooter(std::istream& in, std::string className, std::string header, std::string type);
 
 };
 

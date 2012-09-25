@@ -19,16 +19,16 @@
 class GrDiffusion
 {
 public:
-	GrDiffusion();
-	virtual ~GrDiffusion();
+  GrDiffusion();
+  virtual ~GrDiffusion();
   /**
   * @brief Diffuse selected chemicals on the grid
   */
-	virtual void diffuse(GrSimulationGrid& grid) const = 0;
+  virtual void diffuse(GrSimulationGrid& grid) const = 0;
   /**
   * @return The enumerated type of the method
   */
-	virtual DiffusionMethod getMethod() const = 0;
+  virtual DiffusionMethod getMethod() const = 0;
   /**
   * @brief Deep copy of the diffusion method
   */

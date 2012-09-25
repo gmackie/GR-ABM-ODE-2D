@@ -26,10 +26,10 @@ class Agent
 {
 private:
   /// Fake RTTI for serialization purposes
-	static const std::string _ClassName;
+  static const std::string _ClassName;
 
-	/// A global ID counter for assigning a unique ID to an agent.
-	static unsigned long _nextID;
+  /// A global ID counter for assigning a unique ID to an agent.
+  static unsigned long _nextID;
 
 protected:
   /**
@@ -44,14 +44,14 @@ protected:
   * X-Macro for holding all the agent-specific properties.
   * \see Agent::visitProperties Agent::serialize Agent::deserialize
   */
-  
+
   /**
   * @def P(type, name, default, desc)
   * This macro is used to add a new property to an agent.  This will
   * automatically add code for serialization and accessing via corresponding
   * getname() and setname() functions.
   */
-  #define AGENT_PROPS \
+#define AGENT_PROPS \
 	P(unsigned long, id, 0, "Unique agent ID")  \
 	P(int, birthTime, 0, "")  \
 	P(int, deathTime, 0, "")  \
@@ -128,7 +128,7 @@ protected:
   bool _isODEsolved;    /// Specifies whether this agent's odes have been solved for this timestep (for the two cell case)
   Scalar _lasttimestep; /// Last timestep used in an adaptive ode method
   std::valarray<double> _initvector;  /// valarray that holds all the integration variables to be passed to an integration method
-    
+
   /**
   * @brief Move an agent based on chemotaxis
   * @details Agents move with respect to the gradient of chemokines at their
@@ -137,7 +137,7 @@ protected:
   * - Chemokine gradient define the probabilities (i.e. proportional) of moving
   *   into different micro-compartments
   * - CCL2, CCL5, and CXCL9 have different effect for different cell types
-  * 
+  *
   * Each agent type also have crowding rules that relate to the size of the agent:
   * - Only one macrophage per micro-compartment
   * - Only one tcell may move to an occupied cell (occupier may be a tcell or macrophage)
@@ -152,7 +152,7 @@ protected:
   *
   * @return Calculated position to move to based on chemotaxis
   */
-	Pos moveAgent(GrGrid& grid, bool ccl2, bool ccl5, bool cxcl9, bool attractant, double bonusFactor);
+  Pos moveAgent(GrGrid& grid, bool ccl2, bool ccl5, bool cxcl9, bool attractant, double bonusFactor);
   /**
   * @brief returns an ordinal direction of the location to move based on chemotaxis
   *
@@ -166,7 +166,7 @@ protected:
   * @return Calculated ordinial direction to move to based on chemotaxis
   * @see compartmentOrdinalToCoordinates
   */
-	int getDestinationOrdinal(GrGrid& grid, bool ccl2, bool ccl5, bool cxcl9, bool attractant, double bonusFactor);
+  int getDestinationOrdinal(GrGrid& grid, bool ccl2, bool ccl5, bool cxcl9, bool attractant, double bonusFactor);
   /**
   * @brief Converts an ordinal to a grid position based on the agent's current position
   * The possible values for the ordinal are:
@@ -182,7 +182,7 @@ protected:
   *
   * @return Global position of indicated direction wrt to agent
   */
-	Pos compartmentOrdinalToCoordinates(int ordinal, const Pos& dim) const;
+  Pos compartmentOrdinalToCoordinates(int ordinal, const Pos& dim) const;
 
 public:
   /**
@@ -192,7 +192,7 @@ public:
   * allowing the random number generator to remain in synch after
   * deserialization.
   */
-	Agent();
+  Agent();
   /**
   * @brief Standard constructor, must be used outside of serialization
   * @todo Finish documentation of these functions
@@ -211,21 +211,21 @@ public:
   * @param stdIL10R
   * @param odesize number of ode variables (for setting up initial size of initvector)
   */
-	Agent(int birthtime, int deathtime, int row, int col
-			//TNFR Components
-			, Scalar meanTNFR1
-			, Scalar stdTNFR1
-			, Scalar meanTNFR2
-			, Scalar stdTNFR2
-			, Scalar kSynth
-			, Scalar kTACE
-			// IL10 components
-			, Scalar iIL10R
-			, Scalar stdIL10R
-      , int odesize
-		);
+  Agent(int birthtime, int deathtime, int row, int col
+        //TNFR Components
+        , Scalar meanTNFR1
+        , Scalar stdTNFR1
+        , Scalar meanTNFR2
+        , Scalar stdTNFR2
+        , Scalar kSynth
+        , Scalar kTACE
+        // IL10 components
+        , Scalar iIL10R
+        , Scalar stdIL10R
+        , int odesize
+       );
 
-	virtual ~Agent();
+  virtual ~Agent();
 
   /**
   * @brief serializes class specific meta-information
@@ -234,7 +234,7 @@ public:
   *
   * @param out output stream to write to
   */
-	static void classSerialize(std::ostream& out);
+  static void classSerialize(std::ostream& out);
   /**
   * @brief serializes class specific meta-information
   * This function serializes meta-information (i.e. the last id used) to
@@ -242,7 +242,7 @@ public:
   *
   * @param in input stream to read from
   */
-	static void classDeserialize(std::istream& in);
+  static void classDeserialize(std::istream& in);
 
   static auto_ptr<ODESolvers::Stepper> stepper; /// ODE Stepper for all agents (unless overridden)
   static auto_ptr<LungFunc> deriv;              /// ODE Function for all agents (unless overridden)
@@ -256,34 +256,41 @@ public:
   *
   * @return Stepper to use to integrate the method
   */
-  virtual ODESolvers::Stepper* getStepper(ODESolvers::ODEMethod method) {
+  virtual ODESolvers::Stepper* getStepper(ODESolvers::ODEMethod method)
+  {
     static ODESolvers::ODEMethod initMethod = method;
-    if(stepper.get() == NULL || method != initMethod) {
-      stepper.reset(ODESolvers::StepperFactory(method, _initvector.size()));
-      initMethod = method;
-    }
+    if(stepper.get() == NULL || method != initMethod)
+      {
+        stepper.reset(ODESolvers::StepperFactory(method, _initvector.size()));
+        initMethod = method;
+      }
     return stepper.get();
   }
 
-  static LungFunc* buildDerivFunc(); 
+  static LungFunc* buildDerivFunc();
   bool getODEstatus() const;
   void setODEstatus(bool isodesolved);
 
-  virtual LungFunc* getDerivFunc() {
-    if(deriv.get() == NULL) {
-      deriv.reset(buildDerivFunc());
-    }
+  virtual LungFunc* getDerivFunc()
+  {
+    if(deriv.get() == NULL)
+      {
+        deriv.reset(buildDerivFunc());
+      }
     return deriv.get();
   }
 
-  virtual bool NFkBCapable() const { return false; }
+  virtual bool NFkBCapable() const
+  {
+    return false;
+  }
 
   /**
   * @brief Move the agent on the grid
   *
   * @param grid
   */
-	virtual void move(GrGrid& grid) = 0;
+  virtual void move(GrGrid& grid) = 0;
   /**
   * @brief Causes the agent to secrete chemokines
   *
@@ -307,11 +314,11 @@ public:
   * @param il10rDynamics Account for il10r dynamics
   * @param tgammatransition Account for T\gamma transitions
   */
-	virtual void computeNextState(const int time, GrGrid& grid, Stats& stats, bool tnfrDynamics, bool nfkbDynamics, bool il10rDynamics, bool tgammatransition) = 0;
+  virtual void computeNextState(const int time, GrGrid& grid, Stats& stats, bool tnfrDynamics, bool nfkbDynamics, bool il10rDynamics, bool tgammatransition) = 0;
   /**
   * @brief Updates the current state of the agent to be the calculated next state \see computeNextState
   */
-	virtual void updateState() = 0;
+  virtual void updateState() = 0;
   /**
   * @brief Updates the statistics object with the final state of the agent
   *
@@ -324,7 +331,9 @@ public:
   * \f$M1M2ratio = \frac{IL10R1_{surfBound}}{\max (TNFR1_{surfBound}, 1)}\f$
   */
   void updateM1M2Ratio()
-    { _M1M2Ratio = getsurfBoundTNFR1() / std::max(getsurfBoundIL10R(), 1.0); }
+  {
+    _M1M2Ratio = getsurfBoundTNFR1() / std::max(getsurfBoundIL10R(), 1.0);
+  }
   /**
   * @brief Copies internal variables to valarray for solving ODEs
   *
@@ -377,13 +386,13 @@ public:
 
   void checkTolerance(valarray<double>& veccheck);
 
-	virtual void solveDegradation (GrGrid& grid, double dt, bool tnfrDynamics, bool il10rDynamics) = 0;
-	virtual void solveDegradation (GrGrid& grid, double dt, bool tnfrDynamics, bool il10rDynamics, Scalar meanTNFR1, Scalar iIL10R);
+  virtual void solveDegradation (GrGrid& grid, double dt, bool tnfrDynamics, bool il10rDynamics) = 0;
+  virtual void solveDegradation (GrGrid& grid, double dt, bool tnfrDynamics, bool il10rDynamics, Scalar meanTNFR1, Scalar iIL10R);
 
   /**
   * @brief Kill the agent
   */
-	virtual void kill() = 0;
+  virtual void kill() = 0;
   /**
   * @brief Deactivate the agent
   *
@@ -392,44 +401,44 @@ public:
   */
   virtual void deactivate(const int time, Stats& stats) = 0;
   /**
-  * @brief 
+  * @brief
   *
   * @return True if dead, False otherwise
   */
-	virtual bool isDead() const = 0;
+  virtual bool isDead() const = 0;
   /**
-  * @brief 
+  * @brief
   *
   * @return True if the next state will be dead, False otherwise
   */
-	virtual bool isDeadNext() = 0;
+  virtual bool isDeadNext() = 0;
   /**
   * @brief Serializes the agent to stdout
   */
-	virtual void print() const = 0;
+  virtual void print() const = 0;
   /**
   * @brief Returns the derived class's enumerated type tag for static casting
   *
   * @return Internal AgentType \see AgentType
   */
-	virtual AgentType getAgentType() const = 0;
-	virtual int getState() const = 0;
+  virtual AgentType getAgentType() const = 0;
+  virtual int getState() const = 0;
   /**
   * @brief Clones the agent
   * @return an exact duplicate of the agent
   */
   virtual Agent* clone() const = 0;
-	int getRow() const;
-	int getCol() const;
+  int getRow() const;
+  int getCol() const;
   /**
-  * @brief 
+  * @brief
   *
   * @param time Time (in seconds since infection) of simulation
   *
   * @return True if agent's life span has ended
   */
-	bool timeToDie(const int time) const;
-    
+  bool timeToDie(const int time) const;
+
   /**
   * @brief Accurately compares two arguments to a specific precision
   *
@@ -444,27 +453,36 @@ public:
   * @name Property Accessors
   * @{
   */
-  #define P(type, name, ival, desc) \
+#define P(type, name, ival, desc) \
     const type& get##name() const { return _##name; }
   AGENT_PROPS
-  #undef P
+#undef P
   /**@}*/
 
-	void setTrackMolecularDynamics(bool val) { _trackMolecularDynamics = val; }
-  const Pos& getPosition() const { return _pos; } //Backwards compat
-  unsigned long getID() const { return _id; }   //Backwards compat
+  void setTrackMolecularDynamics(bool val)
+  {
+    _trackMolecularDynamics = val;
+  }
+  const Pos& getPosition() const
+  {
+    return _pos;  //Backwards compat
+  }
+  unsigned long getID() const
+  {
+    return _id;  //Backwards compat
+  }
   /**
   * @brief Saves a serialized version of the agent to out \see deserialize
   *
   * @param out Output stream to save to
   */
-	virtual void serialize(std::ostream& out) const;
+  virtual void serialize(std::ostream& out) const;
   /**
   * @brief Loads an agent from the stream that was serialized \see serialize
   *
   * @param in Input stream to load from
   */
-	virtual void deserialize(std::istream& in);
+  virtual void deserialize(std::istream& in);
   /**
   * @brief visits all the properties of the agent class
   * @param v Visitor that will visit() each property
@@ -483,44 +501,54 @@ public:
 
 inline unsigned long Agent::createID()
 {
-	return _nextID++;
+  return _nextID++;
 }
 
 inline bool Agent::timeToDie(const int time) const
 {
-	return time >= getdeathTime();
+  return time >= getdeathTime();
 }
 
 inline int Agent::getRow() const
 {
-	return _pos.x;
+  return _pos.x;
 }
 
 inline int Agent::getCol() const
 {
-	return _pos.y;
+  return _pos.y;
 }
 
 template<typename Visitor>
-inline void Agent::visitProperties(Visitor& v) {
-  #define P(type, name, ival, desc) \
+inline void Agent::visitProperties(Visitor& v)
+{
+#define P(type, name, ival, desc) \
     v.visit(#name, _##name, desc);
   AGENT_PROPS
-  #undef P
+#undef P
 }
 template<typename Visitor>
-inline void Agent::visitProperties(Visitor& v) const { 
-  #define P(type, name, ival, desc) \
+inline void Agent::visitProperties(Visitor& v) const
+{
+#define P(type, name, ival, desc) \
     v.visit(#name, _##name, desc);
   AGENT_PROPS
-  #undef P
+#undef P
 }
-inline bool Agent::getODEstatus() const { return _isODEsolved; }
-inline void Agent::setODEstatus(bool isodesolved) { _isODEsolved = isodesolved; }
+inline bool Agent::getODEstatus() const
+{
+  return _isODEsolved;
+}
+inline void Agent::setODEstatus(bool isodesolved)
+{
+  _isODEsolved = isodesolved;
+}
 
-struct LungFunc : ODESolvers::DerivativeFunc {
+struct LungFunc : ODESolvers::DerivativeFunc
+{
   const size_t il10offset;
-  struct Params_t {
+  struct Params_t
+  {
     Agent* agent;
     GrGrid* grid;
   };
@@ -528,19 +556,34 @@ struct LungFunc : ODESolvers::DerivativeFunc {
   virtual ~LungFunc() {}
   virtual void operator()(const ODESolvers::ODEState& vecread, double /*t*/, ODESolvers::Derivative& vecwrite, void* params) const;
   void il10deriv(const ODESolvers::ODEState& vecread, double /*t*/, ODESolvers::Derivative& vecwrite, Params_t* params) const;
-  virtual size_t dim() const { return _PARAM(PARAM_TNFODE_EN)*10+_PARAM(PARAM_IL10ODE_EN)*3; }
-  size_t tnfidx() const { return 8; }
-  size_t il10idx() const { return il10offset; }
+  virtual size_t dim() const
+  {
+    return _PARAM(PARAM_TNFODE_EN)*10+_PARAM(PARAM_IL10ODE_EN)*3;
+  }
+  size_t tnfidx() const
+  {
+    return 8;
+  }
+  size_t il10idx() const
+  {
+    return il10offset;
+  }
 };
 
-struct NFKBFunc : LungFunc {
+struct NFKBFunc : LungFunc
+{
   NFKBFunc(size_t il10) : LungFunc(il10) {}
   /*virtual*/ void operator()(const ODESolvers::ODEState& vecread, double /*t*/, ODESolvers::Derivative& vecwrite, void* params) const;
-  /*virtual*/ size_t dim() const { return 36+_PARAM(PARAM_IL10ODE_EN)*3; }
+  /*virtual*/
+  size_t dim() const
+  {
+    return 36+_PARAM(PARAM_IL10ODE_EN)*3;
+  }
 };
 
 
-inline LungFunc* Agent::buildDerivFunc() {
+inline LungFunc* Agent::buildDerivFunc()
+{
   LungFunc* d = new LungFunc(_PARAM(PARAM_TNFODE_EN)*10);
   return d;
 }

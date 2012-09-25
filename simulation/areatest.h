@@ -15,17 +15,21 @@
 class AreaTest : public TTest
 {
 public:
-	AreaTest(double alpha, int testPeriod, int samplePeriod);
-	~AreaTest();
-	void update(const int time, const int index, Stats& stats);
-	void evaluate(const int index, Stats& stats, double degressOfFreedom);
-	OutcomeMethod getMethod() const;
-  /*virtual*/ TTest* clone() const { return new AreaTest(*this); }
+  AreaTest(double alpha, int testPeriod, int samplePeriod);
+  ~AreaTest();
+  void update(const int time, const int index, Stats& stats);
+  void evaluate(const int index, Stats& stats, double degressOfFreedom);
+  OutcomeMethod getMethod() const;
+  /*virtual*/
+  TTest* clone() const
+  {
+    return new AreaTest(*this);
+  }
 };
 
 inline OutcomeMethod AreaTest::getMethod() const
 {
-	return OUTCOME_AREA;
+  return OUTCOME_AREA;
 }
 
 #endif /* AREATEST_H_ */

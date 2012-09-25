@@ -54,6 +54,7 @@
 	kApoptosis = "0.00432456"
 	thresholdApoptosisTNF_Molecular = "1405.23"
 	saturationApoptosisTNF_Molecular = "2500"
+  halfSatIL10mRNA = "250"
 	kApoptosis_Molecular = "1.42427e-06"
 	kApoptosis_NFkB_Molecular = "1.38e-06"
 	probApoptosisTNF = "0.04"

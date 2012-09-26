@@ -119,7 +119,7 @@ int main(int argc, char *argv[])
   ("dim,d", po::value(&dim)->default_value(100))
   ("diffusion", po::value<int>(&diffMethod)->default_value(4),
    "Diffusion method:\n0 - FTCS\n1 - BTCS (SOR, correct)\n2 - BTCS (SOR, wrong)\n3 - FTCS Grid Swap\n4 - ADE Grid Swap")
-  ("odesolver", po::value<size_t>()->default_value(4), odestream.str().c_str())
+  ("odesolver", po::value(&odeSolver)->default_value(4), odestream.str().c_str())
   ("timesteps,t", po::value<int>(&timesteps), "Number of time steps to simulate\nTakes precedence over --days")
   ("days", po::value<int>(&nDays)->default_value(200), "Number of days to simulate")
   ("script,c", "Scripting mode")

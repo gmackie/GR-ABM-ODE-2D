@@ -76,7 +76,7 @@ void Treg::computeNextState(const int time, GrGrid& grid, Stats& stats, bool tnf
     }
 
 //	else if (tnfrDynamics && intCompareGT(_intBoundTNFR1, _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR)) &&
-//			 intCompareGT(1 - pow(2.7183, -_PARAM(PARAM_GR_K_APOPTOSIS_MOLECULAR) * (_intBoundTNFR1 - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR))), g_Rand.getReal()))
+//			 intCompareGT(1 - exp(-_PARAM(PARAM_GR_K_APOPTOSIS_MOLECULAR) * (_intBoundTNFR1 - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR))), g_Rand.getReal()))
 //	{
 //		// TNF induced apoptosis
 //		++stats.getTcellApoptosisTNF();
@@ -84,7 +84,7 @@ void Treg::computeNextState(const int time, GrGrid& grid, Stats& stats, bool tnf
 //        grid.incKillings(_pos);
 //	}
 //	else if (!tnfrDynamics && tnfBoundFraction > _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF) &&
-//			 g_Rand.getReal() < 1 - pow(2.7183, -_PARAM(PARAM_GR_K_APOPTOSIS) * (tnfBoundFraction - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF))))
+//			 g_Rand.getReal() < 1 - exp(-_PARAM(PARAM_GR_K_APOPTOSIS) * (tnfBoundFraction - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF))))
 //	{
 //		// TNF induced apoptosis
 //		++stats.getTcellApoptosisTNF();
@@ -151,7 +151,7 @@ void Treg::handleResting(const int time, GrGrid& grid, Stats& stats)
                   // These are inverse equations of each other since TNF would upregulate the 'Monitor Molecule' while IL10 would
                   // downregulate the 'Monitor Molecule'
 //                      Scalar scaledProbTNF = ((_PARAM(PARAM_TREG_PROB_DEACTIVATE) * currentTNF)/(currentTNF + _PARAM(PARAM_TREG_DEACTIVATE_HALF_SAT_TNF)));
-//                      Scalar scaledProbIL10 = _PARAM(PARAM_TREG_PROB_DEACTIVATE) * pow(2.7183, -_PARAM(PARAM_TREG_DEACTIVATE_HALF_SAT_IL10) * currentIL10);
+//                      Scalar scaledProbIL10 = _PARAM(PARAM_TREG_PROB_DEACTIVATE) * exp(-_PARAM(PARAM_TREG_DEACTIVATE_HALF_SAT_IL10) * currentIL10);
 
 //                      std::cout << "Scaled Prob: " << scaledProbTNF + scaledProbIL10 << std::endl;
 

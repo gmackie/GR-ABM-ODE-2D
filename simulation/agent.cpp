@@ -405,7 +405,7 @@ void Agent::derivativeTNF(const valarray<double>& vecread, valarray<double>& vec
 
   if (_kmRNA > 0)
     {
-      IkmRNA = _kmRNA * ((_kSynth/_kmRNA)+ ((1.0 - (_kSynth/_kmRNA))/(1.0 + pow(2.7183, ((eqsurfBoundIL10R - _PARAM(PARAM_GR_LINK_RNA_GAMMA))/_PARAM(PARAM_GR_LINK_RNA_DELTA))))));
+      IkmRNA = _kmRNA * ((_kSynth/_kmRNA)+ ((1.0 - (_kSynth/_kmRNA))/(1.0 + exp((eqsurfBoundIL10R - _PARAM(PARAM_GR_LINK_RNA_GAMMA))/_PARAM(PARAM_GR_LINK_RNA_DELTA)))));
     }
   else
     {
@@ -463,7 +463,7 @@ void Agent::solveTNF(GrGrid& grid, double dt)
 
   if (_kmRNA > 0)
     {
-      IkmRNA = _kmRNA * ((_kSynth/_kmRNA)+ ((1.0 - (_kSynth/_kmRNA))/(1.0 + pow(2.7183, ((eqsurfBoundIL10R - _PARAM(PARAM_GR_LINK_RNA_GAMMA))/_PARAM(PARAM_GR_LINK_RNA_DELTA))))));
+      IkmRNA = _kmRNA * ((_kSynth/_kmRNA)+ ((1.0 - (_kSynth/_kmRNA))/(1.0 + exp((eqsurfBoundIL10R - _PARAM(PARAM_GR_LINK_RNA_GAMMA))/_PARAM(PARAM_GR_LINK_RNA_DELTA)))));
     }
   else
     {
@@ -562,7 +562,7 @@ void Agent::derivativeTNFandIL10(const valarray<double>& vecread, valarray<doubl
 
   if (_kmRNA > 0)
     {
-      IkmRNA = _kmRNA * ((_kSynth/_kmRNA) + ((1.0 - (_kSynth/_kmRNA))/(1.0 + pow(2.7183, ((vecread[12] - _PARAM(PARAM_GR_LINK_RNA_GAMMA))/_PARAM(PARAM_GR_LINK_RNA_DELTA))))));
+      IkmRNA = _kmRNA * ((_kSynth/_kmRNA) + ((1.0 - (_kSynth/_kmRNA))/(1.0 + exp((vecread[12] - _PARAM(PARAM_GR_LINK_RNA_GAMMA))/_PARAM(PARAM_GR_LINK_RNA_DELTA)))));
     }
   else
     {
@@ -632,7 +632,7 @@ void Agent::solveTNFandIL10(GrGrid& grid, double dt)
 
   if (_kmRNA > 0)
     {
-      IkmRNA = _kmRNA * ((_kSynth/_kmRNA) + ((1.0 - (_kSynth/_kmRNA))/(1.0 + pow(2.7183, ((_surfBoundIL10R - _PARAM(PARAM_GR_LINK_RNA_GAMMA))/_PARAM(PARAM_GR_LINK_RNA_DELTA))))));
+      IkmRNA = _kmRNA * ((_kSynth/_kmRNA) + ((1.0 - (_kSynth/_kmRNA))/(1.0 + exp((_surfBoundIL10R - _PARAM(PARAM_GR_LINK_RNA_GAMMA))/_PARAM(PARAM_GR_LINK_RNA_DELTA)))));
     }
   else
     {
@@ -705,7 +705,7 @@ void Agent::derivativeTNFandNFKB(const valarray<double>& vecread, valarray<doubl
 
   if (_kmRNA > 0)
     {
-      IkmRNA = _kmRNA * ((_kSynth/_kmRNA)+ ((1.0 - (_kSynth/_kmRNA))/(1.0 + pow(2.7183, ((eqsurfBoundIL10R - _PARAM(PARAM_GR_LINK_RNA_GAMMA))/_PARAM(PARAM_GR_LINK_RNA_DELTA))))));
+      IkmRNA = _kmRNA * ((_kSynth/_kmRNA)+ ((1.0 - (_kSynth/_kmRNA))/(1.0 + exp((eqsurfBoundIL10R - _PARAM(PARAM_GR_LINK_RNA_GAMMA))/_PARAM(PARAM_GR_LINK_RNA_DELTA)))));
     }
   else
     {
@@ -731,8 +731,8 @@ void Agent::derivativeTNFandNFKB(const valarray<double>& vecread, valarray<doubl
   vecwrite[9] = ((DENSITY/NAV) * _PARAM(PARAM_GR_K_SHED) * vecread[5]) * dt;
   // NF-kB dynamics model equations
   vecwrite[10] = (_PARAM(PARAM_GR_ka)*vecread[4]*(_PARAM(PARAM_GR_KN)-vecread[10])*_PARAM(PARAM_GR_kA20)/(_PARAM(PARAM_GR_kA20)+vecread[18])-_PARAM(PARAM_GR_ki)*vecread[10]) * dt;
-  vecwrite[11] = (_PARAM(PARAM_GR_k4)*(_PARAM(PARAM_GR_KNN)-vecread[11]-vecread[12]-vecread[13])-_PARAM(PARAM_GR_k1)*pow(vecread[10],2.0)*vecread[11]) * dt;
-  vecwrite[12] = (_PARAM(PARAM_GR_k1)*pow(vecread[10],2.0)*vecread[11]-_PARAM(PARAM_GR_k3)*vecread[12]*(_PARAM(PARAM_GR_k2)+vecread[18])/_PARAM(PARAM_GR_k2)) * dt;
+  vecwrite[11] = (_PARAM(PARAM_GR_k4)*(_PARAM(PARAM_GR_KNN)-vecread[11]-vecread[12]-vecread[13])-_PARAM(PARAM_GR_k1)*(vecread[10]*vecread[10])*vecread[11]) * dt;
+  vecwrite[12] = (_PARAM(PARAM_GR_k1)*(vecread[10]*vecread[10])*vecread[11]-_PARAM(PARAM_GR_k3)*vecread[12]*(_PARAM(PARAM_GR_k2)+vecread[18])/_PARAM(PARAM_GR_k2)) * dt;
   vecwrite[13] = (_PARAM(PARAM_GR_k3)*vecread[12]*(_PARAM(PARAM_GR_k2)+vecread[18])/_PARAM(PARAM_GR_k2)-_PARAM(PARAM_GR_k4)*vecread[13]) * dt;
   vecwrite[14] = (_PARAM(PARAM_GR_a2)*vecread[12]*vecread[20]-_PARAM(PARAM_GR_tp)*vecread[14]) * dt;
   vecwrite[15] = (_PARAM(PARAM_GR_a3)*vecread[12]*vecread[23]-_PARAM(PARAM_GR_tp)*vecread[15]) * dt;
@@ -817,7 +817,7 @@ void Agent::solveNFkBandTNF(GrGrid& grid, double dt)
 
   if (_kmRNA > 0)
     {
-      IkmRNA = _kmRNA * ((_kSynth/_kmRNA)+ ((1.0 - (_kSynth/_kmRNA))/(1.0 + pow(2.7183, ((eqsurfBoundIL10R - _PARAM(PARAM_GR_LINK_RNA_GAMMA))/_PARAM(PARAM_GR_LINK_RNA_DELTA))))));
+      IkmRNA = _kmRNA * ((_kSynth/_kmRNA)+ ((1.0 - (_kSynth/_kmRNA))/(1.0 + exp((eqsurfBoundIL10R - _PARAM(PARAM_GR_LINK_RNA_GAMMA))/_PARAM(PARAM_GR_LINK_RNA_DELTA)))));
     }
   else
     {
@@ -842,8 +842,8 @@ void Agent::solveNFkBandTNF(GrGrid& grid, double dt)
 
   // NF-kB dynamics model equations
   dIKKKa = (_PARAM(PARAM_GR_ka)*_surfBoundTNFR1*(_PARAM(PARAM_GR_KN)-_IKKKa)*_PARAM(PARAM_GR_kA20)/(_PARAM(PARAM_GR_kA20)+_A20)-_PARAM(PARAM_GR_ki)*_IKKKa) * dt;
-  dIKKn = (_PARAM(PARAM_GR_k4)*(_PARAM(PARAM_GR_KNN)-_IKKn-_IKKa-_IKKi)-_PARAM(PARAM_GR_k1)*pow(_IKKKa,2.0)*_IKKn) * dt;
-  dIKKa = (_PARAM(PARAM_GR_k1)*pow(_IKKKa,2.0)*_IKKn-_PARAM(PARAM_GR_k3)*_IKKa*(_PARAM(PARAM_GR_k2)+_A20)/_PARAM(PARAM_GR_k2)) * dt;
+  dIKKn = (_PARAM(PARAM_GR_k4)*(_PARAM(PARAM_GR_KNN)-_IKKn-_IKKa-_IKKi)-_PARAM(PARAM_GR_k1)*(_IKKKa*_IKKKa)*_IKKn) * dt;
+  dIKKa = (_PARAM(PARAM_GR_k1)*(_IKKKa*_IKKKa)*_IKKn-_PARAM(PARAM_GR_k3)*_IKKa*(_PARAM(PARAM_GR_k2)+_A20)/_PARAM(PARAM_GR_k2)) * dt;
   dIKKi = (_PARAM(PARAM_GR_k3)*_IKKa*(_PARAM(PARAM_GR_k2)+_A20)/_PARAM(PARAM_GR_k2)-_PARAM(PARAM_GR_k4)*_IKKi) * dt;
   dIkBp = (_PARAM(PARAM_GR_a2)*_IKKa*_IkB-_PARAM(PARAM_GR_tp)*_IkBp) * dt;
   dNFkB_IkBp = (_PARAM(PARAM_GR_a3)*_IKKa*_NFkB_IkB-_PARAM(PARAM_GR_tp)*_NFkB_IkBp) * dt;
@@ -939,7 +939,7 @@ void Agent::derivativeTNFandIL10andNFKB(const valarray<double>& vecread, valarra
 
   if (_kmRNA > 0)
     {
-      IkmRNA = _kmRNA * ((_kSynth/_kmRNA) + ((1.0 - (_kSynth/_kmRNA))/(1.0 + pow(2.7183, ((vecread[12] - _PARAM(PARAM_GR_LINK_RNA_GAMMA))/_PARAM(PARAM_GR_LINK_RNA_DELTA))))));
+      IkmRNA = _kmRNA * ((_kSynth/_kmRNA) + ((1.0 - (_kSynth/_kmRNA))/(1.0 + exp((vecread[12] - _PARAM(PARAM_GR_LINK_RNA_GAMMA))/_PARAM(PARAM_GR_LINK_RNA_DELTA)))));
     }
   else
     {
@@ -960,8 +960,8 @@ void Agent::derivativeTNFandIL10andNFKB(const valarray<double>& vecread, valarra
   vecwrite[9] = ((DENSITY/NAV) * _PARAM(PARAM_GR_K_SHED) * vecread[5]) * dt;
   // NF-kB dynamics model equations
   vecwrite[10] = (_PARAM(PARAM_GR_ka)*vecread[4]*(_PARAM(PARAM_GR_KN)-vecread[10])*_PARAM(PARAM_GR_kA20)/(_PARAM(PARAM_GR_kA20)+vecread[18])-_PARAM(PARAM_GR_ki)*vecread[10]) * dt;
-  vecwrite[11] = (_PARAM(PARAM_GR_k4)*(_PARAM(PARAM_GR_KNN)-vecread[11]-vecread[12]-vecread[13])-_PARAM(PARAM_GR_k1)*pow(vecread[10],2.0)*vecread[11]) * dt;
-  vecwrite[12] = (_PARAM(PARAM_GR_k1)*pow(vecread[10],2.0)*vecread[11]-_PARAM(PARAM_GR_k3)*vecread[12]*(_PARAM(PARAM_GR_k2)+vecread[18])/_PARAM(PARAM_GR_k2)) * dt;
+  vecwrite[11] = (_PARAM(PARAM_GR_k4)*(_PARAM(PARAM_GR_KNN)-vecread[11]-vecread[12]-vecread[13])-_PARAM(PARAM_GR_k1)*(vecread[10]*vecread[10])*vecread[11]) * dt;
+  vecwrite[12] = (_PARAM(PARAM_GR_k1)*(vecread[10]*vecread[10])*vecread[11]-_PARAM(PARAM_GR_k3)*vecread[12]*(_PARAM(PARAM_GR_k2)+vecread[18])/_PARAM(PARAM_GR_k2)) * dt;
   vecwrite[13] = (_PARAM(PARAM_GR_k3)*vecread[12]*(_PARAM(PARAM_GR_k2)+vecread[18])/_PARAM(PARAM_GR_k2)-_PARAM(PARAM_GR_k4)*vecread[13]) * dt;
   vecwrite[14] = (_PARAM(PARAM_GR_a2)*vecread[12]*vecread[20]-_PARAM(PARAM_GR_tp)*vecread[14]) * dt;
   vecwrite[15] = (_PARAM(PARAM_GR_a3)*vecread[12]*vecread[23]-_PARAM(PARAM_GR_tp)*vecread[15]) * dt;
@@ -1056,7 +1056,7 @@ void Agent::solveTNFandIL10andNFkB(GrGrid& grid, double dt)
 
   if (_kmRNA > 0)
     {
-      IkmRNA = _kmRNA * ((_kSynth/_kmRNA)+ ((1.0 - (_kSynth/_kmRNA))/(1.0 + pow(2.7183, ((_surfBoundIL10R - _PARAM(PARAM_GR_LINK_RNA_GAMMA))/_PARAM(PARAM_GR_LINK_RNA_DELTA))))));
+      IkmRNA = _kmRNA * ((_kSynth/_kmRNA)+ ((1.0 - (_kSynth/_kmRNA))/(1.0 + exp((_surfBoundIL10R - _PARAM(PARAM_GR_LINK_RNA_GAMMA))/_PARAM(PARAM_GR_LINK_RNA_DELTA)))));
     }
   else
     {
@@ -1080,8 +1080,8 @@ void Agent::solveTNFandIL10andNFkB(GrGrid& grid, double dt)
 
   // NF-kB dynamics model equations
   dIKKKa = (_PARAM(PARAM_GR_ka)*_surfBoundTNFR1*(_PARAM(PARAM_GR_KN)-_IKKKa)*_PARAM(PARAM_GR_kA20)/(_PARAM(PARAM_GR_kA20)+_A20)-_PARAM(PARAM_GR_ki)*_IKKKa) * dt;
-  dIKKn = (_PARAM(PARAM_GR_k4)*(_PARAM(PARAM_GR_KNN)-_IKKn-_IKKa-_IKKi)-_PARAM(PARAM_GR_k1)*pow(_IKKKa,2.0)*_IKKn) * dt;
-  dIKKa = (_PARAM(PARAM_GR_k1)*pow(_IKKKa,2.0)*_IKKn-_PARAM(PARAM_GR_k3)*_IKKa*(_PARAM(PARAM_GR_k2)+_A20)/_PARAM(PARAM_GR_k2)) * dt;
+  dIKKn = (_PARAM(PARAM_GR_k4)*(_PARAM(PARAM_GR_KNN)-_IKKn-_IKKa-_IKKi)-_PARAM(PARAM_GR_k1)*(_IKKKa*_IKKKa)*_IKKn) * dt;
+  dIKKa = (_PARAM(PARAM_GR_k1)*(_IKKKa*_IKKKa)*_IKKn-_PARAM(PARAM_GR_k3)*_IKKa*(_PARAM(PARAM_GR_k2)+_A20)/_PARAM(PARAM_GR_k2)) * dt;
   dIKKi = (_PARAM(PARAM_GR_k3)*_IKKa*(_PARAM(PARAM_GR_k2)+_A20)/_PARAM(PARAM_GR_k2)-_PARAM(PARAM_GR_k4)*_IKKi) * dt;
   dIkBp = (_PARAM(PARAM_GR_a2)*_IKKa*_IkB-_PARAM(PARAM_GR_tp)*_IkBp) * dt;
   dNFkB_IkBp = (_PARAM(PARAM_GR_a3)*_IKKa*_NFkB_IkB-_PARAM(PARAM_GR_tp)*_NFkB_IkBp) * dt;
@@ -1212,9 +1212,9 @@ void Agent::solveNFkBODEsEquilibrium(double dt)
   // NF-kB dynamics model equations
   //dIKKKa = (_PARAM(PARAM_GR_ka)*_surfBoundTNFR1*(_PARAM(PARAM_GR_KN)-_IKKKa)*_PARAM(PARAM_GR_kA20)/(_PARAM(PARAM_GR_kA20)+_A20)-_PARAM(PARAM_GR_ki)*_IKKKa) * dt;
   dIKKKa = 0.0;
-  //dIKKn = (_PARAM(PARAM_GR_k4)*(_PARAM(PARAM_GR_KNN)-_IKKn-_IKKa-_IKKi)-_PARAM(PARAM_GR_k1)*pow(_IKKKa,2.0)*_IKKn) * dt;
+  //dIKKn = (_PARAM(PARAM_GR_k4)*(_PARAM(PARAM_GR_KNN)-_IKKn-_IKKa-_IKKi)-_PARAM(PARAM_GR_k1)*(_IKKKa*_IKKKa)*_IKKn) * dt;
   dIKKn = 0.0;
-  //dIKKa = (_PARAM(PARAM_GR_k1)*pow(_IKKKa,2.0)*_IKKn-_PARAM(PARAM_GR_k3)*_IKKa*(_PARAM(PARAM_GR_k2)+_A20)/_PARAM(PARAM_GR_k2)) * dt;
+  //dIKKa = (_PARAM(PARAM_GR_k1)*(_IKKKa*_IKKKa)*_IKKn-_PARAM(PARAM_GR_k3)*_IKKa*(_PARAM(PARAM_GR_k2)+_A20)/_PARAM(PARAM_GR_k2)) * dt;
   dIKKa = 0.0;
   //dIKKi = (_PARAM(PARAM_GR_k3)*_IKKa*(_PARAM(PARAM_GR_k2)+_A20)/_PARAM(PARAM_GR_k2)-_PARAM(PARAM_GR_k4)*_IKKi) * dt;
   dIKKi = 0.0;
@@ -1305,7 +1305,7 @@ bool Agent::TNFinducedApoptosis(GrGrid &grid, bool tnfrDynamics, bool nfkbDynami
       Scalar testintBoundTNFR1 = std::min(_intBoundTNFR1, _PARAM(PARAM_GR_TNF_APOPTOSIS_SAT));
 
       Threshold = intCompareGT(_intBoundTNFR1, _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR));
-      Probability = intCompareGT(1 - pow(2.7183, -_PARAM(PARAM_GR_K_APOPTOSIS_MOLECULAR) * (testintBoundTNFR1 - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR))), g_Rand.getReal());
+      Probability = intCompareGT(1 - exp(-_PARAM(PARAM_GR_K_APOPTOSIS_MOLECULAR) * (testintBoundTNFR1 - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR))), g_Rand.getReal());
 
     }
   else if (nfkbDynamics)
@@ -1313,7 +1313,7 @@ bool Agent::TNFinducedApoptosis(GrGrid &grid, bool tnfrDynamics, bool nfkbDynami
       double nfkb_adjusted_k_apoptosis = _PARAM(PARAM_GR_K_APOPTOSIS_NFKB_MOLECULAR) * (_PARAM(PARAM_GR_K_IAP)/(_PARAM(PARAM_GR_K_IAP) + _normalizedIAP));
 
       Threshold = intCompareGT(_intBoundTNFR1, _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR));
-      Probability = intCompareGT(1 - pow(2.7183, -nfkb_adjusted_k_apoptosis * (_intBoundTNFR1 - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR))), g_Rand.getReal());
+      Probability = intCompareGT(1 - exp(-nfkb_adjusted_k_apoptosis * (_intBoundTNFR1 - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR))), g_Rand.getReal());
 
     }
   else if (!tnfrDynamics)
@@ -1321,7 +1321,7 @@ bool Agent::TNFinducedApoptosis(GrGrid &grid, bool tnfrDynamics, bool nfkbDynami
       double tnfBoundFraction = grid.TNF(_pos) / (grid.TNF(_pos) + _PARAM(PARAM_GR_KD1) * 48.16e11);
 
       Threshold = intCompareGT(tnfBoundFraction, _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF));
-      Probability = intCompareGT(1 - pow(2.7183, -_PARAM(PARAM_GR_K_APOPTOSIS) * (tnfBoundFraction - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF))), g_Rand.getReal());
+      Probability = intCompareGT(1 - exp(-_PARAM(PARAM_GR_K_APOPTOSIS) * (tnfBoundFraction - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF))), g_Rand.getReal());
 
     }
   else
@@ -1344,14 +1344,14 @@ bool Agent::TNFinducedNFkB(GrGrid &grid, bool tnfrDynamics, bool nfkbDynamics)
       testsurfBoundTNFR1 = std::min(_surfBoundTNFR1, (_PARAM(PARAM_MAC_TNF_NFKB_SAT_FRACTION) * (_surfTNFR1 + _surfBoundTNFR1)));
 
       Threshold = intCompareGT(_surfBoundTNFR1, _PARAM(PARAM_MAC_THRESHOLD_NFKB_TNF_MOLECULAR));
-      Probability = intCompareGT(1 - pow(2.7183, -_PARAM(PARAM_MAC_K_NFKB_MOLECULAR) * (testsurfBoundTNFR1 - _PARAM(PARAM_MAC_THRESHOLD_NFKB_TNF_MOLECULAR))), g_Rand.getReal());
+      Probability = intCompareGT(1 - exp(-_PARAM(PARAM_MAC_K_NFKB_MOLECULAR) * (testsurfBoundTNFR1 - _PARAM(PARAM_MAC_THRESHOLD_NFKB_TNF_MOLECULAR))), g_Rand.getReal());
     }
 
 
   else if (nfkbDynamics)
     {
       Threshold = intCompareGT(_normalizedACT, _PARAM(PARAM_GR_ACT_THRESHOLD));
-      Probability = intCompareGT(1 - pow(2.7183, -_PARAM(PARAM_GR_ACT_K) * (_normalizedACT - _PARAM(PARAM_GR_ACT_THRESHOLD))), g_Rand.getReal());
+      Probability = intCompareGT(1 - exp(-_PARAM(PARAM_GR_ACT_K) * (_normalizedACT - _PARAM(PARAM_GR_ACT_THRESHOLD))), g_Rand.getReal());
     }
 
 
@@ -1360,7 +1360,7 @@ bool Agent::TNFinducedNFkB(GrGrid &grid, bool tnfrDynamics, bool nfkbDynamics)
       double tnfBoundFraction = grid.TNF(_pos) / (grid.TNF(_pos) + _PARAM(PARAM_GR_KD1) * 48.16e11);
 
       Threshold = intCompareGT(tnfBoundFraction, _PARAM(PARAM_MAC_THRESHOLD_NFKB_TNF));
-      Probability = intCompareGT(1 - pow(2.7183, -_PARAM(PARAM_MAC_K_NFKB) * (tnfBoundFraction - _PARAM(PARAM_MAC_THRESHOLD_NFKB_TNF))), g_Rand.getReal());
+      Probability = intCompareGT(1 - exp(-_PARAM(PARAM_MAC_K_NFKB) * (tnfBoundFraction - _PARAM(PARAM_MAC_THRESHOLD_NFKB_TNF))), g_Rand.getReal());
     }
 
   else
@@ -1382,7 +1382,7 @@ void Agent::calcIkmRNA(GrGrid& grid, double& kmRNA, double ksynth, bool il10rDyn
   else
     eqsurfBoundIL10R = ((grid.il10(_pos)/(NAV * VOL)) * _surfIL10R) / (_PARAM(PARAM_GR_I_KD) + (grid.il10(_pos)/(NAV * VOL)));
 
-  kmRNA = (kmRNA) * ((ksynth/(kmRNA)) + ((1.0 - (ksynth/(kmRNA)))/(1.0 + pow(2.7183, ((eqsurfBoundIL10R - _PARAM(PARAM_GR_LINK_RNA_GAMMA))/_PARAM(PARAM_GR_LINK_RNA_DELTA))))));
+  kmRNA = (kmRNA) * ((ksynth/(kmRNA)) + ((1.0 - (ksynth/(kmRNA)))/(1.0 + exp(((eqsurfBoundIL10R - _PARAM(PARAM_GR_LINK_RNA_GAMMA))/_PARAM(PARAM_GR_LINK_RNA_DELTA))))));
 
 }
 
@@ -1612,7 +1612,7 @@ void Agent::deserialize(std::istream& in)
 
       double IkmRNA;
       if (agent->getkmRNA() > 0)
-        IkmRNA = agent->getkmRNA() * ((agent->getkSynth()/agent->getkmRNA()) + ((1.0 - (agent->getkSynth()/agent->getkmRNA()))/(1.0 + pow(2.7183, ((eqsurfBoundIL10R - _PARAM(PARAM_GR_LINK_RNA_GAMMA))/_PARAM(PARAM_GR_LINK_RNA_DELTA))))));
+        IkmRNA = agent->getkmRNA() * ((agent->getkSynth()/agent->getkmRNA()) + ((1.0 - (agent->getkSynth()/agent->getkmRNA()))/(1.0 + exp((eqsurfBoundIL10R - _PARAM(PARAM_GR_LINK_RNA_GAMMA))/_PARAM(PARAM_GR_LINK_RNA_DELTA)))));
       else
         IkmRNA = 0.0;
 
@@ -1677,8 +1677,8 @@ void NFKBFunc::operator()(const ODESolvers::ODEState& vecread, double t, ODESolv
   vecwrite[9] = (((DENSITY/NAV) * _PARAM(PARAM_GR_K_SHED) * vecread[5])) * (NAV * VOL);
   // NF-kB dynamics model equations
   vecwrite[10] = (_PARAM(PARAM_GR_ka)*vecread[4]*(_PARAM(PARAM_GR_KN)-vecread[10])*_PARAM(PARAM_GR_kA20)/(_PARAM(PARAM_GR_kA20)+vecread[18])-_PARAM(PARAM_GR_ki)*vecread[10]);
-  vecwrite[11] = (_PARAM(PARAM_GR_k4)*(_PARAM(PARAM_GR_KNN)-vecread[11]-vecread[12]-vecread[13])-_PARAM(PARAM_GR_k1)*pow(vecread[10],2.0)*vecread[11]);
-  vecwrite[12] = (_PARAM(PARAM_GR_k1)*pow(vecread[10],2.0)*vecread[11]-_PARAM(PARAM_GR_k3)*vecread[12]*(_PARAM(PARAM_GR_k2)+vecread[18])/_PARAM(PARAM_GR_k2));
+  vecwrite[11] = (_PARAM(PARAM_GR_k4)*(_PARAM(PARAM_GR_KNN)-vecread[11]-vecread[12]-vecread[13])-_PARAM(PARAM_GR_k1)*(vecread[10]*vecread[10])*vecread[11]);
+  vecwrite[12] = (_PARAM(PARAM_GR_k1)*(vecread[10]*vecread[10])*vecread[11]-_PARAM(PARAM_GR_k3)*vecread[12]*(_PARAM(PARAM_GR_k2)+vecread[18])/_PARAM(PARAM_GR_k2));
   vecwrite[13] = (_PARAM(PARAM_GR_k3)*vecread[12]*(_PARAM(PARAM_GR_k2)+vecread[18])/_PARAM(PARAM_GR_k2)-_PARAM(PARAM_GR_k4)*vecread[13]);
   vecwrite[14] = (_PARAM(PARAM_GR_a2)*vecread[12]*vecread[20]-_PARAM(PARAM_GR_tp)*vecread[14]);
   vecwrite[15] = (_PARAM(PARAM_GR_a3)*vecread[12]*vecread[23]-_PARAM(PARAM_GR_tp)*vecread[15]);

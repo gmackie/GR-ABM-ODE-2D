@@ -89,8 +89,8 @@ void RecruitmentLnODEProxy::solveODE(const int time, const Stats& statsPrevious,
                               _PARAM(PARAM_TCELL_LYMPH_PROXY_FACTOR_TIME_END);
           Scalar fluxFactor2 = (time - _PARAM(PARAM_TCELL_LYMPH_PROXY_FACTOR_TIME_END))/ timeDelta2;
           //Scalar fluxFactor2 = std::min<Scalar>(0,(time - _PARAM(PARAM_TCELL_LYMPH_PROXY_FACTOR_TIME_END))/ timeDelta2);
-          _odeInitialConditions[_idxEffectorT8] = fluxFactor2 * (0.0019 * pow(totMtb, 2) + 2.5275 * totMtb + 475.34);
-          _odeInitialConditions[_idxCTL] = fluxFactor2 * (0.0007 * pow(totMtb, 2) + 0.9734 * totMtb + 182.98);
+          _odeInitialConditions[_idxEffectorT8] = fluxFactor2 * (0.0019 * (totMtb*totMtb) + 2.5275 * totMtb + 475.34);
+          _odeInitialConditions[_idxCTL] = fluxFactor2 * (0.0007 * (totMtb*totMtb) + 0.9734 * totMtb + 182.98);
           //std::cerr << "time: " << time << "fluxFactor2: " << fluxFactor2 << std::endl; //DBG
           std::cerr << "time: " << time << ", totMtb: " << totMtb << ", if4  _odeInitialConditions[_idxEffectorT8]: " << _odeInitialConditions[_idxEffectorT8] << std::endl; //DBG
         }
@@ -105,8 +105,8 @@ void RecruitmentLnODEProxy::solveODE(const int time, const Stats& statsPrevious,
     {
       if (totMtb >= _PARAM(PARAM_TCELL_LYMPH_PROXY_MTB_THRESHOLD))
         {
-          _odeInitialConditions[_idxEffectorT8] = (0.0019 * pow(totMtb, 2) + 2.5275 * totMtb + 475.34);
-          _odeInitialConditions[_idxCTL] = (0.0007 * pow(totMtb, 2) + 0.9734 * totMtb + 182.98);
+          _odeInitialConditions[_idxEffectorT8] = (0.0019 * (totMtb*totMtb) + 2.5275 * totMtb + 475.34);
+          _odeInitialConditions[_idxCTL] = (0.0007 * (totMtb*totMtb) + 0.9734 * totMtb + 182.98);
           std::cout << "time: " << time << ", totMtb: " << totMtb << ", if6  _odeInitialConditions[_idxEffectorT8]: " << _odeInitialConditions[_idxEffectorT8] << std::endl; //DBG
         }
       else

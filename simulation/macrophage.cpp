@@ -474,7 +474,7 @@ void Mac::computeNextState(const int time, GrGrid& grid, Stats& stats, bool tnfr
     }
 
 ////	else if (!nfkbDynamics && tnfrDynamics && _intBoundTNFR1 > _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR) &&
-////			 g_Rand.getReal() < 1 - pow(2.7183, -_PARAM(PARAM_GR_K_APOPTOSIS_MOLECULAR) * (_intBoundTNFR1 - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR))))
+////			 g_Rand.getReal() < 1 - exp(-_PARAM(PARAM_GR_K_APOPTOSIS_MOLECULAR) * (_intBoundTNFR1 - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR))))
 ////	{
 ////		// TNF induced apoptosis
 ////		stats.incMacApoptosisTNF(_state);
@@ -482,7 +482,7 @@ void Mac::computeNextState(const int time, GrGrid& grid, Stats& stats, bool tnfr
 ////	}
 
 //    else if (!nfkbDynamics && tnfrDynamics && intCompareGT(_intBoundTNFR1, _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR)) &&
-//             intCompareGT(1 - pow(2.7183, -_PARAM(PARAM_GR_K_APOPTOSIS_MOLECULAR) * (_intBoundTNFR1 - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR))), g_Rand.getReal()))
+//             intCompareGT(1 - exp(-_PARAM(PARAM_GR_K_APOPTOSIS_MOLECULAR) * (_intBoundTNFR1 - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR))), g_Rand.getReal()))
 //	{
 
 ////        std::cout << "TNF Induced Mac Apoptosis CompareGT" << std::endl;
@@ -495,7 +495,7 @@ void Mac::computeNextState(const int time, GrGrid& grid, Stats& stats, bool tnfr
 //	}
 
 ////	else if (nfkbDynamics && _intBoundTNFR1 > _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR) &&
-////			 g_Rand.getReal() < 1 - pow(2.7183, -nfkb_adjusted_k_apoptosis * (_intBoundTNFR1 - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR))))
+////			 g_Rand.getReal() < 1 - exp(-nfkb_adjusted_k_apoptosis * (_intBoundTNFR1 - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR))))
 ////	{
 ////		// TNF induced apoptosis
 ////		stats.incMacApoptosisTNF(_state);
@@ -504,7 +504,7 @@ void Mac::computeNextState(const int time, GrGrid& grid, Stats& stats, bool tnfr
 
 
 //    else if (nfkbDynamics && intCompareGT(_intBoundTNFR1, _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR)) &&
-//			 intCompareGT(1 - pow(2.7183, -nfkb_adjusted_k_apoptosis * (_intBoundTNFR1 - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR))), g_Rand.getReal()))
+//			 intCompareGT(1 - exp(-nfkb_adjusted_k_apoptosis * (_intBoundTNFR1 - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR))), g_Rand.getReal()))
 //	{
 //		// TNF induced apoptosis
 //		++stats.getMacApoptosisTNF(_state);
@@ -514,7 +514,7 @@ void Mac::computeNextState(const int time, GrGrid& grid, Stats& stats, bool tnfr
 
 
 //	else if (!tnfrDynamics && tnfBoundFraction > _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF) &&
-//			 g_Rand.getReal() < 1 - pow(2.7183, -_PARAM(PARAM_GR_K_APOPTOSIS) * (tnfBoundFraction - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF))))
+//			 g_Rand.getReal() < 1 - exp(-_PARAM(PARAM_GR_K_APOPTOSIS) * (tnfBoundFraction - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF))))
 //	{
 //		// TNF induced apoptosis
 //		++stats.getMacApoptosisTNF(_state);
@@ -559,11 +559,11 @@ void Mac::computeNextState(const int time, GrGrid& grid, Stats& stats, bool tnfr
 
 //            bool threshold = false;
 //            bool prob = false;
-//            prob = intCompareGT(1 - pow(2.7183, -_PARAM(PARAM_MAC_K_NFKB_MOLECULAR) * (_surfBoundTNFR1 - _PARAM(PARAM_MAC_THRESHOLD_NFKB_TNF_MOLECULAR))), g_Rand.getReal());
+//            prob = intCompareGT(1 - exp(-_PARAM(PARAM_MAC_K_NFKB_MOLECULAR) * (_surfBoundTNFR1 - _PARAM(PARAM_MAC_THRESHOLD_NFKB_TNF_MOLECULAR))), g_Rand.getReal());
 //            threshold = intCompareGT(_surfBoundTNFR1, _PARAM(PARAM_MAC_THRESHOLD_NFKB_TNF_MOLECULAR));
 
 ////            if (!nfkbDynamics && tnfrDynamics && intCompareGT(_surfBoundTNFR1, _PARAM(PARAM_MAC_THRESHOLD_NFKB_TNF_MOLECULAR)) &&
-////                    intCompareGT(1 - pow(2.7183, -_PARAM(PARAM_MAC_K_NFKB_MOLECULAR) * (_surfBoundTNFR1 - _PARAM(PARAM_MAC_THRESHOLD_NFKB_TNF_MOLECULAR))), g_Rand.getReal()))
+////                    intCompareGT(1 - exp(-_PARAM(PARAM_MAC_K_NFKB_MOLECULAR) * (_surfBoundTNFR1 - _PARAM(PARAM_MAC_THRESHOLD_NFKB_TNF_MOLECULAR))), g_Rand.getReal()))
 //            if (!nfkbDynamics && tnfrDynamics && threshold && prob)
 //            {
 //                tnfInducedNFkB = true;
@@ -585,7 +585,7 @@ void Mac::computeNextState(const int time, GrGrid& grid, Stats& stats, bool tnfr
 
 //			else
 //				tnfInducedNFkB = tnfBoundFraction > _PARAM(PARAM_MAC_THRESHOLD_NFKB_TNF) &&
-//					g_Rand.getReal() < 1 - pow(2.7183, -_PARAM(PARAM_MAC_K_NFKB) * (tnfBoundFraction - _PARAM(PARAM_MAC_THRESHOLD_NFKB_TNF)));
+//					g_Rand.getReal() < 1 - exp(-_PARAM(PARAM_MAC_K_NFKB) * (tnfBoundFraction - _PARAM(PARAM_MAC_THRESHOLD_NFKB_TNF)));
 
 //            _NFkB = _state == Mac::MAC_CINFECTED || _state == Mac::MAC_ACTIVE || tnfInducedNFkB || getExtMtbInMoore(grid) > _PARAM(PARAM_MAC_THRESHOLD_NFKB_EXTMTB);
 
@@ -694,7 +694,7 @@ void Mac::handleResting(const int time, GrGrid& grid, Stats& stats, bool /*nfkbD
 //				_nextState = Mac::MAC_ACTIVE;
 //			}
 //			else if (intCompareGT(_normalizedACT, _PARAM(PARAM_GR_ACT_THRESHOLD)) &&
-//					 intCompareGT(1 - pow(2.7183, -_PARAM(PARAM_GR_ACT_K) * (_normalizedACT - _PARAM(PARAM_GR_ACT_THRESHOLD))), g_Rand.getReal()))
+//					 intCompareGT(1 - exp(-_PARAM(PARAM_GR_ACT_K) * (_normalizedACT - _PARAM(PARAM_GR_ACT_THRESHOLD))), g_Rand.getReal()))
 //			{
 //				_intMtb = 0;
 //				_activationTime = time;
@@ -767,7 +767,7 @@ void Mac::handleInfected(const int time, GrGrid& grid, Stats& stats, bool /*nfkb
 //					_nextState = Mac::MAC_ACTIVE;
 //				}
 //				else if (intCompareGT(_normalizedACT, _PARAM(PARAM_GR_ACT_THRESHOLD)) &&
-//                         intCompareGT(1 - pow(2.7183, -_PARAM(PARAM_GR_ACT_K) * (_normalizedACT - _PARAM(PARAM_GR_ACT_THRESHOLD))), g_Rand.getReal()))
+//                         intCompareGT(1 - exp(-_PARAM(PARAM_GR_ACT_K) * (_normalizedACT - _PARAM(PARAM_GR_ACT_THRESHOLD))), g_Rand.getReal()))
 //				{
 //					_intMtb = 0;
 //					_activationTime = time;

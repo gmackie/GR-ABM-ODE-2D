@@ -176,9 +176,9 @@ static void diffuse_degrade(GrGrid& nextGrid)
 {
   const Scalar dt = _PARAM(PARAM_GR_DT_DIFFUSION);
 
-  const Scalar TNFdegRate = pow(2.7183, (-1.0 *  _PARAM(PARAM_GR_K_DEG) * dt));
-  const Scalar IL10degRate = pow(2.7183, (-1.0 *  _PARAM(PARAM_GR_I_K_DEG) * dt));
-  const Scalar CHEMOKINEdegRate = pow(2.7183, (-1.0 *  _PARAM(PARAM_GR_CHEMOKINE_K_DEG) * dt));
+  const Scalar TNFdegRate = exp(-1.0 *  _PARAM(PARAM_GR_K_DEG) * dt);
+  const Scalar IL10degRate = exp(-1.0 *  _PARAM(PARAM_GR_I_K_DEG) * dt);
+  const Scalar CHEMOKINEdegRate = exp(-1.0 *  _PARAM(PARAM_GR_CHEMOKINE_K_DEG) * dt);
 
   //Degradation equation here is separated based on operator splitting causing it to lag
   //behind diffusion.  We make the assumption diffuse << degrade to

@@ -120,7 +120,7 @@ void Tgam::computeNextState(const int time, GrGrid& grid, Stats& stats, bool tnf
     }
 
 //	else if (tnfrDynamics && intCompareGT(_intBoundTNFR1, _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR)) &&
-//			 intCompareGT(1 - pow(2.7183, -_PARAM(PARAM_GR_K_APOPTOSIS_MOLECULAR) * (_intBoundTNFR1 - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR))), g_Rand.getReal()))
+//			 intCompareGT(1 - exp(-_PARAM(PARAM_GR_K_APOPTOSIS_MOLECULAR) * (_intBoundTNFR1 - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR))), g_Rand.getReal()))
 //	{
 //		// TNF induced apoptosis
 //		++stats.getTcellApoptosisTNF();
@@ -128,7 +128,7 @@ void Tgam::computeNextState(const int time, GrGrid& grid, Stats& stats, bool tnf
 //        grid.incKillings(_pos);
 //	}
 //	else if (!tnfrDynamics && tnfBoundFraction > _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF) &&
-//			 g_Rand.getReal() < 1 - pow(2.7183, -_PARAM(PARAM_GR_K_APOPTOSIS) * (tnfBoundFraction - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF))))
+//			 g_Rand.getReal() < 1 - exp(-_PARAM(PARAM_GR_K_APOPTOSIS) * (tnfBoundFraction - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF))))
 //	{
 //		// TNF induced apoptosis
 //		++stats.getTcellApoptosisTNF();
@@ -215,17 +215,17 @@ void Tgam::handleActive(const int time, GrGrid& grid, Stats& stats, bool tgammat
         }
       if (_nAntigenStim > 1)
         {
-          AgProb = (1.0/3.0) * (1 - pow(2.7183, (-_PARAM(PARAM_TGAM_RATE_AGSTIM)*(_nAntigenStim - 1.0))));
+          AgProb = (1.0/3.0) * (1 - exp((-_PARAM(PARAM_TGAM_RATE_AGSTIM)*(_nAntigenStim - 1.0))));
           ProbSum += AgProb;
         }
       if (_nDownRegulated > 0)
         {
-          TGFProb = (1.0/3.0) * (1 - pow(2.7183, (-_PARAM(PARAM_TGAM_RATE_TGFB)*(_nDownRegulated))));
+          TGFProb = (1.0/3.0) * (1 - exp((-_PARAM(PARAM_TGAM_RATE_TGFB)*(_nDownRegulated))));
           ProbSum += TGFProb;
         }
       if (_nICOS > 0)
         {
-          ICOSProb = (1.0/3.0) * (1 - pow(2.7183, (-_PARAM(PARAM_TGAM_RATE_ICOS)*(_nICOS))));
+          ICOSProb = (1.0/3.0) * (1 - exp((-_PARAM(PARAM_TGAM_RATE_ICOS)*(_nICOS))));
           ProbSum += ICOSProb;
         }
       if (g_Rand.getReal() < ProbSum)

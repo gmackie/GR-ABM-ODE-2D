@@ -28,6 +28,7 @@ Simulation::Simulation(const Pos& dim)
   , _timeStepsToSimulate(_TIMESTEPS_TO_SIMULATE) //_DAYS_TO_SIMULATE _TIMESTEPS_TO_SIMULATE
   , _mtbClearance(true)
 {
+  moveToThread(this);
 }
 
 Simulation::~Simulation()
@@ -68,36 +69,35 @@ bool Simulation::stopCondition()
           _stats.getTotTNF() < DBL_EPSILON * 10.0);
 }
 
-void Simulation::run()
+void Simulation::step()
 {
+  _modelMutex.lock();
+  _gr->solve();
+  _modelMutex.unlock();
+
   lock();
   bool stop = stopCondition();
-  unlock();
-  while (!stop)
-    {
-      _modelMutex.lock();
-      _gr->solve();
-      _modelMutex.unlock();
 
-      lock();
-      update();
-      stop = _stopFlag || stopCondition();
-      unlock();
+  if(stop)
+    _gr->performT_Test();
 
-      msleep(_delay);
-    }
+  update();
 
-  lock();
-  if (stopCondition())
-    {
-      // Perform one last t-test so any display of simulation results
-      // have current t-test results, not old ones (possibly very old ones
-      // if the testing period is long).
-      _gr->performT_Test();
-      update(); // to get the latest t-test results from _gr
+  if(stop)
       emit stopConditionMet();
-    }
+
   unlock();
+  msleep(_delay);
+
+  if(!(stop || _stopFlag))
+    QMetaObject::invokeMethod(this, "step", Qt::QueuedConnection);
+
+}
+
+void Simulation::run()
+{
+  QMetaObject::invokeMethod(this, "step", Qt::QueuedConnection);
+  exec();
 }
 
 void Simulation::lock() const

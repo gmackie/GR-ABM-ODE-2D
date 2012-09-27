@@ -1624,19 +1624,19 @@ void Agent::deserialize(std::istream& in)
       // mTNF
       vecwrite[1] = (_PARAM(PARAM_GR_K_TRANS) * vecread[0] - agent->getkTACE() * vecread[1]);
       // surfTNFR1
-      vecwrite[2] = (agent->getvTNFR1() - _PARAM(PARAM_GR_K_ON1) * (vecread[8]/(NAV * VOL)) * vecread[2] + koff1 * vecread[4] - _PARAM(PARAM_GR_K_T1) * vecread[2] + _PARAM(PARAM_GR_K_REC1) * vecread[6]);
+      vecwrite[2] = (agent->getvTNFR1() - _PARAM(PARAM_GR_K_ON1) * (vecread[8] * 1.0/(NAV * VOL)) * vecread[2] + koff1 * vecread[4] - _PARAM(PARAM_GR_K_T1) * vecread[2] + _PARAM(PARAM_GR_K_REC1) * vecread[6]);
       // surfTNFR2
-      vecwrite[3] = (agent->getvTNFR2() - _PARAM(PARAM_GR_K_ON2) * (vecread[8]/(NAV * VOL)) * vecread[3] + koff2 * vecread[5] - _PARAM(PARAM_GR_K_T2) * vecread[3] + _PARAM(PARAM_GR_K_REC2) * vecread[7]);
+      vecwrite[3] = (agent->getvTNFR2() - _PARAM(PARAM_GR_K_ON2) * (vecread[8] * 1.0/(NAV * VOL)) * vecread[3] + koff2 * vecread[5] - _PARAM(PARAM_GR_K_T2) * vecread[3] + _PARAM(PARAM_GR_K_REC2) * vecread[7]);
       // surfBoundTNFR1
-      vecwrite[4] = (_PARAM(PARAM_GR_K_ON1) * (vecread[8]/(NAV * VOL)) * vecread[2] - koff1 * vecread[4] - _PARAM(PARAM_GR_K_INT1) * vecread[4]);
+      vecwrite[4] = (_PARAM(PARAM_GR_K_ON1) * (vecread[8] * 1.0/(NAV * VOL)) * vecread[2] - koff1 * vecread[4] - _PARAM(PARAM_GR_K_INT1) * vecread[4]);
       // surfBoundTNFR2
-      vecwrite[5] = (_PARAM(PARAM_GR_K_ON2) * (vecread[8]/(NAV * VOL)) * vecread[3] - koff2 * vecread[5] - _PARAM(PARAM_GR_K_INT2) * vecread[5] - _PARAM(PARAM_GR_K_SHED) * vecread[5]);
+      vecwrite[5] = (_PARAM(PARAM_GR_K_ON2) * (vecread[8] * 1.0/(NAV * VOL)) * vecread[3] - koff2 * vecread[5] - _PARAM(PARAM_GR_K_INT2) * vecread[5] - _PARAM(PARAM_GR_K_SHED) * vecread[5]);
       // intBoundTNFR1
       vecwrite[6] = (_PARAM(PARAM_GR_K_INT1) * vecread[4] - _PARAM(PARAM_GR_K_DEG1) * vecread[6] - _PARAM(PARAM_GR_K_REC1) * vecread[6]);
       // intBoundTNFR2
       vecwrite[7] = (_PARAM(PARAM_GR_K_INT2) * vecread[5] - _PARAM(PARAM_GR_K_DEG2) * vecread[7] - _PARAM(PARAM_GR_K_REC2) * vecread[7]);
       // sTNF
-      vecwrite[8] = (((DENSITY/NAV) * (agent->getkTACE() * vecread[1] - _PARAM(PARAM_GR_K_ON1) * (vecread[8]/(NAV * VOL)) * vecread[2] + koff1 * vecread[4] - _PARAM(PARAM_GR_K_ON2) * (vecread[8]/(NAV * VOL)) * vecread[3] + koff2 * vecread[5]))) * (NAV * VOL);
+      vecwrite[8] = (((DENSITY/NAV) * (agent->getkTACE() * vecread[1] - _PARAM(PARAM_GR_K_ON1) * (vecread[8] * 1.0/(NAV * VOL)) * vecread[2] + koff1 * vecread[4] - _PARAM(PARAM_GR_K_ON2) * (vecread[8] * 1.0/(NAV * VOL)) * vecread[3] + koff2 * vecread[5]))) * (NAV * VOL);
       // shedTNFR2
       vecwrite[9] = (((DENSITY/NAV) * _PARAM(PARAM_GR_K_SHED) * vecread[5])) * (NAV * VOL);
     }
@@ -1649,11 +1649,11 @@ inline void LungFunc::il10deriv(const ODESolvers::ODEState& vecread, double /*t*
   const double Ikoff = _PARAM(PARAM_GR_I_K_ON) * _PARAM(PARAM_GR_I_KD);
   // IL10 Ordinary Differential Equations
   // sIL10
-  vecwrite[il10offset+0] = ((((DENSITY/NAV) * params->agent->getkISynth()) + ((DENSITY/NAV) * (Ikoff * vecread[il10offset+2] - _PARAM(PARAM_GR_I_K_ON) * vecread[il10offset+1] * (vecread[il10offset+0]/(NAV * VOL)))))) * (NAV * VOL);
+  vecwrite[il10offset+0] = ((((DENSITY/NAV) * params->agent->getkISynth()) + ((DENSITY/NAV) * (Ikoff * vecread[il10offset+2] - _PARAM(PARAM_GR_I_K_ON) * vecread[il10offset+1] * (vecread[il10offset+0] * 1.0/(NAV * VOL)))))) * (NAV * VOL);
   // surfIL10R
-  vecwrite[il10offset+1] = (params->agent->getvIL10R() - _PARAM(PARAM_GR_I_K_ON) * vecread[il10offset+1] * (vecread[il10offset+0]/(NAV * VOL)) + _PARAM(PARAM_GR_I_K_OFF) * vecread[il10offset+2] - _PARAM(PARAM_GR_I_K_T) * vecread[il10offset+1]);
+  vecwrite[il10offset+1] = (params->agent->getvIL10R() - _PARAM(PARAM_GR_I_K_ON) * vecread[il10offset+1] * (vecread[il10offset+0] * 1.0/(NAV * VOL)) + _PARAM(PARAM_GR_I_K_OFF) * vecread[il10offset+2] - _PARAM(PARAM_GR_I_K_T) * vecread[il10offset+1]);
   // surfBoundIL10R
-  vecwrite[il10offset+2] = (_PARAM(PARAM_GR_I_K_ON) * vecread[il10offset+1] * (vecread[il10offset+0]/(NAV * VOL)) - _PARAM(PARAM_GR_I_K_OFF) * vecread[il10offset+2] - _PARAM(PARAM_GR_I_K_INT) * vecread[il10offset+2]);
+  vecwrite[il10offset+2] = (_PARAM(PARAM_GR_I_K_ON) * vecread[il10offset+1] * (vecread[il10offset+0] * 1.0/(NAV * VOL)) - _PARAM(PARAM_GR_I_K_OFF) * vecread[il10offset+2] - _PARAM(PARAM_GR_I_K_INT) * vecread[il10offset+2]);
 }
 
 void NFKBFunc::operator()(const ODESolvers::ODEState& vecread, double t, ODESolvers::Derivative& vecwrite, void* params) const

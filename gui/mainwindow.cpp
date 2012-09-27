@@ -584,7 +584,7 @@ MainWindow::~MainWindow()
         sim.unlock();
 
       // signal simulation thread to stop
-      sim.stop();
+      sim.quit();
 
       // wait until the thread is stopped
       sim.wait();

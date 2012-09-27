@@ -89,6 +89,9 @@ public:
 
   static QString getTimeStr(int simTime, int time);
 
+public slots:
+  void step();
+
 signals:
   void stopConditionMet();
 };

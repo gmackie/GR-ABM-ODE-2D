@@ -88,9 +88,10 @@ inline void clearPtrList(T& container) {
 
 GrSimulation::~GrSimulation()
 {
-	delete _pDiffusion;
+  if(_pRecruitment) delete _pRecruitment;
+  if(_pDiffusion)   delete _pDiffusion;
 	for (int i = 0; i < NOUTCOMES; i++)
-		delete _pTTest[i];
+		if(_pTTest[i]) delete _pTTest[i];
   clearPtrList(_macList);
   clearPtrList(_tgamList);
   clearPtrList(_tregList);

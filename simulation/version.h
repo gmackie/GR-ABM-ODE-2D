@@ -1,7 +1,7 @@
 #ifndef VERSION_H_
 #define VERSION_H_
 
-#define _NUM(x) 0##x
+#define _NUM(x) x##0
 #define NUM(x) _NUM(x)
 
 #if NUM(SVN_VERSION) == 0

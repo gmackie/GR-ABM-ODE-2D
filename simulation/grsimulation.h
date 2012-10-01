@@ -637,7 +637,7 @@ void GrSimulation::serialize(Archive& ar, const unsigned int version) {
     if(version != SVN_VERSION)
       { 
         std::cerr<< "Warning: Serialization version mismatch!  Trying to serialize "
-                 << version << " but program is " << SVN_VERSION <<std::endl;
+                 << (SVN_VERSION/256)*256 + version << " but program is " << SVN_VERSION <<std::endl;
       }
   #endif
   /* Register the classes to be serialized (only needed for serializing through
@@ -676,7 +676,7 @@ void GrSimulation::serialize(Archive& ar, const unsigned int version) {
 }
 
 #ifdef SVN_VERSION  //Add the svn version to the class
-  BOOST_CLASS_VERSION(GrSimulation, SVN_VERSION);
+  BOOST_CLASS_VERSION(GrSimulation, SVN_VERSION % 256);
 #endif
 
 #endif /* GRSIMULATION_H */

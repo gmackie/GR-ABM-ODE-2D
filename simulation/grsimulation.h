@@ -634,7 +634,7 @@ inline void GrSimulation::timestepSync()
 template<class Archive>
 void GrSimulation::serialize(Archive& ar, const unsigned int version) {
   #ifdef SVN_VERSION
-    if(version != SVN_VERSION)
+    if(version != SVN_VERSION % 256)
       { 
         std::cerr<< "Warning: Serialization version mismatch!  Trying to serialize "
                  << (SVN_VERSION/256)*256 + version << " but program is " << SVN_VERSION <<std::endl;

@@ -10,7 +10,6 @@ CONFIG *= debug_and_release qt opengl qwt
 QT += core gui opengl
 
 HEADERS += scalardatasets/scalartotmtbdataset.h \
-    simulation/serialization.h \
     simulation/params.h \
     simulation/paramsbase.h \
     simulation/grdiffusionadeswap.h \
@@ -98,7 +97,7 @@ HEADERS += scalardatasets/scalartotmtbdataset.h \
     gui/graphviewer.h \
     gui/agenthistogram.h \
     simulation/numericalMethods.h
-SOURCES += simulation/serialization.cpp \
+SOURCES += \
     simulation/params.cpp \
     simulation/paramsbase.cpp \
     simulation/grdiffusionadeswap.cpp \
@@ -197,7 +196,7 @@ exists( .git/ ) {
       VERSION = "Unknown"
 }
 
-DEFINES += SVN_VERSION=\\\"$$VERSION\\\"
+DEFINES += SVN_VERSION=\"$$VERSION\"
 DEFINES += TIXML_USE_STL
 
 macx { 

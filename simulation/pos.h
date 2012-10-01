@@ -81,6 +81,12 @@ struct Pos
     return dist;
   }
 
+  template<typename Archive>
+  void serialize(Archive& ar, const unsigned int /*version*/) {
+    ar & BOOST_SERIALIZATION_NVP(x);
+    ar & BOOST_SERIALIZATION_NVP(y);
+  }
+
 };
 inline std::ostream& operator<<(std::ostream& s, const Pos& p)
 {

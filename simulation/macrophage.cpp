@@ -9,11 +9,8 @@
 #include "params.h"
 #include "stat.h"
 #include "grgrid.h"
-#include "serialization.h"
 
 using namespace std;
-
-const std::string Mac::_ClassName = "Mac";
 
 int Mac::_macodeSize = 0;
 auto_ptr<ODESolvers::Stepper> Mac::stepper;
@@ -944,6 +941,7 @@ void Mac::print() const
   std::cout << _intMtb << std::endl;
 }
 
+#if 0
 void Mac::serialize(std::ostream& out) const
 {
   assert(out.good());
@@ -1007,6 +1005,7 @@ void Mac::deserialize(std::istream& in)
       exit(1);
     }
 }
+#endif
 
 int Mac::getCountTgam(Tgam::State state, const GrGrid& grid) const
 {

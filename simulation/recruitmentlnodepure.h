@@ -24,13 +24,12 @@ private:
   virtual void solveODE(const int time, const Stats& statsPrevious, Stats& stats);
 
 public:
-  RecruitmentLnODEPure(std::istream& in);
   RecruitmentLnODEPure();
   virtual ~RecruitmentLnODEPure();
 
   RecruitmentMethod getMethod() const;
-  void serialize(std::ostream& out) const;
-  void deserialize(std::istream& in);
+  template<class Archive>
+  void serialize(Archive& ar, const unsigned int version);
 
   /*virtual*/
   RecruitmentBase* clone() const
@@ -45,4 +44,11 @@ inline RecruitmentMethod RecruitmentLnODEPure::getMethod() const
   return RECR_LN_ODE_PURE;
 }
 
+template<class Archive>
+void RecruitmentLnODEPure::serialize(Archive& ar, const unsigned int version)
+{
+  ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(RecruitmentLnODE);
+}
+
+BOOST_CLASS_EXPORT_KEY(RecruitmentLnODEPure)
 #endif /* RECRUITMENTLNODEPURE_H_ */

@@ -35,8 +35,9 @@ public:
   static bool TcytThresholdRecNew(const GrGrid& grid, const Pos& pSource, double& rThreshold);
   static bool TregThresholdRecNew(const GrGrid& grid, const Pos& pSource, double& rThreshold);
   RecruitmentMethod getMethod() const;
-  void serialize(std::ostream&) const;
-  void deserialize(std::istream&);
+  template<class Archive>
+  void serialize(Archive& ar, const unsigned int version);
+
 
   static bool MacThresholdRecNew(const GrGrid& grid, const Pos& pSource);
   static bool TgamThresholdRecNew(const GrGrid& grid, const Pos& pSource);
@@ -64,7 +65,7 @@ inline bool RecruitmentProb::intCompareGTEQ(const double param1, const double pa
   // since it should not matter
   // COMPARES PARAM1 >= PARAM2 and returns bool based on this evaluation
 
-  double intpart1, intpart2, fracpart1, fracpart2, Store1, Store2, StorePower;
+  double intpart1, intpart2, Store1, Store2, StorePower;
   int intpart1Store, intpart2Store;
 
   bool result = 0;
@@ -83,8 +84,8 @@ inline bool RecruitmentProb::intCompareGTEQ(const double param1, const double pa
       Store1 = (param1 * (ABS_TOL/(pow(10,StorePower))));
       Store2 = (param2 * (ABS_TOL/(pow(10,StorePower))));
 
-      fracpart1 = modf(Store1, &intpart1);
-      fracpart2 = modf(Store2, &intpart2);
+      modf(Store1, &intpart1);
+      modf(Store2, &intpart2);
 
       intpart1Store = (int)intpart1;
       intpart2Store = (int)intpart2;
@@ -263,11 +264,11 @@ inline RecruitmentMethod RecruitmentProb::getMethod() const
   return RECR_PROB;
 }
 
-inline void RecruitmentProb::serialize(std::ostream&) const
+template<class Archive>
+void RecruitmentProb::serialize(Archive& ar, const unsigned int version)
 {
+  ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(RecruitmentBase);
 }
 
-inline void RecruitmentProb::deserialize(std::istream&)
-{
-}
+BOOST_CLASS_EXPORT_KEY(RecruitmentProb)
 #endif /* RECRUITMENTPROB_H_ */

@@ -19,6 +19,8 @@
 #include "grdiffusion.h"
 #include "recruitmentbase.h"
 #include "params.h"
+#include <boost/mpl/for_each.hpp>
+#include <boost/mpl/placeholders.hpp>
 
 using namespace std;
 
@@ -32,7 +34,18 @@ using namespace std;
 class GrSimulation
 {
 private:
-  static const std::string _ClassName;
+
+  /// Functors for boost serialization
+  /// @cond
+  template<typename T> struct wrap {};
+  template<typename Archive> struct serialization_class_register_t {
+    Archive& ar;
+    serialization_class_register_t(Archive& _ar) : ar(_ar) {}
+    template<typename T>
+    void operator()(wrap<T>)
+      { ar.template register_type<T>(); }
+  };
+  /// @endcond
 
   int _time;
   GrSimulationGrid _grid;
@@ -188,15 +201,19 @@ public:
   /**@}*/
 
   /**
-  * Write the simulation in ascii form to stream in order to read it again later
-  * @see deserialize
-  */
-  void serialize(std::ostream& out) const;
-  /**
-  * Read the stream to initialize the simulation.  Do not run init() before/after calling this
+  * Convenience function for saving the simulation state
+  * @see load
   * @see serialize
   */
-  void deserialize(std::istream& in);
+  void save(std::ostream& out) const;
+  template<class Archive>
+  void serialize(Archive& ar, const unsigned int version);
+  /**
+  * Convenience function for loading the simulation state
+  * @see save
+  * @see serialize
+  */
+  void load(std::istream& in);
   void deserializeRecruitmentMethod(RecruitmentMethod method, std::istream& in);
   /**
   * @name Agent Factory Methods
@@ -605,5 +622,52 @@ inline void GrSimulation::timestepSync()
 }
 
 
+template<class Archive>
+void GrSimulation::serialize(Archive& ar, const unsigned int version) {
+  #ifdef SVN_VERSION
+    if(version != SVN_VERSION)
+      { 
+        std::cerr<< "Warning: Serialization version mismatch!  Trying to serialize "
+                 << version << " but program is " << SVN_VERSION <<std::endl;
+      }
+  #endif
+  /* Register the classes to be serialized (only needed for serializing through
+   * abstract base pointer type, like AgentPtr */
+  boost::mpl::for_each<AgentTypes, wrap<boost::mpl::placeholders::_1> >
+    (serialization_class_register_t<Archive>(ar));
+
+  ar & BOOST_SERIALIZATION_NVP(_time);
+  ar & BOOST_SERIALIZATION_NVP(_areaThreshold);
+  ar & BOOST_SERIALIZATION_NVP(_areaThresholdCellDensity);
+  //ar & BOOST_SERIALIZATION_NVP(_diffusion);
+  //ar & BOOST_SERIALIZATION_NVP(_recruitment);
+	ar & BOOST_SERIALIZATION_NVP(_tnfrDynamics);
+	ar & BOOST_SERIALIZATION_NVP(_nfkbDynamics);
+  ar & BOOST_SERIALIZATION_NVP(_il10rDynamics);
+  ar & BOOST_SERIALIZATION_NVP(_tgammatransition);
+  ar & BOOST_SERIALIZATION_NVP(_odeSolver);
+	ar & BOOST_SERIALIZATION_NVP(_tnfDepletionTimeStep);
+  ar & BOOST_SERIALIZATION_NVP(_il10DepletionTimeStep);
+  ar & BOOST_SERIALIZATION_NVP(_tcellRecruitmentBegun);
+  ar & BOOST_SERIALIZATION_NVP(_numMolecularPerDiffusion);
+  ar & BOOST_SERIALIZATION_NVP(_numDiffusionPerAgent);
+
+  ar & BOOST_SERIALIZATION_NVP(_macList);
+  ar & BOOST_SERIALIZATION_NVP(_tgamList);
+  ar & BOOST_SERIALIZATION_NVP(_tregList);
+  ar & BOOST_SERIALIZATION_NVP(_tcytList);
+
+  ar & BOOST_SERIALIZATION_NVP(_grid);
+
+  Agent::classSerialize(ar, version);
+
+  ar & BOOST_SERIALIZATION_NVP(_statsPrevious);
+  ar & BOOST_SERIALIZATION_NVP(_stats);
+  ar & BOOST_SERIALIZATION_NVP(g_Rand);
+}
+
+#ifdef SVN_VERSION  //Add the svn version to the class
+  BOOST_CLASS_VERSION(GrSimulation, SVN_VERSION);
+#endif
 
 #endif /* GRSIMULATION_H */

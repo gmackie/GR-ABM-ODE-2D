@@ -121,7 +121,7 @@ void Simulation::loadState(std::istream& in)
 {
   _modelMutex.lock();
   _stopFlag = false;
-  _gr->deserialize(in);
+  _gr->load(in);
   update();
   _modelMutex.unlock();
 }
@@ -129,7 +129,7 @@ void Simulation::loadState(std::istream& in)
 void Simulation::saveState(std::ostream& out) const
 {
   _modelMutex.lock();
-  _gr->serialize(out);
+  _gr->save(out);
   _modelMutex.unlock();
 }
 

@@ -8,12 +8,8 @@
 #include "tregulatory.h"
 #include "grgrid.h"
 #include "stat.h"
-#include "serialization.h"
 
 using namespace std;
-
-const string Treg::_ClassName = "Treg";
-
 
 // Needed for deserializing the model state.
 // Avoids the calls to the random number generator in the normal constructor, allowing the random number generator
@@ -196,6 +192,7 @@ void Treg::print() const
     }
 }
 
+#if 0
 void Treg::serialize(std::ostream& out) const
 {
   assert(out.good());
@@ -237,6 +234,7 @@ void Treg::deserialize(std::istream& in)
       exit(1);
     }
 }
+#endif
 
 void Treg::updateStatistics(Stats& s) const
 {

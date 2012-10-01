@@ -12,6 +12,8 @@
 #include "params.h"
 #include <string>
 #include "numericalMethods.h"
+// For ode serialization
+#include <boost/serialization/valarray.hpp>
 
 using std::valarray;
 
@@ -25,8 +27,6 @@ struct LungFunc;
 class Agent
 {
 private:
-  /// Fake RTTI for serialization purposes
-  static const std::string _ClassName;
 
   /// A global ID counter for assigning a unique ID to an agent.
   static unsigned long _nextID;
@@ -184,7 +184,8 @@ protected:
   */
   Pos compartmentOrdinalToCoordinates(int ordinal, const Pos& dim) const;
 
-public:
+protected:
+  friend class boost::serialization::access;
   /**
   * @brief Default constructor
   * Needed for deserializing the model state.
@@ -193,6 +194,7 @@ public:
   * deserialization.
   */
   Agent();
+public:
   /**
   * @brief Standard constructor, must be used outside of serialization
   * @todo Finish documentation of these functions
@@ -232,17 +234,12 @@ public:
   * This function serializes meta-information (i.e. the last id used) to
   * maintain consistency between runs
   *
-  * @param out output stream to write to
+  * @tparam Archive
+  * @param ar
+  * @param version
   */
-  static void classSerialize(std::ostream& out);
-  /**
-  * @brief serializes class specific meta-information
-  * This function serializes meta-information (i.e. the last id used) to
-  * maintain consistency between runs
-  *
-  * @param in input stream to read from
-  */
-  static void classDeserialize(std::istream& in);
+  template<typename Archive>
+  static void classSerialize(Archive& ar, const unsigned int version);
 
   static auto_ptr<ODESolvers::Stepper> stepper; /// ODE Stepper for all agents (unless overridden)
   static auto_ptr<LungFunc> deriv;              /// ODE Function for all agents (unless overridden)
@@ -472,17 +469,10 @@ public:
     return _id;  //Backwards compat
   }
   /**
-  * @brief Saves a serialized version of the agent to out \see deserialize
-  *
-  * @param out Output stream to save to
+  * @copydoc GrSimulation::serialize
   */
-  virtual void serialize(std::ostream& out) const;
-  /**
-  * @brief Loads an agent from the stream that was serialized \see serialize
-  *
-  * @param in Input stream to load from
-  */
-  virtual void deserialize(std::istream& in);
+  template<class Archive>
+  void serialize(Archive& ar, const unsigned int version);
   /**
   * @brief visits all the properties of the agent class
   * @param v Visitor that will visit() each property
@@ -587,5 +577,25 @@ inline LungFunc* Agent::buildDerivFunc()
   LungFunc* d = new LungFunc(_PARAM(PARAM_TNFODE_EN)*10);
   return d;
 }
+
+template<class Archive>
+inline void Agent::serialize(Archive& ar, const unsigned int /*version*/) {
+#define P(type, name, ival, desc) \
+  ar & boost::serialization::make_nvp(#name, _##name);
+  AGENT_PROPS
+#undef P
+  ar & BOOST_SERIALIZATION_NVP(_lasttimestep);
+  ar & BOOST_SERIALIZATION_NVP(_initvector);
+}
+
+template<typename Archive>
+inline void Agent::classSerialize(Archive& ar, const unsigned int /*version*/) {
+  ar & boost::serialization::make_nvp("nextID", _nextID);
+}
+
+//@cond
+// Register agent class as one that needs derived type translation
+BOOST_SERIALIZATION_ASSUME_ABSTRACT(Agent);
+//@endcond
 
 #endif /* AGENT_H */

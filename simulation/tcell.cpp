@@ -77,17 +77,3 @@ void Tcell::moveTcell(GrGrid& grid, bool ccl2, bool ccl5, bool cxcl9)
         }
     }
 }
-
-void Tcell::serialize(std::ostream& out) const
-{
-  Agent::serialize(out);
-
-  out << _tcellodeSize << std::endl;
-}
-
-void Tcell::deserialize(std::istream& in)
-{
-  Agent::deserialize(in);
-
-  in >> _tcellodeSize;
-}

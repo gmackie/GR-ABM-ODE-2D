@@ -68,7 +68,10 @@ class GrGrid
 public:
   static const unsigned MAX_AGENTS_PER_CELL = 2;
 private:
-  static const std::string _ClassName;
+  // Make this private so no one can accidently access it
+  // (just for serialization)
+  friend class boost::serialization::access;  
+  GrGrid(){} //For serialization
 
   /*
    * !!! If the data members change then the serialize and deserialize functions need to be updated !!!
@@ -112,8 +115,8 @@ public:
   const PosVector& getSources() const;
   void initSources();
   void shuffleSources();
-  void serialize(std::ostream& out) const;
-  void deserialize(std::istream& in);
+  template<class Archive>
+  void serialize(Archive& ar, const unsigned int version);
   bool isSource(const Pos& p) const;
 
   int getOccupiedNeighborCount(int row, int col) const;
@@ -332,6 +335,23 @@ inline const Agent*  GrGrid::agent         (int x, int y, size_t a) const
 inline Agent*& GrGrid::agent(int x, int y, size_t a)
 {
   return _agents[Indexer::ind(_dim, x, y) * MAX_AGENTS_PER_CELL + a];
+}
+
+template<class Archive>
+void GrGrid::serialize(Archive& ar, const unsigned int /*version*/)
+{
+  ar & BOOST_SERIALIZATION_NVP(_dim);
+  #define GRID(type, name) ar & BOOST_SERIALIZATION_NVP(_##name);
+  #define PADDED_GRID(type, name) \
+    ar & BOOST_SERIALIZATION_NVP(_##name);  \
+    ar & BOOST_SERIALIZATION_NVP(_u_##name);  \
+    ar & BOOST_SERIALIZATION_NVP(_v_##name);
+   GRIDS_DEFS
+  #undef GRID
+  #undef PADDED_GRID
+  ar & BOOST_SERIALIZATION_NVP(_agents);
+  ar & BOOST_SERIALIZATION_NVP(_nCaseation);
+  ar & BOOST_SERIALIZATION_NVP(_sources);
 }
 
 #endif /* GRID_H */

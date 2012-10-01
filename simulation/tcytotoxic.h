@@ -28,8 +28,10 @@ private:
   void handleActive(const int time, GrGrid& grid, Stats& stats);
   void handleDownRegulated(const int time, GrGrid& grid, Stats& stats);
 
-public:
+protected:
+  friend class boost::serialization::access;
   Tcyt();
+public:
   Tcyt(int birthtime, int row, int col, Tcyt::State state);
   ~Tcyt();
   void move(GrGrid& grid);
@@ -52,8 +54,8 @@ public:
   {
     return new Tcyt(*this);
   }
-  void serialize(std::ostream& out) const;
-  void deserialize(std::istream& in);
+  template<class Archive>
+  void serialize(Archive& ar, const unsigned int version);
   AgentType getAgentType() const;
   template<typename Visitor>
   void visitProperties(Visitor& v);
@@ -123,5 +125,13 @@ inline void Tcyt::visitProperties(Visitor& v) const
 }
 
 std::ostream& operator<<(std::ostream& os, const Tcyt::State& s);
+
+template<class Archive>
+void Tcyt::serialize(Archive& ar, const unsigned int /*version*/) {
+  ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(Tcell);
+  ar & boost::serialization::make_nvp("state", _state);
+  ar & boost::serialization::make_nvp("nextState", _nextState);
+  ar & boost::serialization::make_nvp("deactivationTime", _deactivationTime);
+}
 
 #endif /* TCYTOTOXIC_H */

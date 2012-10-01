@@ -9,10 +9,6 @@
 #include "macrophage.h"
 #include "grgrid.h"
 #include "stat.h"
-#include "serialization.h"
-
-const std::string Tgam::_ClassName = "Tgam";
-
 
 // Needed for deserializing the model state.
 // Avoids the calls to the random number generator in the normal constructor, allowing the random number generator
@@ -451,6 +447,8 @@ void Tgam::print() const
     }
 }
 
+#if 0
+
 void Tgam::serialize(std::ostream& out) const
 {
   assert(out.good());
@@ -506,6 +504,8 @@ void Tgam::deserialize(std::istream& in)
       exit(1);
     }
 }
+
+#endif
 
 void Tgam::updateStatistics(Stats& s) const
 {

@@ -26,6 +26,12 @@
 #include <valarray>
 #include <boost/mpl/vector.hpp>
 
+#include <boost/serialization/base_object.hpp>
+#include <boost/serialization/utility.hpp>
+#include <boost/serialization/export.hpp>
+#include <boost/serialization/assume_abstract.hpp>
+#include <boost/serialization/vector.hpp>
+
 #if 1
 #define likely(x) __builtin_expect((x), 1)
 #define unlikely(x) __builtin_expect((x), 0)

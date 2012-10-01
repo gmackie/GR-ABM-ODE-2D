@@ -8,11 +8,14 @@
 #include "recruitmentlnodepure.h"
 #include "stat.h"
 
+BOOST_CLASS_EXPORT_IMPLEMENT(RecruitmentLnODEPure)
+#if 0
 RecruitmentLnODEPure::RecruitmentLnODEPure(std::istream& in)
   : RecruitmentLnODE("", "", in)
 {
 
 }
+#endif
 
 RecruitmentLnODEPure::RecruitmentLnODEPure()
   : RecruitmentLnODE("", "")
@@ -144,14 +147,4 @@ void RecruitmentLnODEPure::solveODE(const int, const Stats&, Stats& stats)
   std::cout << "T80l\t" << _odeInitialConditions[_idxEffectorT80] << std::endl;
   std::cout << "T8l\t" << _odeInitialConditions[_idxEffectorT8] << std::endl;
   std::cout << "TCl\t" << _odeInitialConditions[_idxCTL] << std::endl;*/
-}
-
-inline void RecruitmentLnODEPure::serialize(std::ostream& out) const
-{
-  assert(out.good());
-  RecruitmentLnODE::serialize(out);
-}
-
-inline void RecruitmentLnODEPure::deserialize(std::istream&)
-{
 }

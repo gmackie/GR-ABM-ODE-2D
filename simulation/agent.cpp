@@ -7,11 +7,9 @@
 
 #include "agent.h"
 #include "grgrid.h"
-#include "serialization.h"
 
 using namespace std;
 
-const std::string Agent::_ClassName = "Agent";
 auto_ptr<ODESolvers::Stepper> Agent::stepper;
 auto_ptr<LungFunc> Agent::deriv;
 
@@ -1514,31 +1512,7 @@ Pos Agent::compartmentOrdinalToCoordinates(int ordinal, const Pos& dim) const
 
 }
 
-void Agent::classSerialize(std::ostream& out)
-{
-  assert(out.good());
-  Serialization::writeHeader(out, Agent::_ClassName);
-  out << _nextID << std::endl;
-  Serialization::writeFooter(out, Agent::_ClassName);
-}
-
-void Agent::classDeserialize(std::istream& in)
-{
-  assert(in.good());
-
-  if (!Serialization::readHeader(in, Agent::_ClassName))
-    {
-      exit(1);
-    }
-
-  in >> _nextID;
-
-  if (!Serialization::readFooter(in, Agent::_ClassName))
-    {
-      exit(1);
-    }
-}
-
+#if 0
 void Agent::serialize(std::ostream& out) const
 {
   assert(out.good());
@@ -1592,6 +1566,7 @@ void Agent::deserialize(std::istream& in)
       exit(1);
     }
 }
+#endif
 
 /*virtual*/ void LungFunc::operator()(const ODESolvers::ODEState& vecread, double t, ODESolvers::Derivative& vecwrite, void* params) const
 {

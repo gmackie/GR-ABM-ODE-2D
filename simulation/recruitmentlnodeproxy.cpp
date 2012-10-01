@@ -10,6 +10,8 @@
 
 using namespace std;
 
+BOOST_CLASS_EXPORT_IMPLEMENT(RecruitmentLnODEProxy)
+
 RecruitmentLnODEProxy::RecruitmentLnODEProxy()
   : RecruitmentLnODE("", "")
 {

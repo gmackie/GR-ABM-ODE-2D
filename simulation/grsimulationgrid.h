@@ -47,9 +47,8 @@ public:
   GrGrid& getGrid();
   const PosVector& getSources();
   void initSources();
-  void serialize(std::ostream& out) const;
-  void deserialize(std::istream& in);
-
+  template<typename Archive>
+  void serialize(Archive& ar, const unsigned int version);
 
 private:
   GrGrid *_pCurrentGrid;
@@ -94,16 +93,6 @@ inline void GrSimulationGrid::initSources()
   _pCurrentGrid->initSources();
 }
 
-inline void GrSimulationGrid::serialize(std::ostream& out) const
-{
-  _pCurrentGrid->serialize(out);
-}
-
-inline void GrSimulationGrid::deserialize(std::istream& in)
-{
-  _pCurrentGrid->deserialize(in);
-}
-
 // Make sure that the next grid has the same state as the current grid.
 // This includes agent pointers in addition to chemical concentrations
 // in each grid compartment.
@@ -120,6 +109,11 @@ inline void GrSimulationGrid::updateNextGrid()
 inline void GrSimulationGrid::swap()
 {
   std::swap(_pCurrentGrid, _pNextGrid);
+}
+
+template<typename Archive>
+void GrSimulationGrid::serialize(Archive& ar, const unsigned int /*version*/) {
+  ar & BOOST_SERIALIZATION_NVP(_pCurrentGrid);
 }
 
 #endif /* GRSIMULATIONGRID_H_ */

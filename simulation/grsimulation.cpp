@@ -5,6 +5,9 @@
  *      Author: M. El-Kebir
  */
 
+#include <boost/archive/xml_iarchive.hpp>
+#include <boost/archive/xml_oarchive.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 #include "grsimulation.h"
 #include "float.h"
 #include "grdiffusion.h"
@@ -17,12 +20,8 @@
 #include "mtbtest.h"
 #include "recruitmentprob.h"
 #include "recruitmentlnodepure.h"
-#include "serialization.h"
-#include <boost/date_time/posix_time/posix_time.hpp>
 
 using namespace std;
-
-const std::string GrSimulation::_ClassName = "GrSimulation";
 
 GrSimulation::GrSimulation(const Pos& dim)
 	: _time(0)
@@ -98,140 +97,26 @@ GrSimulation::~GrSimulation()
   clearPtrList(_tcytList);
 }
 
-void GrSimulation::serialize(std::ostream& out) const
+void GrSimulation::save(std::ostream& out) const
 {
 	assert(out.good());
-
-	/*** Set initial fmt flags ***/
-	out.setf(std::ios::scientific, std::ios::floatfield);
-	out.precision(Scalar_PRECISION);
-
-	Serialization::writeHeader(out, GrSimulation::_ClassName);
-
-	// Model version
-	out << GR_VERSION << std::endl;
-
-	// serialize time
-	out << _time << std::endl;
-
-	// serialize area threshold
-	out << _areaThreshold << std::endl;
-	out << _areaThresholdCellDensity << std::endl;
-
-	// serialize diffusion method
-	int intVal = (int) _pDiffusion->getMethod();
-	out << intVal << std::endl;
-
-	// serialize recruitment method and object.
-	int intRecrMtehod = (int) _pRecruitment->getMethod();
-	out << intRecrMtehod << std::endl;
-	_pRecruitment->serialize(out);
-
-	out << _tnfrDynamics << std::endl;
-	out << _nfkbDynamics << std::endl;
-    out << _il10rDynamics << std::endl;
-    out << _tgammatransition << std::endl;
-    out << (int)(_odeSolver) << std::endl;
-	out << _tnfDepletionTimeStep << std::endl;
-    out << _il10DepletionTimeStep << std::endl;
-    out << _tcellRecruitmentBegun <<std::endl;
-    out << _numMolecularPerDiffusion << std::endl;
-    out << _numDiffusionPerAgent << std::endl;
-
-	// serialize grid
-	_grid.serialize(out);
-
-	// Serialize the agent class.
-	Agent::classSerialize(out);
-
-	// serialize macs
-	out << _macList.size() << std::endl;
-	for (MacList::const_iterator it = _macList.begin(); it != _macList.end(); it++)
-	{
-		int agentIndex = getGrid().agentIndex(*it);
-
-		if (agentIndex < 0 || agentIndex >= (int) GrGrid::MAX_AGENTS_PER_CELL)
-		{
-			cerr << "Mac serialization error, invalid agentIndex: " << agentIndex
-				 << " Mac address: " << (*it)
-				 << " Mac position: " << (*it)->getPosition()
-				 << endl;
-			exit(1);
-		}
-
-		out << getGrid().agentIndex((*it)) << endl;
-		(*it)->serialize(out);
-	}
-
-	// serialize tgam cells
-	out << _tgamList.size() << std::endl;
-	for (TgamList::const_iterator it = _tgamList.begin(); it != _tgamList.end(); it++)
-	{
-		int agentIndex = getGrid().agentIndex(*it);
-
-		if (agentIndex < 0 || agentIndex >= (int) GrGrid::MAX_AGENTS_PER_CELL)
-		{
-			cerr << "Tgam serialization error, invalid agentIndex: " << agentIndex
-				 << " Tgam address: " << (*it)
-				 << " Tgam position: " << (*it)->getPosition()
-				 << endl;
-			exit(1);
-		}
-
-		out << getGrid().agentIndex(*it) << endl;
-		(*it)->serialize(out);
-	}
-
-	// serialize tcyt cells
-	out << _tcytList.size() << std::endl;
-	for (TcytList::const_iterator it = _tcytList.begin(); it != _tcytList.end(); it++)
-	{
-		int agentIndex = getGrid().agentIndex((*it));
-
-		if (agentIndex < 0 || agentIndex >= (int) GrGrid::MAX_AGENTS_PER_CELL)
-		{
-			cerr << "Tcyt serialization error, invalid agentIndex: " << agentIndex
-				 << " Tcyt address: " << &(*it)
-				 << " Tcyt position: " << (*it)->getPosition()
-				 << endl;
-			exit(1);
-		}
-
-		out << getGrid().agentIndex((*it)) << endl;
-		(*it)->serialize(out);
-	}
-
-	// serialize treg cells
-	out << _tregList.size() << std::endl;
-	for (TregList::const_iterator it = _tregList.begin(); it != _tregList.end(); it++)
-	{
-		int agentIndex = getGrid().agentIndex((*it));
-
-		if (agentIndex < 0 || agentIndex >= (int) GrGrid::MAX_AGENTS_PER_CELL)
-		{
-			cerr << "Treg serialization error, invalid agentIndex: " << agentIndex
-				 << " Treg address: " << &(*it)
-				 << " Treg position: " << (*it)->getPosition()
-				 << endl;
-			exit(1);
-		}
-
-		out << getGrid().agentIndex((*it)) << endl;
-		(*it)->serialize(out);
-	}
-
-	// serialize statistics
-	_statsPrevious.serialize(out);
-	_stats.serialize(out);
-
-	// serialize random number generator
-	// Do this last so that when de-serializing any random number generation performed as part
-	// de-serialization won't affect the simulation state.
-	g_Rand.serialize(out);
-
-	Serialization::writeFooter(out, GrSimulation::_ClassName);
+  boost::archive::xml_oarchive oa(out);
+  oa << boost::serialization::make_nvp("GR", *this);
+	assert(out.good());
 }
 
+void GrSimulation::load(std::istream& in)
+{
+  timestepSync();
+  setODEsize();
+
+	assert(in.good());
+  boost::archive::xml_iarchive ia(in);
+  ia >> boost::serialization::make_nvp("GR", *this);
+	assert(in.good());
+}
+
+#if 0
 void GrSimulation::deserialize(std::istream& in)
 {
 
@@ -426,6 +311,7 @@ void GrSimulation::deserialize(std::istream& in)
 		exit(1);
 	}
 }
+#endif
 
 void GrSimulation::init()
 {
@@ -1149,29 +1035,6 @@ void GrSimulation::setRecruitmentMethod(RecruitmentMethod method)
     std::cerr << "Invalid recruitment method: " << method << std::endl;
     exit(1);
   }
-}
-
-void GrSimulation::deserializeRecruitmentMethod(RecruitmentMethod method, std::istream& in)
-{
-  assert(in.good());
-	if (_pRecruitment)
-		delete _pRecruitment;
-
-  switch (method)
-  {
-  case RECR_PROB:
-	  _pRecruitment = new RecruitmentProb();
-    break;
-
-  case RECR_LN_ODE_PURE:
-	  _pRecruitment = new RecruitmentLnODEPure(in);
-      break;
-
-  default:
-	    std::cerr << "Invalid recruitment method: " << method << std::endl;
-	    exit(1);
-  }
-  assert(in.good());
 }
 
 void GrSimulation::setOutcomeMethod(int index, OutcomeMethod method, double alpha,

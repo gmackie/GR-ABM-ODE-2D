@@ -49,7 +49,6 @@ class Mac : public Agent
 public:
   enum State {MAC_RESTING, MAC_INFECTED, MAC_CINFECTED, MAC_ACTIVE, MAC_DEAD, NSTATES};
 private:
-  static const std::string _ClassName;
   static int _macodeSize;
   /*
    * !!! If the data members change then the serialize and deserialize functions need to be updated !!!
@@ -112,10 +111,13 @@ private:
   */
   double getExtMtbInMoore(const GrGrid& grid) const;
 
+protected:
+  friend class boost::serialization::access;
+  Mac();
+
 public:
   static double getIntMtbGrowthRate(const int time);
 
-  Mac();
   Mac(int birthtime, int row, int col, Mac::State state, double intMtb, bool NFkB, bool stat1);
   ~Mac();
 
@@ -194,8 +196,8 @@ public:
   static bool isMac(const Agent* pAgent);
   static bool isMac(const Agent* pAgent, Mac::State state);
   void print() const;
-  void serialize(std::ostream& out) const;
-  void deserialize(std::istream& in);
+  template<class Archive>
+  void serialize(Archive& ar, const unsigned int version);
   bool isDeactivated() const;
   double getNFkBn() const;
   double getNFkBc() const;
@@ -375,5 +377,22 @@ inline void Mac::visitProperties(Visitor& v) const
 }
 
 std::ostream& operator<<(std::ostream& os, const Mac::State& s);
+
+
+template<class Archive>
+void Mac::serialize(Archive& ar, const unsigned int /*version*/) {
+  ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(Agent);
+  ar & boost::serialization::make_nvp("state", _state);
+  ar & boost::serialization::make_nvp("nextState", _nextState);
+  ar & boost::serialization::make_nvp("intMtb", _intMtb);
+  ar & boost::serialization::make_nvp("NFkB", _NFkB);
+  ar & boost::serialization::make_nvp("stat1", _stat1);
+  ar & boost::serialization::make_nvp("ICOS", _ICOS);
+  ar & boost::serialization::make_nvp("activationTime", _activationTime);
+  ar & boost::serialization::make_nvp("deactivationTime", _deactivationTime);
+  ar & boost::serialization::make_nvp("stat1Time", _stat1Time);
+  ar & boost::serialization::make_nvp("nfkbTime", _nfkbTime);
+  ar & boost::serialization::make_nvp("macodeSize", _macodeSize);
+}
 
 #endif /* MACROPHAGE_H */

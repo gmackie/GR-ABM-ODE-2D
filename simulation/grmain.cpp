@@ -16,6 +16,8 @@
 #include <boost/iostreams/filtering_stream.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/archive/xml_iarchive.hpp>
+#include <boost/archive/xml_oarchive.hpp>
 #include "recruitmentlnode.h"
 #include "recruitmentlnodepure.h"
 #include "recruitmentprob.h"
@@ -520,7 +522,7 @@ void saveState(const GrSimulation* pSim, int time, std::string dir=std::string("
     std::cerr<<"Unable to open output file: "<<fname<<endl;
   else
     {
-      pSim->serialize(out);
+      pSim->save(out);
     }
 }
 
@@ -929,7 +931,7 @@ int main(int argc, char** argv)
 
       if(!in)
         throw std::runtime_error("Failed to open saved state file");
-      pSim->deserialize(in);
+      pSim->load(in);
     }
 
   buildSim(pSim, diffMethodEnum, recrMethod, vm["odesolver"].as<size_t>(), vm.count("tnfr-dynamics"), vm.count("il10r-dynamics"), vm.count("NFkB-dynamics"), vm.count("adaptive"),

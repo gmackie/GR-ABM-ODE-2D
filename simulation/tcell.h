@@ -26,8 +26,8 @@ public:
   void moveTcell(GrGrid& grid, bool ccl2, bool ccl5, bool cxcl9);
   static void setTcellOdeSize(int odesize);
   static bool isTcell(const Agent* pAgent);
-  virtual void serialize(std::ostream& out) const;
-  virtual void deserialize(std::istream& in);
+  template<class Archive>
+  void serialize(Archive& ar, const unsigned int version);
   virtual void solveDegradation (GrGrid& grid, double dt, bool tnfrDynamics, bool il10rDynamics);
 
 };
@@ -42,4 +42,11 @@ inline void Tcell::setTcellOdeSize(int odesize)
   _tcellodeSize = odesize;
 }
 
+template<class Archive>
+void Tcell::serialize(Archive& ar, const unsigned int /*version*/) {
+  ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(Agent);
+  ar & BOOST_SERIALIZATION_NVP(_tcellodeSize);
+}
+
+BOOST_SERIALIZATION_ASSUME_ABSTRACT(Tcell);
 #endif /* TCELL_H */

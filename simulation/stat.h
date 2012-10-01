@@ -225,17 +225,16 @@ public:
   * \param file_version version of archive given
   */
   template<typename Archive>
-  void serialize(Archive& ar, const unsigned int file_version = 0)
+  void serialize(Archive& ar, const unsigned int file_version=0)
   {
+    (void)file_version;
 #define STAT(type, name, desc, reset)                ar & boost::serialization::make_nvp( #name, _ ## name);
 #define ARRAY_STAT(type, name, sz, desc, reset)      ar & boost::serialization::make_nvp( #name, _ ## name);
 #define AGENT_STAT(type, name, desc, reset)          ar & boost::serialization::make_nvp( #name, _ ## name);
 #define STATE_STAT(type, name, agent_t, desc, reset) ar & boost::serialization::make_nvp( #name, _ ## name);
     //#define AGENTSTATE_STAT(type, name, sz, desc, reset) ar & boost::serialization::make_nvp( #name, _ ## name);
 #include "stat.def"
-    ar & _intMtbFreq.size();
-    for (size_t i = 0; i < _intMtbFreq.size(); i++)
-      ar & _intMtbFreq[i];
+    ar & boost::serialization::make_nvp("intMtbFreq", _intMtbFreq);
   }
 
   void serialize(std::ostream& s) const

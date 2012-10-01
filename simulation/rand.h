@@ -10,6 +10,8 @@
 
 #include <assert.h>
 #include <iostream>
+#include <boost/serialization/nvp.hpp>
+#include <boost/serialization/split_free.hpp>
 
 #ifdef __APPLE__
 #include <boost/random.hpp>
@@ -58,9 +60,9 @@ public:
   double getReal(double a, double b);
   int getInt(int b, int a = 0);
   double getLogNormal(double mean, double sigma);
-  void serialize(std::ostream& out) const;
-  void deserialize(std::istream& in);
   void test(int time);
+  template<class Archive>
+  void serialize(Archive& ar, const unsigned int version);
 };
 
 inline void Rand::setSeed(unsigned int seed)
@@ -103,6 +105,64 @@ inline double Rand::getLogNormal(double mean, double sigma)
 {
   boost::lognormal_distribution<double> rnd(mean, sigma);
   return rnd(_realEng);
+}
+
+namespace boost { namespace serialization {
+  /*
+   * Some serialization methods defined because boost didn't integrate random
+   * library with serialization library.  Basically splits the serialization
+   * process in order to use the iostream version which *is* defined
+   */
+  template<class Archive>
+  inline void serialize(Archive& ar, ranlux64_base_01_t& realEng, const unsigned int version)
+  {
+    split_free(ar, realEng, version);
+  }
+  template<class Archive>
+  inline void save(Archive& ar, const ranlux64_base_01_t& realEng, const unsigned int /*version*/)
+  {
+    std::ostringstream ss;
+    ss<<realEng;
+    std::string s(ss.str());
+    ar << boost::serialization::make_nvp("realEng", s);
+  }
+  template<class Archive>
+  inline void load(Archive& ar, ranlux64_base_01_t& realEng, const unsigned int /*version*/)
+  {
+    std::string s;
+    ar >> boost::serialization::make_nvp("realEng", s);
+    std::istringstream ss(s);
+    ss >> realEng;
+  }
+  template<class Archive>
+  inline void serialize(Archive& ar, mt19937_t& eng, const unsigned int version)
+  {
+    split_free(ar, eng, version);
+  }
+  template<class Archive>
+  inline void save(Archive& ar, const mt19937_t& eng, const unsigned int /*version*/)
+  {
+    std::ostringstream ss;
+    ss << eng;
+    std::string s(ss.str());
+    ar << boost::serialization::make_nvp("eng", s);
+  }
+  template<class Archive>
+  inline void load(Archive& ar, mt19937_t& eng, const unsigned int /*version*/)
+  {
+    std::string s;
+    ar >> boost::serialization::make_nvp("eng", s);
+    std::istringstream ss(s);
+    ss >> eng;
+  }
+}}
+
+template<class Archive>
+void Rand::serialize(Archive& ar, const unsigned int /*version*/)
+{
+  ar & BOOST_SERIALIZATION_NVP(_seed);
+  ar & BOOST_SERIALIZATION_NVP(_eng);
+  ar & BOOST_SERIALIZATION_NVP(_realEng);
 }
 
 #endif /* RAND_H */

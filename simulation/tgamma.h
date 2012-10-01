@@ -35,8 +35,10 @@ private:
   void handleActiveDouble(const int time, GrGrid& grid, Stats& stats);
   void handleInducedReg(const int time, GrGrid& grid, Stats& stats);
 
-public:
+protected:
+  friend class boost::serialization::access;
   Tgam();
+public:
   Tgam(int birthtime, int row, int col, Tgam::State state);
   ~Tgam();
   void move(GrGrid& grid);
@@ -59,8 +61,8 @@ public:
     return new Tgam(*this);
   }
   void print() const;
-  void serialize(std::ostream& out) const;
-  void deserialize(std::istream& in);
+  template<class Archive>
+  void serialize(Archive& ar, const unsigned int version);
   AgentType getAgentType() const;
   template<typename Visitor>
   void visitProperties(Visitor& v);
@@ -138,5 +140,17 @@ inline void Tgam::visitProperties(Visitor& v) const
 }
 
 std::ostream& operator<<(std::ostream& os, const Tgam::State& s);
+
+template<class Archive>
+void Tgam::serialize(Archive& ar, const unsigned int /*version*/) {
+  ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(Tcell);
+  ar & boost::serialization::make_nvp("state", _state);
+  ar & boost::serialization::make_nvp("nextState", _nextState);
+  ar & boost::serialization::make_nvp("deactivationTime", _deactivationTime);
+  ar & boost::serialization::make_nvp("transitionTime", _transitionTime);
+  ar & boost::serialization::make_nvp("AntigenStim", _nAntigenStim);
+  ar & boost::serialization::make_nvp("DownRegulated", _nDownRegulated);
+  ar & boost::serialization::make_nvp("ICOS", _nICOS);
+}
 
 #endif /* TGAMMA_H */

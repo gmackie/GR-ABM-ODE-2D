@@ -9,6 +9,8 @@
 #include "grsimulation.h"
 #include "stat.h"
 
+BOOST_CLASS_EXPORT_IMPLEMENT(RecruitmentProb)
+
 RecruitmentProb::RecruitmentProb()
 {
 }

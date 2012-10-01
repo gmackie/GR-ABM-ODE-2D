@@ -18,10 +18,10 @@ private:
 public:
   RecruitmentLnODEProxy();
   virtual ~RecruitmentLnODEProxy();
+  template<class Archive>
+  void serialize(Archive& ar, const unsigned int version);
 
   RecruitmentMethod getMethod() const;
-  void serialize(std::ostream&) const;
-  void deserialize(std::istream&);
 
   RecruitmentBase* clone() const
   {
@@ -34,18 +34,11 @@ inline RecruitmentMethod RecruitmentLnODEProxy::getMethod() const
 {
   return RECR_LN_ODE_PROXY;
 }
-
-
-// Even though this lymph ode proxy object uses the lymph node ode initial conditions array,
-// it does not save any state between model timesteps. It stores values in the array based
-// only on information for the current time step (ex. the time step value, time) and
-// model parameters. So nothing needs to be done for serialization/deserialization.
-inline void RecruitmentLnODEProxy::serialize(std::ostream&) const
+template<class Archive>
+void RecruitmentLnODEProxy::serialize(Archive& ar, const unsigned int version)
 {
+  ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(RecruitmentBase);
 }
 
-inline void RecruitmentLnODEProxy::deserialize(std::istream&)
-{
-}
-
+BOOST_CLASS_EXPORT_KEY(RecruitmentLnODEProxy)
 #endif /* RECRUITMENTLNODEPROXY_H_ */

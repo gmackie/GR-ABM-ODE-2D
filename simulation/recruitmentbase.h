@@ -20,8 +20,8 @@ public:
   virtual ~RecruitmentBase();
 
   virtual RecruitmentMethod getMethod() const = 0;
-  virtual void serialize(std::ostream& out) const = 0;
-  virtual void deserialize(std::istream& in) = 0;
+  template<typename Archive>
+  void serialize(Archive& ar, const unsigned int version) {}
 
   virtual void recruit(GrSimulation& sim, int time) = 0;
   virtual RecruitmentBase* clone() const = 0;
@@ -39,6 +39,10 @@ public:
   static bool TregRecruitmentThreshold(const GrGrid& g, const Pos& pSource, double& rThreshold);
 };
 
+//@cond
+// Register agent class as one that needs derived type translation
+BOOST_SERIALIZATION_ASSUME_ABSTRACT(RecruitmentBase);
+//@endcond
 
 inline bool RecruitmentBase::intCompareGTEQ(const double param1, const double param2)
 {

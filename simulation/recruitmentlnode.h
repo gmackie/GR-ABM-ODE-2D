@@ -22,9 +22,6 @@
 
 class RecruitmentLnODE : public RecruitmentBase
 {
-private:
-  static const std::string _ClassName;
-
 protected:
 
   static const int _nrConditions = 43;
@@ -64,13 +61,12 @@ protected:
                      ThresholdPosList tcellSources[TCELL_TYPE_COUNT]);
 
 public:
-  RecruitmentLnODE(const std::string& odeApp, const std::string& odeTmpFile, std::istream& in);
   RecruitmentLnODE(const std::string& odeApp, const std::string& odeTmpFile);
   virtual ~RecruitmentLnODE();
 
   RecruitmentMethod getMethod() const;
-  void serialize(std::ostream& out) const;
-  void deserialize(std::istream& in);
+  template<class Archive>
+  void serialize(Archive& ar, const unsigned int version);
   virtual RecruitmentBase* clone() const
   {
     return new RecruitmentLnODE(*this);
@@ -79,9 +75,26 @@ public:
   void recruit(GrSimulation& sim, int time);
 };
 
+//@cond
+// Register agent class as one that needs derived type translation
+BOOST_SERIALIZATION_ASSUME_ABSTRACT(RecruitmentLnODE);
+//@endcond
+
 inline RecruitmentMethod RecruitmentLnODE::getMethod() const
 {
   return RECR_LN_ODE;
 }
+template<class Archive>
+void RecruitmentLnODE::serialize(Archive& ar, const unsigned int version)
+{
+  ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(RecruitmentBase);
+  ar & BOOST_SERIALIZATION_NVP(_tcellTable);
+  ar & BOOST_SERIALIZATION_NVP(_tcellQueueCount);
+  ar & BOOST_SERIALIZATION_NVP(_tcellQueue);
+  ar & BOOST_SERIALIZATION_NVP(_prevMiMci);
+  ar & BOOST_SERIALIZATION_NVP(_odeInitialConditions);
+}
+
+BOOST_CLASS_EXPORT_KEY(RecruitmentLnODE)
 
 #endif /* RECRUITMENTLNODE_H_ */

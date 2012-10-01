@@ -6,9 +6,6 @@
  */
 
 #include "rand.h"
-#include "serialization.h"
-
-const std::string Rand::_ClassName = "Rand";
 
 Rand::Rand(unsigned int	seed)
   : _seed(seed)
@@ -24,6 +21,7 @@ Rand::~Rand()
 {
 }
 
+#if 0
 void Rand::serialize(std::ostream& out) const
 {
   assert(out.good());
@@ -55,6 +53,7 @@ void Rand::deserialize(std::istream& in)
       exit(1);
     }
 }
+#endif
 
 // For debugging problems with random number generation being out of synch between
 // supposedly identical runs (same model, same parameter file, same seed).

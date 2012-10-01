@@ -30,7 +30,6 @@ class Treg : public Tcell
 public:
   enum State {TREG_ACTIVE, TREG_DEAD, NSTATES};
 private:
-  static const std::string _ClassName;
 
   /*
    * !!! If the data members change then the serialize and deserialize functions need to be updated !!!
@@ -39,8 +38,10 @@ private:
   Treg::State _nextState;
   void handleResting(const int time, GrGrid& grid, Stats& stats);
 
-public:
+protected:
+  friend class boost::serialization::access;
   Treg();
+public:
   Treg(int birthtime, int row, int col, Treg::State state);
   ~Treg();
   void move(GrGrid& grid);
@@ -71,8 +72,8 @@ public:
   {
     return new Treg(*this);
   }
-  void serialize(std::ostream& out) const;
-  void deserialize(std::istream& in);
+  template<class Archive>
+  void serialize(Archive& ar, const unsigned int version);
   AgentType getAgentType() const;
 };
 
@@ -121,4 +122,10 @@ inline bool Treg::isDeadNext()
 
 std::ostream& operator<<(std::ostream& os, const Treg::State& s);
 
+template<class Archive>
+void Treg::serialize(Archive& ar, const unsigned int /*version*/) {
+  ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(Tcell);
+  ar & boost::serialization::make_nvp("state", _state);
+  ar & boost::serialization::make_nvp("nextState", _nextState);
+}
 #endif /* TREGULATORY_H */

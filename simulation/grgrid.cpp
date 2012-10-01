@@ -6,13 +6,9 @@
  */
 
 #include "grgrid.h"
-#include "serialization.h"
 #include "agent.h"
 
 using namespace std;
-
-const std::string GrGrid::_ClassName = "GrGrid";
-
 
 #define SZ (dim.x*dim.y)
 #define Scalar_SZ ((dim.x+2)*(dim.y+2))
@@ -97,6 +93,7 @@ void GrGrid::shuffleSources()
   random_shuffle(_sources.begin(), _sources.end(), g_Rand);
 }
 
+#if 0
 void GrGrid::serialize(std::ostream& out) const
 {
   assert(out.good());
@@ -251,6 +248,7 @@ void GrGrid::deserialize(std::istream& in)
 
   Serialization::readFooter(in, GrGrid::_ClassName);
 }
+#endif
 
 bool GrGrid::incKillings(const Pos& p)
 {

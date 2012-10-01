@@ -7,7 +7,7 @@ CXX := g++
 ifndef BOOST_PREFIX
 BOOST_PREFIX := /usr
 endif
-override CXXFLAGS += -DSVN_VERSION=\"$(SVNREV)\" -Wall -W -I$(BOOST_PREFIX)/include -Wno-strict-aliasing -Wno-unknown-pragmas
+override CXXFLAGS += -DSVN_VERSION="$(SVNREV)" -Wall -W -I$(BOOST_PREFIX)/include -Wno-strict-aliasing -Wno-unknown-pragmas
 
 BOOST_LIBS := boost_program_options boost_iostreams boost_serialization boost_filesystem boost_system
 # So far the best way to eleviate the issues with different distros not properly symlinking boost libraries.
@@ -47,7 +47,7 @@ gpu:	LDFLAGS += -lcudart
 gpu:	SRCS += cudautil.cu grdiffusionftcsswapgpu.cu grsimulationgpu.cu
 gpu:	gr_gpu
 
-SRCS := paramsbase.cpp params.cpp rand.cpp agent.cpp gr.cpp grsimulationgrid.cpp grgrid.cpp macrophage.cpp grsimulation.cpp onlinestat.cpp grdiffusion.cpp grdiffusionbtcs.cpp grdiffusionwrongbtcs.cpp grdiffusionadeswap.cpp grdiffusionftcsswap.cpp ttest.cpp areatest.cpp mtbtest.cpp tcell.cpp tcytotoxic.cpp tgamma.cpp tregulatory.cpp recruitmentbase.cpp recruitmentprob.cpp recruitmentlnode.cpp recruitmentlnodeproxy.cpp recruitmentlnodepure.cpp serialization.cpp 
+SRCS := paramsbase.cpp params.cpp rand.cpp agent.cpp gr.cpp grsimulationgrid.cpp grgrid.cpp macrophage.cpp grsimulation.cpp onlinestat.cpp grdiffusion.cpp grdiffusionbtcs.cpp grdiffusionwrongbtcs.cpp grdiffusionadeswap.cpp grdiffusionftcsswap.cpp ttest.cpp areatest.cpp mtbtest.cpp tcell.cpp tcytotoxic.cpp tgamma.cpp tregulatory.cpp recruitmentbase.cpp recruitmentprob.cpp recruitmentlnode.cpp recruitmentlnodeproxy.cpp recruitmentlnodepure.cpp
 OBJS := ${SRCS:.cpp=.o}
 TINYXML_SRCS := tinyxml/tinystr.cpp tinyxml/tinyxml.cpp tinyxml/tinyxmlerror.cpp tinyxml/tinyxmlparser.cpp
 TINYXML_OBJS := ${TINYXML_SRCS:.cpp=.o}
@@ -81,7 +81,11 @@ gr4: $(TINYXML_OBJS) $(OBJS) grmain.o
 lhs:	$(TINYXML_OBJS) rand.o paramsbase.o params.o serialization.o lhs.o
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
+depend:	.depend
+.depend:
+	$(CXX) $(CXXFLAGS) -MM $(SRCS) > .depend
+
 clean:
 	rm -f ${OBJS} ${TINYXML_OBJS} grmain.o lhs.o gr gr1 gr2 gr3 gr4 lhs
 
--include Makefile.depend
+-include .depend

@@ -9,9 +9,6 @@
 #include "macrophage.h"
 #include "grgrid.h"
 #include "stat.h"
-#include "serialization.h"
-
-const std::string Tcyt::_ClassName = "Tcyt";
 
 // Needed for deserializing the model state.
 // Avoids the calls to the random number generator in the normal constructor, allowing the random number generator
@@ -308,6 +305,7 @@ void Tcyt::print() const
     }
 }
 
+#if 0
 void Tcyt::serialize(std::ostream& out) const
 {
   assert(out.good());
@@ -353,6 +351,7 @@ void Tcyt::deserialize(std::istream& in)
       exit(1);
     }
 }
+#endif
 
 void Tcyt::updateStatistics(Stats& s) const
 {

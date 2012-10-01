@@ -8,6 +8,7 @@
 #include <boost/archive/xml_iarchive.hpp>
 #include <boost/archive/xml_oarchive.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <fstream>
 #include "grsimulation.h"
 #include "float.h"
 #include "grdiffusion.h"
@@ -98,12 +99,24 @@ GrSimulation::~GrSimulation()
   clearPtrList(_tcytList);
 }
 
+void GrSimulation::save(const char* fname) const
+{
+  std::ofstream ofs(fname);
+  save(ofs);
+}
+
 void GrSimulation::save(std::ostream& out) const
 {
 	assert(out.good());
   boost::archive::xml_oarchive oa(out);
   oa << boost::serialization::make_nvp("GR", *this);
 	assert(out.good());
+}
+
+void GrSimulation::load(const char* fname)
+{
+  std::ifstream ifs(fname);
+  load(ifs);
 }
 
 void GrSimulation::load(std::istream& in)

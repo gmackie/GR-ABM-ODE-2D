@@ -86,6 +86,6 @@ depend:	.depend
 	$(CXX) $(CXXFLAGS) -MM $(SRCS) > .depend
 
 clean:
-	rm -f ${OBJS} ${TINYXML_OBJS} grmain.o lhs.o gr gr1 gr2 gr3 gr4 lhs
+	rm -f ${OBJS} ${TINYXML_OBJS} grmain.o lhs.o gr gr1 gr2 gr3 gr4 lhs .depend
 
 -include .depend

@@ -5,7 +5,12 @@
  *      Author: M. El-Kebir
  */
 
+#ifndef TIXML_USE_STL
+#define TIXML_USE_STL
+#endif //TIXML_USE_STL
+
 #include "paramsbase.h"
+#include "tinyxml/tinyxml.h"
 #include <stdlib.h>
 #include <iostream>
 #include <fstream>
@@ -350,7 +355,8 @@ const ParamDescription ParamsBase::_description[_PARAM_COUNT] =
 };
 
 ParamsBase::ParamsBase(const Pos& dim)
-  : _dim(dim)
+  : _xmlDoc(new TiXmlDocument())
+  , _dim(dim)
   , _doubleParam()
   , _intParam()
   , _initialMacs()
@@ -362,6 +368,7 @@ ParamsBase::ParamsBase(const Pos& dim)
 
 ParamsBase::~ParamsBase()
 {
+  if(_xmlDoc) delete _xmlDoc;
 }
 
 void ParamsBase::defineDefaults()
@@ -644,13 +651,13 @@ bool ParamsBase::fromXml(const char* filename)
 {
   bool res;
 
-  if (!_xmlDoc.LoadFile(filename))
+  if (!_xmlDoc->LoadFile(filename))
     {
-      std::cerr << _xmlDoc.ErrorDesc() << " '" << filename << "'" << std::endl;
+      std::cerr << _xmlDoc->ErrorDesc() << " '" << filename << "'" << std::endl;
       return false;
     }
 
-  const TiXmlElement* pRootElement = _xmlDoc.RootElement();
+  const TiXmlElement* pRootElement = _xmlDoc->RootElement();
   if (!pRootElement || strcmp(pRootElement->Value(), _element[0].name.c_str()))
     {
       std::cerr << "Expected root element with name '" << _element[0].name << "'." << std::endl;
@@ -832,7 +839,7 @@ bool ParamsBase::toXml(const char* filename) const
       return false;
     }
 
-  const TiXmlElement* pRootElement = _xmlDoc.RootElement();
+  const TiXmlElement* pRootElement = _xmlDoc->RootElement();
   if (!pRootElement || strcmp(pRootElement->Value(), _element[0].name.c_str()))
     {
       std::cerr << "Expected root element with name '" << _element[0].name << "'." << std::endl;
@@ -917,7 +924,7 @@ void ParamsBase::writeElement(std::ostream& out, const TiXmlElement* pElement, i
     }
 
   // For the root element, write the "Init" element.
-  if (pElement == _xmlDoc.RootElement())
+  if (pElement == _xmlDoc->RootElement())
     {
       writeInitNode(out, indent+1);
     }
@@ -951,7 +958,7 @@ void ParamsBase::writeParameter(std::ostream& out, int parameterIndex, int inden
 void ParamsBase::writeInitNode(std::ostream& out, int indent) const
 {
   doIdentation(out, indent);
-  const TiXmlElement* pInitNode = _xmlDoc.RootElement()->FirstChildElement("Init");
+  const TiXmlElement* pInitNode = _xmlDoc->RootElement()->FirstChildElement("Init");
   out << "<Init>" << std::endl;
   for(const TiXmlElement* pElem = pInitNode->FirstChildElement(); pElem; pElem = pElem->NextSiblingElement())
     {
@@ -973,4 +980,7 @@ void ParamsBase::doIdentation(std::ostream& out, int indent) const
     out << "\t";
 }
 
-
+const TiXmlElement* ParamsBase::getRootElement() const
+{
+  return _xmlDoc->RootElement();
+}

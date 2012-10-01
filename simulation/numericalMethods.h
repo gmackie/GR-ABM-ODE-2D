@@ -7,10 +7,10 @@
 #include <stdexcept>
 #include <limits>
 #include <iostream>
-using namespace std;
 
 namespace ODESolvers
 {
+using namespace std;
 
 typedef valarray<double> ODEState;
 typedef valarray<double> Derivative;

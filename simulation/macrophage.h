@@ -12,8 +12,6 @@
 #include "agent.h"
 #include "tgamma.h"
 
-using namespace std;
-
 /*!
 @brief Macrophage agent class.
 @details
@@ -121,8 +119,8 @@ public:
   Mac(int birthtime, int row, int col, Mac::State state, double intMtb, bool NFkB, bool stat1);
   ~Mac();
 
-  static auto_ptr<ODESolvers::Stepper> stepper;
-  static auto_ptr<LungFunc> deriv;
+  static std::auto_ptr<ODESolvers::Stepper> stepper;
+  static std::auto_ptr<LungFunc> deriv;
 
   /*virtual*/
   ODESolvers::Stepper* getStepper(ODESolvers::ODEMethod method)

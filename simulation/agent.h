@@ -241,8 +241,8 @@ public:
   template<typename Archive>
   static void classSerialize(Archive& ar, const unsigned int version);
 
-  static auto_ptr<ODESolvers::Stepper> stepper; /// ODE Stepper for all agents (unless overridden)
-  static auto_ptr<LungFunc> deriv;              /// ODE Function for all agents (unless overridden)
+  static std::auto_ptr<ODESolvers::Stepper> stepper; /// ODE Stepper for all agents (unless overridden)
+  static std::auto_ptr<LungFunc> deriv;              /// ODE Function for all agents (unless overridden)
 
   /**
   * @brief Gets the associated stepper for the agent type

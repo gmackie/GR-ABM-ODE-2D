@@ -8,13 +8,12 @@
 #ifndef PARAMS_H
 #define PARAMS_H
 
-#ifndef TIXML_USE_STL
-#define TIXML_USE_STL
-#endif //TIXML_USE_STL
-
-#include "tinyxml/tinyxml.h"
 #include "pos.h"
 #include "scalar.h"
+
+class TiXmlElement;
+class TiXmlAttribute;
+class TiXmlDocument;
 
 typedef enum
 {
@@ -358,7 +357,7 @@ protected:
   static const int _PARAM_COUNT;
   static const ParamDescription _description[];
 
-  TiXmlDocument _xmlDoc;
+  TiXmlDocument* _xmlDoc;
   Pos _dim;
 
   bool _paramsRead[PARAM_DOUBLE_COUNT + PARAM_INT_COUNT];
@@ -426,7 +425,7 @@ public:
 
 inline const TiXmlDocument& ParamsBase::getXmlDoc() const
 {
-  return _xmlDoc;
+  return *_xmlDoc;
 }
 
 // Given an index into the _description array for an integer parameter,
@@ -545,11 +544,6 @@ inline const std::string& ParamsBase::getDescription(ParamIntType param) const
 {
   assert(param != PARAM_INT_COUNT);
   return _description[paramIndex(param)].description;
-}
-
-inline const TiXmlElement* ParamsBase::getRootElement() const
-{
-  return _xmlDoc.RootElement();
 }
 
 #endif /* PARAMS_H */

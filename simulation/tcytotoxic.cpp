@@ -10,6 +10,8 @@
 #include "grgrid.h"
 #include "stat.h"
 
+using namespace std;
+
 // Needed for deserializing the model state.
 // Avoids the calls to the random number generator in the normal constructor, allowing the random number generator
 // to remain in synch after deserialization.

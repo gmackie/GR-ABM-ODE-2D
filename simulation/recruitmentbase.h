@@ -11,8 +11,6 @@
 #include "gr.h"
 #include "grgrid.h"
 
-using namespace std;
-
 class RecruitmentBase
 {
 public:

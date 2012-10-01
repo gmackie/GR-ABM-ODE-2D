@@ -22,8 +22,6 @@
 #include <boost/mpl/for_each.hpp>
 #include <boost/mpl/placeholders.hpp>
 
-using namespace std;
-
 /**
 * @brief Simulation class that holds all information about the simulation.
 * This includes interacting agents, simulation options, diffusing chemicals,
@@ -35,8 +33,8 @@ class GrSimulation
 {
 private:
 
-  /// Functors for boost serialization
   /// @cond
+  /// Functors for boost serialization
   template<typename T> struct wrap {};
   template<typename Archive> struct serialization_class_register_t {
     Archive& ar;
@@ -205,7 +203,16 @@ public:
   * @see load
   * @see serialize
   */
+  void save(const char* fname) const;
+  /// @overload void GrSimulation::save(const char* fname)
   void save(std::ostream& out) const;
+  /**
+  * @brief 
+  *
+  * @tparam Archive 
+  * @param ar boost::archive to save the object to.
+  * @param version version number of the class to be serialized (if SVN_VERSION defined, this will be the revision number)
+  */
   template<class Archive>
   void serialize(Archive& ar, const unsigned int version);
   /**
@@ -213,6 +220,8 @@ public:
   * @see save
   * @see serialize
   */
+  void load(const char* fname);
+  /// @overload void GrSimulation::load(const char* fname)
   void load(std::istream& in);
   void deserializeRecruitmentMethod(RecruitmentMethod method, std::istream& in);
   /**

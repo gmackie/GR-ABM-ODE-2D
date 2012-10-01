@@ -5,7 +5,12 @@
  *      Author: pwolberg
  */
 
+#ifndef TIXML_USE_STL
+#define TIXML_USE_STL
+#endif //TIXML_USE_STL
+
 #include "params.h"
+#include "tinyxml/tinyxml.h"
 #include <iostream>
 #include <fstream>
 #include <stdio.h>

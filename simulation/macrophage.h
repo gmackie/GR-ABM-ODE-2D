@@ -47,7 +47,6 @@ class Mac : public Agent
 public:
   enum State {MAC_RESTING, MAC_INFECTED, MAC_CINFECTED, MAC_ACTIVE, MAC_DEAD, NSTATES};
 private:
-  static int _macodeSize;
   /*
    * !!! If the data members change then the serialize and deserialize functions need to be updated !!!
    */
@@ -205,7 +204,6 @@ public:
   void setC1rrChemTNF(double value);
   AgentType getAgentType() const;
   void disperseMtb(GrGrid& grid, double fraction);
-  static void setMacOdeSize(int odesize);
   template<typename Visitor>
   void visitProperties(Visitor& v);
   template<typename Visitor>
@@ -342,11 +340,6 @@ inline double Mac::getIntMtbGrowthRate(const int time)
   return intMtbGrowthRate;
 }
 
-inline void Mac::setMacOdeSize(int odesize)
-{
-  _macodeSize = odesize;
-}
-
 template<typename Visitor>
 inline void Mac::visitProperties(Visitor& v)
 {
@@ -390,7 +383,6 @@ void Mac::serialize(Archive& ar, const unsigned int /*version*/) {
   ar & boost::serialization::make_nvp("deactivationTime", _deactivationTime);
   ar & boost::serialization::make_nvp("stat1Time", _stat1Time);
   ar & boost::serialization::make_nvp("nfkbTime", _nfkbTime);
-  ar & boost::serialization::make_nvp("macodeSize", _macodeSize);
 }
 
 #endif /* MACROPHAGE_H */

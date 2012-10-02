@@ -211,7 +211,6 @@ public:
   * @param kTACE
   * @param iIL10R
   * @param stdIL10R
-  * @param odesize number of ode variables (for setting up initial size of initvector)
   */
   Agent(int birthtime, int deathtime, int row, int col
         //TNFR Components
@@ -224,7 +223,6 @@ public:
         // IL10 components
         , Scalar iIL10R
         , Scalar stdIL10R
-        , int odesize
        );
 
   virtual ~Agent();
@@ -585,7 +583,6 @@ inline void Agent::serialize(Archive& ar, const unsigned int /*version*/) {
   AGENT_PROPS
 #undef P
   ar & BOOST_SERIALIZATION_NVP(_lasttimestep);
-  ar & BOOST_SERIALIZATION_NVP(_initvector);
 }
 
 template<typename Archive>

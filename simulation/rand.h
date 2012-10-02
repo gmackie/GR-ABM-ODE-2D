@@ -10,6 +10,7 @@
 
 #include <assert.h>
 #include <iostream>
+#include <sstream>
 #include <boost/serialization/nvp.hpp>
 #include <boost/serialization/split_free.hpp>
 

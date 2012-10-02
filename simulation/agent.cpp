@@ -42,17 +42,13 @@ Agent::Agent(int birthtime, int deathtime, int row, int col
              // IL10 components
              , Scalar iIL10R
              , Scalar stdIL10R
-             , int odesize
             )
   :
 #define P(type, name, ival, desc) \
       _##name (ival) ,
   AGENT_PROPS
 #undef P
-  _lasttimestep(_PARAM(PARAM_GR_DT_MOLECULAR)),
-
-  // Valarrays for Numerical Methods
-  _initvector(0.0, odesize)
+  _lasttimestep(_PARAM(PARAM_GR_DT_MOLECULAR))
 {
   _id = createID();
   _birthTime = (birthtime);
@@ -84,14 +80,15 @@ Agent::~Agent()
 
 void Agent::solveMolecularScale(GrGrid& grid, double t, double dt, ODESolvers::ODEMethod method)
 {
+  LungFunc& fn = *getDerivFunc();
+  if(_initvector.size() != fn.dim()) _initvector.resize(fn.dim());
   writeValarrayFromMembers(grid, _initvector);  //With some pointer magic, should be able to remove this...
-  static valarray<double> error(0); //For adaptive only, not needed atm
+  static valarray<double> error(fn.dim()); //For adaptive only, not needed atm
   static LungFunc::Params_t params;
   params.agent = this;
   params.grid = &grid;
   size_t nsubsteps = (_PARAM(PARAM_NFKBODE_EN) && NFkBCapable()) ? _PARAM(PARAM_GR_NF_KB_TIME_COEFF) : 1;
   ODESolvers::Stepper* stepper = getStepper(method);
-  LungFunc& fn = *getDerivFunc();
   for(size_t i=0; i<nsubsteps; i++)
     stepper->step(_initvector, fn, t+i*dt/nsubsteps, dt/nsubsteps, _lasttimestep, error, (void*)&params);
   writeMembersFromValarray(grid, _initvector);

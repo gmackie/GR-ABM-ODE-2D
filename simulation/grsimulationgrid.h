@@ -113,7 +113,7 @@ inline void GrSimulationGrid::swap()
 
 template<typename Archive>
 void GrSimulationGrid::serialize(Archive& ar, const unsigned int /*version*/) {
-  ar & BOOST_SERIALIZATION_NVP(_pCurrentGrid);
+  ar & boost::serialization::make_nvp("CurrentGrid", *_pCurrentGrid);
 }
 
 #endif /* GRSIMULATIONGRID_H_ */

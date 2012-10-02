@@ -121,13 +121,12 @@ void GrSimulation::load(const char* fname)
 
 void GrSimulation::load(std::istream& in)
 {
-  timestepSync();
-  setODEsize();
-
 	assert(in.good());
   boost::archive::xml_iarchive ia(in);
   ia >> boost::serialization::make_nvp("GR", *this);
 	assert(in.good());
+
+  timestepSync();
 }
 
 #if 0
@@ -136,7 +135,6 @@ void GrSimulation::deserialize(std::istream& in)
 
   timestepSync();
 
-  setODEsize();
 
 	assert(in.good());
 
@@ -335,7 +333,6 @@ void GrSimulation::init()
     // Used to initialize the valarray length for solving ODEs using RK4
     // Must be run before any agents are created so they have the correct
     // valarray length
-    setODEsize();
 
     // initialize the sources
 	_grid.initSources();

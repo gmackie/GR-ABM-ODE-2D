@@ -12,7 +12,6 @@
 
 using namespace std;
 
-int Mac::_macodeSize = 0;
 auto_ptr<ODESolvers::Stepper> Mac::stepper;
 auto_ptr<LungFunc> Mac::deriv;
 
@@ -49,7 +48,6 @@ Mac::Mac(int birthtime, int row, int col, Mac::State state, double intMtb, bool 
           // IL10 components
           , (Scalar) _PARAM(PARAM_GR_I_IL10R_MAC)
           , (Scalar) _PARAM(PARAM_GR_STD_IL10R_MAC)
-          , _macodeSize
          )
   , _state(state)
   , _nextState(state)

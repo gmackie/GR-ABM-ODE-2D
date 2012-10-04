@@ -1063,29 +1063,6 @@ void GrSimulation::setRecruitmentMethod(RecruitmentMethod method)
   }
 }
 
-void GrSimulation::deserializeRecruitmentMethod(RecruitmentMethod method, std::istream& in)
-{
-  assert(in.good());
-	if (_pRecruitment)
-		delete _pRecruitment;
-
-  switch (method)
-  {
-  case RECR_PROB:
-	  _pRecruitment = new RecruitmentProb();
-    break;
-
-  case RECR_LN_ODE_PURE:
-	  _pRecruitment = new RecruitmentLnODEPure(in);
-      break;
-
-  default:
-	    std::cerr << "Invalid recruitment method: " << method << std::endl;
-	    exit(1);
-  }
-  assert(in.good());
-}
-
 void GrSimulation::setOutcomeMethod(int index, OutcomeMethod method, double alpha,
 	int testPeriod, int samplePeriod)
 {

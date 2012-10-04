@@ -861,6 +861,18 @@ void GrSimulation::growExtMtb()
 			if (g.isCaseated(p))
 			{
 				// Bacteria don't gp.x in caseated compartments
+
+                // Ext Mtb in caseation has to die somehow or it will increase with the nrCaseated compartments
+
+                double killProb = (extMtb/upperBound);
+                double dExtMtb = 0.0;
+
+                if (g_Rand.getReal() <= killProb)
+                    dExtMtb = _PARAM(PARAM_EXTMTB_CASEATED_DEATH_RATE) * extMtb * (killProb);
+                if (dExtMtb > extMtb)
+                    dExtMtb = extMtb;
+
+                extMtb += (-1.0 * dExtMtb);
 				++_stats.getNrCaseated();
 				_stats.getTotNonRepExtMtb()+=(extMtb);
 				_stats.getTotExtMtb()+=(extMtb);
@@ -880,10 +892,13 @@ void GrSimulation::growExtMtb()
                 // Scale growth rate based on local caseation
                 // This mimicks the hypoxic environment in granulomas which causes Mtb to decrease its growth rate
                 // This should also prevent the extMtb that are not caught by the trapped function to stop growing as fast
+                // Ext Mtb with caseationCount >= 6 DO NOT GROW
 
-                double dExtMtb;
-                if (caseationCount >= 4)
+                double dExtMtb = 0.0;
+                if (caseationCount >= 2 && caseationCount < 5)
                     dExtMtb = (growthRate/caseationCount) * extMtb * (1.0 - extMtb / upperBound);
+                else if (caseationCount >= 5)
+                    dExtMtb = 0.0;
                 else
                     dExtMtb = growthRate * extMtb * (1.0 - extMtb / upperBound);
 
@@ -1046,6 +1061,29 @@ void GrSimulation::setRecruitmentMethod(RecruitmentMethod method)
     std::cerr << "Invalid recruitment method: " << method << std::endl;
     exit(1);
   }
+}
+
+void GrSimulation::deserializeRecruitmentMethod(RecruitmentMethod method, std::istream& in)
+{
+  assert(in.good());
+	if (_pRecruitment)
+		delete _pRecruitment;
+
+  switch (method)
+  {
+  case RECR_PROB:
+	  _pRecruitment = new RecruitmentProb();
+    break;
+
+  case RECR_LN_ODE_PURE:
+	  _pRecruitment = new RecruitmentLnODEPure(in);
+      break;
+
+  default:
+	    std::cerr << "Invalid recruitment method: " << method << std::endl;
+	    exit(1);
+  }
+  assert(in.good());
 }
 
 void GrSimulation::setOutcomeMethod(int index, OutcomeMethod method, double alpha,

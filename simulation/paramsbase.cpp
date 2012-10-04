@@ -287,6 +287,7 @@ const ParamDescription ParamsBase::_description[_PARAM_COUNT] =
   { "growthRateFactorDelayIntMtb",		MTB_NODE,	false,	true,	0.0,	0,	"",					"Delay, in time steps, after adaptive immunity begins (parameter timeRecEnabled), before applying parameter growthRateFactorPostAdaptiveIntMtb" },
   { "growthRateExtMtb",					MTB_NODE,	false,	false,	0.0,	0,	"",					"Growth rate of extracellular bacteria" },
   { "growthExtMtbBound",					MTB_NODE,	false,	false,	0.0,	0,	"#bacteria",		"Upper bound on the number of extracellular bacteria used in growth function" },
+  { "deathRateExtMtbCaseated",					MTB_NODE,	false,	false,	0.0,	0,	"#bacteria",		"Upper bound on the number of extracellular bacteria used in growth function" },
   { "mtbStoppingThreshold",				GR_NODE,	false,	true,	0.0,	0,	"#bacteria", 		"Stop simulation if mtb count above this threshold and simulation is at the time step specified by mtbStopppingTimeStep"},
   { "mtbStoppingThreshold2",				GR_NODE,	false,	true,	0.0,	0,	"#bacteria", 		"Stop simulation if mtb count above this threshold and simulation is at the time step specified by mtbStopppingTimeStep"},
   { "muMDC_LN",							GR_NODE,	false,	false,	0.0,	0,	"",					"ODE stuff" },

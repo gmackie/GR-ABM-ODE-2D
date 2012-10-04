@@ -7,6 +7,7 @@
 
 #include "grgrid.h"
 #include "agent.h"
+#include "macrophage.h"
 
 using namespace std;
 
@@ -271,6 +272,8 @@ int GrGrid::isTrapped(const Pos& p)
 {
   assert(inRange(p));
   int caseationCount = 0;
+  int chronicCount = 0;
+
   for (int i=-1; i<=1; i++)
     {
       for (int j=-1; j<=1; j++)
@@ -278,13 +281,14 @@ int GrGrid::isTrapped(const Pos& p)
           Pos modp(mod_row(p.x + i), mod_col(p.y + j));
           if (isCaseated(modp))
             caseationCount++;
+          if (hasAgentType(MAC, Mac::MAC_CINFECTED, modp))
+            chronicCount++;
         }
     }
 
   if (caseationCount == (MOORE_COUNT - 1))
     {
       ++_trappedCaseation[Indexer::ind(_dim,p)];
-//        std::cout << "Trapped Cell to Caseation @: " << p << std::endl;
       // Kill any cell that resides in the trapped compartment
       for(unsigned i=0; i<MAX_AGENTS_PER_CELL; i++)
         if(agent(p, i) && !agent(p,i)->isDead())
@@ -293,7 +297,7 @@ int GrGrid::isTrapped(const Pos& p)
             ++_nKillings[Indexer::ind(_dim, p)];
           }
     }
-  return caseationCount;
+  return (caseationCount + chronicCount);
 }
 
 int GrGrid::getOccupiedNeighborCount(int _row, int _col) const

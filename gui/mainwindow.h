@@ -64,6 +64,8 @@ public:
   static const QString _DATASET_EXTMTB;
   static const QString _DATASET_INTMTB;
   static const QString _DATASET_TOTMTB;
+  static const QString _DATASET_KILLINGS;
+  static const QString _DATASET_KILLINGS_GRADIENT;
 
   static const QString _SCALAR_DATASETS[];
   static const int _N_SCALAR_DATASETS;

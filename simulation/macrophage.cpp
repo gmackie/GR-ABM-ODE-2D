@@ -450,13 +450,13 @@ void Mac::computeNextState(const int time, GrGrid& grid, Stats& stats, bool tnfr
       grid.extMTB(_pos) += (_intMtb);
       _intMtb = 0;
 
-//		// in case active, death contributes to caseation
-//		if (_state == Mac::MAC_ACTIVE)
-//		{
-//			grid.incKillings(_pos);
-//		}
+        // in case active, death contributes to caseation
+        if (_state == Mac::MAC_ACTIVE)
+        {
+            grid.incKillings(_pos);
+        }
 
-      grid.incKillings(_pos);
+//      grid.incKillings(_pos);
       _nextState = Mac::MAC_DEAD;
     }
 
@@ -836,6 +836,9 @@ void Mac::handleActivated(const int, GrGrid& grid, Stats&)
     }
 
   // kill extracellular bacteria in the compartment the macrophage resides
+//  if (grid.extMTB(_pos) > 0.0)
+//      std::cout << "ActiveMac on ExtMtb: " << grid.extMTB(_pos) << "  Pos: " << _pos << std::endl;
+
   grid.extMTB(_pos) += (-1 * std::min(grid.extMTB(_pos), _PARAM(PARAM_MAC_NR_UPTAKE_A_EXTMTB)));
 
   _nextState = Mac::MAC_ACTIVE;

@@ -36,6 +36,7 @@
 #include "scalardatasets/scalarintmtbdataset.h"
 #include "scalardatasets/scalartotmtbdataset.h"
 #include "scalardatasets/scalartnfattrextmtb.h"
+#include "scalardatasets/scalarkillingsdataset.h"
 #include "scalardatasets/scalarcelldensitydataset.h"
 #include "scalardatasets/scalardivergencedataset.h"
 #include "vectordatasets/vectorgradientdataset.h"
@@ -84,6 +85,8 @@ const QString MainWindow::_DATASET_CELL_DENSITY = "Cell Density";
 const QString MainWindow::_DATASET_EXTMTB = "Ext. Mtb";
 const QString MainWindow::_DATASET_INTMTB = "Int. Mtb";
 const QString MainWindow::_DATASET_TOTMTB = "Tot. Mtb";
+const QString MainWindow::_DATASET_KILLINGS = "nrKillings";
+const QString MainWindow::_DATASET_KILLINGS_GRADIENT = "grad nrKillings";
 
 const QString MainWindow::_SCALAR_DATASETS[] =
 {
@@ -98,7 +101,8 @@ const QString MainWindow::_SCALAR_DATASETS[] =
   _DATASET_TOTMTB,
   _DATASET_ATTRACTANT,
   _DATASET_TNF_ATTR_EXTMTB,
-  _DATASET_CELL_DENSITY
+  _DATASET_CELL_DENSITY,
+  _DATASET_KILLINGS
 
 };
 
@@ -241,6 +245,7 @@ void MainWindow::initHeightTab()
   _ui.comboBoxHeightDataset->addItem(_DATASET_CXCL9);
   _ui.comboBoxHeightDataset->addItem(_DATASET_EXTMTB);
   _ui.comboBoxHeightDataset->addItem(_DATASET_INTMTB);
+  _ui.comboBoxHeightDataset->addItem(_DATASET_KILLINGS);
 
   /* configure _ui.comboBoxHeightColorDataset */
   _ui.comboBoxHeightColorDataset->addItem(_DATASET_TNF);
@@ -249,6 +254,7 @@ void MainWindow::initHeightTab()
   _ui.comboBoxHeightColorDataset->addItem(_DATASET_CXCL9);
   _ui.comboBoxHeightColorDataset->addItem(_DATASET_EXTMTB);
   _ui.comboBoxHeightColorDataset->addItem(_DATASET_INTMTB);
+  _ui.comboBoxHeightColorDataset->addItem(_DATASET_KILLINGS);
 
   /* configure _ui.comboBoxHeightMappingMethod */
   _ui.comboBoxHeightMappingMethod->addItem(_MAP_METHOD_CLAMP);
@@ -468,6 +474,8 @@ void MainWindow::initSmokeTab()
   _ui.comboBoxSmokeDataset->addItem(_DATASET_TOTMTB);
   _ui.comboBoxSmokeDataset->addItem(_DATASET_ATTRACTANT);
   _ui.comboBoxSmokeDataset->addItem(_DATASET_TNF_ATTR_EXTMTB);
+  _ui.comboBoxSmokeDataset->addItem(_DATASET_KILLINGS);
+
 
   connect(_ui.comboBoxSmokeDataset, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(setSmokeDataset(const QString&)));
 }
@@ -483,6 +491,8 @@ void MainWindow::initGlyphsTab()
   _ui.comboBoxGlyphScalarDataset->addItem(_DATASET_EXTMTB);
   _ui.comboBoxGlyphScalarDataset->addItem(_DATASET_INTMTB);
   _ui.comboBoxGlyphScalarDataset->addItem(_DATASET_ATTRACTANT);
+  _ui.comboBoxGlyphScalarDataset->addItem(_DATASET_KILLINGS);
+
 
   /* configure _ui.comboBoxGlyphVectorDataset */
   _ui.comboBoxGlyphVectorDataset->addItem(_DATASET_TNF_GRADIENT);
@@ -491,6 +501,8 @@ void MainWindow::initGlyphsTab()
   _ui.comboBoxGlyphVectorDataset->addItem(_DATASET_CXCL9_GRADIENT);
   _ui.comboBoxGlyphVectorDataset->addItem(_DATASET_IL10_GRADIENT);
   _ui.comboBoxGlyphVectorDataset->addItem(_DATASET_ATTRACTANT_GRADIENT);
+  _ui.comboBoxGlyphVectorDataset->addItem(_DATASET_KILLINGS_GRADIENT);
+
 
   /* configure _ui.comboBoxGlyphType */
   _ui.comboBoxGlyphType->addItem(_GLYPH_HEDGEHOG);
@@ -1255,6 +1267,10 @@ ScalarDataset* MainWindow::getNewScalarDataset(const QString& value)
     {
       pScalarDataset = new ScalarCellDensityDataset();
     }
+  else if (value == _DATASET_KILLINGS)
+  {
+      pScalarDataset = new ScalarKillingDataset();
+  }
   else
     {
       assert(false);
@@ -1296,6 +1312,12 @@ VectorDataset* MainWindow::getNewVectorDataset(const QString& value)
       ScalarAttractantDataset* pScalarAttractantDataset = new ScalarAttractantDataset();
       pVectorDataset = new VectorGradientDataset(pScalarAttractantDataset, _pItfc->getVectorGlyphGrid());
     }
+  else if (value == _DATASET_KILLINGS_GRADIENT)
+  {
+      ScalarKillingDataset* pScalarKillingDataset = new ScalarKillingDataset();
+      pVectorDataset = new VectorGradientDataset(pScalarKillingDataset, _pItfc->getVectorGlyphGrid());
+  }
+
   else
     {
       assert(false);

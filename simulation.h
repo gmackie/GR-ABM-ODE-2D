@@ -21,6 +21,7 @@ private:
   mutable QMutex _mutex;
   mutable QMutex _modelMutex;
   int _time;
+  Rand rng;
   GrSimulation* _gr;
   GrSimulation* _backbuffer;
   QAtomicInt _delay;

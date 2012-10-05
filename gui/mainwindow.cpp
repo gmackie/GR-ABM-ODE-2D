@@ -1614,8 +1614,12 @@ void MainWindow::loadState(std::string fileName)
       // which is typically unsigned int. This is won't be a problem until about the year 2037.
       // The max 32 bit int is 2147483647. The number of seconds since 1970 (how unix time values
       // are defined) doesn't reach 2147483647 until about the year 2037.
+      _ui.spinBoxSeed->blockSignals(true);
       _ui.spinBoxSeed->setValue((int) g_Rand.getSeed());
+      _ui.spinBoxSeed->blockSignals(false);
+      _ui.comboBoxDiffusion->blockSignals(true);
       _ui.comboBoxDiffusion->setCurrentIndex(sim.getDiffusionMethod());
+      _ui.comboBoxDiffusion->blockSignals(false);
 
       // process/visualize new state
       timerEvent(NULL);

@@ -15,6 +15,7 @@ Simulation::Simulation(const Pos& dim)
   : _mutex(QMutex::Recursive)
   , _modelMutex(QMutex::Recursive)
   , _time(0)
+  , rng(g_Rand)
   , _gr(new GrSimulation(dim))
   , _backbuffer(new GrSimulation(dim))
   , _delay(0)
@@ -35,6 +36,7 @@ void Simulation::update()
 {
   _backbuffer = _gr->clone(_backbuffer);  //Deep copy without deallocating
   _time = _backbuffer->getTime();
+  rng = g_Rand;  //Save the rng at this time point for serialization purposes
   emit updated();
 }
 
@@ -110,7 +112,12 @@ void Simulation::loadState(std::istream& in)
 void Simulation::saveState(std::ostream& out) const
 {
   lock();
+  modelLock();
+  Rand tmp(g_Rand);
+  g_Rand = rng;
   _backbuffer->save(out);
+  g_Rand = tmp;
+  modelUnlock();
   unlock();
 }
 

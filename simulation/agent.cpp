@@ -1623,9 +1623,9 @@ inline void LungFunc::il10deriv(const ODESolvers::ODEState& vecread, double /*t*
   // sIL10
   vecwrite[il10offset+0] = ((((DENSITY/NAV) * params->agent->getkISynth()) + ((DENSITY/NAV) * (Ikoff * vecread[il10offset+2] - _PARAM(PARAM_GR_I_K_ON) * vecread[il10offset+1] * (vecread[il10offset+0] * 1.0/(NAV * VOL)))))) * (NAV * VOL);
   // surfIL10R
-  vecwrite[il10offset+1] = (params->agent->getvIL10R() - _PARAM(PARAM_GR_I_K_ON) * vecread[il10offset+1] * (vecread[il10offset+0] * 1.0/(NAV * VOL)) + _PARAM(PARAM_GR_I_K_OFF) * vecread[il10offset+2] - _PARAM(PARAM_GR_I_K_T) * vecread[il10offset+1]);
+  vecwrite[il10offset+1] = (params->agent->getvIL10R() - _PARAM(PARAM_GR_I_K_ON) * vecread[il10offset+1] * (vecread[il10offset+0] * 1.0/(NAV * VOL)) + Ikoff * vecread[il10offset+2] - _PARAM(PARAM_GR_I_K_T) * vecread[il10offset+1]);
   // surfBoundIL10R
-  vecwrite[il10offset+2] = (_PARAM(PARAM_GR_I_K_ON) * vecread[il10offset+1] * (vecread[il10offset+0] * 1.0/(NAV * VOL)) - _PARAM(PARAM_GR_I_K_OFF) * vecread[il10offset+2] - _PARAM(PARAM_GR_I_K_INT) * vecread[il10offset+2]);
+  vecwrite[il10offset+2] = (_PARAM(PARAM_GR_I_K_ON) * vecread[il10offset+1] * (vecread[il10offset+0] * 1.0/(NAV * VOL)) - Ikoff * vecread[il10offset+2] - _PARAM(PARAM_GR_I_K_INT) * vecread[il10offset+2]);
 }
 
 void NFKBFunc::operator()(const ODESolvers::ODEState& vecread, double t, ODESolvers::Derivative& vecwrite, void* params) const

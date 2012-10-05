@@ -11,6 +11,10 @@
 #include <iostream>
 #include <fstream>
 #include <stdio.h>
+#ifndef TIXML_USE_STL
+#define TIXML_USE_STL
+#endif //TIXML_USE_STL
+#include "tinyxml/tinyxml.h"
 
 Rand g_Rand(1337);
 namespace po = boost::program_options;

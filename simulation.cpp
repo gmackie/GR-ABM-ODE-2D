@@ -27,6 +27,8 @@ Simulation::Simulation(const Pos& dim)
 
 Simulation::~Simulation()
 {
+  delete _gr;
+  delete _backbuffer;
 }
 
 void Simulation::update()
@@ -39,19 +41,28 @@ void Simulation::update()
 bool Simulation::stopCondition()
 {
   return (_timeStepsToSimulate >= 0 && _time >= _timeStepsToSimulate) ||
-         (_mtbClearance && _gr->getStats().getTotExtMtb() == 0 &&
-          _gr->getStats().getTotIntMtb() == 0 &&
-          _gr->getStats().getTotTNF() < DBL_EPSILON * 10.0);
+         (_mtbClearance && _backbuffer->getStats().getTotExtMtb() == 0 &&
+          _backbuffer->getStats().getTotIntMtb() == 0 &&
+          _backbuffer->getStats().getTotTNF() < DBL_EPSILON * 10.0);
 }
 
 void Simulation::step()
 {
+  lock();
+    bool stop = stopCondition();
+  unlock();
+
+  if(stop) {
+    emit stopConditionMet();
+    return;
+  }
+
   _modelMutex.lock();
-  _gr->solve();
+    _gr->solve();
   _modelMutex.unlock();
 
   lock();
-    bool stop = stopCondition();
+    stop = stopCondition();
     if(stop)
       _gr->performT_Test();
     update();

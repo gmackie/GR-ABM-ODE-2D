@@ -593,7 +593,7 @@ MainWindow::~MainWindow()
   if (sim.isRunning())
     {
       // unlock the simulation thread if it is locked due to pausing
-      if (_simStatus == SIM_PAUSED)
+      if (_simStatus != SIM_RUNNING)
         sim.unlock();
 
       // signal simulation thread to stop
@@ -1694,7 +1694,6 @@ void MainWindow::switchStatus(SimStatus newStatus)
       break;
     case SIM_STOPPED:
       if(_simStatus == SIM_RUNNING) sim.lock();
-      sim.stop();
       _pGLWindow->setWindowTitle("Visualization (stopped)");
       _ui.pushButtonAnimation->setText("Continue simulation");
       _ui.spinBoxSeed->setEnabled(true);

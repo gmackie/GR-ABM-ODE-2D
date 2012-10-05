@@ -68,13 +68,45 @@ GrSimulation* GrSimulation::clone(GrSimulation* sim) const {
     ret = new (sim) GrSimulation(*this);
   }
   for(MacList::iterator begin = ret->_macList.begin(); begin!=ret->_macList.end(); begin++)
-    (*begin) = static_cast<Mac*>((*begin)->clone());
+  {
+    Mac* pAgent = static_cast<Mac*>((*begin)->clone());
+    for(size_t i=0;i<GrGrid::MAX_AGENTS_PER_CELL;i++) //Place it proper in the grid
+      if(*begin == getGrid().agent(pAgent->getPosition(), i)) {
+        ret->getGrid().agent(pAgent->getPosition(), i) = pAgent;
+        break;
+      }
+    *begin = pAgent;
+  }
   for(TgamList::iterator begin = ret->_tgamList.begin(); begin!=ret->_tgamList.end(); begin++)
-    (*begin) = static_cast<Tgam*>((*begin)->clone());
+  {
+    Tgam* pAgent = static_cast<Tgam*>((*begin)->clone());
+    for(size_t i=0;i<GrGrid::MAX_AGENTS_PER_CELL;i++) //Place it proper in the grid
+      if(*begin == getGrid().agent(pAgent->getPosition(), i)) {
+        ret->getGrid().agent(pAgent->getPosition(), i) = pAgent;
+        break;
+      }
+    *begin = pAgent;
+  }
   for(TregList::iterator begin = ret->_tregList.begin(); begin!=ret->_tregList.end(); begin++)
-    (*begin) = static_cast<Treg*>((*begin)->clone());
+  {
+    Treg* pAgent = static_cast<Treg*>((*begin)->clone());
+    for(size_t i=0;i<GrGrid::MAX_AGENTS_PER_CELL;i++) //Place it proper in the grid
+      if(*begin == getGrid().agent(pAgent->getPosition(), i)) {
+        ret->getGrid().agent(pAgent->getPosition(), i) = pAgent;
+        break;
+      }
+    *begin = pAgent;
+  }
   for(TcytList::iterator begin = ret->_tcytList.begin(); begin!=ret->_tcytList.end(); begin++)
-    (*begin) = static_cast<Tcyt*>((*begin)->clone());
+  {
+    Tcyt* pAgent = static_cast<Tcyt*>((*begin)->clone());
+    for(size_t i=0;i<GrGrid::MAX_AGENTS_PER_CELL;i++) //Place it proper in the grid
+      if(*begin == getGrid().agent(pAgent->getPosition(), i)) {
+        ret->getGrid().agent(pAgent->getPosition(), i) = pAgent;
+        break;
+      }
+    *begin = pAgent;
+  }
   if(ret->_pDiffusion)
     ret->_pDiffusion = ret->_pDiffusion->clone();
   if(ret->_pRecruitment)

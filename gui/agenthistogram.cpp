@@ -191,28 +191,28 @@ void AgentHistogram::updatePlot()
     for(size_t i=0; i<sim.getMacList().size(); i++)
       {
         visitor.iter = 0;
-        visitor.visit(&(sim.getMacList()[i]));
+        visitor.visit((sim.getMacList()[i]));
       }
     pbar->setValue(10);
     pbar->repaint();
     for(size_t i=0; i<sim.getTgamList().size(); i++)
       {
         visitor.iter = 0;
-        visitor.visit(&(sim.getTgamList()[i]));
+        visitor.visit((sim.getTgamList()[i]));
       }
     pbar->setValue(20);
     pbar->repaint();
     for(size_t i=0; i<sim.getTregList().size(); i++)
       {
         visitor.iter = 0;
-        visitor.visit(&(sim.getTregList()[i]));
+        visitor.visit((sim.getTregList()[i]));
       }
     pbar->setValue(30);
     pbar->repaint();
     for(size_t i=0; i<sim.getTcytList().size(); i++)
       {
         visitor.iter = 0;
-        visitor.visit(&(sim.getTcytList()[i]));
+        visitor.visit((sim.getTcytList()[i]));
       }
     pbar->setValue(40);
     pbar->repaint();
@@ -244,28 +244,28 @@ void AgentHistogram::updatePlot()
     for(size_t i=0; i<sim.getMacList().size(); i++)
       {
         visitor.iter = 0;
-        visitor.visit(&(sim.getMacList()[i]));
+        visitor.visit((sim.getMacList()[i]));
       }
     pbar->setValue(60);
     pbar->repaint();
     for(size_t i=0; i<sim.getTgamList().size(); i++)
       {
         visitor.iter = 0;
-        visitor.visit(&(sim.getTgamList()[i]));
+        visitor.visit((sim.getTgamList()[i]));
       }
     pbar->setValue(70);
     pbar->repaint();
     for(size_t i=0; i<sim.getTregList().size(); i++)
       {
         visitor.iter = 0;
-        visitor.visit(&(sim.getTregList()[i]));
+        visitor.visit((sim.getTregList()[i]));
       }
     pbar->setValue(80);
     pbar->repaint();
     for(size_t i=0; i<sim.getTcytList().size(); i++)
       {
         visitor.iter = 0;
-        visitor.visit(&(sim.getTcytList()[i]));
+        visitor.visit((sim.getTcytList()[i]));
       }
     pbar->setValue(90);
     pbar->repaint();

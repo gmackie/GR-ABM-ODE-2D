@@ -96,7 +96,7 @@ public:
   static const QString _OUTCOME_METHOD_1;
   static const QString _OUTCOME_METHOD_2;
 
-  static const int _TIMER_PERIOD = 10; // In milliseconds.
+  static const int _TIMER_PERIOD = 15; // In milliseconds (60 Hz == 16.6ms)
 
 public slots:
   void updateTimeBox(int);
@@ -161,6 +161,7 @@ protected:
 
 private slots:
   void on_agentHistButton_clicked(bool checked);
+  void update();
 
 private:
   void initVisualizationTab();

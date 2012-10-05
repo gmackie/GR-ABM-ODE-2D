@@ -189,13 +189,12 @@ struct AgentInfoVisitor
 };
 
 template<typename AgentType>
-static const Agent* findAgent(const std::vector<AgentType>& v, size_t id)
+static const Agent* findAgent(const std::vector<AgentType*>& v, size_t id)
 {
   for(size_t i=0; i<v.size(); i++)
     {
-      const Agent* a = &(v[i]);
-      if(a->getid() == id)
-        return a;
+      if(v[i]->getid() == id)
+        return v[i];
     }
   return NULL;
 }

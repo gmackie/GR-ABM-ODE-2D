@@ -7,10 +7,17 @@
 
 #include "grsimulationgrid.h"
 
-GrSimulationGrid::GrSimulationGrid(const Pos& dim)
+GrSimulationGrid::GrSimulationGrid(const GrSimulationGrid& grid)
+  : _pCurrentGrid (new GrGrid(*(grid._pCurrentGrid)))
+  , _pNextGrid (new GrGrid(*(grid._pNextGrid)))
 {
-  _pCurrentGrid = (new GrGrid(dim));
-  _pNextGrid = (new GrGrid(dim));
+
+}
+
+GrSimulationGrid::GrSimulationGrid(const Pos& dim)
+  : _pCurrentGrid (new GrGrid(dim))
+  , _pNextGrid (new GrGrid(dim))
+{
 
 }
 

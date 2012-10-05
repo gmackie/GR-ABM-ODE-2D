@@ -22,12 +22,21 @@ ScalarAgentGrid::~ScalarAgentGrid()
 {
 }
 
+template<typename T>
+static void copy_list(const std::vector<T*>& src, std::vector<T>& dest)
+{
+  dest.reserve(src.size()); // Reduce the number of allocations we need to do
+  dest.clear();
+  for(size_t i=0;i<src.size();i++)
+    dest.push_back(*(src[i]));
+}
+
 void ScalarAgentGrid::evaluate(const Simulation* pSimulation)
 {
-  _macList = pSimulation->getMacList();
-  _tgamList = pSimulation->getTgamList();
-  _tcytList = pSimulation->getTcytList();
-  _tregList = pSimulation->getTregList();
+  copy_list(pSimulation->getMacList(), _macList);
+  copy_list(pSimulation->getTgamList(), _tgamList);
+  copy_list(pSimulation->getTcytList(), _tcytList);
+  copy_list(pSimulation->getTregList(), _tregList);
 
   const GrGrid& grid = pSimulation->getGrGrid();
 
@@ -92,7 +101,7 @@ void ScalarAgentGrid::evaluate(const Simulation* pSimulation)
   for (typeof(_macList.begin()) it = _macList.begin(); it != _macList.end(); it++)
     {
       const Mac& mac = *it;
-      ScalarAgentItem& item = _grid[it->getRow() * _DIM + it->getCol()];
+      ScalarAgentItem& item = _grid[mac.getRow() * _DIM + mac.getCol()];
 
       if (!item._pAgent[0])
         {
@@ -136,7 +145,7 @@ void ScalarAgentGrid::evaluate(const Simulation* pSimulation)
   for (typeof(_tgamList.begin()) it = _tgamList.begin(); it != _tgamList.end(); it++)
     {
       const Tgam& tgam = *it;
-      ScalarAgentItem& item = _grid[it->getRow() * _DIM + it->getCol()];
+      ScalarAgentItem& item = _grid[tgam.getRow() * _DIM + tgam.getCol()];
 
       if (!item._pAgent[0])
         {
@@ -165,7 +174,7 @@ void ScalarAgentGrid::evaluate(const Simulation* pSimulation)
   for (typeof(_tcytList.begin()) it = _tcytList.begin(); it != _tcytList.end(); it++)
     {
       const Tcyt& tcyt = *it;
-      ScalarAgentItem& item = _grid[it->getRow() * _DIM + it->getCol()];
+      ScalarAgentItem& item = _grid[tcyt.getRow() * _DIM + tcyt.getCol()];
 
       if (!item._pAgent[0])
         {
@@ -194,7 +203,7 @@ void ScalarAgentGrid::evaluate(const Simulation* pSimulation)
   for (typeof(_tregList.begin()) it = _tregList.begin(); it != _tregList.end(); it++)
     {
       const Treg& treg = *it;
-      ScalarAgentItem& item = _grid[it->getRow() * _DIM + it->getCol()];
+      ScalarAgentItem& item = _grid[treg.getRow() * _DIM + treg.getCol()];
 
       if (!item._pAgent[0])
         {

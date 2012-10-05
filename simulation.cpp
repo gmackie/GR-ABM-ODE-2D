@@ -16,15 +16,9 @@ Simulation::Simulation(const Pos& dim)
   , _modelMutex(QMutex::Recursive)
   , _time(0)
   , _gr(new GrSimulation(dim))
-  , _grid(dim)
+  , _backbuffer(new GrSimulation(dim))
   , _delay(0)
-  , _updated(false)
   , _stopFlag(false)
-  , _macList()
-  , _tgamList()
-  , _tcytList()
-  , _tregList()
-  , _stats()
   , _timeStepsToSimulate(_TIMESTEPS_TO_SIMULATE) //_DAYS_TO_SIMULATE _TIMESTEPS_TO_SIMULATE
   , _mtbClearance(true)
 {
@@ -37,36 +31,17 @@ Simulation::~Simulation()
 
 void Simulation::update()
 {
-  _updated = true;
-  // get copies
-  _grid = _gr->getGrid();
-  _macList.clear();
-  _time = _gr->getTime();
-  const MacList& macList = _gr->getMacList();
-  _macList.clear();
-  for(typeof(macList.begin()) it = macList.begin(); it != macList.end(); it++)
-    _macList.push_back(**it);
-  const TgamList& tgamList = _gr->getTgamList();
-  _tgamList.clear();
-  for(typeof(tgamList.begin()) it = tgamList.begin(); it != tgamList.end(); it++)
-    _tgamList.push_back(**it);
-  const TcytList& tcytList = _gr->getTcytList();
-  _tcytList.clear();
-  for(typeof(tcytList.begin()) it = tcytList.begin(); it != tcytList.end(); it++)
-    _tcytList.push_back(**it);
-  const TregList& tregList = _gr->getTregList();
-  _tregList.clear();
-  for(typeof(tregList.begin()) it = tregList.begin(); it != tregList.end(); it++)
-    _tregList.push_back(**it);
-  _stats = _gr->getStats();
+  _backbuffer = _gr->clone(_backbuffer);  //Deep copy without deallocating
+  _time = _backbuffer->getTime();
+  emit updated();
 }
 
 bool Simulation::stopCondition()
 {
   return (_timeStepsToSimulate >= 0 && _time >= _timeStepsToSimulate) ||
-         (_mtbClearance && _stats.getTotExtMtb() == 0 &&
-          _stats.getTotIntMtb() == 0 &&
-          _stats.getTotTNF() < DBL_EPSILON * 10.0);
+         (_mtbClearance && _gr->getStats().getTotExtMtb() == 0 &&
+          _gr->getStats().getTotIntMtb() == 0 &&
+          _gr->getStats().getTotTNF() < DBL_EPSILON * 10.0);
 }
 
 void Simulation::step()
@@ -76,22 +51,17 @@ void Simulation::step()
   _modelMutex.unlock();
 
   lock();
-  bool stop = stopCondition();
-
-  if(stop)
-    _gr->performT_Test();
-
-  update();
-
-  if(stop)
+    bool stop = stopCondition();
+    if(stop)
+      _gr->performT_Test();
+    update();
+    if(stop)
       emit stopConditionMet();
-
   unlock();
-  msleep(_delay);
 
+  msleep(_delay);
   if(!(stop || _stopFlag))
     QMetaObject::invokeMethod(this, "step", Qt::QueuedConnection);
-
 }
 
 void Simulation::run()
@@ -128,21 +98,27 @@ void Simulation::loadState(std::istream& in)
 
 void Simulation::saveState(std::ostream& out) const
 {
-  _modelMutex.lock();
-  _gr->save(out);
-  _modelMutex.unlock();
+  lock();
+  _backbuffer->save(out);
+  unlock();
 }
 
 void Simulation::setTnfDepletionTimeStep(int tnfDepletionTimeStep)
 {
   lock();
+  modelLock();
   _gr->setTnfDepletionTimeStep(tnfDepletionTimeStep);
+  _backbuffer->setTnfDepletionTimeStep(tnfDepletionTimeStep);
   unlock();
+  modelUnlock();
 }
 
 void Simulation::setIl10DepletionTimeStep(int il10DepletionTimeStep)
 {
   lock();
+  modelLock();
   _gr->setIl10DepletionTimeStep(il10DepletionTimeStep);
+  _backbuffer->setIl10DepletionTimeStep(il10DepletionTimeStep);
   unlock();
+  modelUnlock();
 }

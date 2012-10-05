@@ -48,7 +48,6 @@ private:
   std::vector<Tgam> _tgamList;
   std::vector<Tcyt> _tcytList;
   std::vector<Treg> _tregList;
-
 public:
   ScalarAgentGrid(size_t _DIM);
   ~ScalarAgentGrid();

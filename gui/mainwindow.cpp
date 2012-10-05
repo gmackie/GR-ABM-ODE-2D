@@ -196,6 +196,7 @@ MainWindow::MainWindow(MainInterface* pItfc, GLWindow* pGLWindow, QWidget* pPara
   connect(_pGLWindow, SIGNAL(updateSelection(int, int)), _pGLWindow, SLOT(selectCell(int, int)));
   connect(this, SIGNAL(updateSelectedCellStats(void)), _pGLWindow, SLOT(updateSelectedCellStats(void)));
   connect(&_pItfc->getSimulation(), SIGNAL(stopConditionMet(void)), this, SLOT(stop(void)));
+  connect(&_pItfc->getSimulation(), SIGNAL(updated(void)), this, SLOT(update(void)));
   connect(_pAgentsWidget, SIGNAL(updateGL(void)), _pGLWindow, SLOT(updateWindow(void)));
   connect(_ui.newGraphWindowButton, SIGNAL(clicked(void)), _pGraphController, SLOT(showNewTimeGraph(void)));
   connect(_pAgentHistogram, SIGNAL(closing(bool)), _ui.agentHistButton, SLOT(setChecked(bool)));
@@ -603,13 +604,14 @@ MainWindow::~MainWindow()
     }
 }
 
+void MainWindow::update()
+{
+  timerEvent(NULL);
+}
+
 void MainWindow::timerEvent(QTimerEvent*)
 {
   Simulation& sim = _pItfc->getSimulation();
-
-  // make sure simulation thread has new stuff for us to process
-  if (!sim.getUpdated())
-    return;
 
   /* BEGIN CRITICAL SECTION */
   /* Since the mutex is recursive, a thread can lock the same mutex multiple times
@@ -620,10 +622,6 @@ void MainWindow::timerEvent(QTimerEvent*)
   int simTime = sim.getTime();
   _pItfc->setSimTime(simTime);
   const Stats stats = sim.getStats();
-
-  // clear update flag
-  sim.setUpdated(false);
-  /* END CRITICAL SECTION */
 
   //if(simTime % 72 == 0)   //Update every half day
   _pGraphController->update(stats, 1.0*simTime);
@@ -1670,79 +1668,39 @@ void MainWindow::switchStatus(SimStatus newStatus)
 {
   Simulation& sim = _pItfc->getSimulation();
 
-  switch (_simStatus)
-    {
-    case SIM_PAUSED:
-      switch (newStatus)
-        {
-        case SIM_RUNNING:
-          sim.unlock();
-          _pGLWindow->setWindowTitle("Visualization (running)");
-          _ui.pushButtonAnimation->setText("Pause simulation");
-          _timerId = startTimer(_TIMER_PERIOD);
-          _stopwatch.start();
-          break;
-        case SIM_STOPPED:
-          sim.unlock();
-          _pGLWindow->setWindowTitle("Visualization (stopped)");
-          _ui.pushButtonAnimation->setText("Continue simulation");
-          killTimer(_timerId);
-          _ui.spinBoxSeed->setEnabled(true);
-          _ui.comboBoxDiffusion->setEnabled(true);
-          break;
-        default:
-          break;
-        }
-      break;
+  if(newStatus == _simStatus)
+    return;
+
+  switch(newStatus)
+  {
     case SIM_RUNNING:
-      switch (newStatus)
-        {
-        case SIM_PAUSED:
-          sim.lock();
-          _pGLWindow->setWindowTitle("Visualization (paused)");
-          _ui.pushButtonAnimation->setText("Continue simulation");
-          killTimer(_timerId);
-          break;
-        case SIM_STOPPED:
-          _pGLWindow->setWindowTitle("Visualization (stopped)");
-          _ui.pushButtonAnimation->setText("Continue simulation");
-          killTimer(_timerId);
-          _ui.spinBoxSeed->setEnabled(true);
-          _ui.comboBoxDiffusion->setEnabled(true);
-          break;
-        default:
-          break;
-        }
+      if(sim.isRunning())
+        sim.unlock();
+      else
+        sim.start();
+      _pGLWindow->setWindowTitle("Visualization (running)");
+      _ui.pushButtonAnimation->setText("Pause simulation");
+      _stopwatch.start();
+      QMetaObject::invokeMethod(&sim, "step", Qt::QueuedConnection);
+      _ui.spinBoxSeed->setEnabled(false);
+      _ui.comboBoxDiffusion->setEnabled(false);
+      break;
+    case SIM_PAUSED:
+      if(_simStatus == SIM_RUNNING) sim.lock();
+      _pGLWindow->setWindowTitle("Visualization (paused)");
+      _ui.pushButtonAnimation->setText("Continue simulation");
+      _ui.spinBoxSeed->setEnabled(false);
+      _ui.comboBoxDiffusion->setEnabled(false);
       break;
     case SIM_STOPPED:
-      assert(!sim.isRunning());
-      switch (newStatus)
-        {
-        case SIM_PAUSED:
-          _pGLWindow->setWindowTitle("Visualization (paused)");
-          _ui.pushButtonAnimation->setText("Continue simulation");
-          _ui.spinBoxSeed->setEnabled(false);
-          _ui.comboBoxDiffusion->setEnabled(false);
-          //_ui.pushButtonAnimation->setEnabled(true);
-          sim.start();
-          sim.lock();
-          break;
-        case SIM_RUNNING:
-          _pGLWindow->setWindowTitle("Visualization (running)");
-          _ui.pushButtonAnimation->setText("Pause simulation");
-          _timerId = startTimer(_TIMER_PERIOD);
-          _stopwatch.start();
-          _ui.spinBoxSeed->setEnabled(false);
-          _ui.comboBoxDiffusion->setEnabled(false);
-          //_ui.pushButtonAnimation->setEnabled(true);
-          sim.start();
-          break;
-        default:
-          break;
-        }
+      if(_simStatus == SIM_RUNNING) sim.lock();
+      sim.stop();
+      _pGLWindow->setWindowTitle("Visualization (stopped)");
+      _ui.pushButtonAnimation->setText("Continue simulation");
+      _ui.spinBoxSeed->setEnabled(true);
+      _ui.comboBoxDiffusion->setEnabled(true);
       break;
-    }
-
+  }
   _simStatus = newStatus;
 }
 

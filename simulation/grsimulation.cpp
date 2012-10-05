@@ -58,8 +58,15 @@ GrSimulation::GrSimulation(const Pos& dim)
     _numDiffusionPerAgent = (int)(AGENT_TIME_STEP / _PARAM(PARAM_GR_DT_DIFFUSION)); // Number of diffusion iterations per agent iteration
 }
 
-GrSimulation* GrSimulation::clone() const {
-  GrSimulation* ret = new GrSimulation(*this);
+GrSimulation* GrSimulation::clone(GrSimulation* sim) const {
+  assert(sim != this);  //Don't copy to yourself... please...
+  GrSimulation* ret = NULL;
+  if(sim == NULL)
+    ret = new GrSimulation(*this);
+  else {
+    sim->~GrSimulation(); //Call the destructor *ONLY* in the case of placement new
+    ret = new (sim) GrSimulation(*this);
+  }
   for(MacList::iterator begin = ret->_macList.begin(); begin!=ret->_macList.end(); begin++)
     (*begin) = static_cast<Mac*>((*begin)->clone());
   for(TgamList::iterator begin = ret->_tgamList.begin(); begin!=ret->_tgamList.end(); begin++)

@@ -248,7 +248,7 @@ public:
   /**
   * @brief Deep-copy of the simulation
   */
-  GrSimulation* clone() const;
+  GrSimulation* clone(GrSimulation* sim) const;
 };
 
 inline bool GrSimulation::getTCellRecruitmentBegun()

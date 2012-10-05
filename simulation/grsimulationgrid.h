@@ -18,6 +18,7 @@ class GrSimulationGrid
 {
 public:
   GrSimulationGrid(const Pos& dim);
+  GrSimulationGrid(const GrSimulationGrid& g);
   virtual ~GrSimulationGrid();
 
   const Pos& getRange() const

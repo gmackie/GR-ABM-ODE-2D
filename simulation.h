@@ -20,19 +20,13 @@ class Simulation : public QThread
 private:
   mutable QMutex _mutex;
   mutable QMutex _modelMutex;
-  QAtomicInt _time;
+  int _time;
   GrSimulation* _gr;
-  GrGrid _grid;
+  GrSimulation* _backbuffer;
   QAtomicInt _delay;
-  bool _updated;
   bool _stopFlag;
-  std::vector<Mac> _macList;
-  std::vector<Tgam> _tgamList;
-  std::vector<Tcyt> _tcytList;
-  std::vector<Treg> _tregList;
-  Stats _stats;
   QAtomicInt _timeStepsToSimulate;
-  bool _mtbClearance;
+  QAtomicInt _mtbClearance;
   double _areaThreshold;
   OutcomeMethod _outcomeMethod;
 
@@ -56,12 +50,10 @@ public:
   {
     return getGrGrid().getRange();
   }
-  bool getUpdated() const;
   double getAreaThreshold() const;
   DiffusionMethod getDiffusionMethod() const;
   OutcomeMethod getOutcomeMethod(int index) const;
   void getOutcomeParameters(int index, int& samplePeriod, int& testPeriod, double& alpha) const;
-  void setUpdated(bool flag);
   void setDiffusionMethod(DiffusionMethod method);
   void setDaysToSimulate(int days);
   void setTimeToSimulate(int steps);
@@ -73,10 +65,10 @@ public:
   /* The following methods are NOT thread-safe, first a lock must be obtained */
   const GrGrid& getGrGrid() const;
   const Stats& getStats() const;
-  const std::vector<Mac>& getMacList() const;
-  const std::vector<Tgam>& getTgamList() const;
-  const std::vector<Tcyt>& getTcytList() const;
-  const std::vector<Treg>& getTregList() const;
+  const MacList& getMacList() const;
+  const TgamList& getTgamList() const;
+  const TcytList& getTcytList() const;
+  const TregList& getTregList() const;
   void loadState(std::istream& in);
   void saveState(std::ostream& out) const;
   void setRecruitmentMethod(RecruitmentMethod recrMethod);
@@ -94,13 +86,17 @@ public slots:
 
 signals:
   void stopConditionMet();
+  void updated();
 };
 
 inline void Simulation::setOutcomeMethod(int index,
     OutcomeMethod method, double alpha, int testPeriod, int samplePeriod)
 {
   lock();
+  modelLock();
   _gr->setOutcomeMethod(index, method, alpha, testPeriod, samplePeriod);
+  _backbuffer->setOutcomeMethod(index, method, alpha, testPeriod, samplePeriod);
+  modelUnlock();
   unlock();
 }
 
@@ -108,7 +104,7 @@ inline void Simulation::getOutcomeParameters(int index,
     int& samplePeriod, int& testPeriod, double& alpha) const
 {
   lock();
-  _gr->getOutcomeParameters(index, samplePeriod, testPeriod, alpha);
+  _backbuffer->getOutcomeParameters(index, samplePeriod, testPeriod, alpha);
   unlock();
 }
 
@@ -117,7 +113,7 @@ inline double Simulation::getAreaThreshold() const
   double res;
 
   lock();
-  res = _areaThreshold;
+  res = _backbuffer->getAreaThreshold();
   unlock();
 
   return res;
@@ -126,7 +122,10 @@ inline double Simulation::getAreaThreshold() const
 inline void Simulation::setAreaThreshold(double areaThreshold)
 {
   lock();
+  modelLock();
   _gr->setAreaThreshold(areaThreshold);
+  _backbuffer->setAreaThreshold(areaThreshold);
+  modelUnlock();
   unlock();
 }
 
@@ -147,33 +146,16 @@ inline void Simulation::setTimeToSimulate(int steps)
 
 inline void Simulation::setMtbClearance(bool enable)
 {
-  lock();
   _mtbClearance = enable;
-  unlock();
 }
 
 inline void Simulation::setDiffusionMethod(DiffusionMethod method)
 {
   lock();
+  modelLock();
   _gr->setDiffusionMethod(method);
-  unlock();
-}
-
-inline bool Simulation::getUpdated() const
-{
-  bool res;
-
-  lock();
-  res = _updated;
-  unlock();
-
-  return res;
-}
-
-inline void Simulation::setUpdated(bool flag)
-{
-  lock();
-  _updated = flag;
+  _backbuffer->setDiffusionMethod(method);
+  modelUnlock();
   unlock();
 }
 
@@ -192,7 +174,7 @@ inline DiffusionMethod Simulation::getDiffusionMethod() const
   DiffusionMethod res;
 
   lock();
-  res = _gr->getDiffusionMethod();
+  res = _backbuffer->getDiffusionMethod();
   unlock();
 
   return res;
@@ -203,7 +185,7 @@ inline OutcomeMethod Simulation::getOutcomeMethod(int index) const
   OutcomeMethod res;
 
   lock();
-  res = _gr->getOutcomeMethod(index);
+  res = _backbuffer->getOutcomeMethod(index);
   unlock();
 
   return res;
@@ -211,52 +193,72 @@ inline OutcomeMethod Simulation::getOutcomeMethod(int index) const
 
 inline const Stats& Simulation::getStats() const
 {
-  return _stats;
+  return _backbuffer->getStats();
 }
 
-inline const std::vector<Mac>& Simulation::getMacList() const
+inline const MacList& Simulation::getMacList() const
 {
-  return _macList;
+  return _backbuffer->getMacList();
 }
 
-inline const std::vector<Tgam>& Simulation::getTgamList() const
+inline const TgamList& Simulation::getTgamList() const
 {
-  return _tgamList;
+  return _backbuffer->getTgamList();
 }
 
-inline const std::vector<Tcyt>& Simulation::getTcytList() const
+inline const TcytList& Simulation::getTcytList() const
 {
-  return _tcytList;
+  return _backbuffer->getTcytList();
 }
 
-inline const std::vector<Treg>& Simulation::getTregList() const
+inline const TregList& Simulation::getTregList() const
 {
-  return _tregList;
+  return _backbuffer->getTregList();
 }
 
 inline const GrGrid& Simulation::getGrGrid() const
 {
-  return _grid;
+  return _backbuffer->getGrid();
 }
 
 inline void Simulation::setRecruitmentMethod(RecruitmentMethod recrMethod)
 {
+  lock();
+  modelLock();
   _gr->setRecruitmentMethod(recrMethod);
+  _backbuffer->setRecruitmentMethod(recrMethod);
+  unlock();
+  modelUnlock();
 }
 
 inline void Simulation::setTnfrDynamics(bool tnfrDynamics)
 {
+  lock();
+  modelLock();
   _gr->setTnfrDynamics(tnfrDynamics);
+  _backbuffer->setTnfrDynamics(tnfrDynamics);
+  unlock();
+  modelUnlock();
 }
 
 inline void Simulation::setNfkbDynamics(bool nfkbDynamics)
 {
+  lock();
+  modelLock();
   _gr->setNfkbDynamics(nfkbDynamics);
+  _backbuffer->setNfkbDynamics(nfkbDynamics);
+  unlock();
+  modelUnlock();
 }
 
 inline void Simulation::setAdaptive(bool adaptive)
 {
+  lock();
+  modelLock();
   _gr->setAdaptive(adaptive);
+  _backbuffer->setAdaptive(adaptive);
+  unlock();
+  modelUnlock();
 }
 
 inline QString Simulation::getTimeStr(int simTime, int time)

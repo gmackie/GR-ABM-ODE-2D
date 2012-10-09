@@ -581,7 +581,7 @@ void GrSimulation::serialize(Archive& ar, const unsigned int version) {
   ar & BOOST_SERIALIZATION_NVP(_areaThreshold);
   ar & BOOST_SERIALIZATION_NVP(_areaThresholdCellDensity);
   //ar & BOOST_SERIALIZATION_NVP(_diffusion);
-  //ar & BOOST_SERIALIZATION_NVP(_recruitment);
+  ar & BOOST_SERIALIZATION_NVP(_pRecruitment);
 	ar & BOOST_SERIALIZATION_NVP(_tnfrDynamics);
 	ar & BOOST_SERIALIZATION_NVP(_nfkbDynamics);
   ar & BOOST_SERIALIZATION_NVP(_il10rDynamics);

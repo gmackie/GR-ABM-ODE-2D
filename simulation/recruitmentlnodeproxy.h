@@ -35,7 +35,7 @@ inline RecruitmentMethod RecruitmentLnODEProxy::getMethod() const
   return RECR_LN_ODE_PROXY;
 }
 template<class Archive>
-void RecruitmentLnODEProxy::serialize(Archive& ar, const unsigned int version)
+inline void RecruitmentLnODEProxy::serialize(Archive& ar, const unsigned int /*version*/)
 {
   ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(RecruitmentBase);
 }

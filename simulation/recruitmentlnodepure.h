@@ -45,7 +45,7 @@ inline RecruitmentMethod RecruitmentLnODEPure::getMethod() const
 }
 
 template<class Archive>
-void RecruitmentLnODEPure::serialize(Archive& ar, const unsigned int version)
+inline void RecruitmentLnODEPure::serialize(Archive& ar, const unsigned int /*version*/)
 {
   ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(RecruitmentLnODE);
 }

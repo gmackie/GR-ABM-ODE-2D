@@ -19,7 +19,7 @@ public:
 
   virtual RecruitmentMethod getMethod() const = 0;
   template<typename Archive>
-  void serialize(Archive& ar, const unsigned int version) {}
+  void serialize(Archive&, const unsigned int) {}
 
   virtual void recruit(GrSimulation& sim, int time) = 0;
   virtual RecruitmentBase* clone() const = 0;

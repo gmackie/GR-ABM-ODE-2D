@@ -31,6 +31,10 @@
 #include <boost/serialization/export.hpp>
 #include <boost/serialization/assume_abstract.hpp>
 #include <boost/serialization/vector.hpp>
+#include <boost/archive/xml_iarchive.hpp>
+#include <boost/archive/xml_oarchive.hpp>
+// All possible archive formats need to be listed here in order for
+// BOOST_CLASS_EXPORT methods to work.
 
 #if 1
 #define likely(x) __builtin_expect((x), 1)

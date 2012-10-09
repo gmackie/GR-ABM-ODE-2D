@@ -16,8 +16,6 @@
 #include <boost/iostreams/filtering_stream.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
 #include <boost/filesystem.hpp>
-#include <boost/archive/xml_iarchive.hpp>
-#include <boost/archive/xml_oarchive.hpp>
 #include "recruitmentlnode.h"
 #include "recruitmentlnodepure.h"
 #include "recruitmentprob.h"

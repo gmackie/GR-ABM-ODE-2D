@@ -265,7 +265,7 @@ inline RecruitmentMethod RecruitmentProb::getMethod() const
 }
 
 template<class Archive>
-void RecruitmentProb::serialize(Archive& ar, const unsigned int version)
+inline void RecruitmentProb::serialize(Archive& ar, const unsigned int /*version*/)
 {
   ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(RecruitmentBase);
 }

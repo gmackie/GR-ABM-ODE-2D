@@ -9,13 +9,6 @@
 #include "stat.h"
 
 BOOST_CLASS_EXPORT_IMPLEMENT(RecruitmentLnODEPure)
-#if 0
-RecruitmentLnODEPure::RecruitmentLnODEPure(std::istream& in)
-  : RecruitmentLnODE("", "", in)
-{
-
-}
-#endif
 
 RecruitmentLnODEPure::RecruitmentLnODEPure()
   : RecruitmentLnODE("", "")

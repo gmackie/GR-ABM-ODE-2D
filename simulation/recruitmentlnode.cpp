@@ -12,15 +12,6 @@
 
 BOOST_CLASS_EXPORT_IMPLEMENT(RecruitmentLnODE)
 
-#if 0
-RecruitmentLnODE::RecruitmentLnODE(const std::string& odeApp, const std::string& odeTmpFile, std::istream& in)
-  : _odeApp(odeApp)
-  , _odeTmpFile(odeTmpFile)
-{
-  RecruitmentLnODE::deserialize(in);
-}
-#endif
-
 RecruitmentLnODE::RecruitmentLnODE(const std::string& odeApp, const std::string& odeTmpFile)
   : _odeApp(odeApp)
   , _odeTmpFile(odeTmpFile)
@@ -285,16 +276,16 @@ void RecruitmentLnODE::recruitTcells(GrSimulation& sim, Stats& stats,
       _tcellQueue.erase(_tcellQueue.begin() + idx);
 
       // check whether the T cell has died while in the queue
-      if (tcell._birthtime + _PARAM(PARAM_TCELL_AGE) < sim.getTime())
+      if (tcell.first + _PARAM(PARAM_TCELL_AGE) < sim.getTime())
         {
-          ++stats.getNrQueuedDie((AgentType)(tcell._type + MAC));
+          ++stats.getNrQueuedDie((AgentType)(tcell.second + MAC));
           continue;
         }
 
       // pick a source
       Pos* p = NULL;
-      for (ThresholdPosList::iterator it = tcellSources[tcell._type].begin();
-           it != tcellSources[tcell._type].end(); it++)
+      for (ThresholdPosList::iterator it = tcellSources[tcell.second].begin();
+           it != tcellSources[tcell.second].end(); it++)
         {
           if (sim.getGrid().getNumberOfAgents(it->second) < 2)
             {
@@ -310,22 +301,22 @@ void RecruitmentLnODE::recruitTcells(GrSimulation& sim, Stats& stats,
         }
       else
         {
-          _tcellQueueCount[tcell._type]--;
+          _tcellQueueCount[tcell.second]--;
           sim.getGrid().nRecruitments(*p)++;
 
           // recruit it
-          switch (tcell._type)
+          switch (tcell.second)
             {
             case TCELL_TYPE_CYT:
-              sim.createTcyt(p->x, p->y, tcell._birthtime, Tcyt::TCYT_ACTIVE);
+              sim.createTcyt(p->x, p->y, tcell.first, Tcyt::TCYT_ACTIVE);
               ++stats.getNrRecruited<Tcyt>();
               break;
             case TCELL_TYPE_GAM:
-              sim.createTgam(p->x, p->y, tcell._birthtime, Tgam::TGAM_ACTIVE);
+              sim.createTgam(p->x, p->y, tcell.first, Tgam::TGAM_ACTIVE);
               ++stats.getNrRecruited<Tgam>();
               break;
             case TCELL_TYPE_REG:
-              sim.createTreg(p->x, p->y, tcell._birthtime, Treg::TREG_ACTIVE);
+              sim.createTreg(p->x, p->y, tcell.first, Treg::TREG_ACTIVE);
               ++stats.getNrRecruited<Treg>();
               break;
             default:

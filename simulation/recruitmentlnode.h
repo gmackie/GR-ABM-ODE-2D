@@ -36,12 +36,7 @@ protected:
   double _tcellTable[TCELL_TYPE_COUNT]; // contains lower bounds
 
   int _tcellQueueCount[TCELL_TYPE_COUNT];
-  struct TcellTypePair
-  {
-    TcellTypePair(int birthtime, TcellType type) : _birthtime(birthtime), _type(type) {};
-    int _birthtime;
-    TcellType _type;
-  };
+  typedef std::pair<int, TcellType> TcellTypePair;
 
   std::vector<TcellTypePair> _tcellQueue;
 
@@ -60,6 +55,8 @@ protected:
   void recruitTcells(GrSimulation& sim, Stats& stats,
                      ThresholdPosList tcellSources[TCELL_TYPE_COUNT]);
 
+  friend class boost::serialization::access;
+  RecruitmentLnODE() {}
 public:
   RecruitmentLnODE(const std::string& odeApp, const std::string& odeTmpFile);
   virtual ~RecruitmentLnODE();
@@ -78,6 +75,7 @@ public:
 //@cond
 // Register agent class as one that needs derived type translation
 BOOST_SERIALIZATION_ASSUME_ABSTRACT(RecruitmentLnODE);
+BOOST_CLASS_EXPORT_KEY(RecruitmentLnODE)
 //@endcond
 
 inline RecruitmentMethod RecruitmentLnODE::getMethod() const
@@ -85,16 +83,16 @@ inline RecruitmentMethod RecruitmentLnODE::getMethod() const
   return RECR_LN_ODE;
 }
 template<class Archive>
-void RecruitmentLnODE::serialize(Archive& ar, const unsigned int version)
+inline void RecruitmentLnODE::serialize(Archive& ar, const unsigned int /*version*/)
 {
   ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(RecruitmentBase);
+  ar & boost::serialization::make_nvp("odeApp", const_cast<std::string&>(_odeApp));
+  ar & boost::serialization::make_nvp("odeTmpFile", const_cast<std::string&>(_odeTmpFile));
   ar & BOOST_SERIALIZATION_NVP(_tcellTable);
   ar & BOOST_SERIALIZATION_NVP(_tcellQueueCount);
   ar & BOOST_SERIALIZATION_NVP(_tcellQueue);
   ar & BOOST_SERIALIZATION_NVP(_prevMiMci);
   ar & BOOST_SERIALIZATION_NVP(_odeInitialConditions);
 }
-
-BOOST_CLASS_EXPORT_KEY(RecruitmentLnODE)
 
 #endif /* RECRUITMENTLNODE_H_ */

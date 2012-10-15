@@ -247,6 +247,8 @@ public:
   void timestepSync();
   /**
   * @brief Deep-copy of the simulation
+  * @param sim if sim != NULL, this object will be cloned onto sim using
+  * placement new()
   */
   GrSimulation* clone(GrSimulation* sim) const;
 };

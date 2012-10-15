@@ -72,6 +72,9 @@ public:
   {
     return new Treg(*this);
   }
+  /**
+  * @copydoc GrSimulation::serialize
+  */
   template<class Archive>
   void serialize(Archive& ar, const unsigned int version);
   AgentType getAgentType() const;

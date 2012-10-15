@@ -475,6 +475,7 @@ public:
   * @brief visits all the properties of the agent class
   * @param v Visitor that will visit() each property
   * @tparam Visitor class that will visit each property via a visit(const char*, T&, const char*)
+  * @see Agent::visitProperties
   */
   template<typename Visitor>
   void visitProperties(Visitor& v);
@@ -482,6 +483,7 @@ public:
   * @brief visits all the properties of the agent class
   * @param v Visitor that will visit() each property
   * @tparam Visitor class that will visit each property via a visit(const char*, const T&, const char*)
+  * @see Agent::visitProperties
   */
   template<typename Visitor>
   void visitProperties(Visitor& v) const;

@@ -18,6 +18,9 @@ private:
 public:
   RecruitmentLnODEProxy();
   virtual ~RecruitmentLnODEProxy();
+  /**
+  * @copydoc GrSimulation::serialize
+  */
   template<class Archive>
   void serialize(Archive& ar, const unsigned int version);
 

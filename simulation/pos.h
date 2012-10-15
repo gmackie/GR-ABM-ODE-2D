@@ -81,6 +81,9 @@ struct Pos
     return dist;
   }
 
+  /**
+  * @copydoc GrSimulation::serialize
+  */
   template<typename Archive>
   void serialize(Archive& ar, const unsigned int /*version*/) {
     ar & BOOST_SERIALIZATION_NVP(x);

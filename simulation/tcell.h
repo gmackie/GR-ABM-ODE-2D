@@ -22,6 +22,9 @@ public:
   virtual ~Tcell();
   void moveTcell(GrGrid& grid, bool ccl2, bool ccl5, bool cxcl9);
   static bool isTcell(const Agent* pAgent);
+  /**
+  * @copydoc GrSimulation::serialize
+  */
   template<class Archive>
   void serialize(Archive& ar, const unsigned int version);
   virtual void solveDegradation (GrGrid& grid, double dt, bool tnfrDynamics, bool il10rDynamics);

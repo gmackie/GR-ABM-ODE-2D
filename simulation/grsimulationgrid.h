@@ -48,6 +48,9 @@ public:
   GrGrid& getGrid();
   const PosVector& getSources();
   void initSources();
+  /**
+  * @copydoc GrSimulation::serialize
+  */
   template<typename Archive>
   void serialize(Archive& ar, const unsigned int version);
 

@@ -63,6 +63,9 @@ public:
 
   RecruitmentMethod getMethod() const;
   template<class Archive>
+  /**
+  * @copydoc GrSimulation::serialize
+  */
   void serialize(Archive& ar, const unsigned int version);
   virtual RecruitmentBase* clone() const
   {

@@ -193,6 +193,9 @@ public:
   static bool isMac(const Agent* pAgent);
   static bool isMac(const Agent* pAgent, Mac::State state);
   void print() const;
+  /**
+  * @copydoc GrSimulation::serialize
+  */
   template<class Archive>
   void serialize(Archive& ar, const unsigned int version);
   bool isDeactivated() const;
@@ -204,8 +207,14 @@ public:
   void setC1rrChemTNF(double value);
   AgentType getAgentType() const;
   void disperseMtb(GrGrid& grid, double fraction);
+  /**
+  * @copydoc Agent::visitProperties(Visitor& v)
+  */
   template<typename Visitor>
   void visitProperties(Visitor& v);
+  /**
+  * @copydoc Agent::visitProperties(Visitor& v) const
+  */
   template<typename Visitor>
   void visitProperties(Visitor& v) const;
 };

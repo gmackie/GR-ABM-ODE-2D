@@ -61,11 +61,20 @@ public:
     return new Tgam(*this);
   }
   void print() const;
+  /**
+  * @copydoc GrSimulation::serialize
+  */
   template<class Archive>
   void serialize(Archive& ar, const unsigned int version);
   AgentType getAgentType() const;
+  /**
+  * @copydoc Agent::visitProperties(Visitor& v)
+  */
   template<typename Visitor>
   void visitProperties(Visitor& v);
+  /**
+  * @copydoc Agent::visitProperties(Visitor& v) const
+  */
   template<typename Visitor>
   void visitProperties(Visitor& v) const;
 };

@@ -18,6 +18,9 @@ public:
   virtual ~RecruitmentBase();
 
   virtual RecruitmentMethod getMethod() const = 0;
+  /**
+  * @copydoc GrSimulation::serialize
+  */
   template<typename Archive>
   void serialize(Archive&, const unsigned int) {}
 

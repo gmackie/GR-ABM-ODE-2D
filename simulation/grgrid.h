@@ -115,6 +115,9 @@ public:
   const PosVector& getSources() const;
   void initSources();
   void shuffleSources();
+  /**
+  * @copydoc GrSimulation::serialize
+  */
   template<class Archive>
   void serialize(Archive& ar, const unsigned int version);
   bool isSource(const Pos& p) const;

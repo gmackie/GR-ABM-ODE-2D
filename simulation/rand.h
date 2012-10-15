@@ -62,6 +62,9 @@ public:
   int getInt(int b, int a = 0);
   double getLogNormal(double mean, double sigma);
   void test(int time);
+  /**
+  * @copydoc GrSimulation::serialize
+  */
   template<class Archive>
   void serialize(Archive& ar, const unsigned int version);
 };

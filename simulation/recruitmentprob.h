@@ -35,6 +35,9 @@ public:
   static bool TcytThresholdRecNew(const GrGrid& grid, const Pos& pSource, double& rThreshold);
   static bool TregThresholdRecNew(const GrGrid& grid, const Pos& pSource, double& rThreshold);
   RecruitmentMethod getMethod() const;
+  /**
+  * @copydoc GrSimulation::serialize
+  */
   template<class Archive>
   void serialize(Archive& ar, const unsigned int version);
 

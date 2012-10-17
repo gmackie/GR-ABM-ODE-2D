@@ -11,6 +11,7 @@
 #include <assert.h>
 #include <iostream>
 #include <sstream>
+#include <boost/version.hpp>  //Boost version checking
 #include <boost/serialization/nvp.hpp>
 #include <boost/serialization/split_free.hpp>
 
@@ -164,6 +165,11 @@ namespace boost { namespace serialization {
 template<class Archive>
 void Rand::serialize(Archive& ar, const unsigned int /*version*/)
 {
+  long boost_version = BOOST_VERSION;
+  ar & BOOST_SERIALIZATION_NVP(boost_version);
+  if(boost_version != BOOST_VERSION)
+    std::cerr<<"Warning: Boost library version for serialized RNG is not the"
+               " same.  Continuing simulation may lead to unexpected results";
   ar & BOOST_SERIALIZATION_NVP(_seed);
   ar & BOOST_SERIALIZATION_NVP(_eng);
   ar & BOOST_SERIALIZATION_NVP(_realEng);

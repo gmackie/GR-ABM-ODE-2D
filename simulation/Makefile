@@ -14,7 +14,7 @@ BOOST_LIBS := boost_program_options boost_iostreams boost_serialization boost_fi
 # If static building, might need to modify to search only .o or .a compiled libraries (kept generic to deal with osx & windows)
 # <- Could completely solve this problem with cmake.... >_>
 BOOST_FOUND_LIBS := $(foreach lib, $(BOOST_LIBS), $(if $(wildcard ${BOOST_PREFIX}/lib/*$(lib)*-mt*), $(lib)-mt, $(lib)))
-override LDFLAGS += -lm -lz -L${BOOST_PREFIX}/lib $(addprefix -l, $(BOOST_FOUND_LIBS))
+override LDFLAGS += -L${BOOST_PREFIX}/lib $(addprefix -l, $(BOOST_FOUND_LIBS)) -lm -lz -lpthread
 
 all: release
 

@@ -10,6 +10,9 @@
 #include <vector>
 #include <assert.h>
 
+float rand_float()
+  { return rand() * 2.0f / RAND_MAX - 1.0f; }
+
 AgentsVisualization::AgentsVisualization(int DIM, const ScalarAgentGrid* pScalarAgentGrid)
   : Visualization(DIM)
   , _pScalarAgentGrid(pScalarAgentGrid)
@@ -20,6 +23,7 @@ AgentsVisualization::AgentsVisualization(int DIM, const ScalarAgentGrid* pScalar
   , _drawCas(true)
   , _drawSrc(true)
   , _drawExtMtb(true)
+  , _drawSquares(true)
   , _gridAlpha(0.7f)
   , _gridHeight(0.0f)
   , _drawSrcMac(false)
@@ -30,7 +34,9 @@ AgentsVisualization::AgentsVisualization(int DIM, const ScalarAgentGrid* pScalar
   , _m1m2thres(0.0)
   , _selRow(-1)
   , _selCol(-1)
+  , stratify(boost::extents[DIM][DIM][2])
 {
+  std::generate(stratify.origin(), stratify.origin() + stratify.num_elements(), rand_float);
   memset(_macFilter, 1, sizeof(_macFilter));
   _deltaX = _MAX_X / (_DIM);
   _deltaY = _MAX_Y / (_DIM);
@@ -91,21 +97,7 @@ void AgentsVisualization::visualize(bool blend, const Simulation*, const ColorMa
                   if(!state) continue;
                 }
                 break;
-                case TGAM:
-                {
-                  if(!_drawTreg) continue;
-                }
-                break;
-                case TREG:
-                {
-                  if(!_drawTgam) continue;
-                }
-                break;
-                case TCYT:
-                {
-                  if(!_drawTcyt) continue;
-                }
-                break;
+                default: continue;
                 }
               const double stnfr = std::max(1e-5, grid[i*_DIM+j]._pAgent[k]->getsurfBoundTNFR1());
               const double sil10r = std::max(1e-5, grid[i*_DIM+j]._pAgent[k]->getsurfBoundIL10R());
@@ -115,140 +107,60 @@ void AgentsVisualization::visualize(bool blend, const Simulation*, const ColorMa
     }
 
   for (int i = 0; i < _DIM; i++)
-    {
-      for (int j = 0; j < _DIM; j++)
+    for (int j = 0; j < _DIM; j++)
+      {
+        int val = grid[i * _DIM + j]._bitMask;
+        if (GET_BIT(val, ScalarAgentGrid::_bitCas) && _drawCas)
         {
-          int val = grid[i * _DIM + j]._bitMask;
-          if (GET_BIT(val, ScalarAgentGrid::_bitSrc) && _drawSrc &&
-              (!_drawSrcMac || GET_BIT(val, ScalarAgentGrid::_bitSrcMac)) &&
-              (!_drawSrcTgam || GET_BIT(val, ScalarAgentGrid::_bitSrcTgam)) &&
-              (!_drawSrcTcyt || GET_BIT(val, ScalarAgentGrid::_bitSrcTcyt)) &&
-              (!_drawSrcTreg || GET_BIT(val, ScalarAgentGrid::_bitSrcTreg)))
-            {
-              glColor4f(0.8f, 0.8f, 0.8f, _gridAlpha);
-              drawQuad(i, j);
-            }
-          else if (GET_BIT(val, ScalarAgentGrid::_bitCas) && _drawCas)
-            {
-              glColor4f(1.0f, 1.0f, 1.0f, _gridAlpha);
-              drawCross(i, j);
-            }
-          else if(_drawm1m2)
-            {
-              for(int k=0; k<2; k++)
-                {
-                  if(grid[i*_DIM+j]._pAgent[k])
-                    {
-                      if(_drawm1m2 == 1)
-                        {
-                          if((grid[i*_DIM+j]._pAgent[k]->getsurfBoundTNFR1() / grid[i*_DIM+j]._pAgent[k]->getsurfBoundIL10R()) > _m1m2thres)
-                            glColor4f(0,1,0, _gridAlpha);   //Green if over the threshold
-                          else
-                            glColor4f(1,0,0, _gridAlpha);    //Red otherwise
-                        }
-                      else
-                        {
-                          if(minRatio != maxRatio)
-                            {
-                              const double stnfr =  std::max(1e-5, grid[i*_DIM+j]._pAgent[k]->getsurfBoundTNFR1());
-                              const double sil10r = std::max(1e-5, grid[i*_DIM+j]._pAgent[k]->getsurfBoundIL10R());
-                              const double ratio = ( (stnfr / sil10r) - minRatio) / (maxRatio - minRatio);
-                              glColor4f(1-ratio, ratio, 0, _gridAlpha);
-                            }
-                          else
-                            glColor4f(1, 0, 0, _gridAlpha);
-                        }
-                      switch(grid[i*_DIM+j]._pAgent[k]->getAgentType())
-                        {
-                        case MAC:
-                        {
-                          const Mac* pMac = static_cast<const Mac*>(grid[i*_DIM+j]._pAgent[k]);
-                          if(!_macFilter[pMac->getState()][AgentsWidget::ENBL]) continue;
-                          char state = (pMac->getNFkB() << AgentsWidget::NFKB) | (pMac->getStat1() << AgentsWidget::STAT1) | (pMac->isDeactivated() << AgentsWidget::DEACT);
-                          state |= (state == 0) << AgentsWidget::OTHER;
-                          state &= (_macFilter[pMac->getState()][AgentsWidget::NFKB] << AgentsWidget::NFKB)
-                                   | (_macFilter[pMac->getState()][AgentsWidget::STAT1] << AgentsWidget::STAT1)
-                                   | (_macFilter[pMac->getState()][AgentsWidget::DEACT] << AgentsWidget::DEACT)
-                                   | (_macFilter[pMac->getState()][AgentsWidget::OTHER] << AgentsWidget::OTHER);
-                          if(!state) continue;
-                        }
-                        break;
-                        case TGAM:
-                        {
-                          if(!_drawTreg) continue;
-                        }
-                        break;
-                        case TREG:
-                        {
-                          if(!_drawTgam) continue;
-                        }
-                        break;
-                        case TCYT:
-                        {
-                          if(!_drawTcyt) continue;
-                        }
-                        break;
-                        }
-                      drawQuad(i, j);
-                    }
-                }
-            }
-          else if (GET_BIT(val, ScalarAgentGrid::_bitTgam) && _drawTgam)
-            {
-              glColor4f(1.0f, 0.71f, 0.76f, _gridAlpha);
-              drawQuad(i, j);
-            }
-          else if (GET_BIT(val, ScalarAgentGrid::_bitTcyt) && _drawTcyt)
-            {
-              glColor4f(0.5f, 0.0f, 0.5f, _gridAlpha);
-              drawQuad(i, j);
-            }
-          else if (GET_BIT(val, ScalarAgentGrid::_bitTreg) && _drawTreg)
-            {
-              glColor4f(0.0f, 1.0f, 1.0f, _gridAlpha);
-              drawQuad(i, j);
-            }
-          else if (GET_BIT(val, ScalarAgentGrid::_bitMac))
-            {
-              const Mac* pMac = NULL;
-              for(int k=0; k<2; k++)
-                if(grid[i*_DIM+j]._pAgent[k])
-                  {
-                    pMac = static_cast<const Mac*>(grid[i*_DIM+j]._pAgent[k]->getAgentType() == MAC ? grid[i*_DIM+j]._pAgent[k] : pMac);
-                  }
-              Q_CHECK_PTR(pMac);
-              char state = (pMac->getNFkB() << AgentsWidget::NFKB) | (pMac->getStat1() << AgentsWidget::STAT1) | (pMac->isDeactivated() << AgentsWidget::DEACT);
-              state |= (state == 0) << AgentsWidget::OTHER;
-              state &= (_macFilter[pMac->getState()][AgentsWidget::NFKB] << AgentsWidget::NFKB)
-                       | (_macFilter[pMac->getState()][AgentsWidget::STAT1] << AgentsWidget::STAT1)
-                       | (_macFilter[pMac->getState()][AgentsWidget::DEACT] << AgentsWidget::DEACT)
-                       | (_macFilter[pMac->getState()][AgentsWidget::OTHER] << AgentsWidget::OTHER);
-
-              if(state && _macFilter[pMac->getState()][AgentsWidget::ENBL])
-                {
-                  if (GET_BIT(val, ScalarAgentGrid::_bitMacResting) && _macFilter[Mac::MAC_RESTING][AgentsWidget::ENBL])
-                    glColor4f(0.0f, 1.0f, 0.0f, _gridAlpha);
-                  else if (GET_BIT(val, ScalarAgentGrid::_bitMacInfected) && _macFilter[Mac::MAC_INFECTED][AgentsWidget::ENBL])
-                    glColor4f(1.0f, 0.65f, 0.0f, _gridAlpha);
-                  else if (GET_BIT(val, ScalarAgentGrid::_bitMacCInfected) && _macFilter[Mac::MAC_CINFECTED][AgentsWidget::ENBL])
-                    glColor4f(1.0f, 0.0f, 0.0f, _gridAlpha);
-                  else if (GET_BIT(val, ScalarAgentGrid::_bitMacActive) && _macFilter[Mac::MAC_ACTIVE][AgentsWidget::ENBL])
-                    glColor4f(0.0f, 0.0f, 1.0f, _gridAlpha);
-                  else continue;
-                }
-              else if (GET_BIT(val, ScalarAgentGrid::_bitExtMtb) && _drawExtMtb)
-                glColor4f(0.67f, 0.67f, 0.0f, _gridAlpha);
-              else
-                continue;
-              drawQuad(i, j);
-            }
-          else if (GET_BIT(val, ScalarAgentGrid::_bitExtMtb) && _drawExtMtb)
-            {
-              glColor4f(0.67f, 0.67f, 0.0f, _gridAlpha);
-              drawQuad(i, j);
+          glColor4f(1.0f, 1.0f, 1.0f, _gridAlpha);
+          drawCross(i, j);
+        }
+        if (GET_BIT(val, ScalarAgentGrid::_bitSrc) && _drawSrc &&
+            (!_drawSrcMac || GET_BIT(val, ScalarAgentGrid::_bitSrcMac)) &&
+            (!_drawSrcTgam || GET_BIT(val, ScalarAgentGrid::_bitSrcTgam)) &&
+            (!_drawSrcTcyt || GET_BIT(val, ScalarAgentGrid::_bitSrcTcyt)) &&
+            (!_drawSrcTreg || GET_BIT(val, ScalarAgentGrid::_bitSrcTreg)))
+          {
+            glColor4f(0.8f, 0.8f, 0.8f, _gridAlpha);
+            drawQuad(i, j);
+          }
+        if(_drawSquares) {  //Setup a priority for each agents drawn in case of drawing squares.
+                 if(_drawTgam && GET_BIT(val, ScalarAgentGrid::_bitTgam)) drawTcell(TGAM, i, j);
+            else if(_drawTcyt && GET_BIT(val, ScalarAgentGrid::_bitTcyt)) drawTcell(TCYT, i, j);
+            else if(_drawTreg && GET_BIT(val, ScalarAgentGrid::_bitTreg)) drawTcell(TREG, i, j);
+            else {
+              int k=0;
+              for(k=0;k<2;k++) {
+                if(!(grid[i*_DIM+j]._pAgent[k] && (grid[i*_DIM+j]._pAgent[k])->getAgentType() == MAC)) continue;
+                else if(drawMac(static_cast<const Mac*>(grid[i*_DIM+j]._pAgent[k]), i, j, k, minRatio, maxRatio))
+                  k=3;  //Finish the loop and don't try to draw any more.
+              }
+              if(k>3)
+                continue; //Drew *a* mac, skip extmtb later.
             }
         }
-    }
+        else {
+          for(int k=0;k<2;k++)
+          {
+            const Agent* agent = grid[i*_DIM+j]._pAgent[k];
+            if(agent == NULL) continue;
+            switch(agent->getAgentType())
+            {
+              case MAC:
+               drawMac(static_cast<const Mac*>(agent), i, j, k, minRatio, maxRatio);
+               break;
+              default:
+               drawTcell(agent->getAgentType(), i, j, k);
+               break;
+            }
+          }
+        }
+        if (GET_BIT(val, ScalarAgentGrid::_bitExtMtb) && _drawExtMtb)
+        {
+          glColor4f(0.67f, 0.67f, 0.0f, _gridAlpha);
+          drawQuad(i, j);
+        }
+      }
 
   glDisable(GL_BLEND);
   glEnable(GL_DEPTH_TEST);
@@ -273,4 +185,94 @@ void AgentsVisualization::drawGrid() const
   glEnd();
 
   glLineWidth(1.0f);
+}
+void AgentsVisualization::drawTcell(const AgentType a_t, int x, int y, int p) const
+{
+  switch(a_t) {
+    case TGAM:
+    {
+      if(!_drawTgam) return;
+      glColor4f(1.0f, 0.71f, 0.76f, _gridAlpha);
+      break;
+    }
+    case TREG:
+    {
+      if(!_drawTreg) return;
+      glColor4f(0.0f, 1.0f, 1.0f, _gridAlpha);
+      break;
+    }
+    case TCYT:
+    {
+      if(!_drawTcyt) return;
+      glColor4f(0.5f, 0.0f, 0.5f, _gridAlpha);
+      break;
+    }
+    default:
+    {
+      qWarning("Not a valid tcell type!"); return;
+    }
+  }
+  if(_drawSquares)
+    drawQuad(x, y);
+  else
+  {
+    float rngx = stratify[x][y][p]*0.25f+0.75f;
+    float rngy = stratify[x][y][1-p]*0.25f+0.75f;
+    drawCell((x+rngx*(2*p-1)*(0.5f-0.3f)), (y+rngy*(2*p-1)*(0.5f-0.3f)), 0.005f, 0.3f);
+  }
+}
+bool AgentsVisualization::drawMac(const Mac* pMac, int x, int y, int p, const double minRatio, const double maxRatio) const
+{
+  if(!pMac) return false;
+  if(pMac->getAgentType() != MAC) return false;
+  char state = (pMac->getNFkB() << AgentsWidget::NFKB) | (pMac->getStat1() << AgentsWidget::STAT1) | (pMac->isDeactivated() << AgentsWidget::DEACT);
+  state |= (state == 0) << AgentsWidget::OTHER;
+  state &= (_macFilter[pMac->getState()][AgentsWidget::NFKB] << AgentsWidget::NFKB)
+           | (_macFilter[pMac->getState()][AgentsWidget::STAT1] << AgentsWidget::STAT1)
+           | (_macFilter[pMac->getState()][AgentsWidget::DEACT] << AgentsWidget::DEACT)
+           | (_macFilter[pMac->getState()][AgentsWidget::OTHER] << AgentsWidget::OTHER);
+  if(!(state && _macFilter[pMac->getState()][AgentsWidget::ENBL]))
+    return false; //Don't draw macs in a disabled state
+
+  if(_drawm1m2 == 1)
+  {
+    if(pMac->getM1M2Ratio() > _m1m2thres)
+      glColor4f(0,1,0, _gridAlpha);   //Green if over the threshold
+    else
+      glColor4f(1,0,0, _gridAlpha);    //Red otherwise
+  }
+  else if(_drawm1m2 != 0)
+  {
+    if(minRatio != maxRatio)
+    {
+      const double ratio = (pMac->getM1M2Ratio() - minRatio) / (maxRatio - minRatio);
+      glColor4f(1-ratio, ratio, 0, _gridAlpha);
+    }
+    else
+      glColor4f(1, 0, 0, _gridAlpha);
+  }
+  else {
+    switch(pMac->getState())
+    {
+      case Mac::MAC_RESTING:
+        glColor4f(0.0f, 1.0f, 0.0f, _gridAlpha); break;
+      case Mac::MAC_INFECTED:
+        glColor4f(1.0f, 0.65f, 0.0f, _gridAlpha); break;
+      case Mac::MAC_CINFECTED:
+        glColor4f(1.0f, 0.0f, 0.0f, _gridAlpha); break;
+      case Mac::MAC_ACTIVE:
+        glColor4f(0.0f, 0.0f, 1.0f, _gridAlpha); break;
+      default:
+        qWarning("Unknown state '%d' for mac", pMac->getState()); return false;
+    }
+  }
+  if(_drawSquares)
+    drawQuad(x, y);
+  else
+  {
+    float rngx = stratify[x][y][p]*0.25f+0.75f;
+    float rngy = stratify[x][y][1-p]*0.25f+0.75f;
+    drawCell((x+rngx*(2*p-1)*(0.5f-0.375f)), (y+rngy*(2*p-1)*(0.5f-0.375f)), 0.00f, 0.375f);
+  }
+  return true;
 }

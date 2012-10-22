@@ -190,6 +190,7 @@ void AgentsWidget::saveSettings() const
   settings.setValue("TgamSrcs", _ui.checkBoxDrawAgentSourcesTgam->isChecked() );
   settings.setValue("TcytSrcs", _ui.checkBoxDrawAgentSourcesTcyt->isChecked() );
   settings.setValue("TregSrcs", _ui.checkBoxDrawAgentSourcesTreg->isChecked() );
+  settings.setValue("SquareAgents", _ui.checkBoxDrawAgentSourcesTreg->isChecked() );
   settings.setValue("M1M2", _ui.comboBoxM1M2->currentIndex() );
   settings.setValue("M1M2Thres", _ui.doubleSpinBoxM1M2Threshold->value() );
 
@@ -237,6 +238,7 @@ void AgentsWidget::loadSettings()
   _ui.checkBoxDrawAgentSourcesTgam->setChecked(settings.value("TgamSrcs",  _ui.checkBoxDrawAgentSourcesTgam->isChecked() ).toBool());
   _ui.checkBoxDrawAgentSourcesTcyt->setChecked(settings.value("TcytSrcs",  _ui.checkBoxDrawAgentSourcesTcyt->isChecked() ).toBool());
   _ui.checkBoxDrawAgentSourcesTreg->setChecked(settings.value("TregSrcs",  _ui.checkBoxDrawAgentSourcesTreg->isChecked() ).toBool());
+  _ui.checkboxSquareAgents->setChecked(        settings.value("SquareAgents", _ui.checkboxSquareAgents->isChecked() ).toBool());
   _ui.comboBoxM1M2->setCurrentIndex(           settings.value("M1M2",      _ui.comboBoxM1M2->currentIndex() ).toInt());
   _ui.doubleSpinBoxM1M2Threshold->setValue(    settings.value("M1M2Thres", _ui.doubleSpinBoxM1M2Threshold->value() ).toDouble());
 
@@ -269,5 +271,11 @@ void AgentsWidget::loadSettings()
   _ui.checkBoxDrawAgentTreg->setChecked(settings.value("TregENBL", _ui.checkBoxDrawAgentTreg->isChecked()).toBool());
   settings.endGroup();
   blockSignals(false);
+  emit updateGL();
+}
+
+void AgentsWidget::on_checkboxSquareAgents_toggled(bool checked)
+{
+  _pAgentsVisualization->setDrawSquares(checked);
   emit updateGL();
 }

@@ -202,6 +202,22 @@ MainWindow::MainWindow(MainInterface* pItfc, GLWindow* pGLWindow, QWidget* pPara
   connect(_pAgentHistogram, SIGNAL(closing(bool)), _ui.agentHistButton, SLOT(setChecked(bool)));
   connect(_pAgentsWidget, SIGNAL(agentFilterChanged(int, int, int, bool)), _pAgentHistogram, SLOT(setAgentFilter(int,int,int,bool)));
 
+  int deltaHue = _ui.horizontalSliderHue->value();
+  _pCurrentColorMap->setHueDelta(deltaHue / _SLIDER_COLORMAP_HUE);
+
+  int deltaSat = _ui.horizontalSliderSat->value();
+  _pCurrentColorMap->setSatDelta(deltaSat / _SLIDER_COLORMAP_SAT);
+
+  int deltaVal = _ui.horizontalSliderVal->value();
+  _pCurrentColorMap->setValDelta(deltaVal / _SLIDER_COLORMAP_VAL);
+
+  int alpha = _ui.horizontalSliderAlpha->value();
+  _pCurrentColorMap->setAlpha(alpha / _SLIDER_COLORMAP_ALPHA);
+
+  int nColors = _ui.spinBoxNumberOfColors->value();
+  _pCurrentColorMap->setNrBands(nColors);
+
+  _pCurrentColorMap->setInvert(_ui.checkBoxReverseColorMap->isChecked());
   emit updateColorMap(_pCurrentColorMap);
 }
 
@@ -612,11 +628,13 @@ void MainWindow::update()
 void MainWindow::timerEvent(QTimerEvent*)
 {
   Simulation& sim = _pItfc->getSimulation();
+  if(!sim.getUpdated()) return; // Nothing's changed, no need to update simulation data structures
 
   /* BEGIN CRITICAL SECTION */
   /* Since the mutex is recursive, a thread can lock the same mutex multiple times
    * and the mutex won't be unlocked until a corresponding number of unlock() calls have been made. */
   sim.lock();
+  sim.setUpdated(false);
   _pItfc->doStep();
 
   int simTime = sim.getTime();

@@ -59,7 +59,7 @@ MainInterface::MainInterface(const Pos& dim, Visualization* pAgentVisualization,
   , _glyphGridNN(true)
   , _smokeGridNN(true)
   , _heightGridNN(true)
-  , _blend(true)
+  , _blend(false)
   , _time(0)
   , _simTime(0)
 {

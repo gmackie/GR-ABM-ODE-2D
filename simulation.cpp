@@ -18,6 +18,7 @@ Simulation::Simulation(const Pos& dim)
   , rng(g_Rand)
   , _gr(new GrSimulation(dim))
   , _backbuffer(new GrSimulation(dim))
+  , _updated(false)
   , _delay(0)
   , _stopFlag(false)
   , _timeStepsToSimulate(_TIMESTEPS_TO_SIMULATE) //_DAYS_TO_SIMULATE _TIMESTEPS_TO_SIMULATE
@@ -32,20 +33,45 @@ Simulation::~Simulation()
   delete _backbuffer;
 }
 
-void Simulation::update()
-{
-  _backbuffer = _gr->clone(_backbuffer);  //Deep copy without deallocating
-  _time = _backbuffer->getTime();
-  rng = g_Rand;  //Save the rng at this time point for serialization purposes
-  emit updated();
-}
-
 bool Simulation::stopCondition()
 {
   return (_timeStepsToSimulate >= 0 && _time >= _timeStepsToSimulate) ||
          (_mtbClearance && _backbuffer->getStats().getTotExtMtb() == 0 &&
           _backbuffer->getStats().getTotIntMtb() == 0 &&
           _backbuffer->getStats().getTotTNF() < DBL_EPSILON * 10.0);
+}
+
+void Simulation::update()
+{ // Seperating update and step allows event loop processing while
+  // simulation is waiting for render loop to finish what it's doing
+  // with the current cloned copy (last timestep)
+  lock();
+#if 1  // Set this to 0 if completely asynchronous is required.
+       // Beware: completely asynchronous does not guarentee
+       // snapshots work properly, but is faster overall
+  if(_updated) {  //Can't update, viz still processing last sim
+    unlock();
+    //Might pin the cpu a bit, should add a small sleep
+    QMetaObject::invokeMethod(this, "update", Qt::QueuedConnection);
+    return;
+  }
+#endif
+
+  bool stop = stopCondition();
+  if(stop)
+    _gr->performT_Test();
+  _backbuffer = _gr->clone(_backbuffer);  //Deep copy without deallocating
+  _time = _backbuffer->getTime();
+  rng = g_Rand;  //Save the rng at this time point for serialization purposes
+  _updated = true;
+  emit updated();
+  if(stop)
+    emit stopConditionMet();
+  unlock();
+
+  msleep(_delay);
+  if(!(stop || _stopFlag))
+    QMetaObject::invokeMethod(this, "step", Qt::QueuedConnection);
 }
 
 void Simulation::step()
@@ -63,18 +89,7 @@ void Simulation::step()
     _gr->solve();
   _modelMutex.unlock();
 
-  lock();
-    stop = stopCondition();
-    if(stop)
-      _gr->performT_Test();
-    update();
-    if(stop)
-      emit stopConditionMet();
-  unlock();
-
-  msleep(_delay);
-  if(!(stop || _stopFlag))
-    QMetaObject::invokeMethod(this, "step", Qt::QueuedConnection);
+  QMetaObject::invokeMethod(this, "update", Qt::QueuedConnection);
 }
 
 void Simulation::run()

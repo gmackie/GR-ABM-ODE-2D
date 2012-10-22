@@ -20,6 +20,7 @@ class Simulation : public QThread
 private:
   mutable QMutex _mutex;
   mutable QMutex _modelMutex;
+  QAtomicInt _updated;
   int _time;
   Rand rng;
   GrSimulation* _gr;
@@ -34,7 +35,6 @@ private:
   bool stopCondition();
 
 public:
-  void update();
   /* The following methods are thread-safe */
   Simulation(const Pos& dim);
   virtual ~Simulation();
@@ -64,6 +64,7 @@ public:
   void setOutcomeMethod(int index, OutcomeMethod method, double alpha, int testPeriod, int samplePeriod);
 
   /* The following methods are NOT thread-safe, first a lock must be obtained */
+  bool getUpdated() const;
   const GrGrid& getGrGrid() const;
   const Stats& getStats() const;
   const MacList& getMacList() const;
@@ -79,11 +80,13 @@ public:
   void setAdaptive(bool adaptive);
   void setTnfDepletionTimeStep(int tnfDepletionTimeStep);
   void setIl10DepletionTimeStep(int il10DepletionTimeStep);
+  void setUpdated(bool value=false);
 
   static QString getTimeStr(int simTime, int time);
 
 public slots:
   void step();
+  void update();
 
 signals:
   void stopConditionMet();
@@ -222,6 +225,11 @@ inline const GrGrid& Simulation::getGrGrid() const
   return _backbuffer->getGrid();
 }
 
+inline bool Simulation::getUpdated() const
+{
+  return _updated;
+}
+
 inline void Simulation::setRecruitmentMethod(RecruitmentMethod recrMethod)
 {
   lock();
@@ -288,6 +296,11 @@ inline void Simulation::modelUnlock() const
 inline GrSimulation& Simulation::getSim()
 {
   return *_gr;
+}
+
+inline void Simulation::setUpdated(bool value)
+{
+  _updated = value;
 }
 
 #endif /* SIMULATION_H_ */

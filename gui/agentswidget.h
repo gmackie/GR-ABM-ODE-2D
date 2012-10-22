@@ -30,6 +30,8 @@ private slots:
   void tregFilterChanged(bool en);
   void tcytFilterChanged(bool en);
 
+  void on_checkboxSquareAgents_toggled(bool checked);
+
 signals:
   void updateGL();
   void agentFilterChanged(int, int, int, bool);

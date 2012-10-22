@@ -399,7 +399,7 @@ QString GLWindow::getAgentStr(const Agent* pAgent)
         {
           res += ", deact";
         }
-      res += QString(", [sbTNF/sbIL10] = %1").arg(pMac->getsurfBoundTNFR1() / pMac->getsurfBoundIL10R(), 0, 'f', 2);
+      res += QString(", [sbTNF/sbIL10] = %1, %2").arg(pMac->getsurfBoundTNFR1() / pMac->getsurfBoundIL10R(), 0, 'f', 2).arg(pMac->getM1M2Ratio(), 0, 'f', 2);
     }
   return res;
 }

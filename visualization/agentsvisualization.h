@@ -187,13 +187,13 @@ inline void AgentsVisualization::drawCell(float i, float j, float k, float R) co
   assert(R<=0.5f);  //Any larger and the cell overlaps the adjacent square
   static float currentColor[4];
   glGetFloatv(GL_CURRENT_COLOR, currentColor);
-  drawCircle((j+0.5f)*_deltaX, (i+0.5f)*_deltaY, k+_gridHeight, R*_deltaX);
+  drawCircle((j+0.5f)*_deltaX, (i+0.5f)*_deltaY, k+_gridHeight+0.001f, R*_deltaX);
   for(int z=0;z<3;z++)
     currentColor[z] *= 0.25f;  //Make 75% darker for nucleus
   glColor4fv(currentColor);
   float rngx = stratify[floor(j)][floor(i)][0];
   float rngy = stratify[floor(j)][floor(i)][1];
-  drawCircle((j+(rngx*R+1)*0.5f)*_deltaX, (i+(rngy*R+1)*0.5f)*_deltaY, k+_gridHeight+0.001f, R*0.5f*_deltaX);
+  drawCircle((j+(rngx*R+1)*0.5f)*_deltaX, (i+(rngy*R+1)*0.5f)*_deltaY, k+_gridHeight+0.002f, R*0.5f*_deltaX);
 }
 
 inline bool AgentsVisualization::getDrawGrid() const

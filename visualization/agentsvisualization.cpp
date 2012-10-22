@@ -99,10 +99,8 @@ void AgentsVisualization::visualize(bool blend, const Simulation*, const ColorMa
                 break;
                 default: continue;
                 }
-              const double stnfr = std::max(1e-5, grid[i*_DIM+j]._pAgent[k]->getsurfBoundTNFR1());
-              const double sil10r = std::max(1e-5, grid[i*_DIM+j]._pAgent[k]->getsurfBoundIL10R());
-              minRatio = std::min(minRatio, stnfr / sil10r);
-              maxRatio = std::max(maxRatio, stnfr / sil10r);
+              minRatio = std::min(minRatio, grid[i*_DIM+j]._pAgent[k]->getM1M2Ratio());
+              maxRatio = std::max(maxRatio, grid[i*_DIM+j]._pAgent[k]->getM1M2Ratio());
             }
     }
 

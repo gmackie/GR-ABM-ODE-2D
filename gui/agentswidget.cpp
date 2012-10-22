@@ -190,7 +190,7 @@ void AgentsWidget::saveSettings() const
   settings.setValue("TgamSrcs", _ui.checkBoxDrawAgentSourcesTgam->isChecked() );
   settings.setValue("TcytSrcs", _ui.checkBoxDrawAgentSourcesTcyt->isChecked() );
   settings.setValue("TregSrcs", _ui.checkBoxDrawAgentSourcesTreg->isChecked() );
-  settings.setValue("SquareAgents", _ui.checkBoxDrawAgentSourcesTreg->isChecked() );
+  settings.setValue("SquareAgents", _ui.checkboxSquareAgents->isChecked() );
   settings.setValue("M1M2", _ui.comboBoxM1M2->currentIndex() );
   settings.setValue("M1M2Thres", _ui.doubleSpinBoxM1M2Threshold->value() );
 

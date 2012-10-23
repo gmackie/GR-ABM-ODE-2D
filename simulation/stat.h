@@ -107,8 +107,8 @@ public:
     clear();
   }
 
-// --- Accessors ---
-
+  /// @name Accessors
+  /// @{
 #define STAT(type, name, desc, reset) \
   const type& get ## name () const { return _ ## name; }  \
   type& get ## name () { return _ ## name; }  \
@@ -156,6 +156,7 @@ public:
   void set ## name (AgentType type, const t& v) { _ ## name [type] = v; } \
   void set ## name (const t& v) { std::fill_n((_ ## name).begin(), (size_t)NAGENTS, v); }
 #include "stat.def"
+  /// @}
 
 // --- Custom Accessors ---
 
@@ -250,6 +251,9 @@ public:
       s << _intMtbFreq[i] << std::endl;
   }
 
+  /**
+  * @brief Clears all stats with the value of the default constructor
+  */
   void clear()
   {
 #define STAT(type, name, desc, reset)           _##name = type();
@@ -260,6 +264,9 @@ public:
 #include "stat.def"
   }
 
+  /**
+  * @brief Resets all resetable stats (reset=1) to the value of the default constructor
+  */
   void reset()
   {
 #define STAT(type, name, desc, reset)           BOOST_PP_EXPR_IF(BOOST_PP_EQUAL(reset, 1), _##name = type());
@@ -269,6 +276,9 @@ public:
     //#define AGENTSTATE_STAT(type, name, sz, desc, reset) s << boost::serialization::make_nvp( #name, _ ## name);
 #include "stat.def"
   }
+  /**
+  * @brief Resets all resetable stats (reset=2) to the value of the default constructor
+  */
   void resetAgentStats()
   {
 #define STAT(type, name, desc, reset)           BOOST_PP_EXPR_IF(BOOST_PP_EQUAL(reset, 2), _##name = type());
@@ -282,6 +292,11 @@ public:
   }
 
   /*** Custom Functions ***/
+  /**
+  * @brief Double dispatch method for updating agent statistics
+  *
+  * @param a
+  */
   void updateAgentStatistics(const Agent* a)
   {
     a->updateStatistics(*this);

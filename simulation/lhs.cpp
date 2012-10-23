@@ -19,7 +19,7 @@
 Rand g_Rand(1337);
 namespace po = boost::program_options;
 
-/*
+/** @class Lhs
  * The lhs program implements the Latin Hypercube Sampling algorithm.
  * This algorithm generates parameter sets by choosing parameter values
  * at random from specified probability distributions for each parameter
@@ -300,7 +300,7 @@ void Lhs::updateParamDouble(ParamDoubleType param, double val)
     }
 }
 
-/*
+/**
  * Perform the LHS
  *
  * See the comments at the start of this file for a general description of the LHS

@@ -324,6 +324,9 @@ public:
   * @details Updates the M1M2Ratio based on it's internal SBTNFR1 and SBIL10R
   * using the following formula:
   * \f$M1M2ratio = \frac{IL10R1_{surfBound}}{\max (TNFR1_{surfBound}, 1)}\f$
+  * This formula is to prevent NaNs or arbitrarily large numbers that usually
+  * only occur at the beginning of a simulation or when SBTNFR1 dominates
+  * anyway -- by how much doesn't really matter.
   */
   void updateM1M2Ratio()
   {

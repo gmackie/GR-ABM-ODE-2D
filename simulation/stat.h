@@ -74,6 +74,7 @@ class Stats
   friend class boost::serialization::access;
 public:
   typedef ba::accumulator_set<Scalar, ba::stats< ba::features< ba::tag::variance, ba::tag::min, ba::tag::max, ba::tag::median > > > Stat;
+  struct group_type {}; //For identifying groups
 protected:
 // --- Data Members ---
 #define STAT(type, name, desc, reset) \
@@ -195,6 +196,8 @@ public:
   template<typename Visitor>
   void visit(Visitor& v)
   {
+      group_type g;
+#define GROUP_STATS(name, desc) v.visit(name, g, desc);
 #define STAT(type, name, desc, reset)                v.visit(#name, _ ## name, desc);
 #define ARRAY_STAT(type, name, sz, desc, reset)      v.visit(#name, _ ## name, desc, sz);
 #define AGENT_STAT(type, name, desc, reset)          ARRAY_STAT(type, name, NAGENTS, desc, reset)
@@ -210,6 +213,8 @@ public:
   template<typename Visitor>
   void visit(Visitor& v) const
   {
+      group_type g;
+#define GROUP_STATS(name, desc) v.visit(name, g, desc);
 #define STAT(type, name, desc, reset)                v.visit(#name, _ ## name, desc);
 #define ARRAY_STAT(type, name, sz, desc, reset)      v.visit(#name, _ ## name, desc, sz);
 #define AGENT_STAT(type, name, desc, reset)          ARRAY_STAT(type, name, NAGENTS, desc, reset)

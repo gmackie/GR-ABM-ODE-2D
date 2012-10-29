@@ -26,6 +26,12 @@ struct StatCounterVisitor
   }
 };
 
+template<>
+void StatCounterVisitor::visit(const char *, const Stats::group_type &, const char *)
+{
+    // Do nothing here.
+}
+
 struct StatUpdateVisitor
 {
   QVector<QVector<double> >& _ydata;
@@ -43,6 +49,12 @@ struct StatUpdateVisitor
       _ydata[iter++].back() = double(val[i]);
   }
 };
+
+template<>
+void StatUpdateVisitor::visit(const char *, const Stats::group_type &, const char *)
+{
+    //Do nothing here..
+}
 
 GraphController::GraphController(const Stats& stats, size_t maxSamples) : _maxSamples(maxSamples)
 {

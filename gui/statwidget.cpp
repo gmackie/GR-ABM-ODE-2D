@@ -38,56 +38,83 @@ struct StatWidgetNameVisitor
 {
   StatWidget& _sw;
   int iter;
-  StatWidgetNameVisitor(StatWidget& sw) : _sw(sw), iter(0) {}
+  QTreeWidgetItem* root;
+  StatWidgetNameVisitor(StatWidget& sw) : _sw(sw), iter(0), root(NULL) {}
   template<typename T>
   void visit(const char* name, const T& val, const char* desc)
   {
-    _sw._ui.tableWidget->insertRow(iter);
-    QTableWidgetItem* item = new QTableWidgetItem();
-    item->setText(QString(name));
-    item->setToolTip(QString(desc));
-    _sw._ui.tableWidget->setItem(iter, 0, item);
-    _sw._ui.tableWidget->setItem(iter, 1, new QTableWidgetItem(toString(val)));
-    ++iter;
+    QTreeWidgetItem* item = new QTreeWidgetItem();
+    item->setText(0, QString(name));
+    item->setText(1, toString(val));
+    item->setToolTip(0, QString(desc));
+    if(root == NULL)
+        _sw._ui.treeWidget->addTopLevelItem(item);
+    else
+        root->addChild(item);
   }
   template<typename T, size_t N, typename E>
   void visit(const char* name, const boost::array<T, N>& val, const char* desc, E e)
   {
-    _sw._ui.tableWidget->insertRow(iter);
-    QTableWidgetItem* item = new QTableWidgetItem();
-    item->setText(QString(name));
-    item->setToolTip(QString(desc));
-    _sw._ui.tableWidget->setItem(iter, 0, item);
-    item = new QTableWidgetItem();
-    item->setText(toString(val));
-    item->setToolTip(enumstoString(e));
-    _sw._ui.tableWidget->setItem(iter, 1, item);
-    ++iter;
+    QTreeWidgetItem* item = new QTreeWidgetItem();
+    item->setText(0, QString(name));
+    item->setText(1, toString(val));
+    item->setToolTip(0, toString(desc));
+    item->setToolTip(1, enumstoString(e));
+    if(root == NULL)
+      _sw._ui.treeWidget->addTopLevelItem(item);
+    else
+      root->addChild(item);
   }
 };
+
+template<>
+void StatWidgetNameVisitor::visit(const char* name, const Stats::group_type&, const char* desc) {
+    root = new QTreeWidgetItem();
+    root->setText(0, QString(name));
+    root->setText(1, QString(desc));
+    _sw._ui.treeWidget->addTopLevelItem(root);
+}
 
 struct StatWidgetUpdateVisitor
 {
   StatWidget& _sw;
   int iter;
-  StatWidgetUpdateVisitor(StatWidget& sw) : _sw(sw), iter(0) {}
+  QTreeWidgetItem* root;
+  StatWidgetUpdateVisitor(StatWidget& sw) : _sw(sw), iter(0), root(NULL) {}
   template<typename T>
-  void visit(const char*, const T& val, const char*)
+  void visit(const char* name, const T& val, const char*)
   {
-    QTableWidgetItem* item = _sw._ui.tableWidget->item(iter, 1);
+    QTreeWidgetItem* item = NULL;
+    if(!root)
+      item = _sw._ui.treeWidget->findItems(name, Qt::MatchExactly, 0).first();
+    else
+      item = root->child(iter++);
     Q_CHECK_PTR(item);
-    item->setText(toString(val));
-    ++iter;
+    item->setText(1, toString(val));
   }
   template<typename T, size_t N, typename E>
-  void visit(const char*, const boost::array<T, N>& val, const char*, E)
+  void visit(const char* name, const boost::array<T, N>& val, const char*, E)
   {
-    QTableWidgetItem* item = _sw._ui.tableWidget->item(iter, 1);
+    QTreeWidgetItem* item = NULL;
+    if(!root)
+      item = _sw._ui.treeWidget->findItems(name, Qt::MatchExactly, 0).first();
+    else
+      item = root->child(iter++);
     Q_CHECK_PTR(item);
-    item->setText(toString(val));
-    ++iter;
+    item->setText(1, toString(val));
   }
 };
+
+template<>
+void StatWidgetUpdateVisitor::visit(const char * name, const Stats::group_type &, const char *)
+{   //Sets up the next group to look in
+    QString n(name);
+    size_t sz = _sw._ui.treeWidget->topLevelItemCount();
+    for(size_t i=0;i<sz;i++)
+      if(n==_sw._ui.treeWidget->topLevelItem(i)->text(0))
+        root =_sw._ui.treeWidget->topLevelItem(i);
+    iter = 0;
+}
 
 StatWidget::StatWidget(const Stats& stats, QWidget* pParent)
   : QWidget(pParent)

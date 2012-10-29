@@ -1,5 +1,7 @@
 /*
 
+GROUP_STATS(name, desc) //Group statistics together in the gui for visibility
+
 STATE_STAT(type, name, agent_t, desc, [reset=0]) //A stat for every state
 
 AGENT_STAT(type, name, desc, [reset=0]) //A stat for every agent type
@@ -11,7 +13,11 @@ ARRAY_STAT(type, name, sz, desc, [reset=0])  //Standard array of stats
 Reset can be either 0 = do not ever reset, 1 = reset on timestep, 2 = reset on agent, 
 
 */
-//Agent stats
+#ifndef GROUP_STATS
+#define GROUP_STATS(name, desc)
+#endif
+
+GROUP_STATS("Agent State Stats", "")
 AGENT_STAT(int, NrOfAgents, "Number of agents", 2)
 STATE_STAT(int, NrOfMacs, Mac, "Number of Macs", 2)
 STATE_STAT(int, NrOfTgams, Tgam, "Number of Tgams", 2)
@@ -27,17 +33,24 @@ STATE_STAT(int, MacDeactivation, Mac, "", 0)
 STATE_STAT(int, TgamDeactivation, Tgam, "", 0)
 STATE_STAT(int, TcytDeactivation, Tcyt, "", 0)
 STAT(int, TcellApoptosisTNF,        "", 0)
-//Regular stats
+
+GROUP_STATS("Misc", "")
 STAT(Scalar, TimePerStep,      "Wall-Time per simulation step (seconds)", 1)
+
+GROUP_STATS("Bacteria Stats", "")
 STAT(Scalar, TotExtMtb,          "Total External MTB", 1)
 STAT(Scalar, TotNonRepExtMtb,    "Total Non-replicating External MTB", 1)
 STAT(Scalar, TotIntMtb,          "Total Internal MTB", 1)
+
+GROUP_STATS("Chemokine Stats", "")
 STAT(Scalar, TotMacAttractant,   "", 1)
 STAT(Scalar, TotTNF,             "", 1)
 STAT(Scalar, TotIL10,            "", 1)
 STAT(Scalar, TotCCL2,            "", 1)
 STAT(Scalar, TotCCL5,            "", 1)
 STAT(Scalar, TotCXCL9,           "", 1)
+
+GROUP_STATS("Other Stats", "")
 STAT(Scalar, TotTNFR1int,        "", 1)
 STAT(Scalar, TotkmRNA,           "", 1)
 AGENT_STAT(int, NrRec, "Total Number of Agents Recruited", 0)
@@ -53,10 +66,14 @@ STAT(int, AreaTNF,          "", 1)
 STAT(int, AreaCellDensity,  "", 1)
 STAT(int, NrCaseated,       "", 1)
 ARRAY_STAT(GrStatus, Status, NOUTCOMES, "", 0)
+
+GROUP_STATS("Recruitment Stats", "")
 AGENT_STAT(int, NrQueued,     "", 1)
 AGENT_STAT(int, NrQueuedDie,  "", 1)
 AGENT_STAT(int, NrRecruited,  "", 1)
 AGENT_STAT(int, Flux,       "", 0)
+
+GROUP_STATS("ODE Stats", "")
 STAT(Scalar, MDC,     "", 0)
 STAT(Scalar, N4,      "", 0)
 STAT(Scalar, TH0,     "", 0)
@@ -76,3 +93,4 @@ STAT(int, NrOfCellsTnfInhibited, "", 1)
 #undef STATE_STAT
 #undef STAT
 #undef ARRAY_STAT
+#undef GROUP_STATS

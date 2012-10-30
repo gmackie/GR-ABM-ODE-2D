@@ -277,6 +277,11 @@ public:
     write("MiApoptTNF");
     write("MciApoptTNF");
     write("MaApoptTNF");
+    write("MacNFkBTNF");
+    write("MrNFkBTNF");
+    write("MiNFkBTNF");
+    write("MciNFkBTNF");
+    write("MaNFkBTNF");
     write("TcellApoptTNF");
     write("Fas/FasL Killing");
     write("Cytotoxic Killing");
@@ -356,7 +361,7 @@ public:
 
     write(stats.getNrCaseated());
 
-    int totMacApoptosisTNF[Mac::NSTATES] = {0}; //Just temporary for Mohammed Fallahi
+    int totMacApoptosisTNF[Mac::NSTATES] = {0};
     int sumMacApoptosisTNF = 0;
 
     for(int i=0; i<Mac::MAC_DEAD; i++)   //Keep a running sum of deaths
@@ -368,6 +373,19 @@ public:
     write(sumMacApoptosisTNF);
     for(int i=0; i<Mac::MAC_DEAD; i++)
       write(totMacApoptosisTNF[i]);
+
+    int totMacNFkBTNF[Mac::NSTATES] = {0};
+    int sumMacNFkBTNF = 0;
+
+    for(int i=0; i<Mac::MAC_DEAD; i++)   //Keep a running sum of activations
+      {
+        totMacNFkBTNF[i]+=(stats.getMacNFkBTNF((Mac::State)i));
+        sumMacNFkBTNF+=totMacNFkBTNF[i];
+      }
+
+    write(sumMacNFkBTNF);
+    for(int i=0; i<Mac::MAC_DEAD; i++)
+      write(totMacNFkBTNF[i]);
 
     write(stats.getTcellApoptosisTNF());
     write(stats.getApoptosisFasFasL());

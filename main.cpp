@@ -41,7 +41,7 @@ void setupScriptingMode(MainWindow& mainWindow)
   Ui::MainWindowClass& ui = mainWindow.getUI();
 
   ui.pushButtonAnimation->click();
-  ui.checkBoxDrawSmoke->setChecked(false);
+  //ui.checkBoxDrawSmoke->setChecked(false);
   ui.groupBoxOutput->setEnabled(false);
   ui.groupBoxStoppingCriteria->setEnabled(false);
   ui.horizontalSliderGranulomaBorderThreshold->setEnabled(false);

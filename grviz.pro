@@ -170,7 +170,6 @@ FORMS += gui/agentswidget.ui \
     gui/agenthistogram.ui
 QMAKE_CXXFLAGS_RELEASE -= -O2 -Wno-strict-aliasing
 QMAKE_CXXFLAGS_RELEASE += -O3 -Wno-strict-aliasing
-QMAKE_LFLAGS_RELEASE += -fopenmp -DOPENMP
 
 BOOST_PREFIX=$$(BOOST_PREFIX) #Grab the environment variable
 isEmpty(BOOST_PREFIX) {

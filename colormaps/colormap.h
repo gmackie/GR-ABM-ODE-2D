@@ -11,6 +11,8 @@
 #include <QString>
 #include "grviz.h"
 
+enum COLORMAP { CMAPRAINBOW=0, CMAPGRAY, CMAPFIRE, CMAPCOOLWARM, CMAPGREENRED, CMAPFIXED, NCOLORMAPS };
+
 class ColorMap
 {
 protected:
@@ -44,7 +46,21 @@ public:
   void setInvert(bool invert);
   bool getInvert() const;
   virtual QString getName() const = 0;
+  virtual COLORMAP getType() const = 0;
 };
+
+inline std::ostream& operator<<(std::ostream& s, COLORMAP m) {
+  switch(m) {
+    case CMAPGRAY:     s<<"Grayscale"; break;
+    case CMAPRAINBOW:  s<<"Rainbow";   break;
+    case CMAPFIRE:     s<<"Fire";      break;
+    case CMAPCOOLWARM: s<<"Cool/Warm"; break;
+    case CMAPGREENRED: s<<"Green/Red"; break;
+    case CMAPFIXED:    s<<"Fixed";     break;
+    default: assert(!"Invalid colormap"); break;
+  }
+  return s;
+}
 
 inline void ColorMap::setInvert(bool invert)
 {

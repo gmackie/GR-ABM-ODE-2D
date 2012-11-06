@@ -1033,36 +1033,31 @@ void GrSimulation::performT_Test()
 
 void GrSimulation::setDiffusionMethod(DiffusionMethod method)
 {
-	if (_pDiffusion->getMethod() != method)
-	{
-		delete _pDiffusion;
+  if (_pDiffusion) {
+    if (_pDiffusion->getMethod() == method)
+      return;
+    delete _pDiffusion;
+  }
 
-		switch (method)
-		{
-		case DIFF_SOR_CORRECT:
-			_pDiffusion = new GrDiffusionBTCS();
-			break;
-		case DIFF_SOR_WRONG:
-			_pDiffusion = new GrDiffusionWrongBTCS();
-			break;
-    case DIFF_REC_EQ:
-        std::clog<<"Warning: DIFF_REC_EQ disabled, defaulting to DIFF_REC_EQ_SWAP"<<std::endl;
-		case DIFF_REC_EQ_SWAP:
-       if(_PARAM(PARAM_GR_DT_DIFFUSION) > 12)
-         std::clog<<("*** WARNING: This diffusion method is unstable for timesteps greater than 12 seconds")<<std::endl;
-			_pDiffusion = new GrDiffusionFTCS_Swap();
-			break;
-    case DIFF_ADE_SWAP:
-        if(_PARAM(PARAM_GR_DT_DIFFUSION) > 30)
-          std::clog<<("*** WARNING: This diffusion method is inaccurate for timesteps greater than 30 seconds")<<std::endl;
-        _pDiffusion = new GrDiffusionADE_Swap();
-        break;
-                
-		}
-    if(method != DIFF_ADE_SWAP && _PARAM(PARAM_GR_DT_DIFFUSION) > 12) {
-     std::clog<<("*** WARNING: This diffusion method is unstable for timesteps greater than 12 seconds")<<std::endl;
-    }
-	}
+  switch (method)
+  {
+  case DIFF_SOR_CORRECT:
+    _pDiffusion = new GrDiffusionBTCS(); break;
+  case DIFF_SOR_WRONG:
+    _pDiffusion = new GrDiffusionWrongBTCS(); break;
+  case DIFF_REC_EQ:
+      std::clog<<"*** WARNING: DIFF_REC_EQ disabled, defaulting to DIFF_REC_EQ_SWAP"<<std::endl;
+  case DIFF_REC_EQ_SWAP:
+      _pDiffusion = new GrDiffusionFTCS_Swap(); break;
+  case DIFF_ADE_SWAP:
+      if(_PARAM(PARAM_GR_DT_DIFFUSION) > 30)
+        std::clog<<("*** WARNING: This diffusion method is inaccurate for timesteps greater than 30 seconds")<<std::endl;
+      _pDiffusion = new GrDiffusionADE_Swap(); break;
+   default:
+      assert(!"Invalid diffusion method"); break;
+  }
+  if(method != DIFF_ADE_SWAP && _PARAM(PARAM_GR_DT_DIFFUSION) > 12)
+   std::clog<<("*** WARNING: This diffusion method is unstable for timesteps greater than 12 seconds")<<std::endl;
 }
 
 RecruitmentMethod GrSimulation::getRecruitmentMethod()
@@ -1113,20 +1108,22 @@ void GrSimulation::setOutcomeMethod(int index, OutcomeMethod method, double alph
 	}
 	else
 	{
-		delete _pTTest[index];
+	    delete _pTTest[index];
 
-		switch (method)
-		{
-		case OUTCOME_AREA:
-			_pTTest[index] = new AreaTest(alpha, testPeriod, samplePeriod);
-			break;
-		case OUTCOME_MTB:
-			_pTTest[index] = new MtbTest(alpha, testPeriod, samplePeriod);
-			break;
-		case OUTCOME_NONE:
-			_pTTest[index] = NULL;
-			break;
-		}
+	    switch (method)
+	    {
+	    case OUTCOME_AREA:
+		    _pTTest[index] = new AreaTest(alpha, testPeriod, samplePeriod);
+		    break;
+	    case OUTCOME_MTB:
+		    _pTTest[index] = new MtbTest(alpha, testPeriod, samplePeriod);
+		    break;
+	    case OUTCOME_NONE:
+		    _pTTest[index] = NULL;
+		    break;
+	    default:
+		assert(!"Invalid outcome method");
+	    }
 	}
 }
 

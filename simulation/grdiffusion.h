@@ -14,7 +14,9 @@
 /**
 * @brief Diffusion base class for defining diffusion methods
 * @todo Redefine this class to deal with individual chemicals, abstracting from
-* the diffusing chemicals (let GrSimulation or GrGrid handle it)
+* the diffusing chemicals (let GrSimulation or GrGrid handle it).  Would be best
+* to have the diffusion method take in two ScalarGrid, one read one write, and
+* work from there.
 */
 class GrDiffusion
 {

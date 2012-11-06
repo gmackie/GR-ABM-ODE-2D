@@ -14,11 +14,11 @@
 Simulation::Simulation(const Pos& dim)
   : _mutex(QMutex::Recursive)
   , _modelMutex(QMutex::Recursive)
+  , _updated(false)
   , _time(0)
   , rng(g_Rand)
   , _gr(new GrSimulation(dim))
   , _backbuffer(new GrSimulation(dim))
-  , _updated(false)
   , _delay(0)
   , _stopFlag(false)
   , _timeStepsToSimulate(_TIMESTEPS_TO_SIMULATE) //_DAYS_TO_SIMULATE _TIMESTEPS_TO_SIMULATE

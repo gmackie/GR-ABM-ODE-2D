@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>574</width>
+    <width>622</width>
     <height>623</height>
    </rect>
   </property>
@@ -30,15 +30,15 @@
     <item row="0" column="0">
      <widget class="QToolBox" name="toolBoxSimulation">
       <property name="currentIndex">
-       <number>3</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="tabStatistics">
        <property name="geometry">
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>279</width>
-         <height>480</height>
+         <width>154</width>
+         <height>56</height>
         </rect>
        </property>
        <attribute name="label">
@@ -72,8 +72,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>279</width>
-         <height>480</height>
+         <width>96</width>
+         <height>71</height>
         </rect>
        </property>
        <attribute name="label">
@@ -99,8 +99,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>279</width>
-             <height>480</height>
+             <width>241</width>
+             <height>315</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_6">
@@ -283,7 +283,7 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>279</width>
+         <width>303</width>
          <height>480</height>
         </rect>
        </property>
@@ -310,7 +310,7 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>279</width>
+             <width>303</width>
              <height>480</height>
             </rect>
            </property>
@@ -320,25 +320,18 @@
             </property>
             <item>
              <widget class="QGroupBox" name="groupBoxOutput">
-              <property name="enabled">
-               <bool>true</bool>
-              </property>
               <property name="title">
                <string>Output</string>
               </property>
+              <property name="checkable">
+               <bool>true</bool>
+              </property>
+              <property name="checked">
+               <bool>false</bool>
+              </property>
               <layout class="QGridLayout" name="gridLayout_18">
-               <item row="0" column="0">
-                <widget class="QCheckBox" name="checkBoxOutput">
-                 <property name="text">
-                  <string>Enable output</string>
-                 </property>
-                </widget>
-               </item>
                <item row="1" column="1">
-                <widget class="QSpinBox" name="spinBoxSnapshotPicInterval">
-                 <property name="enabled">
-                  <bool>false</bool>
-                 </property>
+                <widget class="QSpinBox" name="spinBoxSnapshotStateInterval">
                  <property name="minimum">
                   <number>0</number>
                  </property>
@@ -350,51 +343,15 @@
                  </property>
                 </widget>
                </item>
-               <item row="5" column="0" colspan="2">
-                <widget class="QPushButton" name="pushButtonDumpGrids">
-                 <property name="toolTip">
-                  <string>shortcut: d</string>
-                 </property>
-                 <property name="text">
-                  <string>Dump grids</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="4" column="0" colspan="2">
-                <widget class="QLineEdit" name="lineEditOutput">
-                 <property name="enabled">
-                  <bool>false</bool>
-                 </property>
-                 <property name="readOnly">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-               <item row="3" column="0">
-                <widget class="QLabel" name="labelSnapshotCsvInterval">
-                 <property name="enabled">
-                  <bool>false</bool>
-                 </property>
-                 <property name="text">
-                  <string>CSV period</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="0">
+               <item row="0" column="0">
                 <widget class="QLabel" name="labelSnapshotPicInterval">
-                 <property name="enabled">
-                  <bool>false</bool>
-                 </property>
                  <property name="text">
                   <string>Pic period</string>
                  </property>
                 </widget>
                </item>
-               <item row="3" column="1">
+               <item row="2" column="1">
                 <widget class="QSpinBox" name="spinBoxSnapshotCsvInterval">
-                 <property name="enabled">
-                  <bool>false</bool>
-                 </property>
                  <property name="minimum">
                   <number>0</number>
                  </property>
@@ -407,20 +364,14 @@
                 </widget>
                </item>
                <item row="2" column="0">
-                <widget class="QLabel" name="labelSnapshotStateInterval">
-                 <property name="enabled">
-                  <bool>false</bool>
-                 </property>
+                <widget class="QLabel" name="labelSnapshotCsvInterval">
                  <property name="text">
-                  <string>State period</string>
+                  <string>CSV period</string>
                  </property>
                 </widget>
                </item>
-               <item row="2" column="1">
-                <widget class="QSpinBox" name="spinBoxSnapshotStateInterval">
-                 <property name="enabled">
-                  <bool>false</bool>
-                 </property>
+               <item row="0" column="1">
+                <widget class="QSpinBox" name="spinBoxSnapshotPicInterval">
                  <property name="minimum">
                   <number>0</number>
                  </property>
@@ -429,6 +380,20 @@
                  </property>
                  <property name="value">
                   <number>144</number>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="0">
+                <widget class="QLabel" name="labelSnapshotStateInterval">
+                 <property name="text">
+                  <string>State period</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="0" colspan="2">
+                <widget class="QLineEdit" name="lineEditOutput">
+                 <property name="readOnly">
+                  <bool>true</bool>
                  </property>
                 </widget>
                </item>
@@ -441,6 +406,16 @@
                <string>Simulation state</string>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_2">
+               <item>
+                <widget class="QPushButton" name="pushButtonDumpGrids">
+                 <property name="toolTip">
+                  <string>shortcut: d</string>
+                 </property>
+                 <property name="text">
+                  <string>Dump grids</string>
+                 </property>
+                </widget>
+               </item>
                <item>
                 <widget class="QPushButton" name="pushButtonLoadState">
                  <property name="text">
@@ -498,8 +473,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>279</width>
-         <height>480</height>
+         <width>96</width>
+         <height>71</height>
         </rect>
        </property>
        <attribute name="label">
@@ -525,8 +500,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>279</width>
-             <height>480</height>
+             <width>193</width>
+             <height>156</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_12">
@@ -615,6 +590,9 @@
                  <property name="maximum">
                   <number>72000</number>
                  </property>
+                 <property name="value">
+                  <number>144</number>
+                 </property>
                 </widget>
                </item>
               </layout>
@@ -648,7 +626,7 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>279</width>
+         <width>303</width>
          <height>424</height>
         </rect>
        </property>
@@ -675,7 +653,7 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>279</width>
+             <width>303</width>
              <height>424</height>
             </rect>
            </property>
@@ -873,8 +851,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>279</width>
-         <height>424</height>
+         <width>96</width>
+         <height>26</height>
         </rect>
        </property>
        <attribute name="label">
@@ -891,8 +869,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>279</width>
-         <height>424</height>
+         <width>96</width>
+         <height>71</height>
         </rect>
        </property>
        <attribute name="label">
@@ -918,8 +896,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>279</width>
-             <height>424</height>
+             <width>208</width>
+             <height>244</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -1106,8 +1084,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>279</width>
-         <height>424</height>
+         <width>96</width>
+         <height>89</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1136,8 +1114,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>279</width>
-             <height>406</height>
+             <width>229</width>
+             <height>218</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -1249,8 +1227,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>279</width>
-         <height>424</height>
+         <width>96</width>
+         <height>71</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1276,8 +1254,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>279</width>
-             <height>424</height>
+             <width>280</width>
+             <height>401</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout">
@@ -1371,6 +1349,16 @@
                  <property name="enabled">
                   <bool>true</bool>
                  </property>
+                 <item>
+                  <property name="text">
+                   <string>Clamping</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Scaling (real-time)</string>
+                  </property>
+                 </item>
                 </widget>
                </item>
                <item row="2" column="0">
@@ -1551,8 +1539,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>279</width>
-         <height>424</height>
+         <width>96</width>
+         <height>71</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1577,8 +1565,8 @@
            <property name="geometry">
             <rect>
              <x>0</x>
-             <y>-25</y>
-             <width>264</width>
+             <y>0</y>
+             <width>280</width>
              <height>449</height>
             </rect>
            </property>
@@ -1611,6 +1599,16 @@
                  <property name="enabled">
                   <bool>true</bool>
                  </property>
+                 <item>
+                  <property name="text">
+                   <string>Clamping</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Scaling (real-time)</string>
+                  </property>
+                 </item>
                 </widget>
                </item>
                <item row="1" column="0">
@@ -1910,7 +1908,51 @@
     </item>
    </layout>
   </widget>
+  <action name="actionShowParameters">
+   <property name="text">
+    <string>ShowParameters</string>
+   </property>
+   <property name="toolTip">
+    <string>Show Parameter Window</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+P</string>
+   </property>
+  </action>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>checkBoxStopDays</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>spinBoxStopDays</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>59</x>
+     <y>219</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>178</x>
+     <y>218</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkBoxStopDays</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>spinBoxStopTime</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>104</x>
+     <y>220</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>176</x>
+     <y>250</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

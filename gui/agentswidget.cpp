@@ -271,7 +271,8 @@ void AgentsWidget::loadSettings()
   _ui.checkBoxDrawAgentTreg->setChecked(settings.value("TregENBL", _ui.checkBoxDrawAgentTreg->isChecked()).toBool());
   settings.endGroup();
   blockSignals(false);
-  emit updateGL();
+
+  updateM1M2Settings();
 }
 
 void AgentsWidget::on_checkboxSquareAgents_toggled(bool checked)

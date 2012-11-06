@@ -59,14 +59,6 @@
 
 // static members
 MainWindow* MainWindow::_pMainWindow = NULL;
-const QString MainWindow::_COLORMAP_GRAYSCALE = "Grayscale";
-const QString MainWindow::_COLORMAP_RAINBOW = "Rainbow";
-const QString MainWindow::_COLORMAP_FIRE = "Fire";
-const QString MainWindow::_COLORMAP_COOLWARM = "Cool/warm";
-const QString MainWindow::_COLORMAP_GREENRED = "Green/Red";
-
-const QString MainWindow::_MAP_METHOD_CLAMP = "Clamping";
-const QString MainWindow::_MAP_METHOD_SCALE = "Scaling (real-time)";
 
 const QString MainWindow::_DATASET_ATTRACTANT = "Attractant";
 const QString MainWindow::_DATASET_ATTRACTANT_GRADIENT = "grad Attractant";
@@ -111,27 +103,10 @@ const int MainWindow::_N_SCALAR_DATASETS = sizeof(_SCALAR_DATASETS)/sizeof(QStri
 const QString MainWindow::_INTERPOLATION_BILINEAR = "Bi-linear";
 const QString MainWindow::_INTERPOLATION_NEAREST_NEIGHBOR = "Nearest neighbour";
 
-const QString MainWindow::_COLORMAP_SOURCE_SMOKE = "Smoke";
-const QString MainWindow::_COLORMAP_SOURCE_GLYPHS = "Glyphs";
-const QString MainWindow::_COLORMAP_SOURCE_ISOLINES = "Isolines";
-const QString MainWindow::_COLORMAP_SOURCE_HEIGHTPLOT = "Height plot";
-
 const QString MainWindow::_GLYPH_HEDGEHOG = "Hedgehog";
 const QString MainWindow::_GLYPH_CONE = "Cone";
 const QString MainWindow::_GLYPH_ARROW = "Arrow";
 const QString MainWindow::_GLYPH_TEXTURE = "Texture";
-
-const QString MainWindow::_DIFF_FTCS = "Recursive eq";
-const QString MainWindow::_DIFF_SOR_CORRECT = "SOR correct";
-const QString MainWindow::_DIFF_SOR_WRONG = "SOR wrong";
-const QString MainWindow::_DIFF_FTCS_SWAP = "Swap Recursive eq";
-const QString MainWindow::_DIFF_ADE_SWAP = "Swap ADE eq";
-
-const QString MainWindow::_OUTCOME_AREA = "Area";
-const QString MainWindow::_OUTCOME_MTB = "Mtb.";
-const QString MainWindow::_OUTCOME_NONE = "None";
-const QString MainWindow::_OUTCOME_METHOD_1 = "Method 1";
-const QString MainWindow::_OUTCOME_METHOD_2 = "Method 2";
 
 MainWindow::MainWindow(MainInterface* pItfc, GLWindow* pGLWindow, QWidget* pParamWindow,
                        StatWidget* pStatWidget, AgentsWidget* pAgentsWidget, const QDir& dir, QWidget* parent)
@@ -223,16 +198,15 @@ MainWindow::MainWindow(MainInterface* pItfc, GLWindow* pGLWindow, QWidget* pPara
 
 void MainWindow::initOutcomeTab()
 {
-  _ui.spinBoxOutcomeTestPeriod->setValue(_OUTCOME_TEST_PERIOD);
-  _ui.spinBoxOutcomeSamplePeriod->setValue(_OUTCOME_SAMPLE_PERIOD);
-  _ui.doubleSpinBoxOutcomeAlpha->setValue(_OUTCOME_ALPHA);
 
-  _ui.comboBoxOutcomeMethod->addItem(_OUTCOME_NONE);
-  _ui.comboBoxOutcomeMethod->addItem(_OUTCOME_AREA);
-  _ui.comboBoxOutcomeMethod->addItem(_OUTCOME_MTB);
+  for(int i=0;i<NOUTCOMES;i++)
+    _ui.comboBoxOutcomeNumber->addItem(QString("Method %1").arg(i+1));
 
-  _ui.comboBoxOutcomeNumber->addItem(_OUTCOME_METHOD_1);
-  _ui.comboBoxOutcomeNumber->addItem(_OUTCOME_METHOD_2);
+  for(int i=0;i<NOUTCOMEMETH;i++) {
+    std::ostringstream ss;
+    ss<<OutcomeMethod(i);
+    _ui.comboBoxOutcomeMethod->addItem(QString::fromStdString(ss.str()));
+  }
 
   connect(_ui.comboBoxOutcomeMethod, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(updateOutcomeSettings(void)));
   connect(_ui.comboBoxOutcomeNumber, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(updateOutcomeParameters(void)));
@@ -247,7 +221,6 @@ void MainWindow::initOutputTab()
   _ui.spinBoxSnapshotPicInterval->setValue(_SNAPSHOT_PIC_PERIOD);
 
   connect(_ui.pushButtonDumpGrids, SIGNAL(clicked(bool)), this, SLOT(dumpGrids(void)));
-  connect(_ui.checkBoxOutput, SIGNAL(toggled(bool)), this, SLOT(setEnableOutput(bool)));
   connect(_ui.pushButtonLoadState, SIGNAL(clicked(bool)), this, SLOT(loadState(void)));
   connect(_ui.pushButtonSaveState, SIGNAL(clicked(bool)), this, SLOT(saveState(void)));
   connect(_ui.pushButtonTakeSnapshot, SIGNAL(clicked(bool)), this, SLOT(takePictureSnapshot(void)));
@@ -273,13 +246,9 @@ void MainWindow::initHeightTab()
   _ui.comboBoxHeightColorDataset->addItem(_DATASET_INTMTB);
   _ui.comboBoxHeightColorDataset->addItem(_DATASET_KILLINGS);
 
-  /* configure _ui.comboBoxHeightMappingMethod */
-  _ui.comboBoxHeightMappingMethod->addItem(_MAP_METHOD_CLAMP);
-  _ui.comboBoxHeightMappingMethod->addItem(_MAP_METHOD_SCALE);
-
   connect(_ui.comboBoxHeightDataset, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(updateHeightPlotSettings(void)));
   connect(_ui.comboBoxHeightColorDataset, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(updateHeightPlotSettings(void)));
-  connect(_ui.comboBoxHeightMappingMethod, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(updateHeightPlotSettings(void)));
+  connect(_ui.comboBoxHeightMappingMethod, SIGNAL(currentIndexChanged(int)), this, SLOT(updateHeightPlotSettings(void)));
   connect(_ui.pushButtonHeightRescale, SIGNAL(clicked(bool)), this, SLOT(rescaleHeightRequest(void)));
   connect(_ui.doubleSpinBoxHeightMin, SIGNAL(valueChanged(double)), this, SLOT(updateHeightMinMax(void)));
   connect(_ui.doubleSpinBoxHeightMax, SIGNAL(valueChanged(double)), this, SLOT(updateHeightMinMax(void)));
@@ -318,7 +287,6 @@ void MainWindow::initShortcuts()
   QShortcut* pArrowUp = new QShortcut(QKeySequence("up"), this, NULL, NULL, Qt::ApplicationShortcut);
   QShortcut* pArrowDown = new QShortcut(QKeySequence("down"), this, NULL, NULL, Qt::ApplicationShortcut);
   QShortcut* pFullscreen = new QShortcut(QKeySequence("F11"), this, NULL, NULL, Qt::ApplicationShortcut);
-  QShortcut* pShowParameters = new QShortcut(QKeySequence("Ctrl+p"), this, NULL, NULL, Qt::ApplicationShortcut);
   QShortcut* pLoadState = new QShortcut(QKeySequence("Ctrl+l"), this, NULL, NULL, Qt::ApplicationShortcut);
   QShortcut* pSaveState = new QShortcut(QKeySequence("Ctrl+s"), this, NULL, NULL, Qt::ApplicationShortcut);
   QShortcut* pTakePicture = new QShortcut(QKeySequence("F10"), this, NULL, NULL, Qt::ApplicationShortcut);
@@ -350,7 +318,6 @@ void MainWindow::initShortcuts()
   connect(pArrowUp, SIGNAL(activated(void)), _pGLWindow, SLOT(moveSelectionUp(void)));
   connect(pArrowDown, SIGNAL(activated(void)), _pGLWindow, SLOT(moveSelectionDown(void)));
   connect(pFullscreen, SIGNAL(activated(void)), _pGLWindow, SLOT(toggleFullScreen(void)));
-  connect(pShowParameters, SIGNAL(activated(void)), this, SLOT(showParams(void)));
   connect(pLoadState, SIGNAL(activated(void)), this, SLOT(loadState(void)));
   connect(pSaveState, SIGNAL(activated(void)), this, SLOT(saveState(void)));
   connect(pTakePicture, SIGNAL(activated(void)), this, SLOT(takePictureSnapshot(void)));
@@ -404,28 +371,27 @@ void MainWindow::initVisualizationTab()
   connect(_ui.checkBoxDrawOutcomes, SIGNAL(toggled(bool)), _pGLWindow, SLOT(setPrintOutcome(bool)));
 }
 
+/**
+ * @name Simulation Tab management
+ * @{
+ */
+
+/**
+ * @brief Initialize the simulation tab with default values
+ */
+
 void MainWindow::initSimulationTab()
 {
   /* configure _ui.comboBoxDiffusion */
-  _ui.comboBoxDiffusion->addItem(_DIFF_FTCS);
-  _ui.comboBoxDiffusion->addItem(_DIFF_SOR_CORRECT);
-  _ui.comboBoxDiffusion->addItem(_DIFF_SOR_WRONG);
-  _ui.comboBoxDiffusion->addItem(_DIFF_FTCS_SWAP);
-  _ui.comboBoxDiffusion->addItem(_DIFF_ADE_SWAP);
-
-  // So seeds don't get truncated.
-  _ui.spinBoxSeed->setMaximum(INT_MAX);
-
-  _ui.spinBoxSeed->setValue((int) g_Rand.getSeed());
-
-  connect(_ui.comboBoxDiffusion, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(updateDiffusionMethod(const QString&)));
-  connect(_ui.spinBoxDelay, SIGNAL(valueChanged(int)), this, SLOT(updateDelay(int)));
-  connect(_ui.spinBoxSeed, SIGNAL(valueChanged(int)), this, SLOT(updateSeed(int)));
-  connect(_ui.pushButtonShowParams, SIGNAL(clicked(bool)), this, SLOT(showParams(void)));
-  connect(_ui.checkBoxStopDays, SIGNAL(toggled(bool)), this, SLOT(updateStopCriteria(void)));
-  connect(_ui.checkBoxStopClearance, SIGNAL(toggled(bool)), this, SLOT(updateStopCriteria(void)));
-  connect(_ui.spinBoxStopDays, SIGNAL(valueChanged(int)), this, SLOT(updateTimeBox(int)));
-  connect(_ui.spinBoxStopTime, SIGNAL(valueChanged(int)), this, SLOT(updateStopCriteria(void)));
+  // The first item added will cause a signal.
+  // Block it til we assign the right diffusion method
+  _ui.comboBoxDiffusion->blockSignals(true);
+  for(int i=0;i<NDIFFUSEMETH;i++) {
+    std::ostringstream ss;
+    ss<<DiffusionMethod(i);
+    _ui.comboBoxDiffusion->addItem(QString::fromStdString(ss.str()));
+  }
+  _ui.comboBoxDiffusion->blockSignals(false);
 
   // Set the default diffusion method to ADE swap.
   // This must be after connecting the currentIndexChanged signal
@@ -433,47 +399,100 @@ void MainWindow::initSimulationTab()
   // the combo box doesn't update the simulation object diffusion
   // method, so it remains whatever the default method is from
   // the simulation object constructor.
-  _ui.comboBoxDiffusion->setCurrentIndex(4);
+  _ui.comboBoxDiffusion->setCurrentIndex(DIFF_ADE_SWAP);
+
+  // So seeds don't get truncated.
+  _ui.spinBoxSeed->blockSignals(true);  //Block it in case of deserialization issues.
+  _ui.spinBoxSeed->setMaximum(std::numeric_limits<int>::max());
+  _ui.spinBoxSeed->setValue((int) g_Rand.getSeed());
+  _ui.spinBoxSeed->blockSignals(false);
 }
-void MainWindow::updateTimeBox(int x)
+
+
+void MainWindow::on_checkBoxStopDays_toggled(bool checked)
 {
-  _ui.spinBoxStopTime->setValue(x*TIME_STEPS_PER_DAY);
+  _pItfc->getSimulation().setTimeToSimulate(checked ? _ui.spinBoxStopTime->value() : -1);
 }
+
+void MainWindow::on_spinBoxStopTime_valueChanged(int arg1)
+{
+  _ui.spinBoxStopDays->blockSignals(true);  //Prevent double signaling
+  _ui.spinBoxStopDays->setValue(arg1/TIME_STEPS_PER_DAY);
+  _ui.spinBoxStopDays->blockSignals(false);
+  _pItfc->getSimulation().setTimeToSimulate(arg1);
+}
+
+void MainWindow::on_spinBoxStopDays_valueChanged(int arg1)
+{
+  _ui.spinBoxStopTime->setValue(arg1 * TIME_STEPS_PER_DAY);
+}
+
+void MainWindow::on_checkBoxStopClearance_toggled(bool checked)
+{
+  _pItfc->getSimulation().setMtbClearance(checked);
+}
+
+void MainWindow::on_pushButtonShowParams_clicked()
+{
+  _pParamWindow->show();
+}
+
+void MainWindow::on_actionShowParameters_triggered()
+{
+  _pParamWindow->show();
+}
+
+void MainWindow::on_comboBoxDiffusion_currentIndexChanged(int index)
+{
+  _pItfc->getSimulation().setDiffusionMethod(DiffusionMethod(index));
+}
+
+void MainWindow::on_spinBoxDelay_valueChanged(int arg1)
+{
+  _pItfc->getSimulation().setDelay(arg1);
+}
+
+void MainWindow::on_spinBoxSeed_valueChanged(int arg1)
+{
+  // Need to make sure the simulation thread doesn't touch the RNG while changing the seed.
+  _pItfc->getSimulation().lock();
+  _pItfc->getSimulation().modelLock();
+    g_Rand.setSeed(arg1);
+  _pItfc->getSimulation().modelUnlock();
+  _pItfc->getSimulation().unlock();
+}
+
+///@}
 
 void MainWindow::initColorMapTab()
 {
   /* configure _ui.comboBoxScalarColoring */
-  _ui.comboBoxScalarColoring->addItem(_COLORMAP_GRAYSCALE);
-  _ui.comboBoxScalarColoring->addItem(_COLORMAP_RAINBOW);
-  _ui.comboBoxScalarColoring->addItem(_COLORMAP_FIRE);
-  _ui.comboBoxScalarColoring->addItem(_COLORMAP_COOLWARM);
-  _ui.comboBoxScalarColoring->addItem(_COLORMAP_GREENRED);
-
-  // default for smoke is rainbow colormap
-  _ui.comboBoxScalarColoring->setCurrentIndex(1);
-
-  /* configure _ui.comboBoxMappingMethod */
-  _ui.comboBoxMappingMethod->addItem(_MAP_METHOD_CLAMP);
-  _ui.comboBoxMappingMethod->addItem(_MAP_METHOD_SCALE);
+  for(int i=0;i<NCOLORMAPS;i++) {
+    std::ostringstream ss;
+    ss<<COLORMAP(i);
+    _ui.comboBoxScalarColoring->addItem(QString::fromStdString(ss.str()));
+  }
 
   /* configure _ui.comboBoxColorMapping */
-  _ui.comboBoxColorMapSource->addItem(_COLORMAP_SOURCE_SMOKE);
-  _ui.comboBoxColorMapSource->addItem(_COLORMAP_SOURCE_GLYPHS);
-  _ui.comboBoxColorMapSource->addItem(_COLORMAP_SOURCE_ISOLINES);
-  _ui.comboBoxColorMapSource->addItem(_COLORMAP_SOURCE_HEIGHTPLOT);
+  _ui.comboBoxColorMapSource->blockSignals(true);
+  for(int i=0;i<NCOLORMAPSRCS;i++) {
+      std::ostringstream ss;
+      ss<<COLORMAP_SRC(i);
+      _ui.comboBoxColorMapSource->addItem(QString::fromStdString(ss.str()));
+  }
+  _ui.comboBoxColorMapSource->blockSignals(false);
 
-  connect(_ui.comboBoxScalarColoring, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(setColorMap(const QString&)));
+  connect(_ui.comboBoxScalarColoring, SIGNAL(currentIndexChanged(int)), this, SLOT(setColorMap(int)));
   connect(_ui.spinBoxNumberOfColors, SIGNAL(valueChanged(int)), this, SLOT(updateColorMap(void)));
   connect(_ui.horizontalSliderHue, SIGNAL(valueChanged(int)), this, SLOT(updateColorMap(void)));
   connect(_ui.horizontalSliderSat, SIGNAL(valueChanged(int)), this, SLOT(updateColorMap(void)));
   connect(_ui.horizontalSliderVal, SIGNAL(valueChanged(int)), this, SLOT(updateColorMap(void)));
   connect(_ui.horizontalSliderAlpha, SIGNAL(valueChanged(int)), this, SLOT(updateColorMap(void)));
   connect(_ui.checkBoxReverseColorMap, SIGNAL(toggled(bool)), this, SLOT(updateColorMap(void)));
-  connect(_ui.comboBoxMappingMethod, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(setMappingMethod(const QString&)));
+  connect(_ui.comboBoxMappingMethod, SIGNAL(currentIndexChanged(int)), this, SLOT(setMappingMethod(int)));
   connect(_ui.doubleSpinBoxMin, SIGNAL(valueChanged(double)), this, SLOT(updateColorMapLabels(void)));
   connect(_ui.doubleSpinBoxMax, SIGNAL(valueChanged(double)), this, SLOT(updateColorMapLabels(void)));
   connect(_ui.pushButtonRescale, SIGNAL(clicked(bool)), this, SLOT(rescaleRequest(void)));
-  connect(_ui.comboBoxColorMapSource, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(setColorMapSource(const QString&)));
   connect(this, SIGNAL(updateColorMap(ColorMap*)), _pGLWindow, SLOT(setColorMap(ColorMap*)));
   connect(this, SIGNAL(updateColorMapLabels(float, float)), _pGLWindow, SLOT(updateColorMapLabels(float, float)));
 }
@@ -829,7 +848,7 @@ void MainWindow::setGlyphScaling(int value)
 
 void MainWindow::updateColorMap()
 {
-  setColorMap(_ui.comboBoxScalarColoring->currentText());
+  setColorMap(_ui.comboBoxScalarColoring->currentIndex());
 }
 
 void MainWindow::updateColorMapLabels()
@@ -869,9 +888,9 @@ void MainWindow::rescaleHeightRequest()
   emit updateGL();
 }
 
-void MainWindow::setMappingMethod(const QString& value)
+void MainWindow::setMappingMethod(int value)
 {
-  if (value == _MAP_METHOD_CLAMP)
+  if (value == 0)
     {
       _ui.doubleSpinBoxMax->setEnabled(true);
       _ui.doubleSpinBoxMax->setDecimals(3);
@@ -883,7 +902,7 @@ void MainWindow::setMappingMethod(const QString& value)
 
       // no need to update, as the previous mode was _MAP_METHOD_SCALE
     }
-  else if (value == _MAP_METHOD_SCALE)
+  else if (value == 1)
     {
       _ui.doubleSpinBoxMax->setEnabled(false);
       _ui.doubleSpinBoxMax->setDecimals(7);
@@ -901,8 +920,8 @@ void MainWindow::setSmokeDataset(const QString& value)
   ScalarDataset* pScalarSmokeDataset = getNewScalarDataset(value);
   _pItfc->setScalarSmokeDataset(pScalarSmokeDataset);
 
-  if (_ui.comboBoxMappingMethod->currentText() == _MAP_METHOD_SCALE &&
-      _ui.comboBoxColorMapSource->currentText() == _COLORMAP_SOURCE_SMOKE)
+  if (_ui.comboBoxMappingMethod->currentIndex() == 1 &&
+      _ui.comboBoxColorMapSource->currentIndex() == SMOKE_SRC)
     {
       rescaleRequest();
     }
@@ -921,148 +940,52 @@ void MainWindow::setGlyphVectorDataset(const QString& value)
   emit updateGL();
 }
 
-void MainWindow::setColorMap(const QString& value)
+void MainWindow::setColorMap(const int value)
 {
-  if (value == _COLORMAP_GRAYSCALE)
-    {
-      _pCurrentColorMap = new ColorMapBlackWhite();
-    }
-  else if (value == _COLORMAP_RAINBOW)
-    {
-      _pCurrentColorMap = new ColorMapRainbow();
-    }
-  else if (value == _COLORMAP_FIRE)
-    {
-      _pCurrentColorMap = new ColorMapFire();
-    }
-  else if (value == _COLORMAP_COOLWARM)
-    {
-      _pCurrentColorMap = new ColorMapCoolWarm();
-    }
-  else if (value == _COLORMAP_GREENRED)
-    {
-      _pCurrentColorMap = new ColorMapGreenRed();
+  switch(value) {
+    case CMAPRAINBOW:
+      _pCurrentColorMap = new ColorMapRainbow(); break;
+    case CMAPGRAY:
+      _pCurrentColorMap = new ColorMapBlackWhite(); break;
+    case CMAPFIRE:
+      _pCurrentColorMap = new ColorMapFire(); break;
+    case CMAPCOOLWARM:
+      _pCurrentColorMap = new ColorMapCoolWarm(); break;
+    case CMAPGREENRED:
+      _pCurrentColorMap = new ColorMapGreenRed(); break;
+    default:
+      assert(!"Invalid color map"); break;
     }
   assert(_pCurrentColorMap);
 
-  int deltaHue = _ui.horizontalSliderHue->value();
-  _pCurrentColorMap->setHueDelta(deltaHue / _SLIDER_COLORMAP_HUE);
+  const float deltaHue = 1.0f*_ui.horizontalSliderHue->value();
+  _pCurrentColorMap->setHueDelta(deltaHue / _ui.horizontalSliderHue->maximum());
 
-  int deltaSat = _ui.horizontalSliderSat->value();
-  _pCurrentColorMap->setSatDelta(deltaSat / _SLIDER_COLORMAP_SAT);
+  const float deltaSat = 1.0f*_ui.horizontalSliderSat->value();
+  _pCurrentColorMap->setSatDelta(deltaSat / _ui.horizontalSliderSat->maximum());
 
-  int deltaVal = _ui.horizontalSliderVal->value();
-  _pCurrentColorMap->setValDelta(deltaVal / _SLIDER_COLORMAP_VAL);
+  const float deltaVal = 1.0f*_ui.horizontalSliderVal->value();
+  _pCurrentColorMap->setValDelta(deltaVal / _ui.horizontalSliderVal->maximum());
 
-  int alpha = _ui.horizontalSliderAlpha->value();
-  _pCurrentColorMap->setAlpha(alpha / _SLIDER_COLORMAP_ALPHA);
+  const float alpha = 1.0f*_ui.horizontalSliderAlpha->value();
+  _pCurrentColorMap->setAlpha(alpha / _ui.horizontalSliderAlpha->maximum());
 
-  int nColors = _ui.spinBoxNumberOfColors->value();
+  const int nColors = _ui.spinBoxNumberOfColors->value();
   _pCurrentColorMap->setNrBands(nColors);
 
   _pCurrentColorMap->setInvert(_ui.checkBoxReverseColorMap->isChecked());
 
-  const QString& colorMapSelection = _ui.comboBoxColorMapSource->currentText();
-  if (colorMapSelection == _COLORMAP_SOURCE_SMOKE)
-    {
-      _pItfc->setColorMapSmoke(_pCurrentColorMap);
-    }
-  else if (colorMapSelection == _COLORMAP_SOURCE_GLYPHS)
-    {
-      _pItfc->setColorMapGlyphs(_pCurrentColorMap);
-    }
-  else if (colorMapSelection == _COLORMAP_SOURCE_ISOLINES)
-    {
-      _pItfc->setColorMapIsolines(_pCurrentColorMap);
-    }
-  else if (colorMapSelection == _COLORMAP_SOURCE_HEIGHTPLOT)
-    {
-      _pItfc->setColorMapHeightPlot(_pCurrentColorMap);
-    }
-  else
-    {
-      assert(false);
-    }
+  const int colorMapSelection = _ui.comboBoxColorMapSource->currentIndex();
+  switch(colorMapSelection) {
+    case SMOKE_SRC:      _pItfc->setColorMapSmoke(_pCurrentColorMap); break;
+    case GLYPHS_SRC:     _pItfc->setColorMapGlyphs(_pCurrentColorMap); break;
+    case ISOLINES_SRC:   _pItfc->setColorMapIsolines(_pCurrentColorMap); break;
+    case HEIGHTPLOT_SRC: _pItfc->setColorMapHeightPlot(_pCurrentColorMap); break;
+    default: assert(!"Invalid colormap source"); break;
+  }
 
   emit updateColorMap(_pCurrentColorMap);
   emit updateGL();
-}
-
-void MainWindow::updateSeed(int value)
-{
-  g_Rand.setSeed((unsigned int) value);
-}
-
-void MainWindow::updateDelay(int value)
-{
-  Simulation& sim = _pItfc->getSimulation();
-  sim.setDelay(value);
-}
-
-void MainWindow::setColorMapSource(const QString& value)
-{
-  refreshCurrentColorMap(value);
-  refreshCurrentNormalizer(value);
-  refreshCurrentScalarGrid(value);
-
-  float min = _pCurrentNormalizer->getMin();
-  float max = _pCurrentNormalizer->getMax();
-
-  if (_pCurrentNormalizer->getClamping())
-    {
-      _ui.comboBoxMappingMethod->setCurrentIndex(0);
-    }
-  else
-    {
-      _ui.comboBoxMappingMethod->setCurrentIndex(1);
-    }
-
-  _ui.doubleSpinBoxMin->setValue(min);
-  _ui.doubleSpinBoxMax->setValue(max);
-
-  int hue = (int)(_pCurrentColorMap->getHueDelta() * _SLIDER_COLORMAP_HUE);
-  int sat = (int)(_pCurrentColorMap->getSatDelta() * _SLIDER_COLORMAP_SAT);
-  int val = (int)(_pCurrentColorMap->getValDelta() * _SLIDER_COLORMAP_VAL);
-  int alpha = (int)(_pCurrentColorMap->getAlpha() * _SLIDER_COLORMAP_ALPHA);
-  QString name = _pCurrentColorMap->getName();
-
-  bool reverse = _pCurrentColorMap->getInvert();
-  int nrBands = _pCurrentColorMap->getNrBands();
-
-  _ui.horizontalSliderHue->setValue(hue);
-  _ui.horizontalSliderSat->setValue(sat);
-  _ui.horizontalSliderVal->setValue(val);
-  _ui.horizontalSliderAlpha->setValue(alpha);
-
-  if (name == _COLORMAP_GRAYSCALE)
-    {
-      _ui.comboBoxScalarColoring->setCurrentIndex(0);
-    }
-  else if (name == _COLORMAP_RAINBOW)
-    {
-      _ui.comboBoxScalarColoring->setCurrentIndex(1);
-    }
-  else if (name == _COLORMAP_FIRE)
-    {
-      _ui.comboBoxScalarColoring->setCurrentIndex(2);
-    }
-  else if (name == _COLORMAP_COOLWARM)
-    {
-      _ui.comboBoxScalarColoring->setCurrentIndex(3);
-    }
-  else if (name == _COLORMAP_GREENRED)
-    {
-      _ui.comboBoxScalarColoring->setCurrentIndex(4);
-    }
-  else
-    {
-      assert(false);
-    }
-
-  _ui.checkBoxReverseColorMap->setChecked(reverse);
-  _ui.spinBoxNumberOfColors->setValue(nrBands);
-
-  setColorMap(name);
 }
 
 void MainWindow::setGlyphScalarDataset(const QString& value)
@@ -1070,8 +993,8 @@ void MainWindow::setGlyphScalarDataset(const QString& value)
   ScalarDataset* pScalarGlyphDataset = getNewScalarDataset(value);
   _pItfc->setScalarGlyphDataset(pScalarGlyphDataset);
 
-  if (_ui.comboBoxMappingMethod->currentText() == _MAP_METHOD_SCALE &&
-      _ui.comboBoxColorMapSource->currentText() == _COLORMAP_SOURCE_GLYPHS)
+  if (_ui.comboBoxMappingMethod->currentIndex() == 1 &&
+      _ui.comboBoxColorMapSource->currentIndex() == GLYPHS_SRC)
     {
       rescaleRequest();
     }
@@ -1149,12 +1072,6 @@ void MainWindow::dumpGrids()
     }
 }
 
-void MainWindow::showParams()
-{
-  assert(_pParamWindow);
-  _pParamWindow->show();
-}
-
 void MainWindow::updateIsolinesSettings()
 {
   float lineWidth = _ui.doubleSpinBoxIsolinesLineWidth->value();
@@ -1202,7 +1119,7 @@ void MainWindow::updateHeightPlotSettings()
   _pItfc->setScalarHeightDataset(pScalarHeightDataset);
   _pItfc->setScalarHeightColorDataset(pScalarHeightColorDataset);
 
-  if (_ui.comboBoxHeightMappingMethod->currentText() == _MAP_METHOD_CLAMP)
+  if (_ui.comboBoxHeightMappingMethod->currentIndex() == 0)
     {
       _ui.doubleSpinBoxHeightMax->setEnabled(true);
       _ui.doubleSpinBoxHeightMax->setDecimals(_SLIDER_HEIGHTPLOT_LABEL_PRECISION_CLAMPING);
@@ -1214,7 +1131,7 @@ void MainWindow::updateHeightPlotSettings()
       _pItfc->getScalarHeightNormalizer()->setMin(_ui.doubleSpinBoxHeightMin->value());
       _pItfc->getScalarHeightNormalizer()->setMax(_ui.doubleSpinBoxHeightMax->value());
     }
-  else
+  else if(_ui.comboBoxHeightMappingMethod->currentIndex() == 1)
     {
       _ui.doubleSpinBoxHeightMax->setEnabled(false);
       _ui.doubleSpinBoxHeightMax->setDecimals(_SLIDER_HEIGHTPLOT_LABEL_PRECISION_SCALING);
@@ -1365,55 +1282,6 @@ void MainWindow::setBlend()
   emit updateGL();
 }
 
-void MainWindow::updateDiffusionMethod(const QString& value)
-{
-  Simulation& sim = _pItfc->getSimulation();
-
-  if (value == _DIFF_FTCS)
-    {
-      sim.setDiffusionMethod(DIFF_REC_EQ);
-    }
-  else if (value == _DIFF_SOR_CORRECT)
-    {
-      sim.setDiffusionMethod(DIFF_SOR_CORRECT);
-    }
-  else if (value == _DIFF_SOR_WRONG)
-    {
-      sim.setDiffusionMethod(DIFF_SOR_WRONG);
-    }
-  else if (value == _DIFF_FTCS_SWAP)
-    {
-      sim.setDiffusionMethod(DIFF_REC_EQ_SWAP);
-    }
-  else if (value == _DIFF_ADE_SWAP)
-    {
-      sim.setDiffusionMethod(DIFF_ADE_SWAP);
-    }
-  else
-    {
-      assert(false);
-    }
-}
-
-void MainWindow::updateStopCriteria()
-{
-  Simulation& sim = _pItfc->getSimulation();
-
-  if (_ui.checkBoxStopDays->isChecked())
-    {
-      sim.setTimeToSimulate(_ui.spinBoxStopTime->value());
-    }
-  else
-    {
-      sim.setTimeToSimulate(-1);
-    }
-
-  sim.setMtbClearance(_ui.checkBoxStopClearance->isChecked());
-  disconnect(_ui.spinBoxStopDays,SIGNAL(valueChanged(int)), this, SLOT(updateTimeBox(int)));	//Prevent double signaling
-  _ui.spinBoxStopDays->setValue(_ui.spinBoxStopTime->value()/TIME_STEPS_PER_DAY);
-  connect(_ui.spinBoxStopDays,SIGNAL(valueChanged(int)), this, SLOT(updateTimeBox(int)));
-}
-
 void MainWindow::stop()
 {
   Simulation& sim = _pItfc->getSimulation();
@@ -1435,51 +1303,6 @@ void MainWindow::stop()
 
   if (_scriptingMode)
     qApp->quit();
-}
-
-void MainWindow::setEnableOutput(bool checked)
-{
-  _ui.labelSnapshotPicInterval->setEnabled(checked);
-  _ui.spinBoxSnapshotPicInterval->setEnabled(checked);
-  _ui.labelSnapshotCsvInterval->setEnabled(checked);
-  _ui.spinBoxSnapshotCsvInterval->setEnabled(checked);
-  _ui.labelSnapshotStateInterval->setEnabled(checked);
-  _ui.spinBoxSnapshotStateInterval->setEnabled(checked);
-  _ui.lineEditOutput->setEnabled(checked);
-
-  if (checked && !_pSnapshot)
-    {
-      QString dirName = QFileDialog::getExistingDirectory(this, "Browse directory");
-      if (dirName != QString::null)
-        {
-          _ui.lineEditOutput->setText(dirName);
-          QString fileName = QString("%1%2seed%3.csv").arg(dirName).arg(QDir::separator()).arg(g_Rand.getSeed());
-          const char* strFileName = fileName.toLatin1().data();
-
-          _pSnapshot = new Snapshot(dirName, strFileName);
-
-          std::ofstream outFile(strFileName, std::ios_base::trunc);
-          if (!_pSnapshot->isGood())
-            {
-              QMessageBox::critical(this, "Lung ABM",
-                                    "Failed to open/create file '" + fileName + "' for writing.",
-                                    QMessageBox::Ok, QMessageBox::Ok);
-
-              delete _pSnapshot;
-              _pSnapshot = NULL;
-              _ui.checkBoxOutput->setChecked(false);
-            }
-        }
-      else
-        {
-          _ui.checkBoxOutput->setChecked(false);
-        }
-    }
-  else if (!checked)
-    {
-      delete _pSnapshot;
-      _pSnapshot = NULL;
-    }
 }
 
 void MainWindow::updateGranulomaSettings()
@@ -1506,10 +1329,7 @@ void MainWindow::updateOutcomeParameters()
 {
   Simulation& sim = _pItfc->getSimulation();
 
-  const QString numberStr = _ui.comboBoxOutcomeNumber->currentText();
-
-  int index = 0;
-  if (numberStr == _OUTCOME_METHOD_2) index = 1;
+  int index = _ui.comboBoxOutcomeNumber->currentIndex();
 
   double alpha;
   int testPeriod, samplePeriod;
@@ -1529,47 +1349,16 @@ void MainWindow::updateOutcomeParameters()
   _ui.spinBoxOutcomeTestPeriod->setEnabled(checked);
   _ui.doubleSpinBoxOutcomeAlpha->setEnabled(checked);
 
-  switch (method)
-    {
-    case OUTCOME_AREA:
-      _ui.comboBoxOutcomeMethod->setCurrentIndex(1);
-      break;
-    case OUTCOME_MTB:
-      _ui.comboBoxOutcomeMethod->setCurrentIndex(2);
-      break;
-    case OUTCOME_NONE:
-      _ui.comboBoxOutcomeMethod->setCurrentIndex(0);
-      break;
-    }
+  _ui.comboBoxOutcomeMethod->setCurrentIndex(method);
 }
 
 void MainWindow::updateOutcomeSettings()
 {
   Simulation& sim = _pItfc->getSimulation();
 
-  const QString numberStr = _ui.comboBoxOutcomeNumber->currentText();
-  const QString methodStr = _ui.comboBoxOutcomeMethod->currentText();
+  int index = _ui.comboBoxOutcomeNumber->currentIndex();
 
-  int index = 0;
-  if (numberStr == _OUTCOME_METHOD_2) index = 1;
-
-  OutcomeMethod method = OUTCOME_NONE;
-  if (methodStr == _OUTCOME_NONE)
-    {
-      method = OUTCOME_NONE;
-    }
-  else if (methodStr == _OUTCOME_MTB)
-    {
-      method = OUTCOME_MTB;
-    }
-  else if (methodStr == _OUTCOME_AREA)
-    {
-      method = OUTCOME_AREA;
-    }
-  else
-    {
-      assert(false);
-    }
+  OutcomeMethod method = OutcomeMethod(_ui.comboBoxOutcomeMethod->currentIndex());
 
   bool checked = method != OUTCOME_NONE;
   _ui.labelOutcomeSamplePeriod->setEnabled(checked);
@@ -1801,4 +1590,80 @@ void MainWindow::setSnapshot(Snapshot* pSnapshot)
 {
   delete _pSnapshot;
   _pSnapshot = pSnapshot;
+}
+
+void MainWindow::on_groupBoxOutput_toggled(bool arg1)
+{
+  if(!arg1) {
+    if(_pSnapshot) {  //Turn off output
+      delete _pSnapshot;
+      _pSnapshot = NULL;
+    }
+    return;
+  }
+  if (!_pSnapshot)
+    {
+      QString dirName = QFileDialog::getExistingDirectory(this, "Browse directory");
+      if (dirName == QString::null) {
+        _ui.groupBoxOutput->setChecked(false);
+        return;
+      }
+      _ui.lineEditOutput->setText(dirName);
+      QString fileName = QString("%1%2seed%3.csv").arg(dirName).arg(QDir::separator()).arg(g_Rand.getSeed());
+      const char* strFileName = fileName.toLatin1().data();
+
+      _pSnapshot = new Snapshot(dirName, strFileName);
+
+      if (!_pSnapshot->isGood())
+        {
+          QMessageBox::critical(this, "Lung ABM",
+                                "Failed to open/create file '" + fileName + "' for writing.",
+                                QMessageBox::Ok, QMessageBox::Ok);
+          delete _pSnapshot;
+          _pSnapshot = NULL;
+          _ui.groupBoxOutput->setChecked(false);
+        }
+    }
+}
+
+void MainWindow::on_comboBoxColorMapSource_currentIndexChanged(int index)
+{
+
+  refreshCurrentColorMap(COLORMAP_SRC(index));
+  refreshCurrentNormalizer(COLORMAP_SRC(index));
+  refreshCurrentScalarGrid(COLORMAP_SRC(index));
+  Q_CHECK_PTR(_pCurrentColorMap);
+  Q_CHECK_PTR(_pCurrentNormalizer);
+
+  float min = _pCurrentNormalizer->getMin();
+  float max = _pCurrentNormalizer->getMax();
+
+  if (_pCurrentNormalizer->getClamping())
+      _ui.comboBoxMappingMethod->setCurrentIndex(0);
+  else
+      _ui.comboBoxMappingMethod->setCurrentIndex(1);
+
+  _ui.doubleSpinBoxMin->setValue(min);
+  _ui.doubleSpinBoxMax->setValue(max);
+
+  int hue = (int)(_pCurrentColorMap->getHueDelta() * _SLIDER_COLORMAP_HUE);
+  int sat = (int)(_pCurrentColorMap->getSatDelta() * _SLIDER_COLORMAP_SAT);
+  int val = (int)(_pCurrentColorMap->getValDelta() * _SLIDER_COLORMAP_VAL);
+  int alpha = (int)(_pCurrentColorMap->getAlpha() * _SLIDER_COLORMAP_ALPHA);
+
+  bool reverse = _pCurrentColorMap->getInvert();
+  int nrBands = _pCurrentColorMap->getNrBands();
+
+  _ui.horizontalSliderHue->setValue(hue);
+  _ui.horizontalSliderSat->setValue(sat);
+  _ui.horizontalSliderVal->setValue(val);
+  _ui.horizontalSliderAlpha->setValue(alpha);
+
+  COLORMAP idx = _pCurrentColorMap->getType();
+  _ui.comboBoxScalarColoring->setCurrentIndex(idx);
+
+  _ui.checkBoxReverseColorMap->setChecked(reverse);
+  _ui.spinBoxNumberOfColors->setValue(nrBands);
+
+  setColorMap(idx);
 }

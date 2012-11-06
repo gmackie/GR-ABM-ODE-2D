@@ -59,7 +59,7 @@ Snapshot* setupOutput(MainWindow& mainWindow, const std::string& outputDir, bool
   mainWindow.setSnapshot(pSnapshot);
 
   ui.lineEditOutput->setText(dirName);
-  ui.checkBoxOutput->setChecked(true);
+  ui.groupBoxOutput->setChecked(true);
 
   return pSnapshot;
 }

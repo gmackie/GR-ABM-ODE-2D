@@ -20,6 +20,9 @@
 * Note that the derivation in this paper uses i=cols and j=rows
 * We use i=rows and j=cols thus our coefficients b and c are different
 * than what is shown in the paper (they are switched)
+* @todo Might get a decent performance boost removing the u and v grids and
+* reusing them within the the diffusion, since they get overwritten each
+* iteration.
 */
 class GrDiffusionADE_Swap: public GrDiffusion
 {

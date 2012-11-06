@@ -156,9 +156,9 @@ typedef std::vector<Treg*> TregPtrVector;
 typedef std::pair<double, Pos> ThresholdPosPair;
 typedef std::list<ThresholdPosPair> ThresholdPosList;
 
-typedef enum {DIFF_REC_EQ = 0, DIFF_SOR_CORRECT = 1, DIFF_SOR_WRONG = 2, DIFF_REC_EQ_SWAP = 3, DIFF_ADE_SWAP = 4} DiffusionMethod;
-typedef enum {OUTCOME_AREA = 0, OUTCOME_MTB = 1, OUTCOME_NONE = 2} OutcomeMethod;
-typedef enum {RECR_PROB = 0, RECR_LN_ODE_PROXY = 1, RECR_LN_ODE_PURE = 2, RECR_LN_ODE = 3} RecruitmentMethod;
+typedef enum {DIFF_REC_EQ = 0, DIFF_SOR_CORRECT, DIFF_SOR_WRONG, DIFF_REC_EQ_SWAP, DIFF_ADE_SWAP, NDIFFUSEMETH} DiffusionMethod;
+typedef enum {OUTCOME_AREA = 0, OUTCOME_MTB, OUTCOME_NONE, NOUTCOMEMETH} OutcomeMethod;
+typedef enum {RECR_PROB = 0, RECR_LN_ODE_PROXY, RECR_LN_ODE_PURE, RECR_LN_ODE, NRECRUITMENTMETH} RecruitmentMethod;
 
 
 typedef enum {MAC, TGAM, TCYT, TREG, NAGENTS} AgentType;
@@ -192,6 +192,32 @@ inline std::ostream& operator<<(std::ostream& os, AgentType at)
       break;
     }
   return os;
+}
+
+inline std::ostream& operator<<(std::ostream& out, DiffusionMethod m) {
+  switch(m) {
+    case DIFF_REC_EQ:      out<<"Recursive eq"; break;
+    case DIFF_SOR_CORRECT: out<<"SOR correct";  break;
+    case DIFF_SOR_WRONG:   out<<"SOR wrong";    break;
+    case DIFF_REC_EQ_SWAP: out<<"Swap Recursive eq"; break;
+    case DIFF_ADE_SWAP:    out<<"Swap ADE eq";  break;
+    default:
+      assert(!"Invalid diffusion method");
+      break;
+    }
+  return out;
+}
+
+inline std::ostream& operator<<(std::ostream& out, OutcomeMethod m) {
+  switch(m) {
+    case OUTCOME_AREA: out<<"Area"; break;
+    case OUTCOME_MTB:  out<<"Mtb."; break;
+    case OUTCOME_NONE: out<<"None"; break;
+    default:
+      assert(!"Invalid outcome method");
+      break;
+  }
+  return out;
 }
 
 #endif /* GR_H_ */

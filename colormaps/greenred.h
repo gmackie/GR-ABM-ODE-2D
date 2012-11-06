@@ -15,13 +15,19 @@ class ColorMapGreenRed : public ColorMap
 {
 public:
   ColorMapGreenRed();
-  virtual ~ColorMapGreenRed();
-  virtual void map(float value, float& R, float& G, float& B) const;
-  virtual QString getName() const;
+  ~ColorMapGreenRed();
+  void map(float value, float& R, float& G, float& B) const;
+  QString getName() const;
+  COLORMAP getType() const;
 };
 
 inline QString ColorMapGreenRed::getName() const
 {
   return QString("Green/Red");
+}
+
+inline COLORMAP ColorMapGreenRed::getType() const
+{
+  return CMAPGREENRED;
 }
 #endif /* GREENRED_H_ */

@@ -18,7 +18,21 @@ class AgentsWidget;
 class GraphController;
 class Snapshot;
 
-typedef enum { SIM_RUNNING, SIM_PAUSED, SIM_STOPPED } SimStatus;
+enum SimStatus { SIM_RUNNING, SIM_PAUSED, SIM_STOPPED };
+
+
+enum COLORMAP_SRC { SMOKE_SRC=0, GLYPHS_SRC, ISOLINES_SRC, HEIGHTPLOT_SRC, NCOLORMAPSRCS };
+
+inline std::ostream& operator<<(std::ostream& s, COLORMAP_SRC m) {
+  switch(m) {
+    case SMOKE_SRC:      s<<"Smoke";       break;
+    case GLYPHS_SRC:     s<<"Glyphs";      break;
+    case ISOLINES_SRC:   s<<"Isolines";    break;
+    case HEIGHTPLOT_SRC: s<<"Height plot"; break;
+    default: assert(!"Invalid colormap source"); break;
+  }
+  return s;
+}
 
 class MainWindow : public QMainWindow
 {
@@ -99,7 +113,6 @@ public:
   static const int _TIMER_PERIOD = 15; // In milliseconds (60 Hz == 16.6ms)
 
 public slots:
-  void updateTimeBox(int);
   void toggleAnimation();
   void setBlend();
   void setDrawAgents(bool checked);
@@ -108,17 +121,12 @@ public slots:
   void setDrawIsolines(bool checked);
   void setDrawHeightPlot(bool checked);
   void setGlyphScaling(int value);
-  void setColorMap(const QString& value);
-  void setMappingMethod(const QString& value);
+  void setColorMap(int value);
+  void setMappingMethod(int value);
   void setSmokeDataset(const QString& value);
-  void setColorMapSource(const QString& value);
-  void updateDelay(int value);
-  void updateSeed(int value);
   void updateColorMap();
   void updateColorMapLabels();
   void updateHeightMinMax();
-  void updateDiffusionMethod(const QString& value);
-  void updateStopCriteria();
   void rescaleRequest();
   void rescaleHeightRequest();
   void updateIsolinesSettings();
@@ -128,7 +136,6 @@ public slots:
   void setGlyph(const QString& value);
   void setGlyphClamping(bool checked);
   void dumpGrids();
-  void showParams();
   void selectSmokeColorMap();
   void selectGlyphsColorMap();
   void selectIsolinesColorMap();
@@ -138,7 +145,6 @@ public slots:
   void selectColorMap2();
   void selectColorMap3();
   void selectColorMap4();
-  void setEnableOutput(bool checked);
   void updateGranulomaSettings(void);
   void updateOutcomeSettings();
   void updateOutcomeParameters();
@@ -163,6 +169,28 @@ private slots:
   void on_agentHistButton_clicked(bool checked);
   void update();
 
+  void on_checkBoxStopDays_toggled(bool checked);
+
+  void on_spinBoxStopTime_valueChanged(int arg1);
+
+  void on_spinBoxStopDays_valueChanged(int arg1);
+
+  void on_checkBoxStopClearance_toggled(bool checked);
+
+  void on_pushButtonShowParams_clicked();
+
+  void on_actionShowParameters_triggered();
+
+  void on_comboBoxDiffusion_currentIndexChanged(int index);
+
+  void on_spinBoxDelay_valueChanged(int arg1);
+
+  void on_spinBoxSeed_valueChanged(int arg1);
+
+  void on_groupBoxOutput_toggled(bool arg1);
+
+  void on_comboBoxColorMapSource_currentIndexChanged(int index);
+
 private:
   void initVisualizationTab();
   void initSimulationTab();
@@ -175,9 +203,9 @@ private:
   void initOutputTab();
   void initShortcuts();
   void initComboAllScalars(QComboBox *&comboBox);
-  void refreshCurrentNormalizer(const QString& colorMapSource);
-  void refreshCurrentColorMap(const QString& colorMapSource);
-  void refreshCurrentScalarGrid(const QString& colorMapSource);
+  void refreshCurrentNormalizer(const COLORMAP_SRC m);
+  void refreshCurrentColorMap(const COLORMAP_SRC colorMapSource);
+  void refreshCurrentScalarGrid(const COLORMAP_SRC m);
   ScalarDataset* getNewScalarDataset(const QString& value);
   VectorDataset* getNewVectorDataset(const QString& value);
   void updateStatLabels(const Stats& stats);
@@ -248,73 +276,37 @@ inline void MainWindow::selectColorMap4()
   _ui.comboBoxScalarColoring->setCurrentIndex(4);
 }
 
-inline void MainWindow::refreshCurrentColorMap(const QString& colorMapSource)
+inline void MainWindow::refreshCurrentColorMap(const COLORMAP_SRC m)
 {
-  if (colorMapSource == _COLORMAP_SOURCE_SMOKE)
-    {
-      _pCurrentColorMap = _pItfc->getColorMapSmoke();
-    }
-  else if (colorMapSource == _COLORMAP_SOURCE_GLYPHS)
-    {
-      _pCurrentColorMap = _pItfc->getColorMapGlyphs();
-    }
-  else if (colorMapSource == _COLORMAP_SOURCE_ISOLINES)
-    {
-      _pCurrentColorMap = _pItfc->getColorMapIsolines();
-    }
-  else if (colorMapSource == _COLORMAP_SOURCE_HEIGHTPLOT)
-    {
-      _pCurrentColorMap = _pItfc->getColorMapHeightPlot();
-    }
-  else
-    {
-      assert(false);
-    }
+  switch(m) {
+    case SMOKE_SRC:      _pCurrentColorMap = _pItfc->getColorMapSmoke(); break;
+    case GLYPHS_SRC:     _pCurrentColorMap = _pItfc->getColorMapGlyphs(); break;
+    case ISOLINES_SRC:   _pCurrentColorMap = _pItfc->getColorMapIsolines(); break;
+    case HEIGHTPLOT_SRC: _pCurrentColorMap = _pItfc->getColorMapHeightPlot(); break;
+    default: assert(!"Invalid colormap src"); break;
+  }
 }
 
-inline void MainWindow::refreshCurrentNormalizer(const QString& colorMapSource)
+inline void MainWindow::refreshCurrentNormalizer(const COLORMAP_SRC m)
 {
-  if (colorMapSource == _COLORMAP_SOURCE_SMOKE)
-    {
-      _pCurrentNormalizer = _pItfc->getScalarSmokeNormalizer();
-    }
-  else if (colorMapSource == _COLORMAP_SOURCE_GLYPHS)
-    {
-      _pCurrentNormalizer = _pItfc->getScalarGlyphNormalizer();
-    }
-  else if (colorMapSource == _COLORMAP_SOURCE_ISOLINES)
-    {
-      _pCurrentNormalizer = _pItfc->getScalarIsolinesNormalizer();
-    }
-  else if (colorMapSource == _COLORMAP_SOURCE_HEIGHTPLOT)
-    {
-      _pCurrentNormalizer = _pItfc->getScalarHeightColorNormalizer();
-    }
-  else
-    {
-      assert(false);
-    }
+  switch(m) {
+    case SMOKE_SRC:      _pCurrentNormalizer = _pItfc->getScalarSmokeNormalizer(); break;
+    case GLYPHS_SRC:     _pCurrentNormalizer = _pItfc->getScalarGlyphNormalizer(); break;
+    case ISOLINES_SRC:   _pCurrentNormalizer = _pItfc->getScalarIsolinesNormalizer(); break;
+    case HEIGHTPLOT_SRC: _pCurrentNormalizer = _pItfc->getScalarHeightColorNormalizer(); break;
+    default: assert(!"Invalid colormap src"); break;
+  }
 }
 
-inline void MainWindow::refreshCurrentScalarGrid(const QString& colorMapSource)
+inline void MainWindow::refreshCurrentScalarGrid(const COLORMAP_SRC m)
 {
-  if (colorMapSource == _COLORMAP_SOURCE_SMOKE ||
-      colorMapSource == _COLORMAP_SOURCE_ISOLINES)
-    {
-      _pCurrentScalarGrid = _pItfc->getScalarSmokeGrid();
-    }
-  else if (colorMapSource == _COLORMAP_SOURCE_GLYPHS)
-    {
-      _pCurrentScalarGrid = _pItfc->getScalarGlyphGrid();
-    }
-  else if (colorMapSource == _COLORMAP_SOURCE_HEIGHTPLOT)
-    {
-      _pCurrentScalarGrid = _pItfc->getScalarHeightColorGrid();
-    }
-  else
-    {
-      assert(false);
-    }
+  switch(m) {
+    case SMOKE_SRC:
+    case ISOLINES_SRC:   _pCurrentScalarGrid = _pItfc->getScalarSmokeGrid(); break;
+    case GLYPHS_SRC:     _pCurrentScalarGrid = _pItfc->getScalarGlyphGrid(); break;
+    case HEIGHTPLOT_SRC: _pCurrentScalarGrid = _pItfc->getScalarHeightColorGrid(); break;
+    default: assert(!"Invalid colormap src"); break;
+  }
 }
 
 inline Ui::MainWindowClass& MainWindow::getUI()

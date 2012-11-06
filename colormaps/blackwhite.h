@@ -15,14 +15,20 @@ class ColorMapBlackWhite : public ColorMap
 {
 public:
   ColorMapBlackWhite();
-  virtual ~ColorMapBlackWhite();
-  virtual void map(float value, float& R, float& G, float& B) const;
-  virtual QString getName() const;
+  ~ColorMapBlackWhite();
+  void map(float value, float& R, float& G, float& B) const;
+  QString getName() const;
+  COLORMAP getType() const;
 };
 
 inline QString ColorMapBlackWhite::getName() const
 {
   return QString("Grayscale");
+}
+
+inline COLORMAP ColorMapBlackWhite::getType() const
+{
+  return CMAPGRAY;
 }
 
 #endif /* BLACKWHITE_H_ */

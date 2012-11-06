@@ -52,19 +52,19 @@ protected:
   * getname() and setname() functions.
   */
 #define AGENT_PROPS \
-	P(unsigned long, id, 0, "Unique agent ID")  \
-	P(int, birthTime, 0, "")  \
-	P(int, deathTime, 0, "")  \
-	P(Pos, pos, (Pos(-1, -1)), "")  \
-	P(bool, trackMolecularDynamics, false, "")  \
-	/* TNF associated attributes */ \
-	P(Scalar, mTNF, 0.0, "No. of mTNF on the cell membrane")  \
-	P(Scalar, surfTNFR1, 0.0, "No. of cell surface TNFR1") \
-	P(Scalar, surfTNFR2, 0.0, "") \
-	P(Scalar, surfBoundTNFR1, 0.0, "No. of sTNF-bound cell surface TNFR1") \
-	P(Scalar, surfBoundTNFR2, 0.0, "") \
-	P(Scalar, intBoundTNFR1, 0.0, "No. of internalized TNF-bound TNFR1") \
-	P(Scalar, intBoundTNFR2, 0.0, "") \
+  P(unsigned long, id, 0, "Unique agent ID")  \
+  P(int, birthTime, 0, "")  \
+  P(int, deathTime, 0, "")  \
+  P(Pos, pos, (Pos(-1, -1)), "")  \
+  P(bool, trackMolecularDynamics, false, "")  \
+  /* TNF associated attributes */ \
+  P(Scalar, mTNF, 0.0, "No. of mTNF on the cell membrane")  \
+  P(Scalar, surfTNFR1, 0.0, "No. of cell surface TNFR1") \
+  P(Scalar, surfTNFR2, 0.0, "") \
+  P(Scalar, surfBoundTNFR1, 0.0, "No. of sTNF-bound cell surface TNFR1") \
+  P(Scalar, surfBoundTNFR2, 0.0, "") \
+  P(Scalar, intBoundTNFR1, 0.0, "No. of internalized TNF-bound TNFR1") \
+  P(Scalar, intBoundTNFR2, 0.0, "") \
   P(Scalar, mTNFRNA, 0.0, "") \
   P(Scalar, vTNFR1, 0.0, "Rate of TNFR1 synthesis by cell") \
   P(Scalar, vTNFR2, 0.0, "") \
@@ -79,38 +79,38 @@ protected:
   P(Scalar, meanIL10R, 0.0, "") \
   \
   P(Scalar, M1M2Ratio, 0.0, "surfBoundTNFR1 / max(surfBoundIL10R1, 1) - updated in grsimulation") \
-	/* NF-kB signaling pathway components  */ \
-	P(Scalar, IKKKa, 0.0, "(IKKK in active state)") \
-	P(Scalar, IKKn, (_PARAM(PARAM_GR_KNN)), "(IKK in neutral state)") \
-	P(Scalar, IKKa, 0.0, "(IKK in the active state)") \
-	P(Scalar, IKKi, 0.0, "(IKK in inactive state)") \
-	P(Scalar, IkBp, 0.0, "(Phospho-IkB)") \
-	P(Scalar, NFkB_IkBp, 0.0, "%NFkB|IkBp") \
-	P(Scalar, NFkBc, 0.0, "cytoplasmic NFkB") \
-	P(Scalar, NFkBn, 0.0, "nucluar NFkB") \
-	P(Scalar, A20, 0.0, "") \
-	P(Scalar, A20t, 0.0, "A20 transcript") \
-	P(Scalar, IkB, 0.0, "") \
-	P(Scalar, IkBn, 0.0, "nucluar IkB") \
-	P(Scalar, IkBt, 0.0, "IkB trancript") \
-	P(Scalar, NFkB_IkB, 0.0, "") \
-	P(Scalar, NFkB_IkBn, 0.0, "") \
-	P(Scalar, GA20, 0.0, "(The state of A20)") \
-	P(Scalar, GIkB, 0.0, "(The state of IkB)") \
-	P(Scalar, GR,   0.0, "(The state of reporter genes)") \
-	P(Scalar, c1rrChemTNF, 0.0, "NF-kB independent rate of TNF/chemokine mRNA synthesis") \
-	P(Scalar, c1rChem, 0.0, "") \
-	P(Scalar, c1rTNF, 0.0, "") \
-	P(Scalar, chemt, 0.0, "generic chemokine transcript") \
-	P(Scalar, chem, 0.0, "intracellular generic chemokine protein") \
-	P(Scalar, TNFt, 0.0, "TNF transcript") \
-	P(Scalar, TNF, 0.0, "intracellular TNF") \
-	P(Scalar, ACTt, 0.0, "transcript of macrophage activating molecules") \
-	P(Scalar, ACT, 0.0, "mac-activation molecules") \
-	P(Scalar, normalizedACT, 0.0, "") \
-	P(Scalar, IAPt, 0.0, "transcript of IAP (inhibitor of apoptosis)") \
-	P(Scalar, IAP, 0.0, "") \
-	P(Scalar, normalizedIAP, 0.0, "")
+  /* NF-kB signaling pathway components  */ \
+  P(Scalar, IKKKa, 0.0, "(IKKK in active state)") \
+  P(Scalar, IKKn, (_PARAM(PARAM_GR_KNN)), "(IKK in neutral state)") \
+  P(Scalar, IKKa, 0.0, "(IKK in the active state)") \
+  P(Scalar, IKKi, 0.0, "(IKK in inactive state)") \
+  P(Scalar, IkBp, 0.0, "(Phospho-IkB)") \
+  P(Scalar, NFkB_IkBp, 0.0, "%NFkB|IkBp") \
+  P(Scalar, NFkBc, 0.0, "cytoplasmic NFkB") \
+  P(Scalar, NFkBn, 0.0, "nucluar NFkB") \
+  P(Scalar, A20, 0.0, "") \
+  P(Scalar, A20t, 0.0, "A20 transcript") \
+  P(Scalar, IkB, 0.0, "") \
+  P(Scalar, IkBn, 0.0, "nucluar IkB") \
+  P(Scalar, IkBt, 0.0, "IkB trancript") \
+  P(Scalar, NFkB_IkB, 0.0, "") \
+  P(Scalar, NFkB_IkBn, 0.0, "") \
+  P(Scalar, GA20, 0.0, "(The state of A20)") \
+  P(Scalar, GIkB, 0.0, "(The state of IkB)") \
+  P(Scalar, GR,   0.0, "(The state of reporter genes)") \
+  P(Scalar, c1rrChemTNF, 0.0, "NF-kB independent rate of TNF/chemokine mRNA synthesis") \
+  P(Scalar, c1rChem, 0.0, "") \
+  P(Scalar, c1rTNF, 0.0, "") \
+  P(Scalar, chemt, 0.0, "generic chemokine transcript") \
+  P(Scalar, chem, 0.0, "intracellular generic chemokine protein") \
+  P(Scalar, TNFt, 0.0, "TNF transcript") \
+  P(Scalar, TNF, 0.0, "intracellular TNF") \
+  P(Scalar, ACTt, 0.0, "transcript of macrophage activating molecules") \
+  P(Scalar, ACT, 0.0, "mac-activation molecules") \
+  P(Scalar, normalizedACT, 0.0, "") \
+  P(Scalar, IAPt, 0.0, "transcript of IAP (inhibitor of apoptosis)") \
+  P(Scalar, IAP, 0.0, "") \
+  P(Scalar, normalizedIAP, 0.0, "")
 
   /**
   * @name Agent Properties
@@ -197,7 +197,6 @@ protected:
 public:
   /**
   * @brief Standard constructor, must be used outside of serialization
-  * @todo Finish documentation of these functions
   * @note This function uses the RNG to calculate internal variables.
   * @param birthtime
   * @param deathtime

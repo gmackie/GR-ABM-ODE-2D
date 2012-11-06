@@ -15,14 +15,20 @@ class ColorMapFire : public ColorMap
 {
 public:
   ColorMapFire();
-  virtual ~ColorMapFire();
-  virtual void map(float value, float& R, float& G, float& B) const;
-  virtual QString getName() const;
+  ~ColorMapFire();
+  void map(float value, float& R, float& G, float& B) const;
+  QString getName() const;
+  COLORMAP getType() const;
 };
 
 inline QString ColorMapFire::getName() const
 {
   return QString("Fire");
+}
+
+inline COLORMAP ColorMapFire::getType() const
+{
+  return CMAPFIRE;
 }
 
 #endif /* FIRE_H_ */

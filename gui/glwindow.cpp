@@ -9,13 +9,13 @@
 
 GLWindow::GLWindow(MainInterface* pItfc, QWidget* parent)
   : QWidget(parent)
+  , _trackid(-1)
   , _ui()
   , _pItfc(pItfc)
   , _selRow(-1)
   , _selCol(-1)
   , _printTime(_PRINT_TIME)
   , _printOutcome(_PRINT_OUTCOME)
-  , _trackid(-1)
 {
   for (int i = 0; i < NOUTCOMES; i++)
     {
@@ -154,13 +154,15 @@ struct AgentInfoVisitor
         ss<<"Treg "<<(Treg::State)(a->getState());
         visit(static_cast<const Treg*>(a));
         break;
+      default:
+        assert(!"Invalid agent type");
       }
     //a->visitProperties(*this);
     _curItem->setText(0, QString::fromStdString(ss.str()));
     _curItem->setData(1, Qt::DisplayRole, QVariant::fromValue(a->getid()));
     _curItem->setExpanded(true);
     _curItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
-    _curItem->setCheckState(0, (a->getid() == _trackid ? Qt::Checked : Qt::Unchecked));
+    _curItem->setCheckState(0, (int(a->getid()) == _trackid ? Qt::Checked : Qt::Unchecked));
   }
 
   void visit(const Mac* a)

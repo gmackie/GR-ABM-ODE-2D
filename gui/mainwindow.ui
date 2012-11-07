@@ -37,8 +37,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>154</width>
-         <height>56</height>
+         <width>303</width>
+         <height>480</height>
         </rect>
        </property>
        <attribute name="label">
@@ -72,8 +72,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>96</width>
-         <height>71</height>
+         <width>303</width>
+         <height>480</height>
         </rect>
        </property>
        <attribute name="label">
@@ -99,8 +99,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>241</width>
-             <height>315</height>
+             <width>303</width>
+             <height>480</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_6">
@@ -473,8 +473,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>96</width>
-         <height>71</height>
+         <width>303</width>
+         <height>480</height>
         </rect>
        </property>
        <attribute name="label">
@@ -500,8 +500,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>193</width>
-             <height>156</height>
+             <width>303</width>
+             <height>480</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_12">
@@ -851,8 +851,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>96</width>
-         <height>26</height>
+         <width>303</width>
+         <height>424</height>
         </rect>
        </property>
        <attribute name="label">
@@ -869,8 +869,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>96</width>
-         <height>71</height>
+         <width>303</width>
+         <height>424</height>
         </rect>
        </property>
        <attribute name="label">
@@ -896,8 +896,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>208</width>
-             <height>244</height>
+             <width>303</width>
+             <height>424</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -1084,8 +1084,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>96</width>
-         <height>89</height>
+         <width>303</width>
+         <height>424</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1114,8 +1114,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>229</width>
-             <height>218</height>
+             <width>303</width>
+             <height>406</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -1130,22 +1130,6 @@
               <layout class="QGridLayout" name="gridLayout_10">
                <item row="0" column="1">
                 <widget class="QComboBox" name="comboBoxGlyphType"/>
-               </item>
-               <item row="1" column="1">
-                <widget class="QSpinBox" name="spinBoxGlyphScaling">
-                 <property name="minimum">
-                  <number>1</number>
-                 </property>
-                 <property name="maximum">
-                  <number>200</number>
-                 </property>
-                 <property name="singleStep">
-                  <number>2</number>
-                 </property>
-                 <property name="value">
-                  <number>1</number>
-                 </property>
-                </widget>
                </item>
                <item row="2" column="0">
                 <widget class="QCheckBox" name="checkBoxGlyphClamping">
@@ -1168,6 +1152,19 @@
                 <widget class="QLabel" name="labelGlyphScaling">
                  <property name="text">
                   <string>Glyph scaling</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="1">
+                <widget class="QDoubleSpinBox" name="doubleSpinBoxGlyphScaling">
+                 <property name="decimals">
+                  <number>4</number>
+                 </property>
+                 <property name="singleStep">
+                  <double>0.500000000000000</double>
+                 </property>
+                 <property name="value">
+                  <double>1.000000000000000</double>
                  </property>
                 </widget>
                </item>
@@ -1227,8 +1224,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>96</width>
-         <height>71</height>
+         <width>303</width>
+         <height>424</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1254,8 +1251,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>280</width>
-             <height>401</height>
+             <width>303</width>
+             <height>424</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout">
@@ -1539,8 +1536,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>96</width>
-         <height>71</height>
+         <width>303</width>
+         <height>424</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1566,7 +1563,7 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>280</width>
+             <width>288</width>
              <height>449</height>
             </rect>
            </property>
@@ -1951,6 +1948,38 @@
     <hint type="destinationlabel">
      <x>176</x>
      <y>250</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkBoxDrawGranulomaBorder</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>comboBoxGranulomaDataset</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>378</x>
+     <y>309</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>448</x>
+     <y>336</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkBoxDrawGranulomaBorder</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>horizontalSliderGranulomaBorderThreshold</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>390</x>
+     <y>310</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>445</x>
+     <y>361</y>
     </hint>
    </hints>
   </connection>

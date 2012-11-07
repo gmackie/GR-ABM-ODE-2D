@@ -10,6 +10,9 @@
 
 #include "scalardataset.h"
 
+/**
+* @deprecated Automatically added via ScalarIndexedDataset 
+*/
 class ScalarTnfDataset : public ScalarDataset
 {
 public:

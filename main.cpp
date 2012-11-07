@@ -298,7 +298,7 @@ int main(int argc, char *argv[])
             }
         }
 
-      granvizEnabled = vm.count("granuloma-visualization");
+      /*granvizEnabled = vm.count("granuloma-visualization");
       if (granvizEnabled)
         {
           granvizDatasetIndex = MainWindow::getScalarDataSetIndex(granvizDataSetName);
@@ -308,7 +308,7 @@ int main(int argc, char *argv[])
               std::cerr << dataSetNames;
               return 1;
             }
-        }
+        }*/
 
     }
   catch (std::exception& e)

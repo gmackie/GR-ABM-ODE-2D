@@ -36,20 +36,9 @@ inline ScalarDataset::~ScalarDataset()
 
 inline float ScalarDataset::getScalarNN(const Simulation* pSimulation, float x, float y) const
 {
-  int col = (int)x;
-  int row = (int)y;
-
   const Pos& dim = pSimulation->getSize();
-
-  if (x - col >= 0.5)
-    {
-      col = moduloDIM(col + 1, dim.x);
-    }
-  if (y - row >= 0.5)
-    {
-      row = moduloDIM(row + 1, dim.y);
-    }
-
+  int col = moduloDIM((int)floor(x+0.5f), dim.x);
+  int row = moduloDIM((int)floor(y+0.5f), dim.y);
   return getScalar(pSimulation, row, col);
 }
 

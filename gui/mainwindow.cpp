@@ -26,18 +26,10 @@
 #include "glyphs/glypharrow.h"
 #include "glyphs/glyphtexture.h"
 #include "scalardatasets/scalardataset.h"
-#include "scalardatasets/scalarattractantdataset.h"
-#include "scalardatasets/scalartnfdataset.h"
-#include "scalardatasets/scalarccl2dataset.h"
-#include "scalardatasets/scalarccl5dataset.h"
-#include "scalardatasets/scalarcxcl9dataset.h"
-#include "scalardatasets/scalaril10dataset.h"
-#include "scalardatasets/scalarextmtbdataset.h"
+#include "scalardatasets/scalarindexeddataset.h"
+#include "scalardatasets/scalarcelldensitydataset.h"
 #include "scalardatasets/scalarintmtbdataset.h"
 #include "scalardatasets/scalartotmtbdataset.h"
-#include "scalardatasets/scalartnfattrextmtb.h"
-#include "scalardatasets/scalarkillingsdataset.h"
-#include "scalardatasets/scalarcelldensitydataset.h"
 #include "scalardatasets/scalardivergencedataset.h"
 #include "vectordatasets/vectorgradientdataset.h"
 #include "vectordatasets/vector.h"
@@ -338,37 +330,19 @@ void MainWindow::initVisualizationTab()
   initComboAllScalars(_ui.comboBoxGranulomaDataset);
 
   // Set the initial granuloma dataset.
-  QString defaultName = _DATASET_TNF;
-  int initialDatasetIndex = _ui.comboBoxGranulomaDataset->findText(defaultName, Qt::MatchExactly);
-  if (initialDatasetIndex > -1)
-    {
-      _ui.comboBoxGranulomaDataset->setCurrentIndex(initialDatasetIndex);
+  int defaultidx = GrGrid::IDX_TNF;
+  _ui.comboBoxGranulomaDataset->setCurrentIndex(defaultidx);
 
-      // Overrides the granuloma dataset defined in the MainInterface constructor.
-      ScalarDataset* pScalarGranulomaDataset = getNewScalarDataset(defaultName);
-      _pItfc->setScalarGranulomaDataset(pScalarGranulomaDataset);
-    }
-  else
-    {
-      // Shouldn't get here.
-      std::cerr << "Invalid granuloma dataset combo box index encountered." << std::endl;
-      exit(1);
-    }
-
-  connect(_ui.checkBoxDrawAgents, SIGNAL(toggled(bool)), this, SLOT(setDrawAgents(bool)));
-  connect(_ui.checkBoxDrawSmoke, SIGNAL(toggled(bool)), this, SLOT(setDrawSmoke(bool)));
-  connect(_ui.checkBoxDrawGlyphs, SIGNAL(toggled(bool)), this, SLOT(setDrawGlyphs(bool)));
-  connect(_ui.checkBoxDrawIsolines, SIGNAL(toggled(bool)), this, SLOT(setDrawIsolines(bool)));
-  connect(_ui.checkBoxDrawHeightPlot, SIGNAL(toggled(bool)), this, SLOT(setDrawHeightPlot(bool)));
-  connect(_ui.checkBoxBlend, SIGNAL(toggled(bool)), this, SLOT(setBlend(void)));
-
-  connect(_ui.checkBoxDrawGranulomaBorder, SIGNAL(toggled(bool)), this, SLOT(updateGranulomaSettings(void)));
-  connect(_ui.comboBoxGranulomaDataset, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(updateGranulomaSettings(void)));
-  connect(_ui.horizontalSliderGranulomaBorderThreshold, SIGNAL(valueChanged(int)), this, SLOT(updateGranulomaSettings(void)));
-
+  // Overrides the granuloma dataset defined in the MainInterface constructor.
+  ScalarDataset* pScalarGranulomaDataset = getNewScalarDataset(defaultidx);
+  _pItfc->setScalarGranulomaDataset(pScalarGranulomaDataset);
 
   connect(_ui.checkBoxDrawTime, SIGNAL(toggled(bool)), _pGLWindow, SLOT(setPrintTime(bool)));
   connect(_ui.checkBoxDrawOutcomes, SIGNAL(toggled(bool)), _pGLWindow, SLOT(setPrintOutcome(bool)));
+  connect(_ui.checkBoxDrawGranulomaBorder, SIGNAL(toggled(bool)), this, SLOT(updateGranulomaSettings(void)));
+  connect(_ui.comboBoxGranulomaDataset, SIGNAL(currentIndexChanged(int)), this, SLOT(updateGranulomaSettings(void)));
+  connect(_ui.horizontalSliderGranulomaBorderThreshold, SIGNAL(valueChanged(int)), this, SLOT(updateGranulomaSettings(void)));
+
 }
 
 /**
@@ -500,44 +474,19 @@ void MainWindow::initColorMapTab()
 void MainWindow::initSmokeTab()
 {
   /* configure _ui.comboBoxSmokeDataset */
-  _ui.comboBoxSmokeDataset->addItem(_DATASET_TNF);
-  _ui.comboBoxSmokeDataset->addItem(_DATASET_CCL2);
-  _ui.comboBoxSmokeDataset->addItem(_DATASET_CCL5);
-  _ui.comboBoxSmokeDataset->addItem(_DATASET_CXCL9);
-  _ui.comboBoxSmokeDataset->addItem(_DATASET_IL10);
-  _ui.comboBoxSmokeDataset->addItem(_DATASET_EXTMTB);
-  _ui.comboBoxSmokeDataset->addItem(_DATASET_INTMTB);
-  _ui.comboBoxSmokeDataset->addItem(_DATASET_TOTMTB);
-  _ui.comboBoxSmokeDataset->addItem(_DATASET_ATTRACTANT);
-  _ui.comboBoxSmokeDataset->addItem(_DATASET_TNF_ATTR_EXTMTB);
-  _ui.comboBoxSmokeDataset->addItem(_DATASET_KILLINGS);
-
-
-  connect(_ui.comboBoxSmokeDataset, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(setSmokeDataset(const QString&)));
+  initComboAllScalars(_ui.comboBoxSmokeDataset);
 }
 
 void MainWindow::initGlyphsTab()
 {
   /* configure _ui.comboBoxGlyphScalarDataset */
-  _ui.comboBoxGlyphScalarDataset->addItem(_DATASET_TNF);
-  _ui.comboBoxGlyphScalarDataset->addItem(_DATASET_CCL2);
-  _ui.comboBoxGlyphScalarDataset->addItem(_DATASET_CCL5);
-  _ui.comboBoxGlyphScalarDataset->addItem(_DATASET_CXCL9);
-  _ui.comboBoxGlyphScalarDataset->addItem(_DATASET_IL10);
-  _ui.comboBoxGlyphScalarDataset->addItem(_DATASET_EXTMTB);
-  _ui.comboBoxGlyphScalarDataset->addItem(_DATASET_INTMTB);
-  _ui.comboBoxGlyphScalarDataset->addItem(_DATASET_ATTRACTANT);
-  _ui.comboBoxGlyphScalarDataset->addItem(_DATASET_KILLINGS);
+  initComboAllScalars(_ui.comboBoxGlyphScalarDataset);
 
 
   /* configure _ui.comboBoxGlyphVectorDataset */
-  _ui.comboBoxGlyphVectorDataset->addItem(_DATASET_TNF_GRADIENT);
-  _ui.comboBoxGlyphVectorDataset->addItem(_DATASET_CCL2_GRADIENT);
-  _ui.comboBoxGlyphVectorDataset->addItem(_DATASET_CCL5_GRADIENT);
-  _ui.comboBoxGlyphVectorDataset->addItem(_DATASET_CXCL9_GRADIENT);
-  _ui.comboBoxGlyphVectorDataset->addItem(_DATASET_IL10_GRADIENT);
-  _ui.comboBoxGlyphVectorDataset->addItem(_DATASET_ATTRACTANT_GRADIENT);
-  _ui.comboBoxGlyphVectorDataset->addItem(_DATASET_KILLINGS_GRADIENT);
+  initComboAllScalars(_ui.comboBoxGlyphVectorDataset);
+  for(int i=0;i<_ui.comboBoxGlyphVectorDataset->count();i++)  //Add ' grad' to the end of the label (consistency)
+    _ui.comboBoxGlyphVectorDataset->setItemText(i, _ui.comboBoxGlyphVectorDataset->itemText(i) + " grad");
 
 
   /* configure _ui.comboBoxGlyphType */
@@ -546,11 +495,8 @@ void MainWindow::initGlyphsTab()
   _ui.comboBoxGlyphType->addItem(_GLYPH_ARROW);
   _ui.comboBoxGlyphType->addItem(_GLYPH_TEXTURE);
 
-  connect(_ui.spinBoxGlyphScaling, SIGNAL(valueChanged(int)), this, SLOT(setGlyphScaling(int)));
-  connect(_ui.comboBoxGlyphVectorDataset, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(setGlyphVectorDataset(const QString&)));
-  connect(_ui.comboBoxGlyphScalarDataset, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(setGlyphScalarDataset(const QString&)));
+  _ui.doubleSpinBoxGlyphScaling->setMaximum(std::numeric_limits<double>::max());
   connect(_ui.comboBoxGlyphType, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(setGlyph(const QString&)));
-  connect(_ui.checkBoxGlyphClamping, SIGNAL(toggled(bool)), this, SLOT(setGlyphClamping(bool)));
 }
 
 void MainWindow::initIsolinesTab()
@@ -563,56 +509,32 @@ void MainWindow::initIsolinesTab()
   connect(_ui.doubleSpinBoxMax, SIGNAL(valueChanged(double)), this, SLOT(updateIsolinesSettings(void)));
 }
 
-
-
 /*
 	Initialize a combo box with all the scalar data sets.
 */
 void MainWindow::initComboAllScalars(QComboBox *&comboBox)
 {
-
-  for (int i = 0; i < _N_SCALAR_DATASETS; i++)
+  for (int i = 0; i < GrGrid::IDX_NGRIDS; i++)
     {
-      comboBox->addItem(_SCALAR_DATASETS[i]);
+      std::ostringstream ss;
+      ss<<GrGrid::GRID_IDX(i);
+      comboBox->addItem(QString::fromStdString(ss.str()));
     }
-
-}
-
-
-int MainWindow::getScalarDataSetIndex(const QString &dataSetName)
-{
-  for (int i = 0; i < _N_SCALAR_DATASETS; i++)
-    {
-      if (_SCALAR_DATASETS[i].compare(dataSetName, Qt::CaseInsensitive) == 0)
-        {
-          return i;
-        }
-    }
-
-  return -1;
-}
-
-int MainWindow::getScalarDataSetIndex(const std::string &dataSetName)
-{
-  QString name;
-  name = QString::fromStdString(dataSetName);
-  return getScalarDataSetIndex(name);
+  comboBox->addItem("Cell Density");
+  comboBox->addItem("Int. Mtb");
+  comboBox->addItem("Tot. Mtb");
 }
 
 void MainWindow::getScalarDataSetNames(std::string &names)
 {
-  for (int i = 0; i < _N_SCALAR_DATASETS; i++)
-    {
-      if (_SCALAR_DATASETS[i].contains(' ', Qt::CaseInsensitive))
-        {
-          names += "\"" + _SCALAR_DATASETS[i].toStdString() + "\"\n";
-        }
-      else
-        {
-          names += _SCALAR_DATASETS[i].toStdString() + "\n";
-        }
-    }
-
+  std::ostringstream ss;
+  for (int i = 0; i < GrGrid::IDX_NGRIDS; i++)
+      ss<<GrGrid::GRID_IDX(i)<<std::endl;
+  ss<<("Cell Density")<<std::endl;
+  ss<<("Ext. Mtb")<<std::endl;
+  ss<<("Int. Mtb")<<std::endl;
+  ss<<("Tot. Mtb")<<std::endl;
+  names = ss.str();
 }
 
 MainWindow::~MainWindow()
@@ -778,74 +700,6 @@ void MainWindow::toggleAnimation()
     switchStatus(SIM_RUNNING);
 }
 
-void MainWindow::setDrawAgents(bool checked)
-{
-  _pItfc->setDrawAgents(checked);
-  _ui.tabAgents->setEnabled(checked);
-
-  emit updateGL();
-}
-
-void MainWindow::setDrawSmoke(bool checked)
-{
-  _pItfc->setDrawSmoke(checked);
-  _ui.tabSmoke->setEnabled(checked || _pItfc->getDrawIsolines());
-
-  _pItfc->updateGrids();
-  emit updateGL();
-}
-
-void MainWindow::setDrawGlyphs(bool checked)
-{
-  _pItfc->setDrawGlyphs(checked);
-  _ui.tabGlyphs->setEnabled(checked);
-
-  _pItfc->updateGrids();
-  emit updateGL();
-}
-
-void MainWindow::setDrawIsolines(bool checked)
-{
-  _pItfc->setDrawIsolines(checked);
-  _ui.groupBoxIsoline->setEnabled(checked);
-  _ui.tabSmoke->setEnabled(checked || _pItfc->getDrawSmoke());
-
-  _pItfc->updateGrids();
-  emit updateGL();
-}
-
-void MainWindow::setDrawHeightPlot(bool checked)
-{
-  if (checked)
-    {
-      _ui.checkBoxDrawGlyphs->setChecked(false);
-      _ui.checkBoxDrawSmoke->setChecked(false);
-      _ui.checkBoxDrawIsolines->setChecked(false);
-      _ui.checkBoxDrawGlyphs->setEnabled(false);
-      _ui.checkBoxDrawSmoke->setEnabled(false);
-      _ui.checkBoxDrawIsolines->setEnabled(false);
-    }
-  else
-    {
-      _ui.checkBoxDrawGlyphs->setEnabled(true);
-      _ui.checkBoxDrawSmoke->setEnabled(true);
-      _ui.checkBoxDrawIsolines->setEnabled(true);
-    }
-
-  _pItfc->setDrawHeightPlot(checked);
-  _ui.tabHeightPlot->setEnabled(checked);
-
-  _pItfc->updateGrids();
-  emit updateGL();
-}
-
-void MainWindow::setGlyphScaling(int value)
-{
-  _pItfc->setGlyphScalingFactor(value);
-
-  emit updateGL();
-}
-
 void MainWindow::updateColorMap()
 {
   setColorMap(_ui.comboBoxScalarColoring->currentIndex());
@@ -915,31 +769,6 @@ void MainWindow::setMappingMethod(int value)
     }
 }
 
-void MainWindow::setSmokeDataset(const QString& value)
-{
-  ScalarDataset* pScalarSmokeDataset = getNewScalarDataset(value);
-  _pItfc->setScalarSmokeDataset(pScalarSmokeDataset);
-
-  if (_ui.comboBoxMappingMethod->currentIndex() == 1 &&
-      _ui.comboBoxColorMapSource->currentIndex() == SMOKE_SRC)
-    {
-      rescaleRequest();
-    }
-  _pItfc->updateGrids();
-
-  emit updateGL();
-}
-
-void MainWindow::setGlyphVectorDataset(const QString& value)
-{
-  VectorDataset* pVectorGlyphDataset = getNewVectorDataset(value);
-
-  _pItfc->setVectorGlyphDataset(pVectorGlyphDataset);
-
-  _pItfc->updateGrids();
-  emit updateGL();
-}
-
 void MainWindow::setColorMap(const int value)
 {
   switch(value) {
@@ -988,21 +817,6 @@ void MainWindow::setColorMap(const int value)
   emit updateGL();
 }
 
-void MainWindow::setGlyphScalarDataset(const QString& value)
-{
-  ScalarDataset* pScalarGlyphDataset = getNewScalarDataset(value);
-  _pItfc->setScalarGlyphDataset(pScalarGlyphDataset);
-
-  if (_ui.comboBoxMappingMethod->currentIndex() == 1 &&
-      _ui.comboBoxColorMapSource->currentIndex() == GLYPHS_SRC)
-    {
-      rescaleRequest();
-    }
-  _pItfc->updateGrids();
-
-  emit updateGL();
-}
-
 void MainWindow::setGlyph(const QString& value)
 {
   Glyph* pGlyph = NULL;
@@ -1037,13 +851,6 @@ void MainWindow::setGlyph(const QString& value)
     }
 
   _pItfc->setGlyph(pGlyph);
-
-  emit updateGL();
-}
-
-void MainWindow::setGlyphClamping(bool checked)
-{
-  _pItfc->setGlyphClamping(checked);
 
   emit updateGL();
 }
@@ -1114,8 +921,8 @@ void MainWindow::updateIsolinesSettings()
 
 void MainWindow::updateHeightPlotSettings()
 {
-  ScalarDataset* pScalarHeightDataset = getNewScalarDataset(_ui.comboBoxHeightDataset->currentText());
-  ScalarDataset* pScalarHeightColorDataset = getNewScalarDataset(_ui.comboBoxHeightColorDataset->currentText());
+  ScalarDataset* pScalarHeightDataset = getNewScalarDataset(_ui.comboBoxHeightDataset->currentIndex());
+  ScalarDataset* pScalarHeightColorDataset = getNewScalarDataset(_ui.comboBoxHeightColorDataset->currentIndex());
   _pItfc->setScalarHeightDataset(pScalarHeightDataset);
   _pItfc->setScalarHeightColorDataset(pScalarHeightColorDataset);
 
@@ -1153,110 +960,27 @@ void MainWindow::updateHeightPlotSettings()
   emit updateGL();
 }
 
-ScalarDataset* MainWindow::getNewScalarDataset(const QString& value)
+ScalarDataset* MainWindow::getNewScalarDataset(int idx)
 {
   ScalarDataset* pScalarDataset = NULL;
-  if (value == _DATASET_TNF)
-    {
-      pScalarDataset = new ScalarTnfDataset();
-    }
-  else if (value == _DATASET_CCL2)
-    {
-      pScalarDataset = new ScalarCcl2Dataset();
-    }
-  else if (value == _DATASET_CCL5)
-    {
-      pScalarDataset = new ScalarCcl5Dataset();
-    }
-  else if (value == _DATASET_CXCL9)
-    {
-      pScalarDataset = new ScalarCxcl9Dataset();
-    }
-  else if (value == _DATASET_IL10)
-    {
-      pScalarDataset = new ScalarIl10Dataset();
-    }
-  else if (value == _DATASET_EXTMTB)
-    {
-      pScalarDataset = new ScalarExtMtbDataset();
-    }
-  else if (value == _DATASET_INTMTB)
-    {
-      pScalarDataset = new ScalarIntMtbDataset();
-    }
-  else if (value == _DATASET_TOTMTB)
-    {
-      pScalarDataset = new ScalarTotMtbDataset();
-    }
-  else if (value == _DATASET_ATTRACTANT)
-    {
-      pScalarDataset = new ScalarAttractantDataset();
-    }
-  else if (value == _DATASET_TNF_ATTR_EXTMTB)
-    {
-      pScalarDataset = new ScalarTnfAttrExtMtb();
-    }
-  else if (value == _DATASET_CELL_DENSITY)
-    {
-      pScalarDataset = new ScalarCellDensityDataset();
-    }
-  else if (value == _DATASET_KILLINGS)
-  {
-      pScalarDataset = new ScalarKillingDataset();
+  switch(idx) {
+    case GrGrid::IDX_NGRIDS: pScalarDataset = new ScalarCellDensityDataset(); break;
+    case GrGrid::IDX_NGRIDS+1: pScalarDataset = new ScalarIntMtbDataset();    break;
+    case GrGrid::IDX_NGRIDS+2: pScalarDataset = new ScalarTotMtbDataset();    break;
+    default:
+      if(idx < GrGrid::IDX_NGRIDS && idx >= 0)
+        pScalarDataset = new ScalarIndexedDataset(GrGrid::GRID_IDX(idx));
+      else
+        assert(!"Invalid Scalar dataset index");
+      break;
   }
-  else
-    {
-      assert(false);
-    }
 
   return pScalarDataset;
 }
 
-VectorDataset* MainWindow::getNewVectorDataset(const QString& value)
+VectorDataset* MainWindow::getNewVectorDataset(int idx)
 {
-  VectorDataset* pVectorDataset = NULL;
-  if (value == _DATASET_TNF_GRADIENT)
-    {
-      ScalarTnfDataset* pScalarTnfDataset = new ScalarTnfDataset();
-      pVectorDataset = new VectorGradientDataset(pScalarTnfDataset, _pItfc->getVectorGlyphGrid());
-    }
-  else if (value == _DATASET_CCL2_GRADIENT)
-    {
-      ScalarCcl2Dataset* pScalarCcl2Dataset = new ScalarCcl2Dataset();
-      pVectorDataset = new VectorGradientDataset(pScalarCcl2Dataset, _pItfc->getVectorGlyphGrid());
-    }
-  else if (value == _DATASET_CCL5_GRADIENT)
-    {
-      ScalarCcl5Dataset* pScalarCcl5Dataset = new ScalarCcl5Dataset();
-      pVectorDataset = new VectorGradientDataset(pScalarCcl5Dataset, _pItfc->getVectorGlyphGrid());
-    }
-  else if (value == _DATASET_CXCL9_GRADIENT)
-    {
-      ScalarCxcl9Dataset* pScalarCxcl9Dataset = new ScalarCxcl9Dataset();
-      pVectorDataset = new VectorGradientDataset(pScalarCxcl9Dataset, _pItfc->getVectorGlyphGrid());
-    }
-  else if (value == _DATASET_IL10_GRADIENT)
-    {
-      ScalarIl10Dataset* pScalarIl10Dataset = new ScalarIl10Dataset();
-      pVectorDataset = new VectorGradientDataset(pScalarIl10Dataset, _pItfc->getVectorGlyphGrid());
-    }
-  else if (value == _DATASET_ATTRACTANT_GRADIENT)
-    {
-      ScalarAttractantDataset* pScalarAttractantDataset = new ScalarAttractantDataset();
-      pVectorDataset = new VectorGradientDataset(pScalarAttractantDataset, _pItfc->getVectorGlyphGrid());
-    }
-  else if (value == _DATASET_KILLINGS_GRADIENT)
-  {
-      ScalarKillingDataset* pScalarKillingDataset = new ScalarKillingDataset();
-      pVectorDataset = new VectorGradientDataset(pScalarKillingDataset, _pItfc->getVectorGlyphGrid());
-  }
-
-  else
-    {
-      assert(false);
-    }
-
-  return pVectorDataset;
+  return new VectorGradientDataset(getNewScalarDataset(idx), _pItfc->getVectorGlyphGrid());
 }
 
 void MainWindow::updateHeightMinMax()
@@ -1266,18 +990,6 @@ void MainWindow::updateHeightMinMax()
 
   _pItfc->getScalarHeightNormalizer()->setMin(min);
   _pItfc->getScalarHeightNormalizer()->setMax(max);
-
-  emit updateGL();
-}
-
-void MainWindow::setBlend()
-{
-  bool checked = _ui.checkBoxBlend->isChecked();
-  _pItfc->setBlend(checked);
-  _ui.labelTransparency->setEnabled(checked);
-  _ui.horizontalSliderAlpha->setEnabled(checked);
-  _ui.labelHeightGridTransparency->setEnabled(checked);
-  _ui.horizontalSliderHeightAlpha->setEnabled(checked);
 
   emit updateGL();
 }
@@ -1309,8 +1021,7 @@ void MainWindow::updateGranulomaSettings()
 {
   _pItfc->setDrawGranuloma(_ui.checkBoxDrawGranulomaBorder->isChecked());
 
-  QString newDatasetName = _ui.comboBoxGranulomaDataset->currentText();
-  ScalarDataset* pScalarGranulomaDataset = getNewScalarDataset(newDatasetName);
+  ScalarDataset* pScalarGranulomaDataset = getNewScalarDataset(_ui.comboBoxGranulomaDataset->currentIndex());
   _pItfc->setScalarGranulomaDataset(pScalarGranulomaDataset);
 
   float val = _ui.horizontalSliderGranulomaBorderThreshold->value() / _SLIDER_GRANULOMA_BORDER_THRESHOLD;
@@ -1666,4 +1377,130 @@ void MainWindow::on_comboBoxColorMapSource_currentIndexChanged(int index)
   _ui.spinBoxNumberOfColors->setValue(nrBands);
 
   setColorMap(idx);
+}
+
+void MainWindow::on_comboBoxSmokeDataset_currentIndexChanged(int index)
+{
+  _pItfc->setScalarSmokeDataset(getNewScalarDataset(index));
+
+  if (_ui.comboBoxMappingMethod->currentIndex() == 1 &&
+      _ui.comboBoxColorMapSource->currentIndex() == SMOKE_SRC)
+    {
+      rescaleRequest();
+    }
+  _pItfc->updateGrids();
+
+  emit updateGL();
+}
+
+void MainWindow::on_comboBoxGlyphScalarDataset_currentIndexChanged(int index)
+{
+  _pItfc->setScalarGlyphDataset(getNewScalarDataset(index));
+
+  if (_ui.comboBoxMappingMethod->currentIndex() == 1 &&
+      _ui.comboBoxColorMapSource->currentIndex() == GLYPHS_SRC)
+    {
+      rescaleRequest();
+    }
+  _pItfc->updateGrids();
+
+  emit updateGL();
+}
+
+void MainWindow::on_comboBoxGlyphVectorDataset_currentIndexChanged(int index)
+{
+  _pItfc->setScalarGlyphDataset(getNewScalarDataset(index));
+
+  if (_ui.comboBoxMappingMethod->currentIndex() == 1 &&
+      _ui.comboBoxColorMapSource->currentIndex() == GLYPHS_SRC)
+    {
+      rescaleRequest();
+    }
+  _pItfc->updateGrids();
+
+  emit updateGL();
+}
+
+void MainWindow::on_doubleSpinBoxGlyphScaling_valueChanged(double arg1)
+{
+  _pItfc->setGlyphScalingFactor(arg1);
+  emit updateGL();
+}
+
+void MainWindow::on_checkBoxDrawAgents_toggled(bool checked)
+{
+  _pItfc->setDrawAgents(checked);
+  _ui.tabAgents->setEnabled(checked);
+
+  emit updateGL();
+}
+
+void MainWindow::on_checkBoxDrawSmoke_toggled(bool checked)
+{
+  _pItfc->setDrawSmoke(checked);
+  _ui.tabSmoke->setEnabled(checked || _pItfc->getDrawIsolines());
+
+  _pItfc->updateGrids();
+  emit updateGL();
+}
+
+void MainWindow::on_checkBoxDrawGlyphs_toggled(bool checked)
+{
+  _pItfc->setDrawGlyphs(checked);
+  _ui.tabGlyphs->setEnabled(checked);
+
+  _pItfc->updateGrids();
+  emit updateGL();
+}
+
+void MainWindow::on_checkBoxDrawIsolines_toggled(bool checked)
+{
+  _pItfc->setDrawIsolines(checked);
+  _ui.groupBoxIsoline->setEnabled(checked);
+  _ui.tabSmoke->setEnabled(checked || _pItfc->getDrawSmoke());
+
+  _pItfc->updateGrids();
+  emit updateGL();
+}
+
+void MainWindow::on_checkBoxDrawHeightPlot_toggled(bool checked)
+{
+  if (checked)
+    {
+      _ui.checkBoxDrawGlyphs->setChecked(false);
+      _ui.checkBoxDrawSmoke->setChecked(false);
+      _ui.checkBoxDrawIsolines->setChecked(false);
+      _ui.checkBoxDrawGlyphs->setEnabled(false);
+      _ui.checkBoxDrawSmoke->setEnabled(false);
+      _ui.checkBoxDrawIsolines->setEnabled(false);
+    }
+  else
+    {
+      _ui.checkBoxDrawGlyphs->setEnabled(true);
+      _ui.checkBoxDrawSmoke->setEnabled(true);
+      _ui.checkBoxDrawIsolines->setEnabled(true);
+    }
+
+  _pItfc->setDrawHeightPlot(checked);
+  _ui.tabHeightPlot->setEnabled(checked);
+
+  _pItfc->updateGrids();
+  emit updateGL();
+}
+
+void MainWindow::on_checkBoxBlend_toggled(bool checked)
+{
+  _pItfc->setBlend(checked);
+  _ui.labelTransparency->setEnabled(checked);
+  _ui.horizontalSliderAlpha->setEnabled(checked);
+  _ui.labelHeightGridTransparency->setEnabled(checked);
+  _ui.horizontalSliderHeightAlpha->setEnabled(checked);
+
+  emit updateGL();
+}
+
+void MainWindow::on_checkBoxGlyphClamping_toggled(bool checked)
+{
+  _pItfc->setGlyphClamping(checked);
+  emit updateGL();
 }

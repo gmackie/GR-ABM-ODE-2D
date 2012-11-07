@@ -13,24 +13,40 @@
 #include <QMutex>
 #include <QAtomicInt>
 
+/**
+ * @brief Simulation thread that runs the model in the background.  Designed
+ * to stop so the gui is able to render and account for *every* frame in order
+ * to take accurate pictures and snapshots.
+ */
 class Simulation : public QThread
 {
   Q_OBJECT
 
 private:
+  /// Locks the thread from updating the backbuffer
   mutable QMutex _mutex;
+  /// Locks the thread from advancing the simulation.
+  /// Useful if running settings need to change.
   mutable QMutex _modelMutex;
+  /// Did the gui thread pick up the last simulation updated?
+  /// If not, _updated is false and sim thread spins (not efficient)
   QAtomicInt _updated;
+  /// Current time of simulation.
   int _time;
+  /// Backup random number generator in dealing with cloning simulation.
   Rand rng;
+  /// Running simulation
   GrSimulation* _gr;
+  /// Updated simulation, gui thread uses this while holding _mutex
   GrSimulation* _backbuffer;
+  /// #ms to wait before continuing to step
   QAtomicInt _delay;
+  /// Been stopped (via condition)
   bool _stopFlag;
+  /// Number of steps til stop
   QAtomicInt _timeStepsToSimulate;
+  /// Stop on mtbClearance?
   QAtomicInt _mtbClearance;
-  double _areaThreshold;
-  OutcomeMethod _outcomeMethod;
 
   bool stopCondition();
 

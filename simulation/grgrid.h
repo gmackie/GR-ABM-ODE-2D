@@ -53,8 +53,8 @@ typedef Indexer2D Indexer;
   GRID       (int, nRecruitmentsTcyt)         \
   GRID       (int, nRecruitmentsTreg)         \
   GRID       (int, nSecretions)         \
-  PADDED_GRID(Scalar, macAttractant)  \
   PADDED_GRID(Scalar, TNF)  \
+  PADDED_GRID(Scalar, macAttractant)  \
   PADDED_GRID(Scalar, CCL2)  \
   PADDED_GRID(Scalar, CCL5)  \
   PADDED_GRID(Scalar, CXCL9)  \
@@ -94,6 +94,16 @@ private:
 #undef PADDED_GRID
 
 public:
+  #define GRID(type, name) IDX_##name,
+  #define PADDED_GRID(type, name) IDX_##name,
+  enum GRID_IDX {
+    __INIT_GRID_IDX__ = -1, //Don't use, just to ensure standard compliance
+   GRIDS_DEFS
+   IDX_NGRIDS
+  };
+#undef GRID
+#undef PADDED_GRID
+
   GrGrid(const Pos& dim);
   ~GrGrid();
 
@@ -216,6 +226,36 @@ public:
     GRIDS_DEFS
 #undef GRID
 #undef PADDED_GRID
+  }
+
+  /**
+   * @brief Given an templated index this sets val to the result of calling
+   * the named grid's indexer.
+   * @note This is probably not the best way to do this, but we're relying on
+   * compiler optimization to remove the switch case entirely.  The reason for
+   * implementing this is so we can index each grid, padded or not, in the same
+   * manner, knowing only the index of the grid we want.  Only should be used
+   * in the gui.
+   * @details example:
+   * getIndexedValue(IDX_TNF,0,0,val) is the same as
+   * val = TNF(0,0);
+   *
+   * @tparam T type to cast to.  Must be copyable and assignable
+   * @param i Index of the grid to get the value of
+   * @param x Row
+   * @param y Column
+   * @param val Value to store result in
+   */
+  template<typename T>
+  void getIndexedValue(GRID_IDX i, int x, int y, T& val) const {
+    switch(i) {
+#define GRID(type, name)        case IDX_##name : val = T(name(x,y)); break;
+#define PADDED_GRID(type, name) case IDX_##name : val = T(name(x,y)); break;
+        GRIDS_DEFS
+#undef GRID
+#undef PADDED_GRID
+      default: assert(!"Invalid index"); break;
+    }
   }
 };
 
@@ -355,6 +395,19 @@ void GrGrid::serialize(Archive& ar, const unsigned int /*version*/)
   ar & BOOST_SERIALIZATION_NVP(_agents);
   ar & BOOST_SERIALIZATION_NVP(_nCaseation);
   ar & BOOST_SERIALIZATION_NVP(_sources);
+}
+
+inline std::ostream& operator<<(std::ostream& s, GrGrid::GRID_IDX e) {
+#define GRID(type, name)        case GrGrid::IDX_##name : s<<#name; break;
+#define PADDED_GRID(type, name) case GrGrid::IDX_##name : s<<#name; break;
+  switch(e) {
+    GRIDS_DEFS
+  default:
+    assert(!"Invalid grid index."); break;
+  }
+#undef GRID
+#undef PADDED_GRID
+  return s;
 }
 
 #endif /* GRID_H */

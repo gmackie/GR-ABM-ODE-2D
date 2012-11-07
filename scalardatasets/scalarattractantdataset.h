@@ -8,6 +8,9 @@
 #ifndef SCALARATTRACTANTDATASET_H_
 #define SCALARATTRACTANTDATASET_H_
 
+/**
+* @deprecated Automatically added via ScalarIndexedDataset 
+*/
 class ScalarAttractantDataset : public ScalarDataset
 {
 public:

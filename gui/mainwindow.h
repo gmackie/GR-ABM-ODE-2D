@@ -47,8 +47,6 @@ public:
   void setSnapshot(Snapshot* pSnapshot);
   void loadState(std::string fileName);
 
-  static int getScalarDataSetIndex(const QString &dataSetName);
-  static int getScalarDataSetIndex(const std::string &dataSetName);
   static void getScalarDataSetNames(std::string &names);
 
   static MainWindow* _pMainWindow;
@@ -114,16 +112,8 @@ public:
 
 public slots:
   void toggleAnimation();
-  void setBlend();
-  void setDrawAgents(bool checked);
-  void setDrawSmoke(bool checked);
-  void setDrawGlyphs(bool checked);
-  void setDrawIsolines(bool checked);
-  void setDrawHeightPlot(bool checked);
-  void setGlyphScaling(int value);
   void setColorMap(int value);
   void setMappingMethod(int value);
-  void setSmokeDataset(const QString& value);
   void updateColorMap();
   void updateColorMapLabels();
   void updateHeightMinMax();
@@ -131,10 +121,7 @@ public slots:
   void rescaleHeightRequest();
   void updateIsolinesSettings();
   void updateHeightPlotSettings();
-  void setGlyphVectorDataset(const QString& value);
-  void setGlyphScalarDataset(const QString& value);
   void setGlyph(const QString& value);
-  void setGlyphClamping(bool checked);
   void dumpGrids();
   void selectSmokeColorMap();
   void selectGlyphsColorMap();
@@ -191,6 +178,28 @@ private slots:
 
   void on_comboBoxColorMapSource_currentIndexChanged(int index);
 
+  void on_comboBoxSmokeDataset_currentIndexChanged(int index);
+
+  void on_comboBoxGlyphScalarDataset_currentIndexChanged(int index);
+
+  void on_comboBoxGlyphVectorDataset_currentIndexChanged(int index);
+
+  void on_doubleSpinBoxGlyphScaling_valueChanged(double arg1);
+
+  void on_checkBoxDrawAgents_toggled(bool checked);
+
+  void on_checkBoxDrawSmoke_toggled(bool checked);
+
+  void on_checkBoxDrawGlyphs_toggled(bool checked);
+
+  void on_checkBoxDrawIsolines_toggled(bool checked);
+
+  void on_checkBoxDrawHeightPlot_toggled(bool checked);
+
+  void on_checkBoxBlend_toggled(bool checked);
+
+  void on_checkBoxGlyphClamping_toggled(bool checked);
+
 private:
   void initVisualizationTab();
   void initSimulationTab();
@@ -206,8 +215,8 @@ private:
   void refreshCurrentNormalizer(const COLORMAP_SRC m);
   void refreshCurrentColorMap(const COLORMAP_SRC colorMapSource);
   void refreshCurrentScalarGrid(const COLORMAP_SRC m);
-  ScalarDataset* getNewScalarDataset(const QString& value);
-  VectorDataset* getNewVectorDataset(const QString& value);
+  ScalarDataset* getNewScalarDataset(int idx);
+  VectorDataset* getNewVectorDataset(int idx);
   void updateStatLabels(const Stats& stats);
   void switchStatus(SimStatus newStatus);
   void updateWindowStatus();

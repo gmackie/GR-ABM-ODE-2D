@@ -11,6 +11,9 @@
 #include "scalardataset.h"
 #include "simulation.h"
 
+/**
+* @deprecated Automatically added via ScalarIndexedDataset 
+*/
 class ScalarExtMtbDataset : public ScalarDataset
 {
 public:

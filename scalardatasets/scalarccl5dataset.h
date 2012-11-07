@@ -10,6 +10,9 @@
 
 #include "scalardataset.h"
 
+/**
+* @deprecated Automatically added via ScalarIndexedDataset 
+*/
 class ScalarCcl5Dataset : public ScalarDataset
 {
 public:

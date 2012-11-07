@@ -3,6 +3,9 @@
 
 #include "scalardataset.h"
 
+/**
+* @deprecated Automatically added via ScalarIndexedDataset 
+*/
 class ScalarKillingDataset:public ScalarDataset
 {
 public:

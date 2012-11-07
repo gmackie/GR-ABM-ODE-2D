@@ -41,7 +41,7 @@ inline float ScalarCellDensityDataset::getScalar(const Simulation* pSimulation, 
     {
       for (int j = -1; j <= 1; j++)
         {
-          if (pSimulation->getGrGrid().isOccupied(moduloDIM(pSimulation->getSize().y, row + i), moduloDIM(pSimulation->getSize().x, col + j)))
+          if (pSimulation->getGrGrid().isOccupied(moduloDIM(row + i, pSimulation->getSize().y), moduloDIM(col + j, pSimulation->getSize().x)))
             {
               mcCount++;
             }

@@ -58,7 +58,7 @@ void GLWidget::initializeGL()
 }
 void GLWidget::updateWindow()
 {
-  updateGL();
+  QGLWidget::updateGL();
 }
 
 void GLWidget::updateProjectionMatrix()
@@ -95,8 +95,15 @@ void GLWidget::updateViewport(int width, int height)
   glGetIntegerv(GL_VIEWPORT, _viewport);
 }
 
+void GLWidget::updateGL() {
+  if(!_update_posted)
+    QMetaObject::invokeMethod(this, "updateWindow", Qt::QueuedConnection);
+  _update_posted = true;  //Don't queue any more screen updates right now
+}
+
 void GLWidget::paintGL()
 {
+  _update_posted = false;
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glShadeModel(GL_SMOOTH);
   glEnable(GL_DEPTH_TEST);

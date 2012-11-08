@@ -408,6 +408,9 @@ QString GLWindow::getAgentStr(const Agent* pAgent)
 
 QImage GLWindow::grabFrameBuffer()
 {
+  //Ensure the screen is up to date before taking a picture.
+  //NOTICE: not using the asynchronous version here (updateGL)
+  _ui.glWidget->updateWindow();
   return _ui.glWidget->renderPixmap().toImage();
 }
 

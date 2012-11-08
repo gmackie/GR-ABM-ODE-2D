@@ -20,10 +20,18 @@ public:
   void setDepth(float depth);
 
 public slots:
+  /**
+   * @brief forces the window to update immediately.
+   */
   void updateWindow();
   void set2DView();
   void set3DViewHeight();
   void setAllowMoveCamera(bool allow);
+  /**
+   * @brief Overriding this filters out multiple signals causing a costly
+   * repaint when we really just want to repaint *after* everything has completed.
+   */
+  void updateGL();
 
 signals:
   void updateSelection(int row, int col);
@@ -53,6 +61,7 @@ private:
   GLint _viewport[4];
   float _depth;
   bool _allowMoveCamera;
+  bool _update_posted;
 
   void updateProjectionMatrix();
   void updateModelViewMatrix();

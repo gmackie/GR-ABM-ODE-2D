@@ -44,7 +44,8 @@ bool Simulation::stopCondition()
 void Simulation::update()
 { // Seperating update and step allows event loop processing while
   // simulation is waiting for render loop to finish what it's doing
-  // with the current cloned copy (last timestep)
+  // with the current cloned copy (last timestep).  Because of this,
+  // standard locking mechs like "wait conditions" WILL NOT WORK.
   lock();
 #if 1  // Set this to 0 if completely asynchronous is required.
        // Beware: completely asynchronous does not guarentee

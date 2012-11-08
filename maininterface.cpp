@@ -125,7 +125,7 @@ void MainInterface::visualize()
 
 void MainInterface::updateGrids()
 {
-
+  _simulation->lock();
   if (_drawAgents)
     {
       _pScalarAgentGrid->evaluate(_simulation);
@@ -179,7 +179,7 @@ void MainInterface::updateGrids()
       _scalarHeightColorNormalizer.setMin(_scalarHeightColorGrid.getMin());
       _scalarHeightColorNormalizer.setMax(_scalarHeightColorGrid.getMax());
     }
-
+  _simulation->unlock();
 }
 
 void MainInterface::serializeGrids(std::ofstream& outFile)

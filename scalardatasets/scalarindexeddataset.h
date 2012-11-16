@@ -10,7 +10,7 @@ public:
   float getScalar(const Simulation* pSimulation, int row, int col) const;
 };
 
-float ScalarIndexedDataset::getScalar(const Simulation* pSimulation, int row, int col) const {
+inline float ScalarIndexedDataset::getScalar(const Simulation* pSimulation, int row, int col) const {
   static float ret=0;
   pSimulation->getGrGrid().getIndexedValue(idx, row, col, ret);
   return ret;

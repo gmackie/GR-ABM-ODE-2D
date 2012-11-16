@@ -26,7 +26,6 @@ HEADERS += scalardatasets/scalartotmtbdataset.h \
     simulation/stat.def \
     scalardatasets/scalarcelldensitydataset.h \
     scalardatasets/scalartnfattrextmtb.h \
-    scalardatasets/scalarattractantdataset.h \
     scalardatasets/scalaragentgridbase.h \
     gui/agentswidget.h \
     gui/graphcontroller.h \
@@ -51,17 +50,11 @@ HEADERS += scalardatasets/scalartotmtbdataset.h \
     gui/mainwindow.h \
     gui/paramwindow.h \
     scalardatasets/scalaragentgrid.h \
-    scalardatasets/scalarccl2dataset.h \
-    scalardatasets/scalarccl5dataset.h \
-    scalardatasets/scalarcxcl9dataset.h \
-    scalardatasets/scalaril10dataset.h \
     scalardatasets/scalardataset.h \
     scalardatasets/scalardivergencedataset.h \
-    scalardatasets/scalarextmtbdataset.h \
     scalardatasets/scalargrid.h \
     scalardatasets/scalarintmtbdataset.h \
     scalardatasets/scalarnormalizer.h \
-    scalardatasets/scalartnfdataset.h \
     simulation/agent.h \
     simulation/areatest.h \
     simulation/gr.h \
@@ -97,7 +90,6 @@ HEADERS += scalardatasets/scalartotmtbdataset.h \
     gui/graphviewer.h \
     gui/agenthistogram.h \
     simulation/numericalMethods.h \
-    scalardatasets/scalarkillingsdataset.h \
     scalardatasets/scalarindexeddataset.h
 SOURCES += \
     simulation/params.cpp \

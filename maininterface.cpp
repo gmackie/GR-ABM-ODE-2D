@@ -6,7 +6,7 @@
  */
 
 #include "maininterface.h"
-#include "scalardatasets/scalartnfdataset.h"
+#include "scalardatasets/scalarindexeddataset.h"
 #include "scalardatasets/scalartnfattrextmtb.h"
 #include "colormaps/fire.h"
 #include "colormaps/blackwhite.h"
@@ -14,6 +14,7 @@
 #include "colormaps/coolwarm.h"
 #include "colormaps/fixed.h"
 #include "scalardatasets/scalaragentgridbase.h"
+#include "simulation/grgrid.h"
 #include <stdio.h>
 
 MainInterface::MainInterface(const Pos& dim, Visualization* pAgentVisualization, ScalarAgentGridBase* pScalarAgentGrid)
@@ -24,11 +25,11 @@ MainInterface::MainInterface(const Pos& dim, Visualization* pAgentVisualization,
   , _scalarHeightNormalizer(_MIN_CLAMP_VALUE, _MAX_CLAMP_VALUE)
   , _scalarHeightColorNormalizer(_MIN_CLAMP_VALUE, _MAX_CLAMP_VALUE)
   , _scalarGranulomaNormalizer(_MIN_CLAMP_VALUE, _MAX_CLAMP_VALUE)
-  , _pScalarSmokeDataset(new ScalarTnfDataset())
-  , _pScalarGlyphDataset(new ScalarTnfDataset())
+  , _pScalarSmokeDataset(new ScalarIndexedDataset(GrGrid::IDX_TNF))
+  , _pScalarGlyphDataset(new ScalarIndexedDataset(GrGrid::IDX_TNF))
   , _pVectorGlyphDataset(NULL)
-  , _pScalarHeightDataset(new ScalarTnfDataset())
-  , _pScalarHeightColorDataset(new ScalarTnfDataset())
+  , _pScalarHeightDataset(new ScalarIndexedDataset(GrGrid::IDX_TNF))
+  , _pScalarHeightColorDataset(new ScalarIndexedDataset(GrGrid::IDX_TNF))
   , _pScalarGranulomaDataset(new ScalarTnfAttrExtMtb())
   , _pScalarAgentGrid(pScalarAgentGrid)
   , _scalarSmokeGrid(dim.x)
@@ -63,7 +64,7 @@ MainInterface::MainInterface(const Pos& dim, Visualization* pAgentVisualization,
   , _time(0)
   , _simTime(0)
 {
-  _pVectorGlyphDataset = new VectorGradientDataset(new ScalarTnfDataset(), getVectorGlyphGrid());
+  _pVectorGlyphDataset = new VectorGradientDataset(new ScalarIndexedDataset(GrGrid::IDX_TNF), getVectorGlyphGrid());
 
   /* setup granulomaVisualization */
   _granulomaVisualization.setTargetValueVector(std::vector<float>(1, _AREA_THRESHOLD));

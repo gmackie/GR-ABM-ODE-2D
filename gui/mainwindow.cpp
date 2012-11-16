@@ -27,6 +27,7 @@
 #include "glyphs/glyphtexture.h"
 #include "scalardatasets/scalardataset.h"
 #include "scalardatasets/scalarindexeddataset.h"
+#include "scalardatasets/scalartnfattrextmtb.h"
 #include "scalardatasets/scalarcelldensitydataset.h"
 #include "scalardatasets/scalarintmtbdataset.h"
 #include "scalardatasets/scalartotmtbdataset.h"
@@ -330,7 +331,7 @@ void MainWindow::initVisualizationTab()
   initComboAllScalars(_ui.comboBoxGranulomaDataset);
 
   // Set the initial granuloma dataset.
-  int defaultidx = GrGrid::IDX_TNF;
+  int defaultidx = GrGrid::IDX_NGRIDS+3;  //TNF+ATTR+MTB
   _ui.comboBoxGranulomaDataset->setCurrentIndex(defaultidx);
 
   // Overrides the granuloma dataset defined in the MainInterface constructor.
@@ -475,18 +476,21 @@ void MainWindow::initSmokeTab()
 {
   /* configure _ui.comboBoxSmokeDataset */
   initComboAllScalars(_ui.comboBoxSmokeDataset);
+  _ui.comboBoxSmokeDataset->setCurrentIndex(GrGrid::IDX_TNF);
 }
 
 void MainWindow::initGlyphsTab()
 {
   /* configure _ui.comboBoxGlyphScalarDataset */
   initComboAllScalars(_ui.comboBoxGlyphScalarDataset);
+  _ui.comboBoxGlyphScalarDataset->setCurrentIndex(GrGrid::IDX_TNF);
 
 
   /* configure _ui.comboBoxGlyphVectorDataset */
   initComboAllScalars(_ui.comboBoxGlyphVectorDataset);
   for(int i=0;i<_ui.comboBoxGlyphVectorDataset->count();i++)  //Add ' grad' to the end of the label (consistency)
     _ui.comboBoxGlyphVectorDataset->setItemText(i, _ui.comboBoxGlyphVectorDataset->itemText(i) + " grad");
+  _ui.comboBoxGlyphVectorDataset->setCurrentIndex(GrGrid::IDX_TNF);
 
 
   /* configure _ui.comboBoxGlyphType */
@@ -523,6 +527,7 @@ void MainWindow::initComboAllScalars(QComboBox *&comboBox)
   comboBox->addItem("Cell Density");
   comboBox->addItem("Int. Mtb");
   comboBox->addItem("Tot. Mtb");
+  comboBox->addItem("TNF + Attract + Ext. Mtb");
 }
 
 void MainWindow::getScalarDataSetNames(std::string &names)
@@ -534,6 +539,7 @@ void MainWindow::getScalarDataSetNames(std::string &names)
   ss<<("Ext. Mtb")<<std::endl;
   ss<<("Int. Mtb")<<std::endl;
   ss<<("Tot. Mtb")<<std::endl;
+  ss<<"TNF + Attract + Ext. Mtb"<<std::endl;
   names = ss.str();
 }
 
@@ -967,6 +973,7 @@ ScalarDataset* MainWindow::getNewScalarDataset(int idx)
     case GrGrid::IDX_NGRIDS: pScalarDataset = new ScalarCellDensityDataset(); break;
     case GrGrid::IDX_NGRIDS+1: pScalarDataset = new ScalarIntMtbDataset();    break;
     case GrGrid::IDX_NGRIDS+2: pScalarDataset = new ScalarTotMtbDataset();    break;
+    case GrGrid::IDX_NGRIDS+3: pScalarDataset = new ScalarTnfAttrExtMtb();    break;
     default:
       if(idx < GrGrid::IDX_NGRIDS && idx >= 0)
         pScalarDataset = new ScalarIndexedDataset(GrGrid::GRID_IDX(idx));

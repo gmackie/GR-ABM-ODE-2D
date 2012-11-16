@@ -59,30 +59,6 @@ public:
   static const QString _MAP_METHOD_SCALE;
   static const QString _MAP_METHOD_CLAMP;
 
-  static const QString _DATASET_TNF;
-  static const QString _DATASET_TNF_GRADIENT;
-  static const QString _DATASET_CCL2;
-  static const QString _DATASET_CCL5_GRADIENT;
-  static const QString _DATASET_CCL5;
-  static const QString _DATASET_CCL2_GRADIENT;
-  static const QString _DATASET_CXCL9;
-  static const QString _DATASET_CXCL9_GRADIENT;
-  static const QString _DATASET_IL10;
-  static const QString _DATASET_IL10_GRADIENT;
-  static const QString _DATASET_ATTRACTANT;
-  static const QString _DATASET_ATTRACTANT_GRADIENT;
-  static const QString _DATASET_TNF_ATTR_EXTMTB;
-  static const QString _DATASET_CELL_DENSITY;
-  static const QString _DATASET_EXTMTB;
-  static const QString _DATASET_INTMTB;
-  static const QString _DATASET_TOTMTB;
-  static const QString _DATASET_KILLINGS;
-  static const QString _DATASET_KILLINGS_GRADIENT;
-
-  static const QString _SCALAR_DATASETS[];
-  static const int _N_SCALAR_DATASETS;
-
-
   static const QString _INTERPOLATION_NEAREST_NEIGHBOR;
   static const QString _INTERPOLATION_BILINEAR;
 

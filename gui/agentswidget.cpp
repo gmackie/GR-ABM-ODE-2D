@@ -109,10 +109,12 @@ void AgentsWidget::setAgentSelection(int row, int col)
 
 void AgentsWidget::updateM1M2Settings()
 {
-  _ui.checkBoxDrawAgentTcyt->setChecked(false);
-  _ui.checkBoxDrawAgentTgam->setChecked(false);
-  _ui.checkBoxDrawAgentTreg->setChecked(false);
-  _ui.checkBoxDrawAgentExtMtb->setChecked(false);
+  if(_ui.comboBoxM1M2->currentIndex() != 0) {
+    _ui.checkBoxDrawAgentTcyt->setChecked(false);
+    _ui.checkBoxDrawAgentTgam->setChecked(false);
+    _ui.checkBoxDrawAgentTreg->setChecked(false);
+    _ui.checkBoxDrawAgentExtMtb->setChecked(false);
+  }
   _ui.doubleSpinBoxM1M2Threshold->setEnabled(_ui.comboBoxM1M2->currentIndex() == 1);
   updateAgentsSettings();
 }

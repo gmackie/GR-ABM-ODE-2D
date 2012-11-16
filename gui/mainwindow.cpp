@@ -53,46 +53,6 @@
 // static members
 MainWindow* MainWindow::_pMainWindow = NULL;
 
-const QString MainWindow::_DATASET_ATTRACTANT = "Attractant";
-const QString MainWindow::_DATASET_ATTRACTANT_GRADIENT = "grad Attractant";
-const QString MainWindow::_DATASET_TNF = "TNF";
-const QString MainWindow::_DATASET_TNF_GRADIENT = "grad TNF";
-const QString MainWindow::_DATASET_CCL2 = "CCL2";
-const QString MainWindow::_DATASET_CCL2_GRADIENT = "grad CCL2";
-const QString MainWindow::_DATASET_CCL5 = "CCL5";
-const QString MainWindow::_DATASET_CCL5_GRADIENT = "grad CCL5";
-const QString MainWindow::_DATASET_CXCL9 = "CXCL9";
-const QString MainWindow::_DATASET_CXCL9_GRADIENT = "grad CXCL9";
-const QString MainWindow::_DATASET_IL10 = "IL10";
-const QString MainWindow::_DATASET_IL10_GRADIENT = "grad IL10";
-const QString MainWindow::_DATASET_TNF_ATTR_EXTMTB = "TNF Attr extMtb";
-const QString MainWindow::_DATASET_CELL_DENSITY = "Cell Density";
-const QString MainWindow::_DATASET_EXTMTB = "Ext. Mtb";
-const QString MainWindow::_DATASET_INTMTB = "Int. Mtb";
-const QString MainWindow::_DATASET_TOTMTB = "Tot. Mtb";
-const QString MainWindow::_DATASET_KILLINGS = "nrKillings";
-const QString MainWindow::_DATASET_KILLINGS_GRADIENT = "grad nrKillings";
-
-const QString MainWindow::_SCALAR_DATASETS[] =
-{
-
-  _DATASET_TNF,
-  _DATASET_CCL2,
-  _DATASET_CCL5,
-  _DATASET_CXCL9,
-  _DATASET_IL10,
-  _DATASET_EXTMTB,
-  _DATASET_INTMTB,
-  _DATASET_TOTMTB,
-  _DATASET_ATTRACTANT,
-  _DATASET_TNF_ATTR_EXTMTB,
-  _DATASET_CELL_DENSITY,
-  _DATASET_KILLINGS
-
-};
-
-const int MainWindow::_N_SCALAR_DATASETS = sizeof(_SCALAR_DATASETS)/sizeof(QString);
-
 const QString MainWindow::_INTERPOLATION_BILINEAR = "Bi-linear";
 const QString MainWindow::_INTERPOLATION_NEAREST_NEIGHBOR = "Nearest neighbour";
 
@@ -222,25 +182,15 @@ void MainWindow::initOutputTab()
 void MainWindow::initHeightTab()
 {
   /* configure _ui.comboBoxHeightDataset */
-  _ui.comboBoxHeightDataset->addItem(_DATASET_TNF);
-  _ui.comboBoxHeightDataset->addItem(_DATASET_CCL2);
-  _ui.comboBoxHeightDataset->addItem(_DATASET_CCL5);
-  _ui.comboBoxHeightDataset->addItem(_DATASET_CXCL9);
-  _ui.comboBoxHeightDataset->addItem(_DATASET_EXTMTB);
-  _ui.comboBoxHeightDataset->addItem(_DATASET_INTMTB);
-  _ui.comboBoxHeightDataset->addItem(_DATASET_KILLINGS);
+  initComboAllScalars(_ui.comboBoxHeightDataset);
+  _ui.comboBoxHeightDataset->setCurrentIndex(GrGrid::IDX_TNF);
 
   /* configure _ui.comboBoxHeightColorDataset */
-  _ui.comboBoxHeightColorDataset->addItem(_DATASET_TNF);
-  _ui.comboBoxHeightColorDataset->addItem(_DATASET_CCL2);
-  _ui.comboBoxHeightColorDataset->addItem(_DATASET_CCL5);
-  _ui.comboBoxHeightColorDataset->addItem(_DATASET_CXCL9);
-  _ui.comboBoxHeightColorDataset->addItem(_DATASET_EXTMTB);
-  _ui.comboBoxHeightColorDataset->addItem(_DATASET_INTMTB);
-  _ui.comboBoxHeightColorDataset->addItem(_DATASET_KILLINGS);
+  initComboAllScalars(_ui.comboBoxHeightColorDataset);
+  _ui.comboBoxHeightColorDataset->setCurrentIndex(GrGrid::IDX_TNF);
 
-  connect(_ui.comboBoxHeightDataset, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(updateHeightPlotSettings(void)));
-  connect(_ui.comboBoxHeightColorDataset, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(updateHeightPlotSettings(void)));
+  connect(_ui.comboBoxHeightDataset, SIGNAL(currentIndexChanged(int)), this, SLOT(updateHeightPlotSettings(void)));
+  connect(_ui.comboBoxHeightColorDataset, SIGNAL(currentIndexChanged(int)), this, SLOT(updateHeightPlotSettings(void)));
   connect(_ui.comboBoxHeightMappingMethod, SIGNAL(currentIndexChanged(int)), this, SLOT(updateHeightPlotSettings(void)));
   connect(_ui.pushButtonHeightRescale, SIGNAL(clicked(bool)), this, SLOT(rescaleHeightRequest(void)));
   connect(_ui.doubleSpinBoxHeightMin, SIGNAL(valueChanged(double)), this, SLOT(updateHeightMinMax(void)));

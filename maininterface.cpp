@@ -116,7 +116,9 @@ void MainInterface::visualize()
     }
   else if (_drawHeightPlot)
     {
+      _simulation->lock();
       _heightPlotVisualization.visualize(_blend, _simulation, _pColorMapHeightPlot);
+      _simulation->unlock();
     }
   else
     {

@@ -47,20 +47,21 @@ typedef Indexer2D Indexer;
 #define GRIDS_DEFS  \
   GRID       (int, nKillings)         \
   GRID       (int, trappedCaseation)  \
-  GRID       (int, nRecruitments)         \
-  GRID       (int, nRecruitmentsMac)         \
-  GRID       (int, nRecruitmentsTgam)         \
-  GRID       (int, nRecruitmentsTcyt)         \
-  GRID       (int, nRecruitmentsTreg)         \
-  GRID       (int, nSecretions)         \
-  PADDED_GRID(Scalar, TNF)  \
+  GRID       (int, nRecruitments)     \
+  GRID       (int, nRecruitmentsMac)  \
+  GRID       (int, nRecruitmentsTgam) \
+  GRID       (int, nRecruitmentsTcyt) \
+  GRID       (int, nRecruitmentsTreg) \
+  GRID       (int, nSecretions)       \
+  PADDED_GRID(Scalar, TNF)            \
   PADDED_GRID(Scalar, macAttractant)  \
-  PADDED_GRID(Scalar, CCL2)  \
-  PADDED_GRID(Scalar, CCL5)  \
-  PADDED_GRID(Scalar, CXCL9)  \
-  PADDED_GRID(Scalar, shedTNFR2)  \
-  PADDED_GRID(Scalar, il10)  \
-  GRID       (Scalar, extMTB)  \
+  PADDED_GRID(Scalar, CCL2)           \
+  PADDED_GRID(Scalar, CCL5)           \
+  PADDED_GRID(Scalar, CXCL9)          \
+  PADDED_GRID(Scalar, shedTNFR2)      \
+  PADDED_GRID(Scalar, il10)           \
+  GRID       (Scalar, extMTB)         \
+  GRID       (Scalar, growthRate)     \
  
 
 class GrGrid

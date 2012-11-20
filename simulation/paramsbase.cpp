@@ -283,9 +283,13 @@ const ParamDescription ParamsBase::_description[_PARAM_COUNT] =
   { "thresholdRecChemokine",              TREG_NODE,	false,	false,	0.0,	0,	"",					"Threshold of TREG Recruitment for Chemokines" },
   { "thresholdRecTNF",                    TREG_NODE,	false,	false,	0.0,	0,	"",					"Threshold of TREG Recruitment for TNF" },
   { "growthRateIntMtb",					MTB_NODE,	false,	false,	0.0,	0,	"",					"Growth rate of intracellular bacteria" },
+  { "growthRateIntMtbMin",					MTB_NODE,	false,	false,	0.0,	0,	"",					"Growth rate of intracellular bacteria minimum" },
+  { "growthRateIntMtbMax",					MTB_NODE,	false,	false,	0.0,	0,	"",					"Growth rate of intracellular bacteria maximum" },
   { "growthRateFactorPostAdaptiveIntMtb",	MTB_NODE,	false,	true,	1.0,	1,	"",					"Factor applied to growth rate of intracellular bacteria (parameter growthRateIntMtb) after adaptive immunity begins" },
   { "growthRateFactorDelayIntMtb",		MTB_NODE,	false,	true,	0.0,	0,	"",					"Delay, in time steps, after adaptive immunity begins (parameter timeRecEnabled), before applying parameter growthRateFactorPostAdaptiveIntMtb" },
   { "growthRateExtMtb",					MTB_NODE,	false,	false,	0.0,	0,	"",					"Growth rate of extracellular bacteria" },
+  { "growthRateExtMtbMin",					MTB_NODE,	false,	false,	0.0,	0,	"",					"Growth rate of extracellular bacteria minimum" },
+  { "growthRateExtMtbMax",					MTB_NODE,	false,	false,	0.0,	0,	"",					"Growth rate of extracellular bacteria maximum" },
   { "growthExtMtbBound",					MTB_NODE,	false,	false,	0.0,	0,	"#bacteria",		"Upper bound on the number of extracellular bacteria used in growth function" },
   { "deathRateExtMtbCaseated",					MTB_NODE,	false,	false,	0.0,	0,	"#bacteria",		"Upper bound on the number of extracellular bacteria used in growth function" },
   { "mtbStoppingThreshold",				GR_NODE,	false,	true,	0.0,	0,	"#bacteria", 		"Stop simulation if mtb count above this threshold and simulation is at the time step specified by mtbStopppingTimeStep"},
@@ -353,6 +357,7 @@ const ParamDescription ParamsBase::_description[_PARAM_COUNT] =
   { "NFkBdynamics",	GR_NODE,	false,	true,	0.0,	0,	"boolean",					"NFkB dynamics" },
   { "TNFdynamics",	GR_NODE,	false,	true,	0.0,	0,	"boolean",					"TNF dynamics" },
   { "IL10dynamics",	GR_NODE,	false,	true,	0.0,	0,	"boolean",					"IL10 dynamics" },
+  { "RandomizeGrowthRate",	GR_NODE,	false,	true,	0.0,	0,	"boolean",					"Randomize growth rate" },
 };
 
 ParamsBase::ParamsBase(const Pos& dim)

@@ -63,6 +63,7 @@ void ScalarAgentGrid::evaluate(const Simulation* pSimulation)
           item._shedTNFR2 = grid.shedTNFR2(p);
           item._il10 = grid.il10(p);
           item._extMtb = grid.extMTB(p);
+          item._growthRate = grid.growthRate(p);
           item._pAgent[0] = NULL;
           item._pAgent[1] = NULL;
 

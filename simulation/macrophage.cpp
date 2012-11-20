@@ -59,7 +59,9 @@ Mac::Mac(int birthtime, int row, int col, Mac::State state, double intMtb, bool 
   , _deactivationTime(-1)
   , _stat1Time(-1)
   , _nfkbTime(-1)
-
+  , _growthRate(_PARAM(PARAM_RAND_GROWTHRATE_EN) ? 
+                g_Rand.getReal(_PARAM(PARAM_INTMTB_GROWTH_RATE_MIN), _PARAM(PARAM_INTMTB_GROWTH_RATE_MAX))
+                : _PARAM(PARAM_INTMTB_GROWTH_RATE))
 {
 }
 

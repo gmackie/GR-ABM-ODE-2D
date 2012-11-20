@@ -250,6 +250,7 @@ void GLWindow::updateSelectedCellStats()
       gridInfo->addChild(make_item("shedTNFR2",     item._shedTNFR2,     ""));
       gridInfo->addChild(make_item("il10",          item._il10,          ""));
       gridInfo->addChild(make_item("extMtb",        item._extMtb,        ""));
+      gridInfo->addChild(make_item("growthRate",    item._growthRate,    ""));
       AgentInfoVisitor(agentInfoWindow, _trackid).visit(item._pAgent[0]);
       AgentInfoVisitor(agentInfoWindow, _trackid).visit(item._pAgent[1]);
 

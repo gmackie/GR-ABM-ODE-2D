@@ -261,7 +261,11 @@
 	</Tcell>
 	<Mtb
 		growthRateIntMtb = "1.0015"
+		growthRateIntMtbMin = "1.0010"
+		growthRateIntMtbMax = "1.0020"
 		growthRateExtMtb = "1.0007"
+		growthRateExtMtbMin = "1.0005"
+		growthRateExtMtbMax = "1.0010"
 		growthExtMtbBound = "200"
 		deathRateExtMtbCaseated = "1.5"
 		/>

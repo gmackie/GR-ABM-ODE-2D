@@ -362,6 +362,12 @@ void GrSimulation::deserialize(std::istream& in)
 }
 #endif
 
+static void initGrowthRateGrid(GrGrid& g) {
+  for(int i=0;i<g.getRange().x;i++)
+    for(int j=0;j<g.getRange().y;j++)
+      g.growthRate(i,j) = g_Rand.getReal(_PARAM(PARAM_EXTMTB_GROWTH_RATE_MIN),_PARAM(PARAM_EXTMTB_GROWTH_RATE_MAX));
+}
+
 void GrSimulation::init()
 {
 	// Before initializing anything check to see if the time step criteria are met
@@ -463,6 +469,8 @@ void GrSimulation::init()
             count--;
         }
     }
+    
+    initGrowthRateGrid(getGrid());
 
 }
 
@@ -883,7 +891,6 @@ void GrSimulation::moveTcells()
 
 void GrSimulation::growExtMtb()
 {
-    const double growthRate = _PARAM(PARAM_EXTMTB_GROWTH_RATE) - 1;
 	const double upperBound = _PARAM(PARAM_EXTMTB_UPPER_BOUND);
 
   GrGrid& g = _grid.getGrid();
@@ -893,6 +900,10 @@ void GrSimulation::growExtMtb()
 	{
 		for (p.y = 0; p.y < dim.y; p.y++)
 		{
+      double growthRate = _PARAM(PARAM_EXTMTB_GROWTH_RATE) - 1;
+      if(_PARAM(PARAM_RAND_GROWTHRATE_EN))
+        growthRate = getGrid().growthRate(p);
+
 			Scalar& extMtb = g.extMTB(p);
 			
 			if (g.isCaseated(p))

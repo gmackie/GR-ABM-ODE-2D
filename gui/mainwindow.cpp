@@ -30,6 +30,7 @@
 #include "scalardatasets/scalartnfattrextmtb.h"
 #include "scalardatasets/scalarcelldensitydataset.h"
 #include "scalardatasets/scalarintmtbdataset.h"
+#include "scalardatasets/scalargrowthratedataset.h"
 #include "scalardatasets/scalartotmtbdataset.h"
 #include "scalardatasets/scalardivergencedataset.h"
 #include "vectordatasets/vectorgradientdataset.h"
@@ -478,6 +479,7 @@ void MainWindow::initComboAllScalars(QComboBox *&comboBox)
   comboBox->addItem("Int. Mtb");
   comboBox->addItem("Tot. Mtb");
   comboBox->addItem("TNF + Attract + Ext. Mtb");
+  comboBox->addItem("Internal Growth Rate");
 }
 
 void MainWindow::getScalarDataSetNames(std::string &names)
@@ -490,6 +492,7 @@ void MainWindow::getScalarDataSetNames(std::string &names)
   ss<<("Int. Mtb")<<std::endl;
   ss<<("Tot. Mtb")<<std::endl;
   ss<<"TNF + Attract + Ext. Mtb"<<std::endl;
+  ss<<"Internal Growth Rate"<<std::endl;
   names = ss.str();
 }
 
@@ -924,6 +927,7 @@ ScalarDataset* MainWindow::getNewScalarDataset(int idx)
     case GrGrid::IDX_NGRIDS+1: pScalarDataset = new ScalarIntMtbDataset();    break;
     case GrGrid::IDX_NGRIDS+2: pScalarDataset = new ScalarTotMtbDataset();    break;
     case GrGrid::IDX_NGRIDS+3: pScalarDataset = new ScalarTnfAttrExtMtb();    break;
+    case GrGrid::IDX_NGRIDS+4: pScalarDataset = new ScalarGrowthRateDataset();break;
     default:
       if(idx < GrGrid::IDX_NGRIDS && idx >= 0)
         pScalarDataset = new ScalarIndexedDataset(GrGrid::GRID_IDX(idx));

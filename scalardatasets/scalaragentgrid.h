@@ -33,6 +33,7 @@ struct ScalarAgentItem
   double _shedTNFR2;
   double _il10;
   double _extMtb;
+  double _growthRate;
 };
 
 /**

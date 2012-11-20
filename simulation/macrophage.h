@@ -60,6 +60,7 @@ private:
   int _deactivationTime;
   int _stat1Time;
   int _nfkbTime;
+  double _growthRate;
 
   /**
   * @brief
@@ -113,7 +114,7 @@ protected:
   Mac();
 
 public:
-  static double getIntMtbGrowthRate(const int time);
+  double getIntMtbGrowthRate(const int time);
 
   Mac(int birthtime, int row, int col, Mac::State state, double intMtb, bool NFkB, bool stat1);
   ~Mac();
@@ -183,6 +184,7 @@ public:
   Mac::State getNextState() const;
   double getIntMtb() const;
   void setIntMtb(double intMtb);
+  double getGrowthRate() const;
   void kill();
   void deactivate(const int time, Stats& stats);
   void apoptosis(GrGrid& grid);
@@ -274,6 +276,11 @@ inline void Mac::setIntMtb(double intMtb)
   _intMtb = intMtb;
 }
 
+inline double Mac::getGrowthRate() const
+{
+  return _growthRate;
+}
+
 inline bool Mac::isMac(const Agent* pAgent)
 {
   return pAgent && pAgent->getAgentType() == MAC;
@@ -334,7 +341,7 @@ inline void Mac::setC1rrChemTNF(double value)
 
 inline double Mac::getIntMtbGrowthRate(const int time)
 {
-  double intMtbGrowthRate =  _PARAM(PARAM_INTMTB_GROWTH_RATE);
+  double intMtbGrowthRate =  _growthRate;
 
   if (time >= (_PARAM(PARAM_TCELL_TIME_RECRUITMENT_ENABLED) + _PARAM(PARAM_INTMTB_GROWTH_RATE_FACTOR_DELAY)))
     {
@@ -360,6 +367,7 @@ inline void Mac::visitProperties(Visitor& v)
   v.visit("deactivationTime", _deactivationTime, "");
   v.visit("stat1Time", _stat1Time, "");
   v.visit("nfkbTime", _nfkbTime, "");
+  v.visit("growthRate", _growthRate, "");
   Agent::visitProperties(v);
 }
 template<typename Visitor>
@@ -373,6 +381,7 @@ inline void Mac::visitProperties(Visitor& v) const
   v.visit("deactivationTime", _deactivationTime, "");
   v.visit("stat1Time", _stat1Time, "");
   v.visit("nfkbTime", _nfkbTime, "");
+  v.visit("growthRate", _growthRate, "");
   Agent::visitProperties(v);
 }
 
@@ -392,6 +401,7 @@ void Mac::serialize(Archive& ar, const unsigned int /*version*/) {
   ar & boost::serialization::make_nvp("deactivationTime", _deactivationTime);
   ar & boost::serialization::make_nvp("stat1Time", _stat1Time);
   ar & boost::serialization::make_nvp("nfkbTime", _nfkbTime);
+  ar & boost::serialization::make_nvp("growthRate", _growthRate);
 }
 
 #endif /* MACROPHAGE_H */

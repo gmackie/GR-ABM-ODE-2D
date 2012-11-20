@@ -805,6 +805,7 @@ int main(int argc, char** argv)
 
   po::options_description simdyn_opts("Simulation Dynamics");
   simdyn_opts.add_options()
+  ("rand-growth", "Randomize inter- and extra-cellular bacteria growth rates")
   ("tnfr-dynamics", "Use molecular level TNF/TNFR dynamics in the model")
   ("il10r-dynamics", "Use molecular level IL10/IL10R dynamics in the model")
   ("NFkB-dynamics", "Use molecular level intracellular NFkB dynamics in the model")
@@ -885,6 +886,7 @@ int main(int argc, char** argv)
   Params::getInstance()->setParam(PARAM_TNFODE_EN, vm.count("tnfr-dynamics") || vm.count("NFkB-dynamics"));
   Params::getInstance()->setParam(PARAM_IL10ODE_EN, vm.count("il10r-dynamics"));
   Params::getInstance()->setParam(PARAM_NFKBODE_EN, vm.count("NFkB-dynamics"));
+  Params::getInstance()->setParam(PARAM_RAND_GROWTHRATE_EN, vm.count("rand-growth"));
 
   DiffusionMethod diffMethodEnum;
   switch (vm["diffusion"].as<unsigned>())

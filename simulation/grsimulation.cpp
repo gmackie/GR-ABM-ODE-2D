@@ -902,7 +902,7 @@ void GrSimulation::growExtMtb()
 		{
       double growthRate = _PARAM(PARAM_EXTMTB_GROWTH_RATE) - 1;
       if(_PARAM(PARAM_RAND_GROWTHRATE_EN))
-        growthRate = getGrid().growthRate(p);
+        growthRate = getGrid().growthRate(p) - 1;
 
 			Scalar& extMtb = g.extMTB(p);
 			

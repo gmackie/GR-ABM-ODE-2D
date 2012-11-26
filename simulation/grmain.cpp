@@ -180,7 +180,7 @@ public:
           write(NAN);
           write(NAN);
         }
-      const Stats::Stat& vic = stat.getMacIntMtbStats(Mac::MAC_INFECTED);
+      const Stats::Stat& vic = stat.getMacIntMtbStats(Mac::MAC_CINFECTED);
       if(ba::extract::count(vic) > 0)
         {
           write(ba::extract::max(vic));

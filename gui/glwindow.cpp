@@ -466,7 +466,7 @@ void GLWindow::moveSelectionUp()
 {
   if (_selRow != -1 && _selCol != -1)
     {
-      emit updateSelection((_selCol + 1 + _ui.glWidget->dim.y) % _ui.glWidget->dim.y, _selCol);
+      emit updateSelection((_selRow + 1 + _ui.glWidget->dim.y) % _ui.glWidget->dim.y, _selCol);
     }
 }
 
@@ -474,7 +474,7 @@ void GLWindow::moveSelectionDown()
 {
   if (_selRow != -1 && _selCol != -1)
     {
-      emit updateSelection((_selCol - 1 + _ui.glWidget->dim.y) % _ui.glWidget->dim.y, _selCol);
+      emit updateSelection((_selRow - 1 + _ui.glWidget->dim.y) % _ui.glWidget->dim.y, _selCol);
     }
 }
 

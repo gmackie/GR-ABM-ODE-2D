@@ -35,6 +35,7 @@ GLWidget::~GLWidget()
 
 void GLWidget::initializeGL()
 {
+  glEnable(GL_MULTISAMPLE);
   glMatrixMode(GL_MODELVIEW);
   glShadeModel(GL_SMOOTH);
 

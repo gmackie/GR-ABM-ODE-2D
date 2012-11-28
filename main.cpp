@@ -17,6 +17,7 @@
 
 #include <QtGui>
 #include <QApplication>
+#include <QGLFormat>
 #include <QTime>
 #include <QDir>
 #include <QString>
@@ -67,6 +68,12 @@ Snapshot* setupOutput(MainWindow& mainWindow, const std::string& outputDir, bool
 int main(int argc, char *argv[])
 {
   QApplication a(argc, argv);
+  { //Setup a default perferred format
+    QGLFormat f = QGLFormat::defaultFormat();
+    f.setDoubleBuffer(true);
+    f.setSampleBuffers(true);
+    QGLFormat::setDefaultFormat(f);
+  }
 
   int odeSolver;
   bool tnfrDynamics;

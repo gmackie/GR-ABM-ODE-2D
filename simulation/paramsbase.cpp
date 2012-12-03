@@ -358,6 +358,7 @@ const ParamDescription ParamsBase::_description[_PARAM_COUNT] =
   { "TNFdynamics",	GR_NODE,	false,	true,	0.0,	0,	"boolean",					"TNF dynamics" },
   { "IL10dynamics",	GR_NODE,	false,	true,	0.0,	0,	"boolean",					"IL10 dynamics" },
   { "RandomizeGrowthRate",	GR_NODE,	false,	true,	0.0,	0,	"boolean",					"Randomize growth rate" },
+  { "growthRateSamples", GR_NODE, false, true, 0.0, 1, "", "Number of samples for growthRate frequency statistic"},
 };
 
 ParamsBase::ParamsBase(const Pos& dim)

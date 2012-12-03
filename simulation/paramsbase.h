@@ -329,6 +329,7 @@ typedef enum
   PARAM_TNFODE_EN,
   PARAM_IL10ODE_EN,
   PARAM_RAND_GROWTHRATE_EN,
+  PARAM_GROWTHRATE_SAMPLES,
   PARAM_INT_COUNT // dummy for the count
 } ParamIntType;
 

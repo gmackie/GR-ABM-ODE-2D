@@ -1091,6 +1091,7 @@ void Mac::updateStatistics(Stats& stats) const
   ++stats.getNrOfAgents(MAC);
   ++stats.getNrOfMacs((Mac::State)getState());
   stats.getMacIntMtbStats((Mac::State)getState())(getIntMtb());
+
   if(getState() == Mac::MAC_INFECTED || getState() == Mac::MAC_CINFECTED)
     {
       // This can happen if  _PARAM(PARAM_MAC_THRESHOLD_BURST_CI_INTMTB) < _PARAM(PARAM_MAC_THRESHOLD_BECOME_CI_INTMTB)
@@ -1102,6 +1103,15 @@ void Mac::updateStatistics(Stats& stats) const
       assert(getIntMtb() < stats.getIntMtbFreq().size());
 
       ++stats.getIntMtbFreq(int(getIntMtb()));
+      if(_PARAM(PARAM_RAND_GROWTHRATE_EN))
+        {
+          double m = (getGrowthRate() - _PARAM(PARAM_INTMTB_GROWTH_RATE_MIN)) /
+                      (_PARAM(PARAM_INTMTB_GROWTH_RATE_MAX) - _PARAM(PARAM_INTMTB_GROWTH_RATE_MIN));
+          int idx = int(m*_PARAM(PARAM_GROWTHRATE_SAMPLES));
+          assert(idx < int(stats.getGrowthRateFreq().size()));
+          ++stats.getGrowthRateFreq(idx);
+          stats.getMacGrowthRateStat()(getGrowthRate());
+        }
     }
 
   if (!isDead())

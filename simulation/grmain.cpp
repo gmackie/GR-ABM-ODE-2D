@@ -151,6 +151,22 @@ public:
     write("Mci Mean");
     write("Mci Median");
     write("Mci StdDev");
+
+    write("Growth Max");
+    write("Growth Min");
+    write("Growth Mean");
+    write("Growth Median");
+    write("Growth StdDev");
+    sz = sim.getStats().getGrowthRateFreq().size();
+    for(unsigned i=0; i<sz; i++)
+      {
+        stringstream ss;
+        double f0=double(i) / _PARAM(PARAM_GROWTHRATE_SAMPLES) *
+                  (_PARAM(PARAM_INTMTB_GROWTH_RATE_MAX) - _PARAM(PARAM_INTMTB_GROWTH_RATE_MIN))
+                  + _PARAM(PARAM_INTMTB_GROWTH_RATE_MIN);
+        ss<<f0;
+        write(ss.str());
+      }
     endRow();
   }
   void saveRow(const GrSimulation& sim)
@@ -174,11 +190,11 @@ public:
         }
       else
         {
-          write(NAN);
-          write(NAN);
-          write(NAN);
-          write(NAN);
-          write(NAN);
+          write(0);
+          write(0);
+          write(0);
+          write(0);
+          write(0);
         }
       const Stats::Stat& vic = stat.getMacIntMtbStats(Mac::MAC_CINFECTED);
       if(ba::extract::count(vic) > 0)
@@ -191,12 +207,33 @@ public:
         }
       else
         {
-          write(NAN);
-          write(NAN);
-          write(NAN);
-          write(NAN);
-          write(NAN);
+          write(0);
+          write(0);
+          write(0);
+          write(0);
+          write(0);
         }
+    }
+    const Stats::Stat& vg = stat.getMacGrowthRateStat();
+    if(ba::extract::count(vg) > 0)
+      {
+        write(ba::extract::max(vg));
+        write(ba::extract::min(vg));
+        write(ba::extract::mean(vg));
+        write(ba::extract::median(vg));
+        write(sqrt(ba::extract::variance(vg)));
+      }
+    else
+      {
+        write(0);
+        write(0);
+        write(0);
+        write(0);
+        write(0);
+      }
+    {
+      const std::vector<unsigned>& v = stat.getGrowthRateFreq();
+      for(unsigned i=0; i<v.size(); i++) write(v[i]);
     }
     endRow();
   }
@@ -425,6 +462,7 @@ public:
     write("nfkb");
 
     write("intMtb"); // 0 for T cells
+    write("growthRate");
 
     // TNF associated attributes
     write("mTNF");
@@ -485,12 +523,14 @@ public:
         write(m.isDeactivated());
         write(m.getNFkB());
         write(m.getIntMtb());
+        write(m.getGrowthRate());
       }
     else  //Tcell and others
       {
         write(false);
         write(false);
         write(false);
+        write(0);
         write(0);
       }
 
@@ -783,6 +823,7 @@ int main(int argc, char** argv)
   stats.add_options()
   ("moi", "Generate csv file of internal MTB statistics, saved in -moi.csv")
   ("stats", "Generate csv file of general statistics, saved in .csv")
+  ("growth-samples", po::value<unsigned>()->default_value(10), "Number of samples for growth rate statistics")
   ("csv-interval", po::value<unsigned>()->default_value(1), "CSV update interval (10 min timesteps)")
   ("molecular-track-radius", po::value(&molecularTrackingRadius)->default_value(0.0), "Radius from center of grid of initial cells to track molecular dynamics. 0 means don't track any cells.")
   ("molecular-track-ids", po::value(&track_ids), "Comma-seperated list of ids to track")
@@ -887,6 +928,7 @@ int main(int argc, char** argv)
   Params::getInstance()->setParam(PARAM_IL10ODE_EN, vm.count("il10r-dynamics"));
   Params::getInstance()->setParam(PARAM_NFKBODE_EN, vm.count("NFkB-dynamics"));
   Params::getInstance()->setParam(PARAM_RAND_GROWTHRATE_EN, vm.count("rand-growth"));
+  Params::getInstance()->setParam(PARAM_GROWTHRATE_SAMPLES, vm["growth-samples"].as<unsigned>());
 
   DiffusionMethod diffMethodEnum;
   switch (vm["diffusion"].as<unsigned>())

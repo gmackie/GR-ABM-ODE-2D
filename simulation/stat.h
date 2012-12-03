@@ -96,7 +96,9 @@ protected:
 
 //--- Custom Members ---
   boost::array<Stat, Mac::NSTATES> _macIntMtbStats;
+  Stat _macGrowthRateStat;
   std::vector<unsigned> _intMtbFreq;
+  std::vector<unsigned> _growthRateFreq;
 
 public:
 
@@ -104,6 +106,7 @@ public:
 
   Stats() :
     _intMtbFreq(int(_PARAM(PARAM_MAC_THRESHOLD_BURST_CI_INTMTB)) + 1, 0)
+    , _growthRateFreq(_PARAM(PARAM_GROWTHRATE_SAMPLES), 0)
   {
     clear();
   }
@@ -176,6 +179,30 @@ public:
   void setIntMtbFreq(size_t i, const unsigned& v)
   {
     _intMtbFreq[i] = v;
+  }
+
+  unsigned& getGrowthRateFreq(size_t i)
+  {
+    return _growthRateFreq[i];
+  }
+  unsigned getGrowthRateFreq(size_t i) const
+  {
+    return _growthRateFreq[i];
+  }
+  const std::vector<unsigned>& getGrowthRateFreq() const
+  {
+    return _growthRateFreq;
+  }
+  void setGrowthRateFreq(size_t i, const unsigned& v)
+  {
+    _growthRateFreq[i] = v;
+  }
+
+  Stat& getMacGrowthRateStat() {
+    return _macGrowthRateStat;
+  }
+  const Stat& getMacGrowthRateStat() const {
+    return _macGrowthRateStat;
   }
 
   Stat& getMacIntMtbStats(Mac::State i)
@@ -293,6 +320,7 @@ public:
     //#define AGENTSTATE_STAT(type, name, sz, desc, reset) s << boost::serialization::make_nvp( #name, _ ## name);
 #include "stat.def"
     std::fill(_intMtbFreq.begin(), _intMtbFreq.end(), 0);
+    std::fill(_growthRateFreq.begin(), _growthRateFreq.end(), 0);
     std::fill_n(_macIntMtbStats.begin(), (size_t)Mac::NSTATES, Stat());
   }
 

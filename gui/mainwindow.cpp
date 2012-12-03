@@ -407,7 +407,8 @@ void MainWindow::initColorMapTab()
       _ui.comboBoxColorMapSource->addItem(QString::fromStdString(ss.str()));
   }
   _ui.comboBoxColorMapSource->blockSignals(false);
-
+  _ui.doubleSpinBoxMin->setDecimals(std::numeric_limits<double>::digits10);
+  _ui.doubleSpinBoxMax->setDecimals(std::numeric_limits<double>::digits10);
   connect(_ui.comboBoxScalarColoring, SIGNAL(currentIndexChanged(int)), this, SLOT(setColorMap(int)));
   connect(_ui.spinBoxNumberOfColors, SIGNAL(valueChanged(int)), this, SLOT(updateColorMap(void)));
   connect(_ui.horizontalSliderHue, SIGNAL(valueChanged(int)), this, SLOT(updateColorMap(void)));

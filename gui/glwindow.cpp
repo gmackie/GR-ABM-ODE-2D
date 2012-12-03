@@ -73,7 +73,7 @@ void GLWindow::setColorMap(ColorMap* pCurrentColorMap)
 
 void GLWindow::updateWindow()
 {
-  _ui.glWidget->updateGL();
+  _ui.glWidget->updateWindow();
 }
 
 void GLWindow::toggleFullScreen()
@@ -411,7 +411,7 @@ QImage GLWindow::grabFrameBuffer()
 {
   //Ensure the screen is up to date before taking a picture.
   //NOTICE: not using the asynchronous version here (updateGL)
-  _ui.glWidget->updateWindow();
+  _ui.glWidget->update();
   return _ui.glWidget->renderPixmap().toImage();
 }
 

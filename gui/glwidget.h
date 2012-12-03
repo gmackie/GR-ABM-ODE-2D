@@ -21,17 +21,13 @@ public:
 
 public slots:
   /**
-   * @brief forces the window to update immediately.
+   * @brief Overriding this filters out multiple signals causing a costly
+   * repaint when we really just want to repaint *after* everything has completed.
    */
   void updateWindow();
   void set2DView();
   void set3DViewHeight();
   void setAllowMoveCamera(bool allow);
-  /**
-   * @brief Overriding this filters out multiple signals causing a costly
-   * repaint when we really just want to repaint *after* everything has completed.
-   */
-  void updateGL();
 
 signals:
   void updateSelection(int row, int col);

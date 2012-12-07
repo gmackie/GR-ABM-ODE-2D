@@ -123,22 +123,23 @@ void ScalarAgentGrid::evaluate(const Simulation* pSimulation)
           item._bitMask |= SET_BIT(_bitMacStat1);
         }
 
+      item._bitMask |= SET_BIT(_bitMac);
       switch (mac.getState())
         {
         case Mac::MAC_RESTING:
-          item._bitMask |= (SET_BIT(_bitMac) | SET_BIT(_bitMacResting));
+          item._bitMask |= (SET_BIT(_bitMacResting));
           break;
         case Mac::MAC_INFECTED:
-          item._bitMask |= (SET_BIT(_bitMac) | SET_BIT(_bitMacInfected));
+          item._bitMask |= (SET_BIT(_bitMacInfected));
           break;
         case Mac::MAC_CINFECTED:
-          item._bitMask |= (SET_BIT(_bitMac) | SET_BIT(_bitMacCInfected));
+          item._bitMask |= (SET_BIT(_bitMacCInfected));
           break;
         case Mac::MAC_ACTIVE:
-          item._bitMask |= (SET_BIT(_bitMac) | SET_BIT(_bitMacActive));
+          item._bitMask |= (SET_BIT(_bitMacActive));
           break;
         case Mac::MAC_DEAD:
-          //	item._bitMask |= (SET_BIT(_bitMac) | SET_BIT(_bitDead));
+          item._bitMask &= (~SET_BIT(_bitMac));
           break;
         }
     }
@@ -158,16 +159,17 @@ void ScalarAgentGrid::evaluate(const Simulation* pSimulation)
           item._pAgent[1] = &tgam;
         }
 
+      item._bitMask |= SET_BIT(_bitTgam);
       switch (tgam.getState())
         {
         case Tgam::TGAM_DOWN_REGULATED:
-          item._bitMask |= (SET_BIT(_bitTgam) | SET_BIT(_bitTgamDownRegulated));
+          item._bitMask |= (SET_BIT(_bitTgamDownRegulated));
           break;
         case Tgam::TGAM_ACTIVE:
-          item._bitMask |= (SET_BIT(_bitTgam) | SET_BIT(_bitTgamActive));
+          item._bitMask |= (SET_BIT(_bitTgamActive));
           break;
         case Tgam::TGAM_DEAD:
-          //	item._bitMask |= (SET_BIT(_bitTgam) | SET_BIT(_bitDead));
+          item._bitMask &= ~SET_BIT(_bitTgam);
           break;
         }
     }
@@ -187,16 +189,17 @@ void ScalarAgentGrid::evaluate(const Simulation* pSimulation)
           item._pAgent[1] = &tcyt;
         }
 
+      item._bitMask |= SET_BIT(_bitTcyt);
       switch (tcyt.getState())
         {
         case Tcyt::TCYT_DOWN_REGULATED:
-          item._bitMask |= (SET_BIT(_bitTcyt) | SET_BIT(_bitTcytDownRegulated));
+          item._bitMask |= ( SET_BIT(_bitTcytDownRegulated));
           break;
         case Tcyt::TCYT_ACTIVE:
-          item._bitMask |= (SET_BIT(_bitTcyt) | SET_BIT(_bitTcytActive));
+          item._bitMask |= ( SET_BIT(_bitTcytActive));
           break;
         case Tcyt::TCYT_DEAD:
-          //	item._bitMask| = (SET_BIT(_bitTcyt) | SET_BIT(_bitDead));
+            item._bitMask &= (~SET_BIT(_bitTcyt));
           break;
         }
     }
@@ -216,13 +219,14 @@ void ScalarAgentGrid::evaluate(const Simulation* pSimulation)
           item._pAgent[1] = &treg;
         }
 
+      item._bitMask |= (SET_BIT(_bitTreg));
       switch (treg.getState())
         {
         case Treg::TREG_ACTIVE:
           item._bitMask |= (SET_BIT(_bitTreg) | SET_BIT(_bitTregResting));
           break;
         case Treg::TREG_DEAD:
-          //	item._bitMask |= (SET_BIT(_bitTreg) | SET_BIT(_bitDead));
+          item._bitMask &= (~SET_BIT(_bitTreg));
           break;
         }
     }

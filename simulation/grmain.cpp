@@ -273,6 +273,10 @@ public:
     write("repExtMtb");
     write("NonRepl Ext. Mtb.");
     write("Tot Mtb.");
+    write("INH");
+    write("BloodINH");
+    write("INH_Granuloma");
+    write("INH_NormalTissue");
     write("TNF");
     write("IntTNFR1");
     write("TotMiMa kmRNA");
@@ -361,6 +365,15 @@ public:
     write(repExtMtb);
     write(stats.getTotNonRepExtMtb());
     write((stats.getTotIntMtb() + stats.getTotExtMtb()));
+
+    size_t sz = sim.getGrid().getSize();          //get nr of compartments on the grid
+    Scalar NavV = 6.02e23 * 8.0e-12 * sz;         //volume for the whole grid
+    write(stats.getTotINH() / NavV);
+
+    write(stats.getBloodConcINH());
+    int gransz = stats.getAreaCellDensity();
+    write(stats.getTotINHGran() / gransz);
+    write(stats.getTotINHNorm() / (sz - gransz));
 
     write(stats.getTotTNF());
     write(stats.getTotTNFR1int());

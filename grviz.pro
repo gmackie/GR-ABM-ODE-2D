@@ -15,6 +15,7 @@ HEADERS += scalardatasets/scalartotmtbdataset.h \
     simulation/grdiffusionadeswap.h \
     simulation/grdiffusionftcsswap.h \
     simulation/grsimulationgrid.h \
+    simulation/grvascular.h \
     simulation/tinyxml/tinyxml.h \
     simulation/tinyxml/tinystr.h \
     simulation/recruitmentlnodepure.h \
@@ -97,6 +98,7 @@ SOURCES += \
     simulation/grdiffusionadeswap.cpp \
     simulation/grdiffusionftcsswap.cpp \
     simulation/grsimulationgrid.cpp \
+    simulation/grvascular.cpp \
     simulation/tinyxml/tinyxmlparser.cpp \
     simulation/tinyxml/tinyxmlerror.cpp \
     simulation/tinyxml/tinyxml.cpp \

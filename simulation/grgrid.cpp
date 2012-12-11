@@ -120,9 +120,11 @@ void GrGrid::serialize(std::ostream& out) const
           out << nRecruitmentsTcyt(p) << endl;
           out << nRecruitmentsTreg(p) << endl;
           out << nSecretions(p) << endl;
+          out << nCells(p) << endl;
           out << macAttractant(p) << endl;
           out << TNF(p) << endl;
           out << CCL2(p) << endl; // CCL5, CSCL9 values are based on CCL2 values.
+          out << INH(p) << endl;
           out << shedTNFR2(p) << endl;
           out << il10(p) << endl;
           out << extMTB(p) << endl;
@@ -138,6 +140,7 @@ void GrGrid::serialize(std::ostream& out) const
         {
           out << u_macAttractant(p) << endl;
           out << u_TNF(p) << endl;
+          out << u_INH(p) << endl;
           out << u_CCL2(p) << endl; // CCL5, CSCL9 values are based on CCL2 values.
           out << u_shedTNFR2(p) << endl;
           out << u_il10(p) << endl;
@@ -153,6 +156,7 @@ void GrGrid::serialize(std::ostream& out) const
         {
           out << v_macAttractant(p) << endl;
           out << v_TNF(p) << endl;
+          out << v_INH(p) << endl;
           out << v_CCL2(p) << endl; // CCL5, CSCL9 values are based on CCL2 values.
           out << v_shedTNFR2(p) << endl;
           out << v_il10(p) << endl;
@@ -202,8 +206,10 @@ void GrGrid::deserialize(std::istream& in)
         in >> (int&) nRecruitmentsTcyt(p);
         in >> (int&) nRecruitmentsTreg(p);
         in >> (int&) nSecretions(p);
+        in >> (int&) nCells(p);
         in >> (Scalar&) macAttractant(p);
         in >> (Scalar&) TNF(p);
+        in >> (Scalar&) INH(p);
         in >> (Scalar&) CCL2(p);  // CCL5, CSCL9 values are based on CCL2 values.
         in >> (Scalar&) shedTNFR2(p);
         in >> (Scalar&) il10(p);
@@ -223,6 +229,7 @@ void GrGrid::deserialize(std::istream& in)
       {
         in >> (Scalar&) u_macAttractant(p);
         in >> (Scalar&) u_TNF(p);
+        in >> (Scalar&) u_INH(p);
         in >> (Scalar&) u_CCL2(p);  // CCL5, CSCL9 values are based on CCL2 values.
         in >> (Scalar&) u_shedTNFR2(p);
         in >> (Scalar&) u_il10(p);
@@ -234,6 +241,7 @@ void GrGrid::deserialize(std::istream& in)
       {
         in >> (Scalar&) v_macAttractant(p);
         in >> (Scalar&) v_TNF(p);
+        in >> (Scalar&) v_INH(p);
         in >> (Scalar&) v_CCL2(p);  // CCL5, CSCL9 values are based on CCL2 values.
         in >> (Scalar&) v_shedTNFR2(p);
         in >> (Scalar&) v_il10(p);

@@ -81,6 +81,10 @@ const ParamDescription ParamsBase::_description[_PARAM_COUNT] =
   { "diffusivityIL10",					GR_NODE,	false,	false,	0.0,	0,	"cm^2/s",			"IL10 diffusivity" },
   { "degRateTNF",							GR_NODE,	false,	false,	0.0,	0,	"",					"TNF degradation rate (per 6s)" },
   { "degRateIL10",					    GR_NODE,	false,	false,	0.0,	0,	"",					"IL10 degradation rate (per 6s)" },
+  { "diffusivityINH",                       GR_NODE,    false,  false,  0.0,    0,  "cm^2/s",           "INH diffusivity" },
+  { "minDiffusivityINH",                    GR_NODE,    false,  false,  0.0,    0,  "cm^2/s",           "Minimum diffusivity of INH in compartments with max cells" },
+  {"degRateINH",                      GR_NODE,    false,  false,  0.0,    0,  "",                 " INH degradation rate (per 6s)" },
+  {"degRateConstINH",                      GR_NODE,    false,  false,  0.0,    0,  "",                 " INH degradation rate constant" },
   { "degRateChemokines",					GR_NODE,	false,	false,	0.0,	0,	"",					"Chemokine degradation rate (per 6s)" },
   { "ChemokinekDeg",                      GR_NODE,	false,	false,	0.0,	0,	"1/s",				"Chemokine degradation rate constant" },
   { "minChemotaxis",						GR_NODE,	false,	false,	0.0,	0,	"#molecules",		"Chemotaxis sensivity range (lower bound)" },
@@ -91,6 +95,17 @@ const ParamDescription ParamsBase::_description[_PARAM_COUNT] =
   { "dIL10_Tcyt",							GR_NODE,	false,	false,	0.0,	0,	"#molecules/6s",	"Secretion rate of IL10 by Tcyt" },
   { "dIL10_Treg",							GR_NODE,	false,	false,	0.0,	0,	"#molecules/6s",	"Secretion rate of IL10 by Treg" },
 
+    // Blood compartment parameters
+  { "vascularPermeability",               GR_NODE,	false,	false,	0.0,	0,	"cm/s",             "Vascular permeability of cytokines" },
+  { "bloodVolume",                        GR_NODE,	false,	false,	0.0,	0,	"L",                "Blood compartment total volume" },
+  //{ "bloodIL10clearance",                 GR_NODE,	false,	true,	0.0,	0,	"1/s",              "Blood compartment clearance rate of IL10" },
+  //{ "bloodTNFclearance",                  GR_NODE,	false,	true,	0.0,	0,	"1/s",              "Blood compartment clearance rate of TNF" },
+  { "degRateINH_Plasma_Fast_Acet",    GR_NODE,    false,  false,  0.0,    0,  "1/s",              "Blood compartment clearance rate of INH in fast acetylators" },
+    { "degRateINH_Plasma_Slow_Acet",    GR_NODE,    false,  false,  0.0,    0,  "1/s",              "Blood compartment clearance rate of INH in slow acetylators" },
+  //{ "bloodIL10dose",                      GR_NODE,	false,	true,	0.0,	0,	"#molecules",       "Blood compartment dose of IL10" },
+  //{ "bloodTNFdose",                       GR_NODE,	false,	true,	0.0,	0,	"#molecules",       "Blood compartment dose of TNF" },
+    { "bloodINHdose",                       GR_NODE, false, false,  0.0,    0,  "#molecules",       "Blood compartment dose of INH" },
+  // End of blood compartment parameters
 
   // molecular TNF-associated parameters
   { "kSynthMac",							GR_NODE,	false,	false,	0.0,	0,	"#/cell.sec",		"Basal rate of mTNF synthesis by a macrophage" },
@@ -331,6 +346,10 @@ const ParamDescription ParamsBase::_description[_PARAM_COUNT] =
   { "nrSources",							GR_NODE,	true,	true,	0.0,	0,	"",					"Number of vascular sources on the grid" },
   { "nrKillingsCaseation",				GR_NODE,	true,	false,	0.0,	0,	"",					"Number of killings for a compartment to become caseated" },
   { "NFkBTimeCoefficient",				GR_NODE,	true,	false,	0.0,	0,	"-",				"number of NF-kB time-steps within a single diffusion time-step" },
+  { "dosageStartTime",                    GR_NODE,	true,	false,	0.0,	0,	"#timesteps",       "Time to begin dosing strategy" },
+  //{ "dosageIntervalIL10",                 GR_NODE,	true,	true,	10.0,	10,	"#timesteps",       "Time interval of IL10 doses" },
+  //{ "dosageIntervalTNF",                  GR_NODE,	true,	true,	10.0,	10,	"#timesteps",       "Time interval of TNF doses" },
+  { "dosageIntervalINH",                  GR_NODE,	true,	false,	1.0,	1,	"#timesteps",       "Time interval of INH doses" },
   { "maxAge",								MAC_NODE,	true,	false,	0.0,	0,	"#timesteps",		"Maximal macrophage age" },
   { "maxAgeAct",							MAC_NODE,	true,	false,	0.0,	0,	"#timesteps",		"Maximal activated macrophage age" },
   { "initNumber",							MAC_NODE,	true,	true,	0.0,	0,	"",					"Initial number of resting macrophages on the grid" },

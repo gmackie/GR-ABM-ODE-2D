@@ -19,6 +19,7 @@
 #include "grdiffusion.h"
 #include "recruitmentbase.h"
 #include "params.h"
+#include "grvascular.h"
 #include <boost/mpl/for_each.hpp>
 #include <boost/mpl/placeholders.hpp>
 
@@ -72,6 +73,8 @@ private:
   TTest* _pTTest[NOUTCOMES];
   /// Recruitment method to use
   RecruitmentBase* _pRecruitment;
+  /// Vascular method
+  Vascular* _pVascular;
   /// Enable TNFR Dynamics?
   bool _tnfrDynamics;
   /// Enable NFkB Dynamics?
@@ -584,7 +587,8 @@ void GrSimulation::serialize(Archive& ar, const unsigned int version) {
   ar & BOOST_SERIALIZATION_NVP(_areaThresholdCellDensity);
   //ar & BOOST_SERIALIZATION_NVP(_diffusion);
   ar & BOOST_SERIALIZATION_NVP(_pRecruitment);
-	ar & BOOST_SERIALIZATION_NVP(_tnfrDynamics);
+  ar & BOOST_SERIALIZATION_NVP(_pVascular);
+    ar & BOOST_SERIALIZATION_NVP(_tnfrDynamics);
 	ar & BOOST_SERIALIZATION_NVP(_nfkbDynamics);
   ar & BOOST_SERIALIZATION_NVP(_il10rDynamics);
   ar & BOOST_SERIALIZATION_NVP(_tgammatransition);

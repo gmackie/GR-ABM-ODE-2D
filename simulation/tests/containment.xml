@@ -166,6 +166,20 @@
 	dIL10_Tgam = "10"
 	dIL10_Tcyt = "0"
 	dIL10_Treg = "10"
+        degRateINH = "0.9905"
+        degRateConstINH = "2e-6"
+        diffusivityINH = "9e-07"
+        minDiffusivityINH = "9e-07"
+        degRateINH_Plasma_Fast_Acet = "1.9254e-04"
+        degRateINH_Plasma_Slow_Acet = "4.8135e-05"
+        dosageStartTime = "1"
+        bloodINHdose = "0.0"
+        dosageIntervalINH = "144"
+        vascularPermeability = "2.5e-7"
+        bloodVolume = "5"
+        dosageIntervalIL10 = "10"
+        dosageIntervalTNF = "10"
+
 	>
 	<Mac
 		initNumber = "105"

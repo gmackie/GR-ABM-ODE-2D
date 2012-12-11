@@ -15,6 +15,7 @@
 #include "grdiffusionadeswap.h"
 #include "grdiffusionftcsswap.h"
 #include "grdiffusionadeswap.h"
+#include "grvascular.h"
 #include "areatest.h"
 #include "mtbtest.h"
 #include "recruitmentprob.h"
@@ -36,7 +37,8 @@ GrSimulation::GrSimulation(const Pos& dim)
 	, _pDiffusion(new GrDiffusionADE_Swap())
 	, _pTTest()
 	, _pRecruitment(NULL)
-	, _tnfrDynamics(false)
+    , _pVascular(new Vascular())
+    , _tnfrDynamics(false)
 	, _nfkbDynamics(false)
   , _il10rDynamics(false)
   , _tgammatransition(false)
@@ -109,6 +111,8 @@ GrSimulation* GrSimulation::clone(GrSimulation* sim) const {
     ret->_pDiffusion = ret->_pDiffusion->clone();
   if(ret->_pRecruitment)
     ret->_pRecruitment = ret->_pRecruitment->clone();
+  if (ret->_pVascular)
+      ret->_pVascular = ret->_pVascular->clone();
   for(size_t i=0;i<NOUTCOMES;i++)
     if(ret->_pTTest[i])
       ret->_pTTest[i] = ret->_pTTest[i]->clone();
@@ -127,6 +131,7 @@ inline void clearPtrList(T& container) {
 GrSimulation::~GrSimulation()
 {
   if(_pRecruitment) delete _pRecruitment;
+  if (_pVascular) delete _pVascular;
   if(_pDiffusion)   delete _pDiffusion;
 	for (int i = 0; i < NOUTCOMES; i++)
 		if(_pTTest[i]) delete _pTTest[i];
@@ -595,6 +600,18 @@ void GrSimulation::solve()
 		il10Depletion = true;
 		_il10rDynamics = false;
 	}
+
+    // Get cell density information to use for adjusting diffusion
+    GrGrid& g = _grid.getGrid();
+    Pos p;
+    Pos dim = g.getRange();
+    for (p.x = 0; p.x < dim.x; p.x++)
+    {
+        for (p.y = 0; p.y < dim.y; p.y++)
+        {
+            g.nCells(p) = g.getCellDensity(p);
+        }
+    }
     
     // Calculate Diffusion and Molecular events for a 10 min timestep
     // Agent time step is 600 s (10 min)
@@ -619,6 +636,9 @@ void GrSimulation::solve()
             adjustFauxDegradation(_PARAM(PARAM_GR_DT_MOLECULAR));
             //adjustTNFDegradation(_PARAM(PARAM_GR_DT_MOLECULAR));
     }  
+    _pVascular->solveVascularSources(_grid.getGrid(), _PARAM(PARAM_GR_DT_DIFFUSION),_time, DiffStep);
+    _stats.getBloodConcINH() = _pVascular->getBloodConcentrationINH();
+
     }
 
     // move macrophages
@@ -956,6 +976,7 @@ void GrSimulation::growExtMtb()
 
 			_stats.getTotMacAttractant() += (g.macAttractant(p));
 			_stats.getTotTNF() += (g.TNF(p));
+            _stats.getTotINH() += (g.INH(p));
             _stats.getTotIL10() += (g.il10(p));
 			_stats.getTotCCL2() += (g.CCL2(p));
 			_stats.getTotCCL5() += (g.CCL5(p));
@@ -965,7 +986,14 @@ void GrSimulation::growExtMtb()
 				++_stats.getAreaTNF();
 
 			if (g.getCellDensity(p) >= _areaThresholdCellDensity)
-				++_stats.getAreaCellDensity();
+            {
+                ++_stats.getAreaCellDensity();
+                _stats.getTotINHGran() += (g.INH(p))/NAV/VOL;
+            }
+            else
+            {
+                _stats.getTotINHNorm() += (g.INH(p))/NAV/VOL;
+            }
 		}
 	}
 }

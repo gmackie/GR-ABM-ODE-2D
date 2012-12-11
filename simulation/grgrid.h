@@ -53,8 +53,10 @@ typedef Indexer2D Indexer;
   GRID       (int, nRecruitmentsTcyt) \
   GRID       (int, nRecruitmentsTreg) \
   GRID       (int, nSecretions)       \
+  GRID       (int, nCells)            \
   PADDED_GRID(Scalar, TNF)            \
   PADDED_GRID(Scalar, macAttractant)  \
+  PADDED_GRID(Scalar, INH)            \
   PADDED_GRID(Scalar, CCL2)           \
   PADDED_GRID(Scalar, CCL5)           \
   PADDED_GRID(Scalar, CXCL9)          \
@@ -167,8 +169,10 @@ public:
 #define GRID(type, name) \
   const type& name (const Pos& p) const;  \
   const type& name (int x, int y) const;  \
+  const type* name () const;  \
         type& name (const Pos& p);  \
-        type& name (int x, int y);
+        type& name (int x, int y);  \
+        type* name ();
 #define PADDED_GRID(type, name) \
   const type& name (const Pos& p) const;  \
   const type& name (int x, int y) const;  \
@@ -315,10 +319,14 @@ inline const std::vector<Pos>& GrGrid::getSources() const
     { return _##name [Indexer::ind(_dim, p)]; } \
   inline const type& GrGrid:: name (int x, int y) const  \
     { return _##name [Indexer::ind(_dim, x, y)]; }  \
+  inline const type* GrGrid:: name () const  \
+      { return _##name.data(); }  \
   inline type& GrGrid:: name (const Pos& p) \
     { return _##name [Indexer::ind(_dim, p)]; } \
   inline type& GrGrid:: name (int x, int y)  \
-    { return _##name [Indexer::ind(_dim, x, y)]; }
+    { return _##name [Indexer::ind(_dim, x, y)]; } \
+  inline type* GrGrid:: name ()  \
+      { return _##name.data(); }
 #define PADDED_GRID(type, name) \
   inline const type& GrGrid:: name (const Pos& p) const  \
     { return _##name [Indexer::padInd(_dim, p)]; } \

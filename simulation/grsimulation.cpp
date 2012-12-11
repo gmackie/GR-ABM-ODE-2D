@@ -6,6 +6,8 @@
  */
 
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/math/special_functions/nonfinite_num_facets.hpp>
+#include <boost/archive/codecvt_null.hpp>
 #include <fstream>
 #include "grsimulation.h"
 #include "float.h"
@@ -150,9 +152,14 @@ void GrSimulation::save(const char* fname) const
 void GrSimulation::save(std::ostream& out) const
 {
 	assert(out.good());
-  boost::archive::xml_oarchive oa(out);
+  std::locale loc = out.getloc();
+  std::locale default_locale(out.getloc(), new boost::archive::codecvt_null<char>);
+  std::locale _locale(default_locale, new boost::math::nonfinite_num_put<char>);
+  out.imbue(_locale);
+  boost::archive::xml_oarchive oa(out, boost::archive::no_codecvt);
   oa << boost::serialization::make_nvp("GR", *this);
 	assert(out.good());
+  out.imbue(loc);
 }
 
 void GrSimulation::load(const char* fname)
@@ -164,10 +171,14 @@ void GrSimulation::load(const char* fname)
 void GrSimulation::load(std::istream& in)
 {
 	assert(in.good());
-  boost::archive::xml_iarchive ia(in);
-  ia >> boost::serialization::make_nvp("GR", *this);
+  std::locale loc = in.getloc();
+  std::locale default_locale(in.getloc(), new boost::archive::codecvt_null<char>);
+  std::locale _locale(default_locale, new boost::math::nonfinite_num_get<char>);
+  in.imbue(_locale);
+  boost::archive::xml_iarchive oa(in, boost::archive::no_codecvt);
+  oa >> boost::serialization::make_nvp("GR", *this);
 	assert(in.good());
-
+  in.imbue(loc);
   timestepSync();
 }
 

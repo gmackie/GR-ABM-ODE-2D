@@ -169,7 +169,7 @@ void Rand::serialize(Archive& ar, const unsigned int /*version*/)
   ar & BOOST_SERIALIZATION_NVP(boost_version);
   if(boost_version != BOOST_VERSION)
     std::cerr<<"Warning: Boost library version for serialized RNG is not the"
-               " same.  Continuing simulation may lead to unexpected results";
+               " same.  Continuing simulation may lead to unexpected results"<<std::endl;
   ar & BOOST_SERIALIZATION_NVP(_seed);
   ar & BOOST_SERIALIZATION_NVP(_eng);
   ar & BOOST_SERIALIZATION_NVP(_realEng);

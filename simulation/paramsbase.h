@@ -48,17 +48,7 @@ typedef enum
     PARAM_GR_D_INH,
     PARAM_GR_D_INH_MIN,
 
-    // blood compartment parameters
-    PARAM_GR_VASCULAR_PERMEABILITY,
-    PARAM_GR_VASCULAR_VOLUME,
-    //  PARAM_GR_VASCULAR_IL10_CLEARANCE,
-    //  PARAM_GR_VASCULAR_TNF_CLEARANCE,
-      PARAM_GR_DEG_INH_PLASMA_FAST,
-        PARAM_GR_DEG_INH_PLASMA_SLOW,
-    //  PARAM_GR_VASCULAR_IL10_DOSE,
-    //  PARAM_GR_VASCULAR_TNF_DOSE,
-      PARAM_GR_VASCULAR_INH_DOSE,
-    //end of blood compartment parameters
+
 
   PARAM_GR_DEG_TNF,
   PARAM_GR_DEG_IL10,
@@ -73,6 +63,19 @@ typedef enum
   PARAM_TGAM_SEC_RATE_IL10,
   PARAM_TCYT_SEC_RATE_IL10,
   PARAM_TREG_SEC_RATE_IL10,
+
+
+    // blood compartment parameters
+    PARAM_GR_VASCULAR_PERMEABILITY,
+    PARAM_GR_VASCULAR_VOLUME,
+    //  PARAM_GR_VASCULAR_IL10_CLEARANCE,
+    //  PARAM_GR_VASCULAR_TNF_CLEARANCE,
+      PARAM_GR_DEG_INH_PLASMA_FAST,
+        PARAM_GR_DEG_INH_PLASMA_SLOW,
+    //  PARAM_GR_VASCULAR_IL10_DOSE,
+    //  PARAM_GR_VASCULAR_TNF_DOSE,
+      PARAM_GR_VASCULAR_INH_DOSE,
+    //end of blood compartment parameters
 
   // molecular TNF-associated parameters
   PARAM_GR_K_SYNTH_MAC,

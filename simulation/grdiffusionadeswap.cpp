@@ -137,7 +137,7 @@ static void diffuse_u_nofluxbc(const Scalar* __restrict__ grid_u, Scalar* __rest
           Scalar& new_u = newgrid_u[Indexer::padInd(dim, i,j)];
 
           new_u = ((coefficient_a * ct_u) + (coefficient_b * (up_u + dn_u)) + (coefficient_c * (lt_u + rt_u)) )/ (1.0-coef);
-          new_u = max(0.0, new_u);
+          new_u = new_u <= cutOff ? Scalar(0.0) : new_u;
 
         }
     }
@@ -258,7 +258,7 @@ static void diffuse_v_nofluxbc(const Scalar* __restrict__ grid_v, Scalar* __rest
           Scalar& new_v = newgrid_v[Indexer::padInd(dim, i,j)];
 
           new_v = ((coefficient_a * ct_v) + (coefficient_b * (up_v + dn_v)) + (coefficient_c * (lt_v + rt_v))) / (1.0 - coef);
-          new_v = max(0.0, new_v);
+          new_v = new_v <= cutOff ? Scalar(0.0) : new_v;
 
         }
     }

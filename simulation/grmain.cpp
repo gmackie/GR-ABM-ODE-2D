@@ -372,7 +372,14 @@ public:
 
     write(stats.getBloodConcINH());
     int gransz = stats.getAreaCellDensity();
-    write(stats.getTotINHGran() / gransz);
+    if (gransz == 0)
+    {
+        write(0.0);
+    }
+    else
+    {
+        write(stats.getTotINHGran() / gransz);
+    }
     write(stats.getTotINHNorm() / (sz - gransz));
 
     write(stats.getTotTNF());

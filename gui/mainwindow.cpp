@@ -707,9 +707,7 @@ void MainWindow::setMappingMethod(int value)
   if (value == 0)
     {
       _ui.doubleSpinBoxMax->setEnabled(true);
-      _ui.doubleSpinBoxMax->setDecimals(3);
       _ui.doubleSpinBoxMin->setEnabled(true);
-      _ui.doubleSpinBoxMin->setDecimals(3);
       _ui.pushButtonRescale->setEnabled(true);
 
       _pCurrentNormalizer->setClamping(true);
@@ -719,9 +717,7 @@ void MainWindow::setMappingMethod(int value)
   else if (value == 1)
     {
       _ui.doubleSpinBoxMax->setEnabled(false);
-      _ui.doubleSpinBoxMax->setDecimals(7);
       _ui.doubleSpinBoxMin->setEnabled(false);
-      _ui.doubleSpinBoxMin->setDecimals(7);
       _ui.pushButtonRescale->setEnabled(false);
 
       _pCurrentNormalizer->setClamping(false);

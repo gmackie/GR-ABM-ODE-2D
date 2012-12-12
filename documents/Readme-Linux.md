@@ -6,7 +6,7 @@ Ubuntu 12.04
 
 This also works for Linux Mint 12
 
-    $ sudo apt-get install subversion g++ libboost-program-options-dev libboost-iostreams-dev libboost-serialization-dev
+    $ sudo apt-get install subversion g++ libboost1.48-all-dev
 
 For the gui:
 

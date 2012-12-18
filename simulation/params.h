@@ -38,9 +38,14 @@ public:
     boost::optional<Range<T> > range; /// Valid range for the parameter
     boost::optional<T> def;           /// Default value for parameter
     std::string name, desc, units, path;
+    ParamDescriptor(T min, T max, std::string n, boost::optional<T> defau, std::string d, std::string u, std::string p)
+    : def(defau), name(n), desc(d), units(u), path(p) { if(min != max) range = Range<T>(min, max); }
   };
 
 private:
+  ///Called from the destructor
+  //void initialize();
+
   /// Convert token string to ptree path (_ -> .)
   static const std::string make_path(const char path[]) {
     std::string s(path);
@@ -62,25 +67,10 @@ private:
   /* Definitions */
 #define P(type, name, path, def, desc, units, min, max) type _##path##_##name; ParamDescriptor<type> _##path##_##name##Desc;
 #include "params.def"
-
-
-  /* Called from constructor */
-   void initialize() {
- #define P(type, n, p, defau, d, u, min, max)  \
-     if(type(min) != type(max)) \
-       _##p##_##n##Desc.range = Range<type>(type(min), type(max));             \
-     _##p##_##n##Desc.name = std::string(#n);           \
-     _##p##_##n##Desc.def = boost::optional<type>(defau); \
-     _##p##_##n##Desc.desc = std::string(d);           \
-     _##p##_##n##Desc.units = std::string(u);         \
-     _##p##_##n##Desc.path = make_path(#p);           \
-     _##p##_##n = !_##p##_##n##Desc.def ? type() : *(_##p##_##n##Desc.def);
- #include "params.def"
-   }
+  int dummy;
 
 public:
-
-  Params() { initialize(); }
+  Params();
 
   /// @name Accessors
   /// @{

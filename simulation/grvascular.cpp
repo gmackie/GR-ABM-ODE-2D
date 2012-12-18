@@ -23,13 +23,13 @@ Vascular::~Vascular()
 
 void Vascular::solveVascularSources(GrGrid& grid, double dt, const int time, int DiffStep)
 {
-    int realTime = time*600 + DiffStep*_PARAM(PARAM_GR_DT_DIFFUSION);
+    int realTime = time*600 + DiffStep*_PARAM(_timestepDiffusion);
 
     if (isDoseStartTime(realTime))
     {
         //addDose(realTime, _PARAM(PARAM_GR_VASCULAR_IL10_DOSE), _PARAM(PARAM_GR_VASCULAR_IL10_DOSE_INTERVAL), _bloodConcentrationIL10);
         //addDose(realTime, _PARAM(PARAM_GR_VASCULAR_TNF_DOSE), _PARAM(PARAM_GR_VASCULAR_TNF_DOSE_INTERVAL), _bloodConcentrationTNF);
-        addDose(realTime, _PARAM(PARAM_GR_VASCULAR_INH_DOSE), _PARAM(PARAM_GR_VASCULAR_INH_DOSE_INTERVAL), _bloodConcentrationINH);
+        addDose(realTime, _PARAM(_bloodINHdose), _PARAM(_dosageIntervalINH), _bloodConcentrationINH);
 
         const std::vector<Pos>& sources = grid.getSources();
 
@@ -59,7 +59,7 @@ void Vascular::solveVascularSources(GrGrid& grid, double dt, const int time, int
         }
         //updateBloodODE(_bloodConcentrationIL10, _PARAM(PARAM_GR_VASCULAR_IL10_CLEARANCE), dt);
         //updateBloodODE(_bloodConcentrationTNF, _PARAM(PARAM_GR_VASCULAR_TNF_CLEARANCE), dt);
-        updateBloodODE(_bloodConcentrationINH, _PARAM(PARAM_GR_DEG_INH_PLASMA_FAST), dt);
+        updateBloodODE(_bloodConcentrationINH, _PARAM(_degRateINH_Plasma_Fast_Acet), dt);
     }
 }
 

@@ -126,7 +126,7 @@
 // forward class declarations
 class GrSimulation;
 class GrGrid;
-class Params;
+class LungParam;
 class Tcell;
 class Mac;
 class Tgam;

@@ -35,19 +35,19 @@ Mac::Mac()
 }
 
 Mac::Mac(int birthtime, int row, int col, Mac::State state, double intMtb, bool NFkB, bool stat1)
-  : Agent(birthtime, birthtime + _PARAM(PARAM_MAC_AGE), row, col
+  : Agent(birthtime, birthtime + _PARAM(Mac_maxAge), row, col
 
           //TNFR Components
-          , (Scalar) _PARAM(PARAM_GR_MEAN_TNFR1_MAC)
-          , (Scalar) _PARAM(PARAM_GR_STD_TNFR1_MAC)
-          , (Scalar) _PARAM(PARAM_GR_MEAN_TNFR2_MAC)
-          , (Scalar) _PARAM(PARAM_GR_STD_TNFR2_MAC)
+          , (Scalar) _PARAM(_meanTNFR1Mac)
+          , (Scalar) _PARAM(_stdTNFR1Mac)
+          , (Scalar) _PARAM(_meanTNFR2Mac)
+          , (Scalar) _PARAM(_stdTNFR2Mac)
           , 0.0 // kSynth
-          , (Scalar) _PARAM(PARAM_GR_K_TACE_MAC)
+          , (Scalar) _PARAM(_kTaceMac)
 
           // IL10 components
-          , (Scalar) _PARAM(PARAM_GR_I_IL10R_MAC)
-          , (Scalar) _PARAM(PARAM_GR_STD_IL10R_MAC)
+          , (Scalar) _PARAM(_meanIL10RMac)
+          , (Scalar) _PARAM(_stdIL10RMac)
          )
   , _state(state)
   , _nextState(state)
@@ -59,9 +59,9 @@ Mac::Mac(int birthtime, int row, int col, Mac::State state, double intMtb, bool 
   , _deactivationTime(-1)
   , _stat1Time(-1)
   , _nfkbTime(-1)
-  , _growthRate(_PARAM(PARAM_RAND_GROWTHRATE_EN) ? 
-                g_Rand.getReal(_PARAM(PARAM_INTMTB_GROWTH_RATE_MIN), _PARAM(PARAM_INTMTB_GROWTH_RATE_MAX))
-                : _PARAM(PARAM_INTMTB_GROWTH_RATE))
+  , _growthRate(_PARAM(_RandomizeGrowthRate) ? 
+                g_Rand.getReal(_PARAM(Mtb_growthRateIntMtbMin), _PARAM(Mtb_growthRateIntMtbMax))
+                : _PARAM(Mtb_growthRateIntMtb))
 {
 }
 
@@ -71,7 +71,7 @@ Mac::~Mac()
 
 void Mac::move(GrGrid& grid)
 {
-  Pos pos = Agent::moveAgent(grid, true, true, false, true, _PARAM(PARAM_MAC_MOVEMENT_BONUSFACTOR));
+  Pos pos = Agent::moveAgent(grid, true, true, false, true, _PARAM(Mac_movementBonusFactor));
 
   if (grid.addAgent(this, pos))
     {
@@ -97,50 +97,50 @@ void Mac::secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDe
     {
       if (_state == Mac::MAC_RESTING)
         {
-          _c1rChem = _PARAM(PARAM_GR_epsilon2) * _PARAM(PARAM_GR_c1r);
-          _c1rTNF = _PARAM(PARAM_GR_epsilon2) * _PARAM(PARAM_GR_c1r);
+          _c1rChem = _PARAM(_epsilon2) * _PARAM(_c1r);
+          _c1rTNF = _PARAM(_epsilon2) * _PARAM(_c1r);
           _c1rrChemTNF = 0;
           _kISynth = 0.0;
         }
       else if (_state == Mac::MAC_INFECTED)
         {
-          _c1rChem = _PARAM(PARAM_GR_c1r);
-          _c1rTNF = _PARAM(PARAM_GR_c1r);
-          _c1rrChemTNF = _PARAM(PARAM_GR_epsilon1) * _PARAM(PARAM_GR_c1r);
+          _c1rChem = _PARAM(_c1r);
+          _c1rTNF = _PARAM(_c1r);
+          _c1rrChemTNF = _PARAM(_epsilon1) * _PARAM(_c1r);
           ++grid.nSecretions(_pos);
-          _kISynth = _PARAM(PARAM_GR_I_K_SYNTH_MAC_INF);
+          _kISynth = _PARAM(_IkSynthMacInf);
 
           if (!il10rDynamics && !il10Depletion)
             {
-              grid.incil10(_pos, _PARAM(PARAM_MAC_SEC_RATE_IL10) * mdt);
+              grid.incil10(_pos, _PARAM(Mac_dIL10) * mdt);
             }
 
         }
       else if (_state == Mac::MAC_ACTIVE)
         {
-          _c1rChem = _PARAM(PARAM_GR_c1r);
-          _c1rTNF = _PARAM(PARAM_GR_c1r);
-          _c1rrChemTNF = _PARAM(PARAM_GR_c1r);
+          _c1rChem = _PARAM(_c1r);
+          _c1rTNF = _PARAM(_c1r);
+          _c1rrChemTNF = _PARAM(_c1r);
           ++grid.nSecretions(_pos);
-          _kISynth = _PARAM(PARAM_GR_I_K_SYNTH_MAC_ACT);
+          _kISynth = _PARAM(_IkSynthMacAct);
 
           if (!il10rDynamics && !il10Depletion)
             {
-              grid.incil10(_pos,  0.5 * _PARAM(PARAM_MAC_SEC_RATE_IL10) * mdt);
+              grid.incil10(_pos,  0.5 * _PARAM(Mac_dIL10) * mdt);
             }
 
         }
       else if (_state == Mac::MAC_CINFECTED)
         {
-          _c1rChem = _PARAM(PARAM_GR_c1r);
-          _c1rTNF = _PARAM(PARAM_GR_c1r);
-          _c1rrChemTNF = _PARAM(PARAM_GR_c1r);
+          _c1rChem = _PARAM(_c1r);
+          _c1rTNF = _PARAM(_c1r);
+          _c1rrChemTNF = _PARAM(_c1r);
           ++grid.nSecretions(_pos);
-          _kISynth = 2.0 * _PARAM(PARAM_GR_I_K_SYNTH_MAC_INF);
+          _kISynth = 2.0 * _PARAM(_IkSynthMacInf);
 
           if (!il10rDynamics && !il10Depletion)
             {
-              grid.incil10(_pos, 2.0 * _PARAM(PARAM_MAC_SEC_RATE_IL10) * mdt);
+              grid.incil10(_pos, 2.0 * _PARAM(Mac_dIL10) * mdt);
             }
         }
     }
@@ -157,31 +157,31 @@ void Mac::secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDe
 
               double il10 = ((grid.il10(_pos) * MW_IL10 * 1e6)/(NAV * VOL)); // Convert IL10 back to ng/mL
 
-              if (il10 > _PARAM(PARAM_GR_CHEMOKINE_IL10_IC50))
+              if (il10 > _PARAM(_IC50ChemokineIL10))
                 {
-                  grid.incCCL2(_pos, (0.25 * _PARAM(PARAM_MAC_SEC_RATE_CCL2) * mdt));
-                  grid.incCCL5(_pos, (0.25 * _PARAM(PARAM_MAC_SEC_RATE_CCL5) * mdt));
-                  grid.incCXCL9(_pos,  (0.25 * _PARAM(PARAM_MAC_SEC_RATE_CXCL9) * mdt));
+                  grid.incCCL2(_pos, (0.25 * _PARAM(Mac_dCCL2) * mdt));
+                  grid.incCCL5(_pos, (0.25 * _PARAM(Mac_dCCL5) * mdt));
+                  grid.incCXCL9(_pos,  (0.25 * _PARAM(Mac_dCXCL9) * mdt));
                 }
 
               else
                 {
-                  grid.incCCL2(_pos, (0.5 * _PARAM(PARAM_MAC_SEC_RATE_CCL2) * mdt));
-                  grid.incCCL5(_pos, (0.5 * _PARAM(PARAM_MAC_SEC_RATE_CCL5) * mdt));
-                  grid.incCXCL9(_pos,  (0.5 * _PARAM(PARAM_MAC_SEC_RATE_CXCL9) * mdt));
+                  grid.incCCL2(_pos, (0.5 * _PARAM(Mac_dCCL2) * mdt));
+                  grid.incCCL5(_pos, (0.5 * _PARAM(Mac_dCCL5) * mdt));
+                  grid.incCXCL9(_pos,  (0.5 * _PARAM(Mac_dCXCL9) * mdt));
                 }
 
-              _kSynth = 0.5 * _PARAM(PARAM_GR_K_SYNTH_MAC);
-              _kmRNA = 0.5 * _PARAM(PARAM_GR_K_RNA_MAC);
+              _kSynth = 0.5 * _PARAM(_kSynthMac);
+              _kmRNA = 0.5 * _PARAM(_kRNAMac);
 //                calcIkmRNA(grid, _kmRNA, _kSynth, il10rDynamics);
               _kISynth = 0.0;
 
               if (!tnfrDynamics && !tnfDepletion)
                 {
                   //std::cout << "LOG OF IL10: " << il10 << std::endl;
-                  double tnfMOD = (1.0/(1.0 + exp((log(il10) + _PARAM(PARAM_GR_LINK_LOG_ALPHA))/_PARAM(PARAM_GR_LINK_LOG_BETA)))); // calculate the fraction of inhibition
+                  double tnfMOD = (1.0/(1.0 + exp((log(il10) + _PARAM(_LinkLogAlpha))/_PARAM(_LinkLogBeta)))); // calculate the fraction of inhibition
                   //std::cout << "tnfMOD: " << tnfMOD << std::endl;
-                  grid.incTNF(_pos, (tnfMOD * 0.5 * _PARAM(PARAM_MAC_SEC_RATE_TNF) * mdt));
+                  grid.incTNF(_pos, (tnfMOD * 0.5 * _PARAM(Mac_dTNF) * mdt));
                 }
 
               ++grid.nSecretions(_pos);
@@ -201,35 +201,35 @@ void Mac::secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDe
 
               double il10 = ((grid.il10(_pos) * MW_IL10 * 1e6)/(NAV * VOL)); // Convert IL10 back to ng/mL
 
-              if (il10 > _PARAM(PARAM_GR_CHEMOKINE_IL10_IC50))
+              if (il10 > _PARAM(_IC50ChemokineIL10))
                 {
-                  grid.incCCL2(_pos, (0.5 * _PARAM(PARAM_MAC_SEC_RATE_CCL2) * mdt));
-                  grid.incCCL5(_pos, (0.5 * _PARAM(PARAM_MAC_SEC_RATE_CCL5) * mdt));
-                  grid.incCXCL9(_pos,  (0.5 * _PARAM(PARAM_MAC_SEC_RATE_CXCL9) * mdt));
+                  grid.incCCL2(_pos, (0.5 * _PARAM(Mac_dCCL2) * mdt));
+                  grid.incCCL5(_pos, (0.5 * _PARAM(Mac_dCCL5) * mdt));
+                  grid.incCXCL9(_pos,  (0.5 * _PARAM(Mac_dCXCL9) * mdt));
                 }
 
               else
                 {
-                  grid.incCCL2(_pos, (_PARAM(PARAM_MAC_SEC_RATE_CCL2) * mdt));
-                  grid.incCCL5(_pos, (_PARAM(PARAM_MAC_SEC_RATE_CCL5) * mdt));
-                  grid.incCXCL9(_pos,  (_PARAM(PARAM_MAC_SEC_RATE_CXCL9) * mdt));
+                  grid.incCCL2(_pos, (_PARAM(Mac_dCCL2) * mdt));
+                  grid.incCCL5(_pos, (_PARAM(Mac_dCCL5) * mdt));
+                  grid.incCXCL9(_pos,  (_PARAM(Mac_dCXCL9) * mdt));
                 }
 
-              _kSynth = _PARAM(PARAM_GR_K_SYNTH_MAC);
-              _kmRNA = _PARAM(PARAM_GR_K_RNA_MAC);
+              _kSynth = _PARAM(_kSynthMac);
+              _kmRNA = _PARAM(_kRNAMac);
 //                calcIkmRNA(grid, _kmRNA, _kSynth, il10rDynamics);
-              _kISynth = _PARAM(PARAM_GR_I_K_SYNTH_MAC_INF);
+              _kISynth = _PARAM(_IkSynthMacInf);
 
               if (!tnfrDynamics && !tnfDepletion)
                 {
                   //std::cout << "LOG OF IL10: " << il10 << std::endl;
-                  double tnfMOD = (1.0/(1.0 + exp((log(il10) + _PARAM(PARAM_GR_LINK_LOG_ALPHA))/_PARAM(PARAM_GR_LINK_LOG_BETA)))); // calculate the fraction of inhibition
-                  grid.incTNF(_pos, (tnfMOD * _PARAM(PARAM_MAC_SEC_RATE_TNF) * mdt));
+                  double tnfMOD = (1.0/(1.0 + exp((log(il10) + _PARAM(_LinkLogAlpha))/_PARAM(_LinkLogBeta)))); // calculate the fraction of inhibition
+                  grid.incTNF(_pos, (tnfMOD * _PARAM(Mac_dTNF) * mdt));
                   //cout << "Debug: IL10 inhibition from Mac::MAC_INFECTED" << std::endl;
                 }
               if (!il10rDynamics && !il10Depletion)
                 {
-                  grid.incil10(_pos, (_PARAM(PARAM_MAC_SEC_RATE_IL10) * mdt));
+                  grid.incil10(_pos, (_PARAM(Mac_dIL10) * mdt));
                   //cout << "Debug: Secrete from Mac::MAC_INFECTED" << std::endl;
                 }
 
@@ -240,36 +240,36 @@ void Mac::secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDe
             {
               double il10 = ((grid.il10(_pos) * MW_IL10 * 1e6)/(NAV * VOL)); // Convert IL10 back to ng/mL
 
-              if (il10 > _PARAM(PARAM_GR_CHEMOKINE_IL10_IC50))
+              if (il10 > _PARAM(_IC50ChemokineIL10))
                 {
-                  grid.incCCL2(_pos, (0.25 * _PARAM(PARAM_MAC_SEC_RATE_CCL2) * mdt));
-                  grid.incCCL5(_pos, (0.25 * _PARAM(PARAM_MAC_SEC_RATE_CCL5) * mdt));
-                  grid.incCXCL9(_pos,  (0.25 * _PARAM(PARAM_MAC_SEC_RATE_CXCL9) * mdt));
+                  grid.incCCL2(_pos, (0.25 * _PARAM(Mac_dCCL2) * mdt));
+                  grid.incCCL5(_pos, (0.25 * _PARAM(Mac_dCCL5) * mdt));
+                  grid.incCXCL9(_pos,  (0.25 * _PARAM(Mac_dCXCL9) * mdt));
                 }
 
               else
                 {
-                  grid.incCCL2(_pos, (0.5 * _PARAM(PARAM_MAC_SEC_RATE_CCL2) * mdt));
-                  grid.incCCL5(_pos, (0.5 * _PARAM(PARAM_MAC_SEC_RATE_CCL5) * mdt));
-                  grid.incCXCL9(_pos,  (0.5 * _PARAM(PARAM_MAC_SEC_RATE_CXCL9) * mdt));
+                  grid.incCCL2(_pos, (0.5 * _PARAM(Mac_dCCL2) * mdt));
+                  grid.incCCL5(_pos, (0.5 * _PARAM(Mac_dCCL5) * mdt));
+                  grid.incCXCL9(_pos,  (0.5 * _PARAM(Mac_dCXCL9) * mdt));
                 }
 
-              _kSynth = 0.5 * _PARAM(PARAM_GR_K_SYNTH_MAC);
-              _kmRNA = 0.5 * _PARAM(PARAM_GR_K_RNA_MAC);
+              _kSynth = 0.5 * _PARAM(_kSynthMac);
+              _kmRNA = 0.5 * _PARAM(_kRNAMac);
 //                calcIkmRNA(grid, _kmRNA, _kSynth, il10rDynamics);
-              _kISynth = _PARAM(PARAM_GR_I_K_SYNTH_MAC_INF);
+              _kISynth = _PARAM(_IkSynthMacInf);
 
               if (!tnfrDynamics && !tnfDepletion)
                 {
                   //std::cout << "LOG OF IL10: " << il10 << std::endl;
-                  double tnfMOD = (1.0/(1.0 + exp((log(il10) + _PARAM(PARAM_GR_LINK_LOG_ALPHA))/_PARAM(PARAM_GR_LINK_LOG_BETA)))); // calculate the fraction of inhibition
-                  grid.incTNF(_pos,(tnfMOD * _PARAM(PARAM_MAC_SEC_RATE_TNF) * mdt));
+                  double tnfMOD = (1.0/(1.0 + exp((log(il10) + _PARAM(_LinkLogAlpha))/_PARAM(_LinkLogBeta)))); // calculate the fraction of inhibition
+                  grid.incTNF(_pos,(tnfMOD * _PARAM(Mac_dTNF) * mdt));
                   //cout << "Debug: IL10 inhibition from Mac::MAC_INFECTED" << std::endl;
                   //std::cout << "tnfMOD: " << tnfMOD << std::endl;
                 }
               if (!il10rDynamics && !il10Depletion)
                 {
-                  grid.incil10(_pos, (_PARAM(PARAM_MAC_SEC_RATE_IL10) * mdt));
+                  grid.incil10(_pos, (_PARAM(Mac_dIL10) * mdt));
                   //cout << "Debug: Secrete from Mac::MAC_INFECTED" << std::endl;
                 }
 
@@ -286,33 +286,33 @@ void Mac::secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDe
 
               double il10 = ((grid.il10(_pos) * MW_IL10 * 1e6)/(NAV * VOL)); // Convert IL10 back to ng/mL
 
-              if (il10 > _PARAM(PARAM_GR_CHEMOKINE_IL10_IC50))
+              if (il10 > _PARAM(_IC50ChemokineIL10))
                 {
-                  grid.incCCL2(_pos, (0.5 * _PARAM(PARAM_MAC_SEC_RATE_CCL2) * mdt));
-                  grid.incCCL5(_pos, (0.5 * _PARAM(PARAM_MAC_SEC_RATE_CCL5) * mdt));
-                  grid.incCXCL9(_pos,  (0.5 * _PARAM(PARAM_MAC_SEC_RATE_CXCL9) * mdt));
+                  grid.incCCL2(_pos, (0.5 * _PARAM(Mac_dCCL2) * mdt));
+                  grid.incCCL5(_pos, (0.5 * _PARAM(Mac_dCCL5) * mdt));
+                  grid.incCXCL9(_pos,  (0.5 * _PARAM(Mac_dCXCL9) * mdt));
                 }
 
               else
                 {
-                  grid.incCCL2(_pos, (_PARAM(PARAM_MAC_SEC_RATE_CCL2) * mdt));
-                  grid.incCCL5(_pos, (_PARAM(PARAM_MAC_SEC_RATE_CCL5) * mdt));
-                  grid.incCXCL9(_pos,  (_PARAM(PARAM_MAC_SEC_RATE_CXCL9) * mdt));
+                  grid.incCCL2(_pos, (_PARAM(Mac_dCCL2) * mdt));
+                  grid.incCCL5(_pos, (_PARAM(Mac_dCCL5) * mdt));
+                  grid.incCXCL9(_pos,  (_PARAM(Mac_dCXCL9) * mdt));
                 }
 
-              _kSynth = _PARAM(PARAM_GR_K_SYNTH_MAC);
-              _kmRNA = _PARAM(PARAM_GR_K_RNA_MAC);
+              _kSynth = _PARAM(_kSynthMac);
+              _kmRNA = _PARAM(_kRNAMac);
 //                calcIkmRNA(grid, _kmRNA, _kSynth, il10rDynamics);
-              _kISynth = 1.5 * _PARAM(PARAM_GR_I_K_SYNTH_MAC_INF);
+              _kISynth = 1.5 * _PARAM(_IkSynthMacInf);
 
               if (!tnfrDynamics && !tnfDepletion)
                 {
-                  double tnfMOD = (1.0/(1.0 + exp((log(il10) + _PARAM(PARAM_GR_LINK_LOG_ALPHA))/_PARAM(PARAM_GR_LINK_LOG_BETA)))); // calculate the fraction of inhibition
-                  grid.incTNF(_pos, (tnfMOD * _PARAM(PARAM_MAC_SEC_RATE_TNF) * mdt));
+                  double tnfMOD = (1.0/(1.0 + exp((log(il10) + _PARAM(_LinkLogAlpha))/_PARAM(_LinkLogBeta)))); // calculate the fraction of inhibition
+                  grid.incTNF(_pos, (tnfMOD * _PARAM(Mac_dTNF) * mdt));
                 }
               if (!il10rDynamics && !il10Depletion)
                 {
-                  grid.incil10(_pos, (2.0 * _PARAM(PARAM_MAC_SEC_RATE_IL10) * mdt));
+                  grid.incil10(_pos, (2.0 * _PARAM(Mac_dIL10) * mdt));
                 }
 
               ++grid.nSecretions(_pos);
@@ -328,33 +328,33 @@ void Mac::secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDe
 
               double il10 = ((grid.il10(_pos) * MW_IL10 * 1e6)/(NAV * VOL)); // Convert IL10 back to ng/mL
 
-              if (il10 > _PARAM(PARAM_GR_CHEMOKINE_IL10_IC50))
+              if (il10 > _PARAM(_IC50ChemokineIL10))
                 {
-                  grid.incCCL2(_pos, (0.5 * _PARAM(PARAM_MAC_SEC_RATE_CCL2) * mdt));
-                  grid.incCCL5(_pos, (0.5 * _PARAM(PARAM_MAC_SEC_RATE_CCL5) * mdt));
-                  grid.incCXCL9(_pos,  (0.5 * _PARAM(PARAM_MAC_SEC_RATE_CXCL9) * mdt));
+                  grid.incCCL2(_pos, (0.5 * _PARAM(Mac_dCCL2) * mdt));
+                  grid.incCCL5(_pos, (0.5 * _PARAM(Mac_dCCL5) * mdt));
+                  grid.incCXCL9(_pos,  (0.5 * _PARAM(Mac_dCXCL9) * mdt));
                 }
 
               else
                 {
-                  grid.incCCL2(_pos, (_PARAM(PARAM_MAC_SEC_RATE_CCL2) * mdt));
-                  grid.incCCL5(_pos, (_PARAM(PARAM_MAC_SEC_RATE_CCL5) * mdt));
-                  grid.incCXCL9(_pos,  (_PARAM(PARAM_MAC_SEC_RATE_CXCL9) * mdt));
+                  grid.incCCL2(_pos, (_PARAM(Mac_dCCL2) * mdt));
+                  grid.incCCL5(_pos, (_PARAM(Mac_dCCL5) * mdt));
+                  grid.incCXCL9(_pos,  (_PARAM(Mac_dCXCL9) * mdt));
                 }
 
-              _kSynth = _PARAM(PARAM_GR_K_SYNTH_MAC);
-              _kmRNA = _PARAM(PARAM_GR_K_RNA_MAC);
+              _kSynth = _PARAM(_kSynthMac);
+              _kmRNA = _PARAM(_kRNAMac);
 //                calcIkmRNA(grid, _kmRNA, _kSynth, il10rDynamics);
-              _kISynth = _PARAM(PARAM_GR_I_K_SYNTH_MAC_ACT) * (_surfBoundTNFR1 / (_surfBoundTNFR1 + _PARAM(PARAM_GR_I_HALF_SAT_IL10_MRNA)));
+              _kISynth = _PARAM(_IkSynthMacAct) * (_surfBoundTNFR1 / (_surfBoundTNFR1 + _PARAM(_halfSatIL10mRNA)));
 
               if (!tnfrDynamics && !tnfDepletion)
                 {
-                  double tnfMOD = (1.0/(1.0 + exp((log(il10) + _PARAM(PARAM_GR_LINK_LOG_ALPHA))/_PARAM(PARAM_GR_LINK_LOG_BETA)))); // calculate the fraction of inhibition
-                  grid.incTNF(_pos, (tnfMOD * _PARAM(PARAM_MAC_SEC_RATE_TNF) * mdt));
+                  double tnfMOD = (1.0/(1.0 + exp((log(il10) + _PARAM(_LinkLogAlpha))/_PARAM(_LinkLogBeta)))); // calculate the fraction of inhibition
+                  grid.incTNF(_pos, (tnfMOD * _PARAM(Mac_dTNF) * mdt));
                 }
               if (!il10rDynamics && !il10Depletion)
                 {
-                  grid.incil10(_pos, (0.10 * _PARAM(PARAM_MAC_SEC_RATE_IL10) * mdt));
+                  grid.incil10(_pos, (0.10 * _PARAM(Mac_dIL10) * mdt));
                 }
 
               ++grid.nSecretions(_pos);
@@ -391,13 +391,13 @@ void Mac::apoptosis(GrGrid& grid)
 bool Mac::checkSTAT1(GrGrid& grid, const int time)
 {
   bool stat1Time = false;
-  bool stat1Stim = g_Rand.getReal() < getCountTgam(Tgam::TGAM_ACTIVE, grid) * _PARAM(PARAM_MAC_PROB_STAT1_TGAM);
+  bool stat1Stim = g_Rand.getReal() < getCountTgam(Tgam::TGAM_ACTIVE, grid) * _PARAM(Mac_probStat1Tgam);
 
   if (stat1Stim)
     _stat1Time = time;
 
   if (_stat1Time != -1)
-    stat1Time = ((_stat1Time + _PARAM(PARAM_MAC_STAT1_ACTIVATION_TIME)) >= time);
+    stat1Time = ((_stat1Time + _PARAM(Mac_stat1ActivationTime)) >= time);
 
   if (!stat1Stim && !stat1Time)
     _stat1Time = -1;
@@ -417,13 +417,13 @@ bool Mac::checkNFkB(GrGrid& grid, const int time, bool tnfInducedNFkB)
 
   bool nfkbState = (_state == Mac::MAC_CINFECTED || _state == Mac::MAC_ACTIVE);
   bool nfkbStim = tnfInducedNFkB;
-  bool nfkbExtMtb = getExtMtbInMoore(grid) > _PARAM(PARAM_MAC_THRESHOLD_NFKB_EXTMTB);
+  bool nfkbExtMtb = getExtMtbInMoore(grid) > _PARAM(Mac_nrExtMtbNFkB);
 
   if (nfkbState || nfkbStim || nfkbExtMtb)
     _nfkbTime = time;
 
   if (_nfkbTime != -1)
-    nfkbTime = ((_nfkbTime + _PARAM(PARAM_MAC_NFKB_ACTIVATION_TIME)) >= time);
+    nfkbTime = ((_nfkbTime + _PARAM(Mac_nfkbActivationTime)) >= time);
 
   if (!nfkbTime && !nfkbState && !nfkbStim && !nfkbExtMtb)
     _nfkbTime = -1;
@@ -443,7 +443,7 @@ bool Mac::checkNFkB(GrGrid& grid, const int time, bool tnfInducedNFkB)
 
 void Mac::computeNextState(const int time, GrGrid& grid, Stats& stats, bool tnfrDynamics, bool nfkbDynamics, bool il10rDynamics, bool)
 {
-  double il10BoundFraction = grid.il10(_pos) / (grid.il10(_pos) + _PARAM(PARAM_GR_I_KD) * 48.16e11);
+  double il10BoundFraction = grid.il10(_pos) / (grid.il10(_pos) + _PARAM(_IkD) * 48.16e11);
 
   // check if it is time to die
   if (timeToDie(time))
@@ -470,16 +470,16 @@ void Mac::computeNextState(const int time, GrGrid& grid, Stats& stats, bool tnfr
       grid.incKillings(_pos);
     }
 
-////	else if (!nfkbDynamics && tnfrDynamics && _intBoundTNFR1 > _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR) &&
-////			 g_Rand.getReal() < 1 - exp(-_PARAM(PARAM_GR_K_APOPTOSIS_MOLECULAR) * (_intBoundTNFR1 - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR))))
+////	else if (!nfkbDynamics && tnfrDynamics && _intBoundTNFR1 > _PARAM(_thresholdApoptosisTNF_Molecular) &&
+////			 g_Rand.getReal() < 1 - exp(-_PARAM(_kApoptosis_Molecular) * (_intBoundTNFR1 - _PARAM(_thresholdApoptosisTNF_Molecular))))
 ////	{
 ////		// TNF induced apoptosis
 ////		stats.incMacApoptosisTNF(_state);
 ////		apoptosis(grid);
 ////	}
 
-//    else if (!nfkbDynamics && tnfrDynamics && intCompareGT(_intBoundTNFR1, _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR)) &&
-//             intCompareGT(1 - exp(-_PARAM(PARAM_GR_K_APOPTOSIS_MOLECULAR) * (_intBoundTNFR1 - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR))), g_Rand.getReal()))
+//    else if (!nfkbDynamics && tnfrDynamics && intCompareGT(_intBoundTNFR1, _PARAM(_thresholdApoptosisTNF_Molecular)) &&
+//             intCompareGT(1 - exp(-_PARAM(_kApoptosis_Molecular) * (_intBoundTNFR1 - _PARAM(_thresholdApoptosisTNF_Molecular))), g_Rand.getReal()))
 //	{
 
 ////        std::cout << "TNF Induced Mac Apoptosis CompareGT" << std::endl;
@@ -491,8 +491,8 @@ void Mac::computeNextState(const int time, GrGrid& grid, Stats& stats, bool tnfr
 //        grid.incKillings(_pos);
 //	}
 
-////	else if (nfkbDynamics && _intBoundTNFR1 > _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR) &&
-////			 g_Rand.getReal() < 1 - exp(-nfkb_adjusted_k_apoptosis * (_intBoundTNFR1 - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR))))
+////	else if (nfkbDynamics && _intBoundTNFR1 > _PARAM(_thresholdApoptosisTNF_Molecular) &&
+////			 g_Rand.getReal() < 1 - exp(-nfkb_adjusted_k_apoptosis * (_intBoundTNFR1 - _PARAM(_thresholdApoptosisTNF_Molecular))))
 ////	{
 ////		// TNF induced apoptosis
 ////		stats.incMacApoptosisTNF(_state);
@@ -500,8 +500,8 @@ void Mac::computeNextState(const int time, GrGrid& grid, Stats& stats, bool tnfr
 ////	}
 
 
-//    else if (nfkbDynamics && intCompareGT(_intBoundTNFR1, _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR)) &&
-//			 intCompareGT(1 - exp(-nfkb_adjusted_k_apoptosis * (_intBoundTNFR1 - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR))), g_Rand.getReal()))
+//    else if (nfkbDynamics && intCompareGT(_intBoundTNFR1, _PARAM(_thresholdApoptosisTNF_Molecular)) &&
+//			 intCompareGT(1 - exp(-nfkb_adjusted_k_apoptosis * (_intBoundTNFR1 - _PARAM(_thresholdApoptosisTNF_Molecular))), g_Rand.getReal()))
 //	{
 //		// TNF induced apoptosis
 //		++stats.getMacApoptosisTNF(_state);
@@ -510,8 +510,8 @@ void Mac::computeNextState(const int time, GrGrid& grid, Stats& stats, bool tnfr
 //	}
 
 
-//	else if (!tnfrDynamics && tnfBoundFraction > _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF) &&
-//			 g_Rand.getReal() < 1 - exp(-_PARAM(PARAM_GR_K_APOPTOSIS) * (tnfBoundFraction - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF))))
+//	else if (!tnfrDynamics && tnfBoundFraction > _PARAM(_thresholdApoptosisTNF) &&
+//			 g_Rand.getReal() < 1 - exp(-_PARAM(_kApoptosis) * (tnfBoundFraction - _PARAM(_thresholdApoptosisTNF))))
 //	{
 //		// TNF induced apoptosis
 //		++stats.getMacApoptosisTNF(_state);
@@ -521,7 +521,7 @@ void Mac::computeNextState(const int time, GrGrid& grid, Stats& stats, bool tnfr
 
   else
     {
-      if (_deactivationTime != -1 && (_deactivationTime + _PARAM(PARAM_MAC_TIMESPAN_REGULATED) <= time))
+      if (_deactivationTime != -1 && (_deactivationTime + _PARAM(Mac_maxTimeReg) <= time))
         {
           // Reset deactivation time since the cell in no-longer deactivated
           _deactivationTime = -1;
@@ -533,12 +533,12 @@ void Mac::computeNextState(const int time, GrGrid& grid, Stats& stats, bool tnfr
               if (_intMtb > 0.0)
                 {
                   _state = Mac::MAC_INFECTED;
-                  _deathTime = _birthTime + _PARAM(PARAM_MAC_AGE);
+                  _deathTime = _birthTime + _PARAM(Mac_maxAge);
                 }
               else
                 {
                   _state = Mac::MAC_RESTING;
-                  _deathTime = _birthTime + _PARAM(PARAM_MAC_AGE);
+                  _deathTime = _birthTime + _PARAM(Mac_maxAge);
                 }
 //                // DBG
 //                std::cout << "State Switch - Active to Resting" << std::endl;
@@ -556,11 +556,11 @@ void Mac::computeNextState(const int time, GrGrid& grid, Stats& stats, bool tnfr
 
 //            bool threshold = false;
 //            bool prob = false;
-//            prob = intCompareGT(1 - exp(-_PARAM(PARAM_MAC_K_NFKB_MOLECULAR) * (_surfBoundTNFR1 - _PARAM(PARAM_MAC_THRESHOLD_NFKB_TNF_MOLECULAR))), g_Rand.getReal());
-//            threshold = intCompareGT(_surfBoundTNFR1, _PARAM(PARAM_MAC_THRESHOLD_NFKB_TNF_MOLECULAR));
+//            prob = intCompareGT(1 - exp(-_PARAM(Mac_kNFkB_Molecular) * (_surfBoundTNFR1 - _PARAM(Mac_thresholdNFkBTNF_Molecular))), g_Rand.getReal());
+//            threshold = intCompareGT(_surfBoundTNFR1, _PARAM(Mac_thresholdNFkBTNF_Molecular));
 
-////            if (!nfkbDynamics && tnfrDynamics && intCompareGT(_surfBoundTNFR1, _PARAM(PARAM_MAC_THRESHOLD_NFKB_TNF_MOLECULAR)) &&
-////                    intCompareGT(1 - exp(-_PARAM(PARAM_MAC_K_NFKB_MOLECULAR) * (_surfBoundTNFR1 - _PARAM(PARAM_MAC_THRESHOLD_NFKB_TNF_MOLECULAR))), g_Rand.getReal()))
+////            if (!nfkbDynamics && tnfrDynamics && intCompareGT(_surfBoundTNFR1, _PARAM(Mac_thresholdNFkBTNF_Molecular)) &&
+////                    intCompareGT(1 - exp(-_PARAM(Mac_kNFkB_Molecular) * (_surfBoundTNFR1 - _PARAM(Mac_thresholdNFkBTNF_Molecular))), g_Rand.getReal()))
 //            if (!nfkbDynamics && tnfrDynamics && threshold && prob)
 //            {
 //                tnfInducedNFkB = true;
@@ -581,20 +581,20 @@ void Mac::computeNextState(const int time, GrGrid& grid, Stats& stats, bool tnfr
 //            }
 
 //			else
-//				tnfInducedNFkB = tnfBoundFraction > _PARAM(PARAM_MAC_THRESHOLD_NFKB_TNF) &&
-//					g_Rand.getReal() < 1 - exp(-_PARAM(PARAM_MAC_K_NFKB) * (tnfBoundFraction - _PARAM(PARAM_MAC_THRESHOLD_NFKB_TNF)));
+//				tnfInducedNFkB = tnfBoundFraction > _PARAM(Mac_thresholdNFkBTNF) &&
+//					g_Rand.getReal() < 1 - exp(-_PARAM(Mac_kNFkB) * (tnfBoundFraction - _PARAM(Mac_thresholdNFkBTNF)));
 
-//            _NFkB = _state == Mac::MAC_CINFECTED || _state == Mac::MAC_ACTIVE || tnfInducedNFkB || getExtMtbInMoore(grid) > _PARAM(PARAM_MAC_THRESHOLD_NFKB_EXTMTB);
+//            _NFkB = _state == Mac::MAC_CINFECTED || _state == Mac::MAC_ACTIVE || tnfInducedNFkB || getExtMtbInMoore(grid) > _PARAM(Mac_nrExtMtbNFkB);
 
           _NFkB = checkNFkB(grid, time, tnfInducedNFkB);
-          //grid.extMTB(_pos) > _PARAM(PARAM_MAC_THRESHOLD_NFKB_EXTMTB);
+          //grid.extMTB(_pos) > _PARAM(Mac_nrExtMtbNFkB);
 
           // Update ICOS
           bool il10InhibitionICOS;
           if (il10rDynamics)
-            il10InhibitionICOS = _stat1 && intCompareGT(_PARAM(PARAM_MAC_THRESHOLD_ICOS), _surfBoundIL10R);
+            il10InhibitionICOS = _stat1 && intCompareGT(_PARAM(Mac_thresholdICOS), _surfBoundIL10R);
           else
-            il10InhibitionICOS = _stat1 && _PARAM(PARAM_MAC_THRESHOLD_ICOS) > il10BoundFraction;
+            il10InhibitionICOS = _stat1 && _PARAM(Mac_thresholdICOS) > il10BoundFraction;
 
           _ICOS = il10InhibitionICOS;
 
@@ -627,23 +627,23 @@ void Mac::solveDegradation(GrGrid& grid, double dt, bool tnfrDynamics, bool il10
 {
   // DBG
 //    cout << "Debug: Running T cell degradation"
-//    	<<  " _PARAM(PARAM_GR_MEAN_TNFR1_MAC): " << _PARAM(PARAM_GR_MEAN_TNFR1_MAC)
-//    	<<  " _PARAM(PARAM_GR_I_IL10R_MAC): " << _PARAM(PARAM_GR_I_IL10R_MAC)
+//    	<<  " _PARAM(_meanTNFR1Mac): " << _PARAM(_meanTNFR1Mac)
+//    	<<  " _PARAM(_meanIL10RMac): " << _PARAM(_meanIL10RMac)
 //    	<< std::endl;
   // DBG
 
-  Agent::solveDegradation(grid, dt, tnfrDynamics, il10rDynamics, _PARAM(PARAM_GR_MEAN_TNFR1_MAC), _PARAM(PARAM_GR_I_IL10R_MAC));
+  Agent::solveDegradation(grid, dt, tnfrDynamics, il10rDynamics, _PARAM(_meanTNFR1Mac), _PARAM(_meanIL10RMac));
 }
 
 void Mac::handleResting(const int time, GrGrid& grid, Stats& stats, bool /*nfkbDynamics*/)
 {
-//	_stat1 |= g_Rand.getReal() < getCountTgam(Tgam::TGAM_ACTIVE, grid) * _PARAM(PARAM_MAC_PROB_STAT1_TGAM);
+//	_stat1 |= g_Rand.getReal() < getCountTgam(Tgam::TGAM_ACTIVE, grid) * _PARAM(Mac_probStat1Tgam);
 
   _stat1 = checkSTAT1(grid, time);
 
-  double killProb = _PARAM(PARAM_MAC_PROB_KILL_R_EXTMTB);
+  double killProb = _PARAM(Mac_probKillExtMtbRest);
   if (_stat1 || _NFkB)
-    killProb = _PARAM(PARAM_MAC_PROB_KILL_R_EXTMTB) + _PARAM(PARAM_MAC_PROB_KILL_R_EXTMTB);
+    killProb = _PARAM(Mac_probKillExtMtbRest) + _PARAM(Mac_probKillExtMtbRest);
 
   killProb = std::min(killProb, 1.0); // Make sure killProb never goes over unity
 
@@ -655,7 +655,7 @@ void Mac::handleResting(const int time, GrGrid& grid, Stats& stats, bool /*nfkbD
    *   (another suggestion: we can even fix this parameter to 1 and thus get rid of it)
    * - with a certain probability kill those bacteria, otherwise become infected */
 
-  if (grid.extMTB(_pos) <= _PARAM(PARAM_MAC_NR_UPTAKE_RI_EXTMTB))
+  if (grid.extMTB(_pos) <= _PARAM(Mac_nrExtMtbUptakeRest))
     {
       // kill extracellular bacteria, only if there are not too many
       grid.extMTB(_pos) = (0);
@@ -665,14 +665,14 @@ void Mac::handleResting(const int time, GrGrid& grid, Stats& stats, bool /*nfkbD
     {
       // there are too many extracellular bacteria, but we can kill some of those
       // with probability PARAM_MAC_PROB_KILL_R_EXTMTB
-      grid.extMTB(_pos) += (-1 * std::min(_PARAM(PARAM_MAC_NR_UPTAKE_RI_EXTMTB), grid.extMTB(_pos)));
+      grid.extMTB(_pos) += (-1 * std::min(_PARAM(Mac_nrExtMtbUptakeRest), grid.extMTB(_pos)));
       _nextState = Mac::MAC_RESTING;
     }
   else
     {
       // too many bacteria and no killing => macrophage may become infected
-      _intMtb = _PARAM(PARAM_MAC_NR_UPTAKE_RI_EXTMTB);
-      grid.extMTB(_pos) = (std::max<double>(grid.extMTB(_pos) - _PARAM(PARAM_MAC_NR_UPTAKE_RI_EXTMTB), 0.0));
+      _intMtb = _PARAM(Mac_nrExtMtbUptakeRest);
+      grid.extMTB(_pos) = (std::max<double>(grid.extMTB(_pos) - _PARAM(Mac_nrExtMtbUptakeRest), 0.0));
 
       _nextState = Mac::MAC_INFECTED;
     }
@@ -683,19 +683,19 @@ void Mac::handleResting(const int time, GrGrid& grid, Stats& stats, bool /*nfkbD
 //	{
 //		if (_stat1)
 //		{
-//			if (getExtMtbInMoore(grid) > _PARAM(PARAM_MAC_THRESHOLD_NFKB_EXTMTB))
+//			if (getExtMtbInMoore(grid) > _PARAM(Mac_nrExtMtbNFkB))
 //			{
 //				_intMtb = 0;
 //				_activationTime = time;
-//				_deathTime = time + _PARAM(PARAM_MAC_A_AGE);
+//				_deathTime = time + _PARAM(Mac_maxAgeAct);
 //				_nextState = Mac::MAC_ACTIVE;
 //			}
-//			else if (intCompareGT(_normalizedACT, _PARAM(PARAM_GR_ACT_THRESHOLD)) &&
-//					 intCompareGT(1 - exp(-_PARAM(PARAM_GR_ACT_K) * (_normalizedACT - _PARAM(PARAM_GR_ACT_THRESHOLD))), g_Rand.getReal()))
+//			else if (intCompareGT(_normalizedACT, _PARAM(_actThreshold)) &&
+//					 intCompareGT(1 - exp(-_PARAM(_activationRate) * (_normalizedACT - _PARAM(_actThreshold))), g_Rand.getReal()))
 //			{
 //				_intMtb = 0;
 //				_activationTime = time;
-//				_deathTime = time + _PARAM(PARAM_MAC_A_AGE);
+//				_deathTime = time + _PARAM(Mac_maxAgeAct);
 //				_nextState = Mac::MAC_ACTIVE;
 //				++stats.getRestingMacActivationTNF();
 //			}
@@ -705,7 +705,7 @@ void Mac::handleResting(const int time, GrGrid& grid, Stats& stats, bool /*nfkbD
 //	{
 //		_intMtb = 0;
 //		_activationTime = time;
-//		_deathTime = time + _PARAM(PARAM_MAC_A_AGE);
+//		_deathTime = time + _PARAM(Mac_maxAgeAct);
 //		_nextState = Mac::MAC_ACTIVE;
 //		++stats.getRestingMacActivationTNF();
 //	}
@@ -714,7 +714,7 @@ void Mac::handleResting(const int time, GrGrid& grid, Stats& stats, bool /*nfkbD
     {
       _intMtb = 0;
       _activationTime = time;
-      _deathTime = time + _PARAM(PARAM_MAC_A_AGE);
+      _deathTime = time + _PARAM(Mac_maxAgeAct);
       _nextState = Mac::MAC_ACTIVE;
       ++stats.getMacActivation(_state);
 //		++stats.getRestingMacActivationTNF();
@@ -730,16 +730,16 @@ void Mac::handleInfected(const int time, GrGrid& grid, Stats& stats, bool /*nfkb
   // The probability to uptake decreases linearly as the number of intra-cellular bacteria increases to the threshold
   // for becoming chronically infected. At that threshold the probability becomes 0.
   // The probability of uptake is the compliment of the probability of killing.
-  double baseProbExtMtbUptake = (1.0 - _PARAM(PARAM_MAC_PROB_KILL_R_EXTMTB))/2.0;
-  double probExtMtbUptake = (baseProbExtMtbUptake *  (1.0 - (_intMtb / _PARAM(PARAM_MAC_THRESHOLD_BECOME_CI_INTMTB)) ));
+  double baseProbExtMtbUptake = (1.0 - _PARAM(Mac_probKillExtMtbRest))/2.0;
+  double probExtMtbUptake = (baseProbExtMtbUptake *  (1.0 - (_intMtb / _PARAM(Mac_nrIntMtbCInf)) ));
   if (grid.extMTB(_pos) > 0 && g_Rand.getReal() < probExtMtbUptake)
     {
-      double dExtMtb = std::min(grid.extMTB(_pos), _PARAM(PARAM_MAC_NR_UPTAKE_RI_EXTMTB));
+      double dExtMtb = std::min(grid.extMTB(_pos), _PARAM(Mac_nrExtMtbUptakeRest));
       grid.extMTB(_pos) += (-dExtMtb);
       _intMtb += dExtMtb;
     }
 
-  if (_intMtb >= _PARAM(PARAM_MAC_THRESHOLD_BECOME_CI_INTMTB))
+  if (_intMtb >= _PARAM(Mac_nrIntMtbCInf))
     {
       _nextState = Mac::MAC_CINFECTED;
       _NFkB = true;
@@ -747,7 +747,7 @@ void Mac::handleInfected(const int time, GrGrid& grid, Stats& stats, bool /*nfkb
   else
     {
 //		_stat1 |= g_Rand.getReal() <
-//			getCountTgam(Tgam::TGAM_ACTIVE, grid) * _PARAM(PARAM_MAC_PROB_STAT1_TGAM);
+//			getCountTgam(Tgam::TGAM_ACTIVE, grid) * _PARAM(Mac_probStat1Tgam);
 
       _stat1 = checkSTAT1(grid, time);
 
@@ -756,19 +756,19 @@ void Mac::handleInfected(const int time, GrGrid& grid, Stats& stats, bool /*nfkb
 //		{
 //			if (_stat1)
 //			{
-//				if (getExtMtbInMoore(grid) > _PARAM(PARAM_MAC_THRESHOLD_NFKB_EXTMTB))
+//				if (getExtMtbInMoore(grid) > _PARAM(Mac_nrExtMtbNFkB))
 //				{
 //					_intMtb = 0;
 //					_activationTime = time;
-//					_deathTime = time + _PARAM(PARAM_MAC_A_AGE);
+//					_deathTime = time + _PARAM(Mac_maxAgeAct);
 //					_nextState = Mac::MAC_ACTIVE;
 //				}
-//				else if (intCompareGT(_normalizedACT, _PARAM(PARAM_GR_ACT_THRESHOLD)) &&
-//                         intCompareGT(1 - exp(-_PARAM(PARAM_GR_ACT_K) * (_normalizedACT - _PARAM(PARAM_GR_ACT_THRESHOLD))), g_Rand.getReal()))
+//				else if (intCompareGT(_normalizedACT, _PARAM(_actThreshold)) &&
+//                         intCompareGT(1 - exp(-_PARAM(_activationRate) * (_normalizedACT - _PARAM(_actThreshold))), g_Rand.getReal()))
 //				{
 //					_intMtb = 0;
 //					_activationTime = time;
-//					_deathTime = time + _PARAM(PARAM_MAC_A_AGE);
+//					_deathTime = time + _PARAM(Mac_maxAgeAct);
 //					_nextState = Mac::MAC_ACTIVE;
 //					++stats.getInfMacActivationTNF();
 //				}
@@ -783,7 +783,7 @@ void Mac::handleInfected(const int time, GrGrid& grid, Stats& stats, bool /*nfkb
         {
 //            _intMtb = 0;
           _activationTime = time;
-          _deathTime = time + _PARAM(PARAM_MAC_A_AGE);
+          _deathTime = time + _PARAM(Mac_maxAgeAct);
           _nextState = Mac::MAC_ACTIVE;
 //            ++stats.getInfMacActivationTNF();
           ++stats.getMacActivation(_state);
@@ -804,7 +804,7 @@ void Mac::handleChronicallyInfected(const int time, GrGrid& grid, Stats& stats)
   // intracellular bacteria reproduce
   _intMtb *= getIntMtbGrowthRate(time);
 
-  if (_intMtb >= _PARAM(PARAM_MAC_THRESHOLD_BURST_CI_INTMTB))
+  if (_intMtb >= _PARAM(Mac_nrIntMtbBurstCInf))
     {
       // burst, all intracellular bacteria disperse to the Moore neighborhood
 //        std::cout << "Burst" << std::endl;
@@ -841,7 +841,7 @@ void Mac::handleActivated(const int, GrGrid& grid, Stats&)
 //  if (grid.extMTB(_pos) > 0.0)
 //      std::cout << "ActiveMac on ExtMtb: " << grid.extMTB(_pos) << "  Pos: " << _pos << std::endl;
 
-  grid.extMTB(_pos) += (-1 * std::min(grid.extMTB(_pos), _PARAM(PARAM_MAC_NR_UPTAKE_A_EXTMTB)));
+  grid.extMTB(_pos) += (-1 * std::min(grid.extMTB(_pos), _PARAM(Mac_nrExtMtbUptakeAct)));
 
   _nextState = Mac::MAC_ACTIVE;
 }
@@ -1094,20 +1094,20 @@ void Mac::updateStatistics(Stats& stats) const
 
   if(getState() == Mac::MAC_INFECTED || getState() == Mac::MAC_CINFECTED)
     {
-      // This can happen if  _PARAM(PARAM_MAC_THRESHOLD_BURST_CI_INTMTB) < _PARAM(PARAM_MAC_THRESHOLD_BECOME_CI_INTMTB)
+      // This can happen if  _PARAM(Mac_nrIntMtbBurstCInf) < _PARAM(Mac_nrIntMtbCInf)
       // or if the intMtb growth rate is high enough for intMtb for a mac > both PARAM(PARAM_MAC_THRESHOLD_BECOME_CI_INTMTB)
-      // and _PARAM(PARAM_MAC_THRESHOLD_BURST_CI_INTMTB). In either case intMtb >  _PARAM(PARAM_MAC_THRESHOLD_BURST_CI_INTMTB)
+      // and _PARAM(Mac_nrIntMtbBurstCInf). In either case intMtb >  _PARAM(Mac_nrIntMtbBurstCInf)
       // when an Mi becomes an MCi. The new MCi won't burst until the next time step, so the assert condition would be true here.
-      //assert(pMac->getIntMtb() < _PARAM(PARAM_MAC_THRESHOLD_BURST_CI_INTMTB));
+      //assert(pMac->getIntMtb() < _PARAM(Mac_nrIntMtbBurstCInf));
 
       assert(getIntMtb() < stats.getIntMtbFreq().size());
 
       ++stats.getIntMtbFreq(int(getIntMtb()));
-      if(_PARAM(PARAM_RAND_GROWTHRATE_EN))
+      if(_PARAM(_RandomizeGrowthRate))
         {
-          double m = (getGrowthRate() - _PARAM(PARAM_INTMTB_GROWTH_RATE_MIN)) /
-                      (_PARAM(PARAM_INTMTB_GROWTH_RATE_MAX) - _PARAM(PARAM_INTMTB_GROWTH_RATE_MIN));
-          int idx = int(m*_PARAM(PARAM_GROWTHRATE_SAMPLES));
+          double m = (getGrowthRate() - _PARAM(Mtb_growthRateIntMtbMin)) /
+                      (_PARAM(Mtb_growthRateIntMtbMax) - _PARAM(Mtb_growthRateIntMtbMin));
+          int idx = int(m*_PARAM(_growthRateSamples));
           assert(idx < int(stats.getGrowthRateFreq().size()));
           ++stats.getGrowthRateFreq(idx);
           stats.getMacGrowthRateStat()(getGrowthRate());

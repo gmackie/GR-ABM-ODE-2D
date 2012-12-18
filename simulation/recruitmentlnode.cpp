@@ -42,10 +42,10 @@ void RecruitmentLnODE::init()
       switch (i)
         {
         case _idxNaiveCD4: // Naive CD4, used to be 1e5
-          _odeInitialConditions[i] = _PARAM(PARAM_initN4);
+          _odeInitialConditions[i] = _PARAM(_initN4);
           break;
         case _idxNaiveCD8: // Naive CD8, used to be .84e5
-          _odeInitialConditions[i] = _PARAM(PARAM_initN8);
+          _odeInitialConditions[i] = _PARAM(_initN8);
           break;
         default:
           _odeInitialConditions[i] = 0;
@@ -88,10 +88,10 @@ void RecruitmentLnODE::updateQueue(const int time, Stats& stats)
   // Compute the fluxes
   double tcellFlux[TCELL_TYPE_COUNT];
 
-  tcellFlux[TCELL_TYPE_GAM] = _PARAM(PARAM_scaling_LN) *
+  tcellFlux[TCELL_TYPE_GAM] = _PARAM(_scalingLN) *
                               (_odeInitialConditions[_idxEffectorT8] + _odeInitialConditions[_idxEffectorTH1]);
 
-  tcellFlux[TCELL_TYPE_CYT] = _PARAM(PARAM_scaling_LN) * _odeInitialConditions[_idxCTL];
+  tcellFlux[TCELL_TYPE_CYT] = _PARAM(_scalingLN) * _odeInitialConditions[_idxCTL];
 
   tcellFlux[TCELL_TYPE_REG] = .1 * tcellFlux[TCELL_TYPE_GAM];
 
@@ -105,7 +105,7 @@ void RecruitmentLnODE::updateQueue(const int time, Stats& stats)
           const int count = (int) (tcellFlux[type] -_tcellTable[type]);
           for (int j = 0; j < count; j++)
             {
-              _tcellQueue.push_back(TcellTypePair(time - g_Rand.getInt(_PARAM(PARAM_TCELL_AGE), 1), type));
+              _tcellQueue.push_back(TcellTypePair(time - g_Rand.getInt(_PARAM(Tcell_maxAge), 1), type));
               _tcellQueueCount[type]++;
             }
 
@@ -161,7 +161,7 @@ void RecruitmentLnODE::updateInitialConditions(Stats& stats)
   // update MDC, if the delta > 0
   if (delta > 0)
     {
-      _odeInitialConditions[_idxMDC] += _PARAM(PARAM_scaling_LUNG) * _PARAM(PARAM_scaling_MDC) * delta;
+      _odeInitialConditions[_idxMDC] += _PARAM(_scalingLung) * _PARAM(_scalingMDC) * delta;
     }
 
   // update _prevMiMci
@@ -276,7 +276,7 @@ void RecruitmentLnODE::recruitTcells(GrSimulation& sim, Stats& stats,
       _tcellQueue.erase(_tcellQueue.begin() + idx);
 
       // check whether the T cell has died while in the queue
-      if (tcell.first + _PARAM(PARAM_TCELL_AGE) < sim.getTime())
+      if (tcell.first + _PARAM(Tcell_maxAge) < sim.getTime())
         {
           ++stats.getNrQueuedDie((AgentType)(tcell.second + MAC));
           continue;
@@ -361,10 +361,10 @@ void RecruitmentLnODE::recruitMac(GrSimulation& sim, const Pos& p)
 
   // if the number of macrophages on the grid is less than _INITIAL_NUMBER_OF_MACROPHAGES,
   // recruit a resting macrophage
-  if (sim.getStats().getNrOfMacs() < _PARAM(PARAM_MAC_INIT_NUMBER))
+  if (sim.getStats().getNrOfMacs() < _PARAM(Mac_initNumber))
     {
       Mac* newMac = sim.createMac(p.x, p.y,
-                                  sim.getTime() - g_Rand.getInt(_PARAM(PARAM_MAC_AGE)), Mac::MAC_RESTING, false, false);
+                                  sim.getTime() - g_Rand.getInt(_PARAM(Mac_maxAge)), Mac::MAC_RESTING, false, false);
       if (sim.getNfkbDynamics())
         {
           // initialize NF-kB signaling from steady-state
@@ -376,11 +376,11 @@ void RecruitmentLnODE::recruitMac(GrSimulation& sim, const Pos& p)
     {
       bool macThreshold = MacRecruitmentThreshold(sim.getGrid(), p);
 
-      if (macThreshold && g_Rand.getReal() < _PARAM(PARAM_MAC_PROB_RECRUITMENT))
+      if (macThreshold && g_Rand.getReal() < _PARAM(Mac_probRec))
         {
           sim.getGrid().nRecruitments(p)++;
           Mac* newMac = sim.createMac(p.x, p.y,
-                                      sim.getTime() - g_Rand.getInt(_PARAM(PARAM_MAC_AGE)), Mac::MAC_RESTING, false, false);
+                                      sim.getTime() - g_Rand.getInt(_PARAM(Mac_maxAge)), Mac::MAC_RESTING, false, false);
           if (sim.getNfkbDynamics())
             {
               // initialize NF-kB signaling from steady-state

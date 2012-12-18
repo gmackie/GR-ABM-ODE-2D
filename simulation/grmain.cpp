@@ -6,7 +6,8 @@
  */
 
 #include "gr.h"
-#include "params.h"
+#include "xmlhandler.h"
+#include "lungparams.h"
 #include "grsimulation.h"
 #include "stat.h"
 #include "rand.h"
@@ -161,9 +162,9 @@ public:
     for(unsigned i=0; i<sz; i++)
       {
         stringstream ss;
-        double f0=double(i) / _PARAM(PARAM_GROWTHRATE_SAMPLES) *
-                  (_PARAM(PARAM_INTMTB_GROWTH_RATE_MAX) - _PARAM(PARAM_INTMTB_GROWTH_RATE_MIN))
-                  + _PARAM(PARAM_INTMTB_GROWTH_RATE_MIN);
+        double f0=double(i) / _PARAM(_growthRateSamples) *
+                  (_PARAM(Mtb_growthRateIntMtbMax) - _PARAM(Mtb_growthRateIntMtbMin))
+                  + _PARAM(Mtb_growthRateIntMtbMin);
         ss<<f0;
         write(ss.str());
       }
@@ -647,12 +648,12 @@ bool shouldStop(int time, GrSimulation* pSim)
   int areaCellDensity = stats.getAreaCellDensity();
 
   // Stop if too large
-  if ( (_PARAM(PARAM_MTB_STOPPING_TIME_STEP) > 0 && time == _PARAM(PARAM_MTB_STOPPING_TIME_STEP) && totMtb < _PARAM(PARAM_MTB_STOPPING_THRESHOLD) ) ||
-       (_PARAM(PARAM_AREA_CELL_DENSITY_STOPPING_TIME_STEP) && time == _PARAM(PARAM_AREA_CELL_DENSITY_STOPPING_TIME_STEP) && areaCellDensity < _PARAM(PARAM_AREA_CELL_DENSITY_STOPPING_THRESHOLD)) )
+  if ( (_PARAM(_mtbStopppingTimeStep) > 0 && time == _PARAM(_mtbStopppingTimeStep) && totMtb < _PARAM(_mtbStoppingThreshold) ) ||
+       (_PARAM(_areaCellDensityStopppingTimeStep) && time == _PARAM(_areaCellDensityStopppingTimeStep) && areaCellDensity < _PARAM(_areaCellDensityStoppingThreshold)) )
     return true;
   // Stop if too small
-  if ( (_PARAM(PARAM_MTB_STOPPING_TIME_STEP2) > 0 && time == _PARAM(PARAM_MTB_STOPPING_TIME_STEP2) && totMtb > _PARAM(PARAM_MTB_STOPPING_THRESHOLD2) ) ||
-       (_PARAM(PARAM_AREA_CELL_DENSITY_STOPPING_TIME_STEP2) && time == _PARAM(PARAM_AREA_CELL_DENSITY_STOPPING_TIME_STEP2) && areaCellDensity > _PARAM(PARAM_AREA_CELL_DENSITY_STOPPING_THRESHOLD2)) )
+  if ( (_PARAM(_mtbStopppingTimeStep2) > 0 && time == _PARAM(_mtbStopppingTimeStep2) && totMtb > _PARAM(_mtbStoppingThreshold2) ) ||
+       (_PARAM(_areaCellDensityStopppingTimeStep2) && time == _PARAM(_areaCellDensityStopppingTimeStep2) && areaCellDensity > _PARAM(_areaCellDensityStoppingThreshold2)) )
     return true;
 
   return false;
@@ -941,14 +942,18 @@ int main(int argc, char** argv)
   // Must be done before making GrSimulation.
   // Also must be done before creating a lymph ODE recruitment object,
   // since the base lymph ODE class, RecruitmentLnODE, uses parameters in its constructor.
-  if (!Params::getInstance(pdim)->fromXml(paramFile.c_str()))
+  boost::property_tree::ptree pt;
+  std::auto_ptr<ParamFileHandler> handler(new XMLHandler("GR"));
+  std::ifstream _if(paramFile.c_str());
+  LungParam::getInstance().load(_if, handler.get(), pt);
+  if(!handler->good())
     throw std::runtime_error("Unable to get parameters from file, cannot continue...");
 
-  Params::getInstance()->setParam(PARAM_TNFODE_EN, vm.count("tnfr-dynamics") || vm.count("NFkB-dynamics"));
-  Params::getInstance()->setParam(PARAM_IL10ODE_EN, vm.count("il10r-dynamics"));
-  Params::getInstance()->setParam(PARAM_NFKBODE_EN, vm.count("NFkB-dynamics"));
-  Params::getInstance()->setParam(PARAM_RAND_GROWTHRATE_EN, vm.count("rand-growth"));
-  Params::getInstance()->setParam(PARAM_GROWTHRATE_SAMPLES, vm["growth-samples"].as<unsigned>());
+  LungParam::getInstance().set_NFkBdynamics(vm.count("tnfr-dynamics") || vm.count("NFkB-dynamics"));
+  LungParam::getInstance().set_TNFdynamics (vm.count("il10r-dynamics"));
+  LungParam::getInstance().set_IL10dynamics(vm.count("NFkB-dynamics"));
+  LungParam::getInstance().set_RandomizeGrowthRate(vm.count("rand-growth"));
+  LungParam::getInstance().set_growthRateSamples(vm["growth-samples"].as<unsigned>());
 
   DiffusionMethod diffMethodEnum;
   switch (vm["diffusion"].as<unsigned>())
@@ -1021,7 +1026,7 @@ int main(int argc, char** argv)
   if (!vm.count("load"))
     {
       g_Rand.setSeed(seed);
-      pSim->init();
+      pSim->init(pt, true);
     }
 
   pSim->initMolecularTracking(molecularTrackingRadius);

@@ -9,7 +9,7 @@
 #define AGENT_H
 
 #include "gr.h"
-#include "params.h"
+#include "lungparams.h"
 #include <string>
 #include "numericalMethods.h"
 // For ode serialization
@@ -81,7 +81,7 @@ protected:
   P(Scalar, M1M2Ratio, 0.0, "surfBoundTNFR1 / max(surfBoundIL10R1, 1) - updated in grsimulation") \
   /* NF-kB signaling pathway components  */ \
   P(Scalar, IKKKa, 0.0, "(IKKK in active state)") \
-  P(Scalar, IKKn, (_PARAM(PARAM_GR_KNN)), "(IKK in neutral state)") \
+  P(Scalar, IKKn, (_PARAM(_KNN)), "(IKK in neutral state)") \
   P(Scalar, IKKa, 0.0, "(IKK in the active state)") \
   P(Scalar, IKKi, 0.0, "(IKK in inactive state)") \
   P(Scalar, IkBp, 0.0, "(Phospho-IkB)") \
@@ -550,7 +550,7 @@ struct LungFunc : ODESolvers::DerivativeFunc
   void il10deriv(const ODESolvers::ODEState& vecread, double /*t*/, ODESolvers::Derivative& vecwrite, Params_t* params) const;
   virtual size_t dim() const
   {
-    return _PARAM(PARAM_TNFODE_EN)*10+_PARAM(PARAM_IL10ODE_EN)*3;
+    return _PARAM(_TNFdynamics)*10+_PARAM(_IL10dynamics)*3;
   }
   size_t tnfidx() const
   {
@@ -569,14 +569,14 @@ struct NFKBFunc : LungFunc
   /*virtual*/
   size_t dim() const
   {
-    return 36+_PARAM(PARAM_IL10ODE_EN)*3;
+    return 36+_PARAM(_IL10dynamics)*3;
   }
 };
 
 
 inline LungFunc* Agent::buildDerivFunc()
 {
-  LungFunc* d = new LungFunc(_PARAM(PARAM_TNFODE_EN)*10);
+  LungFunc* d = new LungFunc(_PARAM(_TNFdynamics)*10);
   return d;
 }
 

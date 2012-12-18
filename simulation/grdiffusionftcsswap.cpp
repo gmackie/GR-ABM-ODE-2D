@@ -55,35 +55,35 @@ void GrDiffusionFTCS_Swap::diffuse(GrSimulationGrid& grSim) const
   {
     #pragma omp section
     {
-      ::diffuse(grid.TNF(), nextGrid.TNF(), grid.getRange(), _PARAM(PARAM_GR_D_TNF) * 6 / (4e-6), _PARAM(PARAM_GR_K_DEG), _cutOffValue);
+      ::diffuse(grid.TNF(), nextGrid.TNF(), grid.getRange(), _PARAM(_diffusivityTNF) * 6 / (4e-6), _PARAM(_kDeg), _cutOffValue);
     }
     #pragma omp section
     {
-      ::diffuse(grid.shedTNFR2(), nextGrid.shedTNFR2(), grid.getRange(), _PARAM(PARAM_GR_D_SHED_TNFR2) * 6 / (4e-6), 1.0, _cutOffValue);
+      ::diffuse(grid.shedTNFR2(), nextGrid.shedTNFR2(), grid.getRange(), _PARAM(_diffusivityShedTNFR2) * 6 / (4e-6), 1.0, _cutOffValue);
     }
     #pragma omp section
     {
-      ::diffuse(grid.macAttractant(), nextGrid.macAttractant(), grid.getRange(), _PARAM(PARAM_GR_D_CHEMOKINES) * 6 / (4e-6), _PARAM(PARAM_GR_CHEMOKINE_K_DEG), _cutOffValue);
+      ::diffuse(grid.macAttractant(), nextGrid.macAttractant(), grid.getRange(), _PARAM(_diffusivityChemokines) * 6 / (4e-6), _PARAM(_ChemokinekDeg), _cutOffValue);
     }
     #pragma omp section
     {
-      ::diffuse(grid.CCL2(), nextGrid.CCL2(), grid.getRange(), _PARAM(PARAM_GR_D_CHEMOKINES) * 6 / (4e-6), _PARAM(PARAM_GR_CHEMOKINE_K_DEG), _cutOffValue);
+      ::diffuse(grid.CCL2(), nextGrid.CCL2(), grid.getRange(), _PARAM(_diffusivityChemokines) * 6 / (4e-6), _PARAM(_ChemokinekDeg), _cutOffValue);
     }
     #pragma omp section
     {
-      ::diffuse(grid.il10(), nextGrid.il10(), grid.getRange(), _PARAM(PARAM_GR_D_IL10) * 6 / (4e-6), _PARAM(PARAM_GR_I_K_DEG), _cutOffValue);
+      ::diffuse(grid.il10(), nextGrid.il10(), grid.getRange(), _PARAM(_diffusivityIL10) * 6 / (4e-6), _PARAM(_Ikdeg), _cutOffValue);
     }
   } //omp parallel
 
   const Scalar dt = 6.0;
-  const Scalar ratioCCL5toCCL2 = _PARAM(PARAM_MAC_SEC_RATE_CCL5) / _PARAM(PARAM_MAC_SEC_RATE_CCL2);
-  const Scalar ratioCXCL9toCCL2 = _PARAM(PARAM_MAC_SEC_RATE_CXCL9) / _PARAM(PARAM_MAC_SEC_RATE_CCL2);
+  const Scalar ratioCCL5toCCL2 = _PARAM(Mac_dCCL5) / _PARAM(Mac_dCCL2);
+  const Scalar ratioCXCL9toCCL2 = _PARAM(Mac_dCXCL9) / _PARAM(Mac_dCCL2);
   Pos p;
   for(p.x = 0; p.x < grid.getRange().x; ++p.x)
     for(p.y = 0; p.y < grid.getRange().y; ++p.y)
       {
-        nextGrid.setshedTNFR2(p, nextGrid.shedTNFR2(p) * (1 - _PARAM(PARAM_GR_KD2) * _PARAM(PARAM_GR_K_ON2) * dt));
-        nextGrid.incTNF(p, (_PARAM(PARAM_GR_KD2) * _PARAM(PARAM_GR_K_ON2) * nextGrid.shedTNFR2(p) * dt));
+        nextGrid.setshedTNFR2(p, nextGrid.shedTNFR2(p) * (1 - _PARAM(_KD2) * _PARAM(_kOn2) * dt));
+        nextGrid.incTNF(p, (_PARAM(_KD2) * _PARAM(_kOn2) * nextGrid.shedTNFR2(p) * dt));
         nextGrid.setCXCL9(p, nextGrid.CCL2(p) * ratioCXCL9toCCL2);
         nextGrid.setCCL5(p, nextGrid.CCL2(p) * ratioCCL5toCCL2);
       }
@@ -95,15 +95,15 @@ void GrDiffusionFTCS_Swap::diffuse(GrSimulationGrid& grSim) const
 	GrGrid& currentGrid = grSim.getCurrentGrid();
 	GrGrid& nextGrid = grSim.getNextGrid();
 
-	const double muTNF = _PARAM(PARAM_GR_D_TNF) * 6 / (4e-6);
-	const double muShedTNFR2 = _PARAM(PARAM_GR_D_SHED_TNFR2) * 6 / (4e-6);
-	const double muChemokines = _PARAM(PARAM_GR_D_CHEMOKINES) * 6 / (4e-6);
-    const double muIL10 = _PARAM(PARAM_GR_D_IL10) * 6 / (4e-6);
-    const double degTNFode = _PARAM(PARAM_GR_K_DEG);
-    const double degIL10ode = _PARAM(PARAM_GR_I_K_DEG);
-    const double degChemokinesode = _PARAM(PARAM_GR_CHEMOKINE_K_DEG);
-	const double ratioCCL5toCCL2 = _PARAM(PARAM_MAC_SEC_RATE_CCL5) / _PARAM(PARAM_MAC_SEC_RATE_CCL2);
-	const double ratioCXCL9toCCL2 = _PARAM(PARAM_MAC_SEC_RATE_CXCL9) / _PARAM(PARAM_MAC_SEC_RATE_CCL2);
+	const double muTNF = _PARAM(_diffusivityTNF) * 6 / (4e-6);
+	const double muShedTNFR2 = _PARAM(_diffusivityShedTNFR2) * 6 / (4e-6);
+	const double muChemokines = _PARAM(_diffusivityChemokines) * 6 / (4e-6);
+    const double muIL10 = _PARAM(_diffusivityIL10) * 6 / (4e-6);
+    const double degTNFode = _PARAM(_kDeg);
+    const double degIL10ode = _PARAM(_Ikdeg);
+    const double degChemokinesode = _PARAM(_ChemokinekDeg);
+	const double ratioCCL5toCCL2 = _PARAM(Mac_dCCL5) / _PARAM(Mac_dCCL2);
+	const double ratioCXCL9toCCL2 = _PARAM(Mac_dCXCL9) / _PARAM(Mac_dCCL2);
 
 
 	const double dt = 6; // time-step (sec)
@@ -155,11 +155,11 @@ void GrDiffusionFTCS_Swap::diffuse(GrSimulationGrid& grSim) const
 					res = 0;
 
 				// degradation of shedTNFR2 is neglected because unbinding reaction is much faster
-				res = res * (1 - _PARAM(PARAM_GR_KD2) * _PARAM(PARAM_GR_K_ON2) * dt);
+				res = res * (1 - _PARAM(_KD2) * _PARAM(_kOn2) * dt);
 				newCell.setShedTNFR2(res);
 
                 double temp = newCell.getTNF();
-				newCell.setTNF(temp + _PARAM(PARAM_GR_KD2) * _PARAM(PARAM_GR_K_ON2) * res * dt);
+				newCell.setTNF(temp + _PARAM(_KD2) * _PARAM(_kOn2) * res * dt);
 
 
                 double il10_i_j_old = cell.getIL10();

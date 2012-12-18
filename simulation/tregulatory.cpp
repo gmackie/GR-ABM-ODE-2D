@@ -42,11 +42,11 @@ void Treg::move(GrGrid& grid)
 void Treg::secrete(GrGrid& grid, bool, bool, bool, bool il10rDynamics, bool il10Depletion, double mdt)
 {
 
-  _kISynth = _PARAM(PARAM_GR_I_K_SYNTH_TCELL);
+  _kISynth = _PARAM(_IkSynthTcell);
 
   if (!il10rDynamics && !il10Depletion)
     {
-      grid.incil10(_pos, (_PARAM(PARAM_TREG_SEC_RATE_IL10) * mdt));
+      grid.incil10(_pos, (_PARAM(_dIL10_Treg) * mdt));
     }
 
 }
@@ -71,16 +71,16 @@ void Treg::computeNextState(const int time, GrGrid& grid, Stats& stats, bool tnf
       grid.incKillings(_pos);
     }
 
-//	else if (tnfrDynamics && intCompareGT(_intBoundTNFR1, _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR)) &&
-//			 intCompareGT(1 - exp(-_PARAM(PARAM_GR_K_APOPTOSIS_MOLECULAR) * (_intBoundTNFR1 - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR))), g_Rand.getReal()))
+//	else if (tnfrDynamics && intCompareGT(_intBoundTNFR1, _PARAM(_thresholdApoptosisTNF_Molecular)) &&
+//			 intCompareGT(1 - exp(-_PARAM(_kApoptosis_Molecular) * (_intBoundTNFR1 - _PARAM(_thresholdApoptosisTNF_Molecular))), g_Rand.getReal()))
 //	{
 //		// TNF induced apoptosis
 //		++stats.getTcellApoptosisTNF();
 //		_nextState = TREG_DEAD;
 //        grid.incKillings(_pos);
 //	}
-//	else if (!tnfrDynamics && tnfBoundFraction > _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF) &&
-//			 g_Rand.getReal() < 1 - exp(-_PARAM(PARAM_GR_K_APOPTOSIS) * (tnfBoundFraction - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF))))
+//	else if (!tnfrDynamics && tnfBoundFraction > _PARAM(_thresholdApoptosisTNF) &&
+//			 g_Rand.getReal() < 1 - exp(-_PARAM(_kApoptosis) * (tnfBoundFraction - _PARAM(_thresholdApoptosisTNF))))
 //	{
 //		// TNF induced apoptosis
 //		++stats.getTcellApoptosisTNF();
@@ -118,7 +118,7 @@ void Treg::handleResting(const int time, GrGrid& grid, Stats& stats)
 //    Scalar currentTNF = grid.TNF(_pos); // Get TNF concentration for scaling Treg deactivation
 //    Scalar currentIL10 = grid.il10(_pos); // Get IL10 concentration for scaling Treg deactivation
 
-  Scalar IL10toTNFWeight = (_PARAM(PARAM_GR_I_K_ON) * (_surfIL10R + _surfBoundIL10R)) / (_PARAM(PARAM_GR_K_ON1) * (_surfBoundTNFR1 + _surfTNFR1)); // Comparing Kd allows us to scale the bound receptors such that the numbers do not favor TNFs higher affinity
+  Scalar IL10toTNFWeight = (_PARAM(_IkOn) * (_surfIL10R + _surfBoundIL10R)) / (_PARAM(_kOn1) * (_surfBoundTNFR1 + _surfTNFR1)); // Comparing Kd allows us to scale the bound receptors such that the numbers do not favor TNFs higher affinity
   Scalar numberFractionTNF;
   if (_surfBoundTNFR1 == 0.0 && _surfBoundIL10R == 0.0)
     numberFractionTNF = 0.0;
@@ -146,14 +146,14 @@ void Treg::handleResting(const int time, GrGrid& grid, Stats& stats)
                   // IL10 is an exponential decay
                   // These are inverse equations of each other since TNF would upregulate the 'Monitor Molecule' while IL10 would
                   // downregulate the 'Monitor Molecule'
-//                      Scalar scaledProbTNF = ((_PARAM(PARAM_TREG_PROB_DEACTIVATE) * currentTNF)/(currentTNF + _PARAM(PARAM_TREG_DEACTIVATE_HALF_SAT_TNF)));
-//                      Scalar scaledProbIL10 = _PARAM(PARAM_TREG_PROB_DEACTIVATE) * exp(-_PARAM(PARAM_TREG_DEACTIVATE_HALF_SAT_IL10) * currentIL10);
+//                      Scalar scaledProbTNF = ((_PARAM(Tcell_Treg_probTregDeactivate) * currentTNF)/(currentTNF + _PARAM(PARAM_TREG_DEACTIVATE_HALF_SAT_TNF)));
+//                      Scalar scaledProbIL10 = _PARAM(Tcell_Treg_probTregDeactivate) * exp(-_PARAM(PARAM_TREG_DEACTIVATE_HALF_SAT_IL10) * currentIL10);
 
 //                      std::cout << "Scaled Prob: " << scaledProbTNF + scaledProbIL10 << std::endl;
 
-//                      Scalar scaledProb = std::min((scaledProbTNF + scaledProbIL10), _PARAM(PARAM_TREG_PROB_DEACTIVATE));
+//                      Scalar scaledProb = std::min((scaledProbTNF + scaledProbIL10), _PARAM(Tcell_Treg_probTregDeactivate));
 
-                  Scalar scaledProb = _PARAM(PARAM_TREG_PROB_DEACTIVATE) * ((numberFractionTNF * _PARAM(PARAM_TREG_DEACTIVATE_SLOPE)) + _PARAM(PARAM_TREG_DEACTIVATE_INTERCEPT));
+                  Scalar scaledProb = _PARAM(Tcell_Treg_probTregDeactivate) * ((numberFractionTNF * _PARAM(Tcell_Treg_deactivateSlope)) + _PARAM(Tcell_Treg_deactivateIntercept));
 //                      std::cout << "Pos :" << _pos << "  IL10: " << grid.il10(_pos) << "  TNF: " << grid.TNF(_pos) << "  Scaled Prob: " << scaledProb << std::endl;
                   if (coinFlip  <= scaledProb)
                     {

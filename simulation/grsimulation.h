@@ -129,7 +129,7 @@ public:
   /**
   * @brief Initialize the simulation for t=0 with initial macs, etc
   */
-  void init();
+  void init(const boost::property_tree::ptree& pt, bool xml);
   /**
   * @brief Select all macrophages within the radius to be used in tracking
   *
@@ -502,17 +502,17 @@ inline void GrSimulation::checkTCellRecruitmentStart()
       return;
     }
 
-  if (_PARAM(PARAM_TCELL_MTB_RECRUITMENT_THRESHOLD) > 0)
+  if (_PARAM(Tcell_mtbRecEnabled) > 0)
     {
       Scalar totMtb = _stats.getTotExtMtb() + _stats.getTotIntMtb();
-      if (totMtb > _PARAM(PARAM_TCELL_MTB_RECRUITMENT_THRESHOLD))
+      if (totMtb > _PARAM(Tcell_mtbRecEnabled))
         {
           _tcellRecruitmentBegun = true;
         }
     }
   else
     {
-      if (_time >= _PARAM(PARAM_TCELL_TIME_RECRUITMENT_ENABLED))
+      if (_time >= _PARAM(Tcell_timeRecEnabled))
         {
           _tcellRecruitmentBegun = true;
         }
@@ -522,29 +522,29 @@ inline void GrSimulation::checkTCellRecruitmentStart()
 inline void GrSimulation::timestepSync()
 {
 //    // Checks to see if the timesteps specified will work with a 10 minutes agent timestep
-//    if (((SECONDS_PER_DAY)/TIME_STEPS_PER_DAY) % _PARAM(PARAM_GR_DT_DIFFUSION) != 0 || ((SECONDS_PER_DAY)/TIME_STEPS_PER_DAY) % _PARAM(PARAM_GR_DT_MOLECULAR) != 0 || _PARAM(PARAM_GR_DT_DIFFUSION) % _PARAM(PARAM_GR_DT_MOLECULAR) != 0)
+//    if (((SECONDS_PER_DAY)/TIME_STEPS_PER_DAY) % _PARAM(_timestepDiffusion) != 0 || ((SECONDS_PER_DAY)/TIME_STEPS_PER_DAY) % _PARAM(_timestepMolecular) != 0 || _PARAM(_timestepDiffusion) % _PARAM(_timestepMolecular) != 0)
 //    {
 //        std::cerr << "\nUnsupported Time Step:\n--Diffusion/Molecular time step must be able to sync with the 10 min agent time step\n" << std::endl;
 //        throw std::runtime_error("*** ERROR: --Redefine the timesteps in the parameter file");
 //    }
 //    // Check the diffusion time step and see if it is larger than the heuristic for level of accuracy
-//    if (_PARAM(PARAM_GR_DT_DIFFUSION) >= (2.0/(_PARAM(PARAM_GR_D_TNF) * ((1/pow(20e-4,2)) + (1/pow(20e-4,2))))))
+//    if (_PARAM(_timestepDiffusion) >= (2.0/(_PARAM(_diffusivityTNF) * ((1/pow(20e-4,2)) + (1/pow(20e-4,2))))))
 //    {
 //        std::cerr << "\nWarning:\n--The diffusion time step is higher than its approximate accuracy limit\n--Any time step higher than ~60 seconds will be a stable but more inaccurate solution\n" << std::endl;
 //        throw std::runtime_error("*** ERROR: --Redefine the timesteps in the parameter file");
 //
 //    }
 //    // Verify that the molecular time step is small than the diffusion time step and smaller than the approximate stability limit
-//    if (_PARAM(PARAM_GR_DT_MOLECULAR) > MOLECULAR_ACCURACY || _PARAM(PARAM_GR_DT_MOLECULAR) > _PARAM(PARAM_GR_DT_DIFFUSION))
+//    if (_PARAM(_timestepMolecular) > MOLECULAR_ACCURACY || _PARAM(_timestepMolecular) > _PARAM(_timestepDiffusion))
 //    {
 //        std::cerr << "\nUnsupported Molecular Time Step:\n--The solution is unstable at time steps greater than 30s\n--The molecular time step must be smaller than the diffusion time step\n" << std::endl;
 //        throw std::runtime_error("*** ERROR: --Redefine the timesteps in the parameter file");
 //    }
 
   double sync1int, sync2int, sync3int;
-  double sync1frac = modf(((SECONDS_PER_DAY)/TIME_STEPS_PER_DAY)/_PARAM(PARAM_GR_DT_DIFFUSION), &sync1int);
-  double sync2frac = modf(((SECONDS_PER_DAY)/TIME_STEPS_PER_DAY)/_PARAM(PARAM_GR_DT_MOLECULAR), &sync2int);
-  double sync3frac = modf(_PARAM(PARAM_GR_DT_DIFFUSION)/_PARAM(PARAM_GR_DT_MOLECULAR), &sync3int);
+  double sync1frac = modf(((SECONDS_PER_DAY)/TIME_STEPS_PER_DAY)/_PARAM(_timestepDiffusion), &sync1int);
+  double sync2frac = modf(((SECONDS_PER_DAY)/TIME_STEPS_PER_DAY)/_PARAM(_timestepMolecular), &sync2int);
+  double sync3frac = modf(_PARAM(_timestepDiffusion)/_PARAM(_timestepMolecular), &sync3int);
 
   // Checks to see if the timesteps specified will work with a 10 minutes agent timestep
   if (sync1frac != 0.0 || sync2frac != 0.0 || sync3frac != 0.0)
@@ -553,14 +553,14 @@ inline void GrSimulation::timestepSync()
       throw std::runtime_error("*** ERROR: --Redefine the timesteps in the parameter file");
     }
   // Check the diffusion time step and see if it is larger than the heuristic for level of accuracy
-  if (_PARAM(PARAM_GR_DT_DIFFUSION) >= (2.0/(_PARAM(PARAM_GR_D_TNF) * ((1/pow(20e-4,2)) + (1/pow(20e-4,2))))))
+  if (_PARAM(_timestepDiffusion) >= (2.0/(_PARAM(_diffusivityTNF) * ((1/pow(20e-4,2)) + (1/pow(20e-4,2))))))
     {
       std::cerr << "\nWarning:\n--The diffusion time step is higher than its approximate accuracy limit\n--Any time step higher than ~60 seconds will be a stable but more inaccurate solution\n" << std::endl;
       throw std::runtime_error("*** ERROR: --Redefine the timesteps in the parameter file");
 
     }
   // Verify that the molecular time step is small than the diffusion time step and smaller than the approximate stability limit
-  if (_PARAM(PARAM_GR_DT_MOLECULAR) > MOLECULAR_ACCURACY || _PARAM(PARAM_GR_DT_MOLECULAR) > _PARAM(PARAM_GR_DT_DIFFUSION))
+  if (_PARAM(_timestepMolecular) > MOLECULAR_ACCURACY || _PARAM(_timestepMolecular) > _PARAM(_timestepDiffusion))
     {
       std::cerr << "\nUnsupported Molecular Time Step:\n--The solution is unstable at time steps greater than 30s\n--The molecular time step must be smaller than the diffusion time step\n" << std::endl;
       throw std::runtime_error("*** ERROR: --Redefine the timesteps in the parameter file");

@@ -56,8 +56,8 @@ GrSimulation::GrSimulation(const Pos& dim)
 		_pTTest[i] = NULL;
     }
 
-    _numMolecularPerDiffusion = (int)(_PARAM(PARAM_GR_DT_DIFFUSION)/_PARAM(PARAM_GR_DT_MOLECULAR)); // Number of molecular iterations per diffusion iteration
-    _numDiffusionPerAgent = (int)(AGENT_TIME_STEP / _PARAM(PARAM_GR_DT_DIFFUSION)); // Number of diffusion iterations per agent iteration
+    _numMolecularPerDiffusion = (int)(_PARAM(_timestepDiffusion)/_PARAM(_timestepMolecular)); // Number of molecular iterations per diffusion iteration
+    _numDiffusionPerAgent = (int)(AGENT_TIME_STEP / _PARAM(_timestepDiffusion)); // Number of diffusion iterations per agent iteration
 }
 
 GrSimulation* GrSimulation::clone(GrSimulation* sim) const {
@@ -381,10 +381,10 @@ void GrSimulation::deserialize(std::istream& in)
 static void initGrowthRateGrid(GrGrid& g) {
   for(int i=0;i<g.getRange().x;i++)
     for(int j=0;j<g.getRange().y;j++)
-      g.growthRate(i,j) = g_Rand.getReal(_PARAM(PARAM_EXTMTB_GROWTH_RATE_MIN),_PARAM(PARAM_EXTMTB_GROWTH_RATE_MAX));
+      g.growthRate(i,j) = g_Rand.getReal(_PARAM(Mtb_growthRateExtMtbMin),_PARAM(Mtb_growthRateExtMtbMax));
 }
 
-void GrSimulation::init()
+void GrSimulation::init(const boost::property_tree::ptree& pt, bool xml)
 {
 	// Before initializing anything check to see if the time step criteria are met
     timestepSync();
@@ -394,11 +394,24 @@ void GrSimulation::init()
     // valarray length
 
     // initialize the sources
-	_grid.initSources();
+    _grid.initSources();
+    const boost::property_tree::ptree& initpt = pt.get_child("GR.Init");
+    PosVector initMacs, initExtMtb;
 
-    PosVector initMacs = Params::getInstance()->getInitialMacs();
-    PosVector initExtMtb = Params::getInstance()->getInitialExtMtb();
-    const int maxMacAge = _PARAM(PARAM_MAC_AGE);
+    std::pair<boost::property_tree::ptree::const_assoc_iterator, boost::property_tree::ptree::const_assoc_iterator>
+      range = initpt.equal_range("Mac");
+    while(range.first != range.second) {
+      const boost::property_tree::ptree& p = (range.first++)->second;
+      initMacs.push_back(Pos((xml ? p.get_child("<xmlattr>") : p), _grid.getCenter()));
+    }
+
+    range = initpt.equal_range("Ext");
+    while(range.first != range.second) {
+      const boost::property_tree::ptree& p = (range.first++)->second;
+      initExtMtb.push_back(Pos((xml ? p.get_child("<xmlattr>") : p), _grid.getCenter()));
+    }
+
+    const int maxMacAge = _PARAM(Mac_maxAge);
 
     // Place initial infected macrophages on the grid
     for (PosVector::const_iterator it = initMacs.begin(); it != initMacs.end(); it++)
@@ -408,8 +421,8 @@ void GrSimulation::init()
         if (_nfkbDynamics)
         {
             // initialize NF-kB signaling from steady-state (12 hours equilibrium)
-            for (int i = 0; i < 7200*_PARAM(PARAM_GR_NF_KB_TIME_COEFF); ++i)
-                pMac->solveNFkBODEsEquilibrium(6.00/_PARAM(PARAM_GR_NF_KB_TIME_COEFF));
+            for (int i = 0; i < 7200*_PARAM(_NFkBTimeCoefficient); ++i)
+                pMac->solveNFkBODEsEquilibrium(6.00/_PARAM(_NFkBTimeCoefficient));
         }
 
         pMac->setIntMtb(1);
@@ -418,7 +431,7 @@ void GrSimulation::init()
 
 //        // Place Treg in Mac Compartment for ODE Testing
 //        //DBG
-//        createTreg(it->x, it->y, g_Rand.getInt(-1, _PARAM(PARAM_TCELL_AGE), Treg::TREG_ACTIVE);
+//        createTreg(it->x, it->y, g_Rand.getInt(-1, _PARAM(Tcell_maxAge), Treg::TREG_ACTIVE);
 //        //DBG
 
     }
@@ -434,7 +447,7 @@ void GrSimulation::init()
 
     // Add a fixed number (PARAM_MAC_INIT_NUMBER) of resting
     // macrophages to the grid
-    int count = _PARAM(PARAM_MAC_INIT_NUMBER);
+    int count = _PARAM(Mac_initNumber);
 
     int nrGridCompartments = (_grid.getSize());
     if (count > nrGridCompartments)
@@ -479,8 +492,8 @@ void GrSimulation::init()
             if (_nfkbDynamics)
             {
                 // initialize NF-kB signaling from steady-state (12 hours equilibrium)
-                for (int i = 0; i < 7200*_PARAM(PARAM_GR_NF_KB_TIME_COEFF); ++i)
-                    newMac->solveNFkBODEsEquilibrium(6.00/_PARAM(PARAM_GR_NF_KB_TIME_COEFF));
+                for (int i = 0; i < 7200*_PARAM(_NFkBTimeCoefficient); ++i)
+                    newMac->solveNFkBODEsEquilibrium(6.00/_PARAM(_NFkBTimeCoefficient));
             }
             count--;
         }
@@ -629,25 +642,25 @@ void GrSimulation::solve()
 	for (int DiffStep = 0; DiffStep < _numDiffusionPerAgent; DiffStep++) 
 	{
     _pDiffusion->diffuse(_grid);
-    secreteFromMacrophages(tnfDepletion, il10Depletion, _PARAM(PARAM_GR_DT_DIFFUSION));
-    secreteFromTcells(tnfDepletion, il10Depletion, _PARAM(PARAM_GR_DT_DIFFUSION));
-    secreteFromCaseations(_PARAM(PARAM_GR_DT_DIFFUSION));
+    secreteFromMacrophages(tnfDepletion, il10Depletion, _PARAM(_timestepDiffusion));
+    secreteFromTcells(tnfDepletion, il10Depletion, _PARAM(_timestepDiffusion));
+    secreteFromCaseations(_PARAM(_timestepDiffusion));
     if ((_nfkbDynamics || _tnfrDynamics || _il10rDynamics) && _adaptive) {
-     solveMolecularScaleAdaptive(_PARAM(PARAM_GR_DT_DIFFUSION));
+     solveMolecularScaleAdaptive(_PARAM(_timestepDiffusion));
      if (!_il10rDynamics || !_tnfrDynamics)
        for (int MolStep = 0; MolStep < _numMolecularPerDiffusion; MolStep++)  //Degradation needs to be on molecular timestep
-          adjustFauxDegradation(_PARAM(PARAM_GR_DT_MOLECULAR));
+          adjustFauxDegradation(_PARAM(_timestepMolecular));
     }
     else
     for (int MolStep = 0; MolStep < _numMolecularPerDiffusion; MolStep++)
     {
         if (_nfkbDynamics || _tnfrDynamics || _il10rDynamics)
-            solveMolecularScale(_PARAM(PARAM_GR_DT_MOLECULAR));
+            solveMolecularScale(_PARAM(_timestepMolecular));
         if (!_il10rDynamics || !_tnfrDynamics)
-            adjustFauxDegradation(_PARAM(PARAM_GR_DT_MOLECULAR));
-            //adjustTNFDegradation(_PARAM(PARAM_GR_DT_MOLECULAR));
+            adjustFauxDegradation(_PARAM(_timestepMolecular));
+            //adjustTNFDegradation(_PARAM(_timestepMolecular));
     }  
-    _pVascular->solveVascularSources(_grid.getGrid(), _PARAM(PARAM_GR_DT_DIFFUSION),_time, DiffStep);
+    _pVascular->solveVascularSources(_grid.getGrid(), _PARAM(_timestepDiffusion),_time, DiffStep);
     _stats.getBloodConcINH() = _pVascular->getBloodConcentrationINH();
 
     }
@@ -832,10 +845,10 @@ void GrSimulation::secreteFromCaseations(double mdt)
 		{
 			if (g.isCaseated(p))
 			{
-				g.incCCL2(p, (0.25 * _PARAM(PARAM_MAC_SEC_RATE_CCL2) * mdt));
-				g.incCCL5(p, (0.25 * _PARAM(PARAM_MAC_SEC_RATE_CCL5) * mdt));
-				g.incCXCL9(p,  (0.25 * _PARAM(PARAM_MAC_SEC_RATE_CXCL9) * mdt));
-				g.incmacAttractant(p, (_PARAM(PARAM_GR_SEC_RATE_ATTRACTANT) * mdt));
+				g.incCCL2(p, (0.25 * _PARAM(Mac_dCCL2) * mdt));
+				g.incCCL5(p, (0.25 * _PARAM(Mac_dCCL5) * mdt));
+				g.incCXCL9(p,  (0.25 * _PARAM(Mac_dCXCL9) * mdt));
+				g.incmacAttractant(p, (_PARAM(_dAttractant) * mdt));
 			}
 		}
 	}
@@ -879,9 +892,9 @@ void GrSimulation::solveMolecularScaleAdaptive(double dt)
 
 void GrSimulation::moveMacrophages()
 {
-	const int timeResting = _PARAM(PARAM_MAC_MOVEMENT_RESTING);
-	const int timeInfected = _PARAM(PARAM_MAC_MOVEMENT_INFECTED);
-	const int timeActive = _PARAM(PARAM_MAC_MOVEMENT_ACTIVE);
+	const int timeResting = _PARAM(Mac_movementRest);
+	const int timeInfected = _PARAM(Mac_movementInf);
+	const int timeActive = _PARAM(Mac_movementAct);
 	
 	for (MacList::iterator it = _macList.begin(); it != _macList.end(); it++)
 	{
@@ -922,7 +935,7 @@ void GrSimulation::moveTcells()
 
 void GrSimulation::growExtMtb()
 {
-	const double upperBound = _PARAM(PARAM_EXTMTB_UPPER_BOUND);
+	const double upperBound = _PARAM(Mtb_growthExtMtbBound);
 
   GrGrid& g = _grid.getGrid();
   const Pos& dim = g.getRange();
@@ -931,8 +944,8 @@ void GrSimulation::growExtMtb()
 	{
 		for (p.y = 0; p.y < dim.y; p.y++)
 		{
-      double growthRate = _PARAM(PARAM_EXTMTB_GROWTH_RATE) - 1;
-      if(_PARAM(PARAM_RAND_GROWTHRATE_EN))
+      double growthRate = _PARAM(Mtb_growthRateExtMtb) - 1;
+      if(_PARAM(_RandomizeGrowthRate))
         growthRate = getGrid().growthRate(p) - 1;
 
 			Scalar& extMtb = g.extMTB(p);
@@ -947,7 +960,7 @@ void GrSimulation::growExtMtb()
                 double dExtMtb = 0.0;
 
                 if (g_Rand.getReal() <= killProb)
-                    dExtMtb = _PARAM(PARAM_EXTMTB_CASEATED_DEATH_RATE) * extMtb * (killProb);
+                    dExtMtb = _PARAM(Mtb_deathRateExtMtbCaseated) * extMtb * (killProb);
                 if (dExtMtb > extMtb)
                     dExtMtb = extMtb;
 
@@ -1022,17 +1035,17 @@ void GrSimulation::adjustTNFDegradation(double dt)
 			Scalar tnf = grid.TNF(pos);
 			if (grid.hasAgentType(MAC, pos))
 			{
-				dtnf = -_PARAM(PARAM_GR_K_INT1) * (tnf / (tnf + _PARAM(PARAM_GR_KD1) * 48.16e11)) * 1500 * dt * 0.4;
+				dtnf = -_PARAM(_kInt1) * (tnf / (tnf + _PARAM(_KD1) * 48.16e11)) * 1500 * dt * 0.4;
 				tnf += dtnf;
 			}
             
             if (grid.hasTcell(pos))
             {
-                dtnf = -_PARAM(PARAM_GR_K_INT1) * (tnf / (tnf + _PARAM(PARAM_GR_KD1) * 48.16e11)) * 800 * dt * 0.4;
+                dtnf = -_PARAM(_kInt1) * (tnf / (tnf + _PARAM(_KD1) * 48.16e11)) * 800 * dt * 0.4;
                 tnf += dtnf;  
             }
             
-			// dtnf = -_PARAM(PARAM_GR_K_INT1) * (tnf / (tnf + _PARAM(PARAM_GR_KD1) * 48.16e11)) * 800 * (cell.hasTcell()) * dt * 0.4;
+			// dtnf = -_PARAM(_kInt1) * (tnf / (tnf + _PARAM(_KD1) * 48.16e11)) * 800 * (cell.hasTcell()) * dt * 0.4;
 			// tnf += dtnf;
 		}
 	}
@@ -1100,13 +1113,13 @@ void GrSimulation::setDiffusionMethod(DiffusionMethod method)
   case DIFF_REC_EQ_SWAP:
       _pDiffusion = new GrDiffusionFTCS_Swap(); break;
   case DIFF_ADE_SWAP:
-      if(_PARAM(PARAM_GR_DT_DIFFUSION) > 30)
+      if(_PARAM(_timestepDiffusion) > 30)
         std::clog<<("*** WARNING: This diffusion method is inaccurate for timesteps greater than 30 seconds")<<std::endl;
       _pDiffusion = new GrDiffusionADE_Swap(); break;
    default:
       assert(!"Invalid diffusion method"); break;
   }
-  if(method != DIFF_ADE_SWAP && _PARAM(PARAM_GR_DT_DIFFUSION) > 12)
+  if(method != DIFF_ADE_SWAP && _PARAM(_timestepDiffusion) > 12)
    std::clog<<("*** WARNING: This diffusion method is unstable for timesteps greater than 12 seconds")<<std::endl;
 }
 

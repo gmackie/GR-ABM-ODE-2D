@@ -25,11 +25,11 @@ void GrDiffusionWrongBTCS::diffuse(GrSimulationGrid&) const
 #if 0
   GrGrid& grid = simGrid.getGrid();
 
-  const double muTNF = _PARAM(PARAM_GR_D_TNF) * 6 / (4e-6);
-  const double muChemokines = _PARAM(PARAM_GR_D_CHEMOKINES) * 6 / (4e-6);
-  const double degTNF = _PARAM(PARAM_GR_DEG_TNF);
-  const double degChemokines = _PARAM(PARAM_GR_DEG_CHEMOKINES);
-  const double dAttractant = _PARAM(PARAM_GR_SEC_RATE_ATTRACTANT);
+  const double muTNF = _PARAM(_diffusivityTNF) * 6 / (4e-6);
+  const double muChemokines = _PARAM(_diffusivityChemokines) * 6 / (4e-6);
+  const double degTNF = _PARAM(_degRateTNF);
+  const double degChemokines = _PARAM(_degRateChemokines);
+  const double dAttractant = _PARAM(_dAttractant);
   const double ok = 0.001; // allowable error for good enough convergence
 
   // we have to use the heap here, since oldGrid does not fit in the stack

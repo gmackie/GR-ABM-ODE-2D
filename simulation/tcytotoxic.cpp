@@ -25,7 +25,7 @@ Tcyt::Tcyt()
 
 Tcyt::Tcyt(int birthtime, int row, int col, Tcyt::State state)
 
-  : Tcell(birthtime, row, col, _PARAM(PARAM_GR_K_SYNTH_TCELL)/10)
+  : Tcell(birthtime, row, col, _PARAM(_kSynthTcell)/10)
   , _state(state)
   , _nextState(state)
   , _deactivationTime(-1)
@@ -51,21 +51,21 @@ void Tcyt::secrete(GrGrid& grid, bool tnfrDynamics, bool, bool tnfDepletion, boo
       return;
     }
 
-  _kSynth = _PARAM(PARAM_GR_K_SYNTH_TCELL)/10;
-  _kmRNA = _PARAM(PARAM_GR_K_RNA_TCELL)/10;
+  _kSynth = _PARAM(_kSynthTcell)/10;
+  _kmRNA = _PARAM(_kRNATcell)/10;
 //    calcIkmRNA(grid, _kmRNA, _kSynth, il10rDynamics);
   _kISynth = 0.0;
 
   if (!tnfrDynamics && !tnfDepletion)
     {
       const double il10 = log(((grid.il10(_pos) * MW_IL10 * 1e6)/(NAV * VOL))); // converting il10 concentration to log(ng/mL) for use in dose dependence
-      const double tnfMOD = (1.0/(1.0 + exp((il10 + _PARAM(PARAM_GR_LINK_LOG_ALPHA))/_PARAM(PARAM_GR_LINK_LOG_BETA)))); // calculate the fraction of inhibition
+      const double tnfMOD = (1.0/(1.0 + exp((il10 + _PARAM(_LinkLogAlpha))/_PARAM(_LinkLogBeta)))); // calculate the fraction of inhibition
 
-      grid.incTNF(_pos, (tnfMOD * _PARAM(PARAM_TCYT_SEC_RATE_TNF) * mdt));
+      grid.incTNF(_pos, (tnfMOD * _PARAM(_dTNF_Tcyt) * mdt));
     }
   if (!il10rDynamics && !il10Depletion)
     {
-      grid.setil10(_pos, (_PARAM(PARAM_TCYT_SEC_RATE_IL10) * mdt));
+      grid.setil10(_pos, (_PARAM(_dIL10_Tcyt) * mdt));
     }
 
 }
@@ -86,16 +86,16 @@ void Tcyt::computeNextState(const int time, GrGrid& grid, Stats& stats, bool tnf
       grid.incKillings(_pos);
     }
 
-//	else if (tnfrDynamics && intCompareGT(_intBoundTNFR1, _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR)) &&
-//			 intCompareGT(1 - exp(-_PARAM(PARAM_GR_K_APOPTOSIS_MOLECULAR) * (_intBoundTNFR1 - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR))), g_Rand.getReal()))
+//	else if (tnfrDynamics && intCompareGT(_intBoundTNFR1, _PARAM(_thresholdApoptosisTNF_Molecular)) &&
+//			 intCompareGT(1 - exp(-_PARAM(_kApoptosis_Molecular) * (_intBoundTNFR1 - _PARAM(_thresholdApoptosisTNF_Molecular))), g_Rand.getReal()))
 //	{
 //		// TNF induced apoptosis
 //		++stats.getTcellApoptosisTNF();
 //		_nextState = TCYT_DEAD;
 //        grid.incKillings(_pos);
 //	}
-//	else if (!tnfrDynamics && tnfBoundFraction > _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF) &&
-//			 g_Rand.getReal() < 1 - exp(-_PARAM(PARAM_GR_K_APOPTOSIS) * (tnfBoundFraction - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF))))
+//	else if (!tnfrDynamics && tnfBoundFraction > _PARAM(_thresholdApoptosisTNF) &&
+//			 g_Rand.getReal() < 1 - exp(-_PARAM(_kApoptosis) * (tnfBoundFraction - _PARAM(_thresholdApoptosisTNF))))
 //	{
 //		// TNF induced apoptosis
 //		++stats.getTcellApoptosisTNF();
@@ -127,7 +127,7 @@ void Tcyt::handleActive(const int, GrGrid& grid, Stats& stats)
 {
   vector<int> PossibleOrdinal;
 
-  if (g_Rand.getReal() < _PARAM(PARAM_TCYT_PROB_KILL_MAC))
+  if (g_Rand.getReal() < _PARAM(Tcell_Tcyt_probKillMac))
     {
       for (int k=0; k<9; k++)
         {
@@ -170,7 +170,7 @@ void Tcyt::handleActive(const int, GrGrid& grid, Stats& stats)
       else if (pMac->getState() == Mac::MAC_CINFECTED)
         {
           double r = g_Rand.getReal();
-          if (r < _PARAM(PARAM_TCYT_PROB_KILL_MAC_CLEANLY))
+          if (r < _PARAM(Tcell_Tcyt_probKillMacCleanly))
             {
               pMac->setIntMtb(0);
               pMac->kill();
@@ -206,7 +206,7 @@ void Tcyt::handleActive(const int, GrGrid& grid, Stats& stats)
 //            return;
 //        }
 
-//        if (g_Rand.getReal() < _PARAM(PARAM_TCYT_PROB_KILL_MAC))
+//        if (g_Rand.getReal() < _PARAM(Tcell_Tcyt_probKillMac))
 //        {
 //            if (pMac->getState() == Mac::MAC_INFECTED)
 //            {
@@ -221,7 +221,7 @@ void Tcyt::handleActive(const int, GrGrid& grid, Stats& stats)
 //            else if (pMac->getState() == Mac::MAC_CINFECTED)
 //            {
 //                double r = g_Rand.getReal();
-//                if (r < _PARAM(PARAM_TCYT_PROB_KILL_MAC_CLEANLY))
+//                if (r < _PARAM(Tcell_Tcyt_probKillMacCleanly))
 //                {
 //                    pMac->setIntMtb(0);
 //                    pMac->kill();
@@ -247,7 +247,7 @@ void Tcyt::handleActive(const int, GrGrid& grid, Stats& stats)
 
 void Tcyt::handleDownRegulated(const int time, GrGrid&, Stats&)
 {
-  if (time - _deactivationTime >= _PARAM(PARAM_TCYT_TIMESPAN_REGULATED))
+  if (time - _deactivationTime >= _PARAM(Tcell_Tcyt_maxTimeReg))
     {
       _nextState = TCYT_ACTIVE;
       _deactivationTime = -1;

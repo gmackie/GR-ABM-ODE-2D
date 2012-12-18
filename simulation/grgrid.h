@@ -9,7 +9,7 @@
 #define GRGRID_H
 
 #include "gr.h"
-#include "params.h"
+#include "lungparams.h"
 #include "pos.h"
 
 

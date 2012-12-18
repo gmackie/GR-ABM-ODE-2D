@@ -29,7 +29,7 @@ Tgam::Tgam()
 
 Tgam::Tgam(int birthtime, int row, int col, Tgam::State state)
 
-  : Tcell(birthtime, row, col, _PARAM(PARAM_GR_K_SYNTH_TCELL))
+  : Tcell(birthtime, row, col, _PARAM(_kSynthTcell))
   , _state(state)
   , _nextState(state)
   , _deactivationTime(-1)
@@ -60,27 +60,27 @@ void Tgam::secrete(GrGrid& grid, bool tnfrDynamics, bool, bool tnfDepletion, boo
       return;
     }
 
-  _kSynth = _PARAM(PARAM_GR_K_SYNTH_TCELL);
-  _kmRNA = _PARAM(PARAM_GR_K_RNA_TCELL);
+  _kSynth = _PARAM(_kSynthTcell);
+  _kmRNA = _PARAM(_kRNATcell);
 //    calcIkmRNA(grid, _kmRNA, _kSynth, il10rDynamics);
 
 
   if (_state == TGAM_ACTIVE_DOUBLE)
     {
-      _kISynth = 0.5 * _PARAM(PARAM_GR_I_K_SYNTH_TCELL);
+      _kISynth = 0.5 * _PARAM(_IkSynthTcell);
 
       if (!il10rDynamics && !il10Depletion)
         {
-          grid.incil10(_pos, (0.5 * _PARAM(PARAM_TREG_SEC_RATE_IL10) * mdt));
+          grid.incil10(_pos, (0.5 * _PARAM(_dIL10_Treg) * mdt));
         }
     }
 
   else if (_state == TGAM_INDUCED_REG)
     {
-      _kISynth = _PARAM(PARAM_GR_I_K_SYNTH_TCELL);
+      _kISynth = _PARAM(_IkSynthTcell);
       if (!il10rDynamics && !il10Depletion)
         {
-          grid.incil10(_pos, (_PARAM(PARAM_TREG_SEC_RATE_IL10) * mdt));
+          grid.incil10(_pos, (_PARAM(_dIL10_Treg) * mdt));
         }
     }
 
@@ -96,8 +96,8 @@ void Tgam::secrete(GrGrid& grid, bool tnfrDynamics, bool, bool tnfDepletion, boo
   if (!tnfrDynamics && !tnfDepletion)
     {
       double il10 = log(((grid.il10(_pos) * MW_IL10 * 1e6)/(NAV * VOL))); // converting il10 concentration to log(ng/mL) for use in dose dependence
-      double tnfMOD = (1.0/(1.0 + exp((il10 + _PARAM(PARAM_GR_LINK_LOG_ALPHA))/_PARAM(PARAM_GR_LINK_LOG_BETA)))); // calculate the fraction of inhibition
-      grid.incTNF(_pos, (tnfMOD * _PARAM(PARAM_TGAM_SEC_RATE_TNF) * mdt));
+      double tnfMOD = (1.0/(1.0 + exp((il10 + _PARAM(_LinkLogAlpha))/_PARAM(_LinkLogBeta)))); // calculate the fraction of inhibition
+      grid.incTNF(_pos, (tnfMOD * _PARAM(_dTNF_Tgam) * mdt));
     }
 }
 
@@ -117,16 +117,16 @@ void Tgam::computeNextState(const int time, GrGrid& grid, Stats& stats, bool tnf
       grid.incKillings(_pos);
     }
 
-//	else if (tnfrDynamics && intCompareGT(_intBoundTNFR1, _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR)) &&
-//			 intCompareGT(1 - exp(-_PARAM(PARAM_GR_K_APOPTOSIS_MOLECULAR) * (_intBoundTNFR1 - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF_MOLECULAR))), g_Rand.getReal()))
+//	else if (tnfrDynamics && intCompareGT(_intBoundTNFR1, _PARAM(_thresholdApoptosisTNF_Molecular)) &&
+//			 intCompareGT(1 - exp(-_PARAM(_kApoptosis_Molecular) * (_intBoundTNFR1 - _PARAM(_thresholdApoptosisTNF_Molecular))), g_Rand.getReal()))
 //	{
 //		// TNF induced apoptosis
 //		++stats.getTcellApoptosisTNF();
 //		_nextState = TGAM_DEAD;
 //        grid.incKillings(_pos);
 //	}
-//	else if (!tnfrDynamics && tnfBoundFraction > _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF) &&
-//			 g_Rand.getReal() < 1 - exp(-_PARAM(PARAM_GR_K_APOPTOSIS) * (tnfBoundFraction - _PARAM(PARAM_GR_THRESHOLD_APOPTOSIS_TNF))))
+//	else if (!tnfrDynamics && tnfBoundFraction > _PARAM(_thresholdApoptosisTNF) &&
+//			 g_Rand.getReal() < 1 - exp(-_PARAM(_kApoptosis) * (tnfBoundFraction - _PARAM(_thresholdApoptosisTNF))))
 //	{
 //		// TNF induced apoptosis
 //		++stats.getTcellApoptosisTNF();
@@ -182,7 +182,7 @@ void Tgam::handleActive(const int time, GrGrid& grid, Stats& stats, bool tgammat
           // Fas/FasL induced apoptosis with probability
           if (pMac &&
               (pMac->getState() == Mac::MAC_INFECTED || pMac->getState() == Mac::MAC_CINFECTED) &&
-              g_Rand.getReal() < _PARAM(PARAM_TGAM_PROB_APOPTOSIS_FAS_FASL))
+              g_Rand.getReal() < _PARAM(Tcell_Tgam_probApoptosisFasFasL))
             {
               ++stats.getApoptosisFasFasL();
               pMac->apoptosis(grid);
@@ -197,12 +197,12 @@ void Tgam::handleActive(const int time, GrGrid& grid, Stats& stats, bool tgammat
                 {
                   _nICOS ++;
                 }
-              if (g_Rand.getReal() < _PARAM(PARAM_TGAM_PROB_ANTIGEN_PRESENTATION))
+              if (g_Rand.getReal() < _PARAM(Tcell_Tgam_probAntigenPresentation))
                 {
                   _nAntigenStim ++;
                 }
             }
-          if (pMac && ((pMac->getState() == Mac::MAC_RESTING && pMac->getNFkB()) || (pMac->getState() == Mac::MAC_RESTING && pMac->getICOS()) || (pMac->getState() == Mac::MAC_ACTIVE)) && grid.extMTB(_pos) > _PARAM(PARAM_TGAM_THRESHOLD_EXT_MTB))
+          if (pMac && ((pMac->getState() == Mac::MAC_RESTING && pMac->getNFkB()) || (pMac->getState() == Mac::MAC_RESTING && pMac->getICOS()) || (pMac->getState() == Mac::MAC_ACTIVE)) && grid.extMTB(_pos) > _PARAM(Tcell_Tgam_thresholdExtMtb))
             {
               _nAntigenStim ++;
             }
@@ -213,17 +213,17 @@ void Tgam::handleActive(const int time, GrGrid& grid, Stats& stats, bool tgammat
         }
       if (_nAntigenStim > 1)
         {
-          AgProb = (1.0/3.0) * (1 - exp((-_PARAM(PARAM_TGAM_RATE_AGSTIM)*(_nAntigenStim - 1.0))));
+          AgProb = (1.0/3.0) * (1 - exp((-_PARAM(Tcell_Tgam_rateAgDegree)*(_nAntigenStim - 1.0))));
           ProbSum += AgProb;
         }
       if (_nDownRegulated > 0)
         {
-          TGFProb = (1.0/3.0) * (1 - exp((-_PARAM(PARAM_TGAM_RATE_TGFB)*(_nDownRegulated))));
+          TGFProb = (1.0/3.0) * (1 - exp((-_PARAM(Tcell_Tgam_rateTGFB)*(_nDownRegulated))));
           ProbSum += TGFProb;
         }
       if (_nICOS > 0)
         {
-          ICOSProb = (1.0/3.0) * (1 - exp((-_PARAM(PARAM_TGAM_RATE_ICOS)*(_nICOS))));
+          ICOSProb = (1.0/3.0) * (1 - exp((-_PARAM(Tcell_Tgam_rateICOS)*(_nICOS))));
           ProbSum += ICOSProb;
         }
       if (g_Rand.getReal() < ProbSum)
@@ -249,7 +249,7 @@ void Tgam::handleActive(const int time, GrGrid& grid, Stats& stats, bool tgammat
     {
       vector<int> PossibleOrdinal;
 
-      if (g_Rand.getReal() < _PARAM(PARAM_TGAM_PROB_APOPTOSIS_FAS_FASL))
+      if (g_Rand.getReal() < _PARAM(Tcell_Tgam_probApoptosisFasFasL))
         {
           for (int k=0; k<9; k++)
             {
@@ -309,7 +309,7 @@ void Tgam::handleActive(const int time, GrGrid& grid, Stats& stats, bool tgammat
 //            // Fas/FasL induced apoptosis with probability
 //            if (pMac &&
 //                (pMac->getState() == Mac::MAC_INFECTED || pMac->getState() == Mac::MAC_CINFECTED) &&
-//                g_Rand.getReal() < _PARAM(PARAM_TGAM_PROB_APOPTOSIS_FAS_FASL))
+//                g_Rand.getReal() < _PARAM(Tcell_Tgam_probApoptosisFasFasL))
 //            {
 //                ++stats.getApoptosisFasFasL();
 //                pMac->apoptosis(grid);
@@ -323,7 +323,7 @@ void Tgam::handleActive(const int time, GrGrid& grid, Stats& stats, bool tgammat
 
 void Tgam::handleDownRegulated(const int time, GrGrid&, Stats&)
 {
-  if (time - _deactivationTime >= _PARAM(PARAM_TGAM_TIMESPAN_REGULATED))
+  if (time - _deactivationTime >= _PARAM(Tcell_Tgam_maxTimeReg))
     {
       _nextState = TGAM_ACTIVE;
       _deactivationTime = -1;
@@ -339,7 +339,7 @@ void Tgam::handleActiveDouble(const int time, GrGrid& grid, Stats& stats)
   // Carries out same action as TGAM_ACTIVE but secretes half rate of IL10
   // Distinct state so it is easier to track
 
-  if (time - _transitionTime >= _PARAM(PARAM_TGAM_TIMESPAN_DOUBLE))
+  if (time - _transitionTime >= _PARAM(Tcell_Tgam_maxTimeDouble))
     {
       _nextState = TGAM_INDUCED_REG;
     }
@@ -365,7 +365,7 @@ void Tgam::handleActiveDouble(const int time, GrGrid& grid, Stats& stats)
       // Fas/FasL induced apoptosis with probability
       if (pMac &&
           (pMac->getState() == Mac::MAC_INFECTED || pMac->getState() == Mac::MAC_CINFECTED) &&
-          g_Rand.getReal() < _PARAM(PARAM_TGAM_PROB_APOPTOSIS_FAS_FASL))
+          g_Rand.getReal() < _PARAM(Tcell_Tgam_probApoptosisFasFasL))
         {
           ++stats.getApoptosisFasFasL();
           pMac->apoptosis(grid);

@@ -220,7 +220,7 @@ void RecruitmentProb::recruit(GrSimulation &sim, const Pos& pSource, size_t cell
 
 //void RecruitmentProb::recruit(GrSimulation& sim)
 //{
-//    //const int timeTcellRecEnabled = _PARAM(PARAM_TCELL_TIME_RECRUITMENT_ENABLED);
+//    //const int timeTcellRecEnabled = _PARAM(Tcell_timeRecEnabled);
 //  GrGrid& grid = sim.getGrid();
 //    const std::vector<Pos>& sources = grid.getSources();
 //    Stats& stats = sim.getStats();
@@ -276,10 +276,10 @@ void RecruitmentProb::recruitMac(GrSimulation& sim, const Pos& pSource)
 
   // if the number of macrophages on the grid is less than _INITIAL_NUMBER_OF_MACROPHAGES,
   // recruit a resting macrophage
-  if (sim.getStats().getNrOfMacs() < _PARAM(PARAM_MAC_INIT_NUMBER))
+  if (sim.getStats().getNrOfMacs() < _PARAM(Mac_initNumber))
     {
       Mac* newMac = sim.createMac(pSource.x, pSource.y,
-                                  sim.getTime() - g_Rand.getInt(_PARAM(PARAM_MAC_AGE)), Mac::MAC_RESTING, false, false);
+                                  sim.getTime() - g_Rand.getInt(_PARAM(Mac_maxAge)), Mac::MAC_RESTING, false, false);
       if (sim.getNfkbDynamics())
         {
           // initialize NF-kB signaling from steady-state
@@ -298,11 +298,11 @@ void RecruitmentProb::recruitMac(GrSimulation& sim, const Pos& pSource)
 //        std::cout << "Function Value: " << macThresholdNewValue << "  Bool Value: " << macBoolNew << std::endl;
 
 
-//        if (macBoolNew && g_Rand.getReal() < (_PARAM(PARAM_MAC_MAX_RECRUITMENT) * macThresholdNewValue))
+//        if (macBoolNew && g_Rand.getReal() < (_PARAM(Mac_maxRecProb) * macThresholdNewValue))
 //        {
 //            ++grid.nRecruitments(pSource);
 //            Mac* newMac = sim.createMac(pSource.x, pSource.y,
-//                sim.getTime() - g_Rand.getInt(_PARAM(PARAM_MAC_AGE)), Mac::MAC_RESTING, false, false);
+//                sim.getTime() - g_Rand.getInt(_PARAM(Mac_maxAge)), Mac::MAC_RESTING, false, false);
 //            if (sim.getNfkbDynamics())
 //            {
 //                // initialize NF-kB signaling from steady-state
@@ -312,11 +312,11 @@ void RecruitmentProb::recruitMac(GrSimulation& sim, const Pos& pSource)
 
 //        }
 
-      if (macThreshold && g_Rand.getReal() < _PARAM(PARAM_MAC_PROB_RECRUITMENT))
+      if (macThreshold && g_Rand.getReal() < _PARAM(Mac_probRec))
         {
           ++grid.nRecruitments(pSource);
           Mac* newMac = sim.createMac(pSource.x, pSource.y,
-                                      sim.getTime() - g_Rand.getInt(_PARAM(PARAM_MAC_AGE)), Mac::MAC_RESTING, false, false);
+                                      sim.getTime() - g_Rand.getInt(_PARAM(Mac_maxAge)), Mac::MAC_RESTING, false, false);
           if (sim.getNfkbDynamics())
             {
               // initialize NF-kB signaling from steady-state
@@ -336,27 +336,27 @@ void RecruitmentProb::recruitTcell(GrSimulation& sim, const Pos& pSource)
   bool tcytThreshold = TcytRecruitmentThreshold(grid, pSource);
   bool tregThreshold = TregRecruitmentThreshold(grid, pSource);
 
-  if (g_Rand.getReal() < _PARAM(PARAM_TCELL_PROB_RECRUITMENT))
+  if (g_Rand.getReal() < _PARAM(Tcell_probRec))
     {
       double r = g_Rand.getReal();
-      if (r < _PARAM(PARAM_TGAM_PROB_RECRUITMENT))
+      if (r < _PARAM(Tcell_Tgam_probRec))
         {
           // recruit a Tgam cell if allowed
           if (tgamThreshold)
             {
               ++grid.nRecruitments(pSource);
               sim.createTgam(pSource.x, pSource.y,
-                             sim.getTime() - g_Rand.getInt(_PARAM(PARAM_TCELL_AGE), 1), Tgam::TGAM_ACTIVE);
+                             sim.getTime() - g_Rand.getInt(_PARAM(Tcell_maxAge), 1), Tgam::TGAM_ACTIVE);
             }
         }
-      else if (r < (_PARAM(PARAM_TGAM_PROB_RECRUITMENT) + _PARAM(PARAM_TCYT_PROB_RECRUITMENT)))
+      else if (r < (_PARAM(Tcell_Tgam_probRec) + _PARAM(Tcell_Tcyt_probRec)))
         {
           // recruit a Tcyt cell if allowed
           if (tcytThreshold)
             {
               ++grid.nRecruitments(pSource);
               sim.createTcyt(pSource.x, pSource.y,
-                             sim.getTime() - g_Rand.getInt(_PARAM(PARAM_TCELL_AGE), 1), Tcyt::TCYT_ACTIVE);
+                             sim.getTime() - g_Rand.getInt(_PARAM(Tcell_maxAge), 1), Tcyt::TCYT_ACTIVE);
             }
         }
       else
@@ -366,7 +366,7 @@ void RecruitmentProb::recruitTcell(GrSimulation& sim, const Pos& pSource)
             {
               ++grid.nRecruitments(pSource);
               sim.createTreg(pSource.x, pSource.y,
-                             sim.getTime() - g_Rand.getInt(_PARAM(PARAM_TCELL_AGE), 1), Treg::TREG_ACTIVE);
+                             sim.getTime() - g_Rand.getInt(_PARAM(Tcell_maxAge), 1), Treg::TREG_ACTIVE);
             }
         }
     }
@@ -382,7 +382,7 @@ inline void RecruitmentProb::recruitCellMac(GrSimulation &sim, const Pos &pSourc
   ++grid.nRecruitments(pSource);
   ++grid.nRecruitmentsMac(pSource);
   Mac* newMac = sim.createMac(pSource.x, pSource.y,
-                              sim.getTime() - g_Rand.getInt(_PARAM(PARAM_MAC_AGE)), Mac::MAC_RESTING, false, false);
+                              sim.getTime() - g_Rand.getInt(_PARAM(Mac_maxAge)), Mac::MAC_RESTING, false, false);
   if (sim.getNfkbDynamics())
     {
       // initialize NF-kB signaling from steady-state
@@ -400,7 +400,7 @@ inline void RecruitmentProb::recruitCellTgam(GrSimulation &sim, const Pos &pSour
   ++grid.nRecruitments(pSource);
   ++grid.nRecruitmentsTgam(pSource);
   sim.createTgam(pSource.x, pSource.y,
-                 sim.getTime() - g_Rand.getInt(_PARAM(PARAM_TCELL_AGE), 1), Tgam::TGAM_ACTIVE);
+                 sim.getTime() - g_Rand.getInt(_PARAM(Tcell_maxAge), 1), Tgam::TGAM_ACTIVE);
 }
 
 
@@ -413,7 +413,7 @@ inline void RecruitmentProb::recruitCellTcyt(GrSimulation &sim, const Pos &pSour
   ++grid.nRecruitments(pSource);
   ++grid.nRecruitmentsTcyt(pSource);
   sim.createTcyt(pSource.x, pSource.y,
-                 sim.getTime() - g_Rand.getInt(_PARAM(PARAM_TCELL_AGE), 1), Tcyt::TCYT_ACTIVE);
+                 sim.getTime() - g_Rand.getInt(_PARAM(Tcell_maxAge), 1), Tcyt::TCYT_ACTIVE);
 }
 
 inline void RecruitmentProb::recruitCellTreg(GrSimulation &sim, const Pos &pSource)
@@ -425,7 +425,7 @@ inline void RecruitmentProb::recruitCellTreg(GrSimulation &sim, const Pos &pSour
   ++grid.nRecruitments(pSource);
   ++grid.nRecruitmentsTreg(pSource);
   sim.createTreg(pSource.x, pSource.y,
-                 sim.getTime() - g_Rand.getInt(_PARAM(PARAM_TCELL_AGE), 1), Treg::TREG_ACTIVE);
+                 sim.getTime() - g_Rand.getInt(_PARAM(Tcell_maxAge), 1), Treg::TREG_ACTIVE);
 }
 
 
@@ -445,10 +445,10 @@ bool RecruitmentProb::PossibleRecruitMac(GrSimulation& sim, const Pos& pSource, 
     {
       // if the number of macrophages on the grid is less than _INITIAL_NUMBER_OF_MACROPHAGES,
       // recruit a resting macrophage
-      if (sim.getStats().getNrOfMacs() < _PARAM(PARAM_MAC_INIT_NUMBER))
+      if (sim.getStats().getNrOfMacs() < _PARAM(Mac_initNumber))
         return true;
 
-      return (macBool && g_Rand.getReal() < (_PARAM(PARAM_MAC_MAX_RECRUITMENT) * macProbValue));
+      return (macBool && g_Rand.getReal() < (_PARAM(Mac_maxRecProb) * macProbValue));
     }
 
   else
@@ -474,12 +474,12 @@ bool RecruitmentProb::PossibleRecruitTgam(GrSimulation& sim, const Pos& pSource,
       if (grid.getNumberOfAgents(pSource) == 1)
         {
           if (grid.hasAgentType(MAC, pSource))
-            TgamBool = g_Rand.getReal() < _PARAM(PARAM_TCELL_PROB_MOVE_TO_MAC);
+            TgamBool = g_Rand.getReal() < _PARAM(Tcell_probMoveToMac);
           else
-            TgamBool = g_Rand.getReal() < _PARAM(PARAM_TCELL_PROB_MOVE_TO_TCELL);
+            TgamBool = g_Rand.getReal() < _PARAM(Tcell_probMoveToTcell);
         }
 
-      return (TgamBool && g_Rand.getReal() < (_PARAM(PARAM_TGAM_MAX_RECRUITMENT) * TgamProbValue));
+      return (TgamBool && g_Rand.getReal() < (_PARAM(Tcell_Tgam_maxRecProb) * TgamProbValue));
 
     }
   else
@@ -505,12 +505,12 @@ bool RecruitmentProb::PossibleRecruitTcyt(GrSimulation& sim, const Pos& pSource,
       if (grid.getNumberOfAgents(pSource) == 1)
         {
           if (grid.hasAgentType(MAC, pSource))
-            TcytBool = g_Rand.getReal() < _PARAM(PARAM_TCELL_PROB_MOVE_TO_MAC);
+            TcytBool = g_Rand.getReal() < _PARAM(Tcell_probMoveToMac);
           else
-            TcytBool = g_Rand.getReal() < _PARAM(PARAM_TCELL_PROB_MOVE_TO_TCELL);
+            TcytBool = g_Rand.getReal() < _PARAM(Tcell_probMoveToTcell);
         }
 
-      return (TcytBool && g_Rand.getReal() < (_PARAM(PARAM_TCYT_MAX_RECRUITMENT) * TcytProbValue));
+      return (TcytBool && g_Rand.getReal() < (_PARAM(Tcell_Tcyt_maxRecProb) * TcytProbValue));
     }
   else
     {
@@ -535,12 +535,12 @@ bool RecruitmentProb::PossibleRecruitTreg(GrSimulation& sim, const Pos& pSource,
       if (grid.getNumberOfAgents(pSource) == 1)
         {
           if (grid.hasAgentType(MAC, pSource))
-            TregBool = g_Rand.getReal() < _PARAM(PARAM_TCELL_PROB_MOVE_TO_MAC);
+            TregBool = g_Rand.getReal() < _PARAM(Tcell_probMoveToMac);
           else
-            TregBool = g_Rand.getReal() < _PARAM(PARAM_TCELL_PROB_MOVE_TO_TCELL);
+            TregBool = g_Rand.getReal() < _PARAM(Tcell_probMoveToTcell);
         }
 
-      return (TregBool && g_Rand.getReal() < (_PARAM(PARAM_TREG_MAX_RECRUITMENT) * TregProbValue));
+      return (TregBool && g_Rand.getReal() < (_PARAM(Tcell_Treg_maxRecProb) * TregProbValue));
     }
 
   else

@@ -22,7 +22,7 @@ using namespace std;
 
 GrGrid::GrGrid(const Pos& dim)
   : _dim(dim)
-  , _nCaseation(_PARAM(PARAM_GR_NR_KILLINGS_FOR_CASEATION))
+  , _nCaseation(_PARAM(_nrKillingsCaseation))
   , _sources()
   , _agents(SZ*MAX_AGENTS_PER_CELL, NULL)
   GRIDS_DEFS
@@ -40,7 +40,7 @@ GrGrid::~GrGrid()
 
 void GrGrid::initSources()
 {
-  int nSources = _PARAM(PARAM_GR_NR_SOURCES);
+  int nSources = _PARAM(_nrSources);
 
   // Useful for testing and debugging.
   // Prevents recruitment and can just watch initial macs without the sources cluttering the screen.

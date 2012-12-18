@@ -38,7 +38,7 @@ static void diffuse_u(const Scalar* __restrict__ grid_u, Scalar* __restrict__ ne
   register Scalar up_u, dn_u, lt_u, rt_u, ct_u;
 
   // Diffusion Constants for Grid and Time
-  const Scalar dt = _PARAM(PARAM_GR_DT_DIFFUSION); //time step (sec)
+  const Scalar dt = _PARAM(_timestepDiffusion); //time step (sec)
   const Scalar dx2 = 20e-4*20e-4;
   const Scalar dy2 = 20e-4*20e-4;
 
@@ -85,11 +85,11 @@ static void diffuse_u_nofluxbc(const Scalar* __restrict__ grid_u, Scalar* __rest
   register Scalar coef;
 
   // Diffusion Constants for Grid and Time
-  const Scalar dt = _PARAM(PARAM_GR_DT_DIFFUSION); //time step (sec)
+  const Scalar dt = _PARAM(_timestepDiffusion); //time step (sec)
   const Scalar dx2 = 20e-4*20e-4;
   const Scalar dy2 = 20e-4*20e-4;
-  const Scalar maxD = _PARAM(PARAM_GR_D_INH);
-  const Scalar minD = _PARAM(PARAM_GR_D_INH_MIN);
+  const Scalar maxD = _PARAM(_diffusivityINH);
+  const Scalar minD = _PARAM(_minDiffusivityINH);
 
   // ADE SCHEME FOR U
   // up: i-1, j n+1
@@ -151,7 +151,7 @@ static void diffuse_v(const Scalar* __restrict__ grid_v, Scalar* __restrict__ ne
   register Scalar up_v, dn_v, lt_v, rt_v, ct_v;
 
   // Diffusion Constants for Grid and Time
-  const Scalar dt = _PARAM(PARAM_GR_DT_DIFFUSION); //time step (sec)
+  const Scalar dt = _PARAM(_timestepDiffusion); //time step (sec)
   const Scalar dx2 = 20e-4*20e-4;
   const Scalar dy2 = 20e-4*20e-4;
 
@@ -201,11 +201,11 @@ static void diffuse_v_nofluxbc(const Scalar* __restrict__ grid_v, Scalar* __rest
   register Scalar coef;
 
   // Diffusion Constants for Grid and Time
-  const Scalar dt = _PARAM(PARAM_GR_DT_DIFFUSION); //time step (sec)
+  const Scalar dt = _PARAM(_timestepDiffusion); //time step (sec)
   const Scalar dx2 = 20e-4*20e-4;
   const Scalar dy2 = 20e-4*20e-4;
-  const Scalar maxD = _PARAM(PARAM_GR_D_INH);
-  const Scalar minD = _PARAM(PARAM_GR_D_INH_MIN);
+  const Scalar maxD = _PARAM(_diffusivityINH);
+  const Scalar minD = _PARAM(_minDiffusivityINH);
 
   // ADE SCHEME FOR V
   // up: i-1, j n
@@ -292,8 +292,8 @@ static void diffuse_avg_ratio(Scalar* newgrid_u, Scalar* newgrid_v, Scalar* newg
   // NOTE: THE _SEC_RATE_CCL should both be multiplied by the MOLECULAR_DT but since these terms will cancel
   // in the division they are not used to keep the error of the floating point division down.
 
-  const Scalar ratioCCL5toCCL2 = _PARAM(PARAM_MAC_SEC_RATE_CCL5) / _PARAM(PARAM_MAC_SEC_RATE_CCL2);
-  const Scalar ratioCXCL9toCCL2 = _PARAM(PARAM_MAC_SEC_RATE_CXCL9) / _PARAM(PARAM_MAC_SEC_RATE_CCL2);
+  const Scalar ratioCCL5toCCL2 = _PARAM(Mac_dCCL5) / _PARAM(Mac_dCCL2);
+  const Scalar ratioCXCL9toCCL2 = _PARAM(Mac_dCXCL9) / _PARAM(Mac_dCCL2);
 
   for(int i=0; i<GETROW(dim); i++)
     {
@@ -319,13 +319,13 @@ static void diffuse_avg_ratio(Scalar* newgrid_u, Scalar* newgrid_v, Scalar* newg
 // This function is used to degrade the molecules on the grid after they have diffused.
 static void diffuse_degrade(GrGrid& nextGrid)
 {
-  const Scalar dt = _PARAM(PARAM_GR_DT_DIFFUSION);
+  const Scalar dt = _PARAM(_timestepDiffusion);
 
-  const Scalar TNFdegRate = exp(-1.0 *  _PARAM(PARAM_GR_K_DEG) * dt);
-  const Scalar IL10degRate = exp(-1.0 *  _PARAM(PARAM_GR_I_K_DEG) * dt);
-  const Scalar CHEMOKINEdegRate = exp(-1.0 *  _PARAM(PARAM_GR_CHEMOKINE_K_DEG) * dt);
+  const Scalar TNFdegRate = exp(-1.0 *  _PARAM(_kDeg) * dt);
+  const Scalar IL10degRate = exp(-1.0 *  _PARAM(_Ikdeg) * dt);
+  const Scalar CHEMOKINEdegRate = exp(-1.0 *  _PARAM(_ChemokinekDeg) * dt);
 
-  const Scalar INHdegRate = exp(-1.0 *  _PARAM(PARAM_GR_K_DEG_INH) * dt);
+  const Scalar INHdegRate = exp(-1.0 *  _PARAM(_degRateConstINH) * dt);
 
   //Degradation equation here is separated based on operator splitting causing it to lag
   //behind diffusion.  We make the assumption diffuse << degrade to
@@ -347,40 +347,40 @@ static void diffuse_degrade(GrGrid& nextGrid)
         // Degradation of sTNF
         nextGrid.setTNF(p, nextGrid.TNF(p) * TNFdegRate);
 //            Total += nextGrid.TNF(p);
-//            nextGrid.incTNF(p, (-1.0 * nextGrid.TNF(p) * _PARAM(PARAM_GR_K_DEG) * dt));
+//            nextGrid.incTNF(p, (-1.0 * nextGrid.TNF(p) * _PARAM(_kDeg) * dt));
 
         // Degradation of il10
         nextGrid.setil10(p, nextGrid.il10(p) * IL10degRate);
-//            nextGrid.setil10(p, (-1.0 * nextGrid.il10(p) * _PARAM(PARAM_GR_I_K_DEG) * dt));
+//            nextGrid.setil10(p, (-1.0 * nextGrid.il10(p) * _PARAM(_Ikdeg) * dt));
 
         // Degradation of CCL2
         nextGrid.setCCL2(p, nextGrid.CCL2(p) * CHEMOKINEdegRate);
-//            nextGrid.incCCL2(p, (-1.0 * nextGrid.CCL2(p) * _PARAM(PARAM_GR_CHEMOKINE_K_DEG) * dt));
+//            nextGrid.incCCL2(p, (-1.0 * nextGrid.CCL2(p) * _PARAM(_ChemokinekDeg) * dt));
 
         // Degradation of CCL5
         nextGrid.setCCL5(p, nextGrid.CCL5(p) * CHEMOKINEdegRate);
-//            nextGrid.incCCL5(p, (-1.0 * nextGrid.CCL5(p) * _PARAM(PARAM_GR_CHEMOKINE_K_DEG) * dt));
+//            nextGrid.incCCL5(p, (-1.0 * nextGrid.CCL5(p) * _PARAM(_ChemokinekDeg) * dt));
 
         // Degradation of CXCL9
         nextGrid.setCXCL9(p, nextGrid.CXCL9(p) * CHEMOKINEdegRate);
-//            nextGrid.incCXCL9(p, (-1.0 * nextGrid.CXCL9(p) * _PARAM(PARAM_GR_CHEMOKINE_K_DEG) * dt));
+//            nextGrid.incCXCL9(p, (-1.0 * nextGrid.CXCL9(p) * _PARAM(_ChemokinekDeg) * dt));
 
         // Degradation of INH
         nextGrid.setINH(p, nextGrid.INH(p) * INHdegRate);
 
 
-        if (_PARAM(PARAM_GR_SEC_RATE_ATTRACTANT) != 0)
+        if (_PARAM(_dAttractant) != 0)
           {
             // Degradation of MacAttractant
             nextGrid.setmacAttractant(p, nextGrid.macAttractant(p) * CHEMOKINEdegRate);
-//                nextGrid.incmacAttractant(p, (-1.0 * nextGrid.macAttractant(p) * _PARAM(PARAM_GR_CHEMOKINE_K_DEG) * dt));
+//                nextGrid.incmacAttractant(p, (-1.0 * nextGrid.macAttractant(p) * _PARAM(_ChemokinekDeg) * dt));
           }
 
         // Unbinding of sTNF from ShedTNFR2
-        nextGrid.incshedTNFR2(p, (-1.0 * nextGrid.shedTNFR2(p) * _PARAM(PARAM_GR_KD2) * _PARAM(PARAM_GR_K_ON2) * dt));
+        nextGrid.incshedTNFR2(p, (-1.0 * nextGrid.shedTNFR2(p) * _PARAM(_KD2) * _PARAM(_kOn2) * dt));
 
         // Addition of sTNF from unbinding from ShedTNFR2
-        nextGrid.incTNF(p, (1.0 * nextGrid.shedTNFR2(p) * _PARAM(PARAM_GR_KD2) * _PARAM(PARAM_GR_K_ON2) * dt));
+        nextGrid.incTNF(p, (1.0 * nextGrid.shedTNFR2(p) * _PARAM(_KD2) * _PARAM(_kOn2) * dt));
 
       }
 
@@ -400,8 +400,8 @@ void GrDiffusionADE_Swap::diffuse(GrSimulationGrid& grSim) const
   {
     #pragma omp section
     {
-      ::diffuse_u(grid.u_TNF(), nextGrid.u_TNF(), grid.getRange(), _PARAM(PARAM_GR_D_TNF), _cutOffValue);
-      ::diffuse_v(grid.v_TNF(), nextGrid.v_TNF(), grid.getRange(), _PARAM(PARAM_GR_D_TNF), _cutOffValue);
+      ::diffuse_u(grid.u_TNF(), nextGrid.u_TNF(), grid.getRange(), _PARAM(_diffusivityTNF), _cutOffValue);
+      ::diffuse_v(grid.v_TNF(), nextGrid.v_TNF(), grid.getRange(), _PARAM(_diffusivityTNF), _cutOffValue);
       ::diffuse_avg(nextGrid.u_TNF(), nextGrid.v_TNF(), nextGrid.TNF(), grid.getRange());
     }
     #pragma omp section
@@ -412,32 +412,32 @@ void GrDiffusionADE_Swap::diffuse(GrSimulationGrid& grSim) const
     }
     #pragma omp section
     {
-      ::diffuse_u(grid.u_shedTNFR2(), nextGrid.u_shedTNFR2(), grid.getRange(), _PARAM(PARAM_GR_D_SHED_TNFR2), _cutOffValue);
-      ::diffuse_v(grid.v_shedTNFR2(), nextGrid.v_shedTNFR2(), grid.getRange(), _PARAM(PARAM_GR_D_SHED_TNFR2), _cutOffValue);
+      ::diffuse_u(grid.u_shedTNFR2(), nextGrid.u_shedTNFR2(), grid.getRange(), _PARAM(_diffusivityShedTNFR2), _cutOffValue);
+      ::diffuse_v(grid.v_shedTNFR2(), nextGrid.v_shedTNFR2(), grid.getRange(), _PARAM(_diffusivityShedTNFR2), _cutOffValue);
       ::diffuse_avg(nextGrid.u_shedTNFR2(), nextGrid.v_shedTNFR2(), nextGrid.shedTNFR2(), grid.getRange());
     }
     #pragma omp section
     {
-      if (_PARAM(PARAM_GR_SEC_RATE_ATTRACTANT) != 0)
+      if (_PARAM(_dAttractant) != 0)
         {
           std::cout << "Why is this running?!?" << std::endl;
-          ::diffuse_u(grid.u_macAttractant(), nextGrid.u_macAttractant(), grid.getRange(), _PARAM(PARAM_GR_D_CHEMOKINES), _cutOffValue);
-          ::diffuse_v(grid.v_macAttractant(), nextGrid.v_macAttractant(), grid.getRange(), _PARAM(PARAM_GR_D_CHEMOKINES), _cutOffValue);
+          ::diffuse_u(grid.u_macAttractant(), nextGrid.u_macAttractant(), grid.getRange(), _PARAM(_diffusivityChemokines), _cutOffValue);
+          ::diffuse_v(grid.v_macAttractant(), nextGrid.v_macAttractant(), grid.getRange(), _PARAM(_diffusivityChemokines), _cutOffValue);
           ::diffuse_avg(nextGrid.u_macAttractant(), nextGrid.v_macAttractant(), nextGrid.macAttractant(), grid.getRange());
         }
 
     }
     #pragma omp section
     {
-      ::diffuse_u(grid.u_CCL2(), nextGrid.u_CCL2(), grid.getRange(), _PARAM(PARAM_GR_D_CHEMOKINES), _cutOffValue);
-      ::diffuse_v(grid.v_CCL2(), nextGrid.v_CCL2(), grid.getRange(), _PARAM(PARAM_GR_D_CHEMOKINES), _cutOffValue);
+      ::diffuse_u(grid.u_CCL2(), nextGrid.u_CCL2(), grid.getRange(), _PARAM(_diffusivityChemokines), _cutOffValue);
+      ::diffuse_v(grid.v_CCL2(), nextGrid.v_CCL2(), grid.getRange(), _PARAM(_diffusivityChemokines), _cutOffValue);
       ::diffuse_avg_ratio(nextGrid.u_CCL2(), nextGrid.v_CCL2(), nextGrid.CCL2(), nextGrid.CCL5(), nextGrid.CXCL9(), grid.getRange());
 
     }
     #pragma omp section
     {
-      ::diffuse_u(grid.u_il10(), nextGrid.u_il10(), grid.getRange(), _PARAM(PARAM_GR_D_IL10), _cutOffValue);
-      ::diffuse_v(grid.v_il10(), nextGrid.v_il10(), grid.getRange(), _PARAM(PARAM_GR_D_IL10), _cutOffValue);
+      ::diffuse_u(grid.u_il10(), nextGrid.u_il10(), grid.getRange(), _PARAM(_diffusivityIL10), _cutOffValue);
+      ::diffuse_v(grid.v_il10(), nextGrid.v_il10(), grid.getRange(), _PARAM(_diffusivityIL10), _cutOffValue);
       ::diffuse_avg(nextGrid.u_il10(), nextGrid.v_il10(), nextGrid.il10(), grid.getRange());
     }
   } //omp parallel

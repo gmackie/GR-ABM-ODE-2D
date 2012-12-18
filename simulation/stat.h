@@ -105,8 +105,8 @@ public:
 // --- Constructor ---
 
   Stats() :
-    _intMtbFreq(int(_PARAM(PARAM_MAC_THRESHOLD_BURST_CI_INTMTB)) + 1, 0)
-    , _growthRateFreq(_PARAM(PARAM_GROWTHRATE_SAMPLES), 0)
+    _intMtbFreq(int(_PARAM(Mac_nrIntMtbBurstCInf)) + 1, 0)
+    , _growthRateFreq(_PARAM(_growthRateSamples), 0)
   {
     clear();
   }

@@ -47,7 +47,7 @@ gpu:	LDFLAGS += -lcudart
 gpu:	SRCS += cudautil.cu grdiffusionftcsswapgpu.cu grsimulationgpu.cu
 gpu:	gr_gpu
 
-SRCS := paramsbase.cpp params.cpp rand.cpp agent.cpp gr.cpp grsimulationgrid.cpp grgrid.cpp macrophage.cpp grsimulation.cpp onlinestat.cpp grdiffusion.cpp grdiffusionbtcs.cpp grdiffusionwrongbtcs.cpp grdiffusionadeswap.cpp grdiffusionftcsswap.cpp grvascular.cpp ttest.cpp areatest.cpp mtbtest.cpp tcell.cpp tcytotoxic.cpp tgamma.cpp tregulatory.cpp recruitmentbase.cpp recruitmentprob.cpp recruitmentlnode.cpp recruitmentlnodeproxy.cpp recruitmentlnodepure.cpp
+SRCS := rand.cpp agent.cpp gr.cpp grsimulationgrid.cpp grgrid.cpp macrophage.cpp grsimulation.cpp onlinestat.cpp grdiffusion.cpp grdiffusionbtcs.cpp grdiffusionwrongbtcs.cpp grdiffusionadeswap.cpp grdiffusionftcsswap.cpp grvascular.cpp ttest.cpp areatest.cpp mtbtest.cpp tcell.cpp tcytotoxic.cpp tgamma.cpp tregulatory.cpp recruitmentbase.cpp recruitmentprob.cpp recruitmentlnode.cpp recruitmentlnodeproxy.cpp recruitmentlnodepure.cpp
 OBJS := ${SRCS:.cpp=.o}
 TINYXML_SRCS := tinyxml/tinystr.cpp tinyxml/tinyxml.cpp tinyxml/tinyxmlerror.cpp tinyxml/tinyxmlparser.cpp
 TINYXML_OBJS := ${TINYXML_SRCS:.cpp=.o}
@@ -78,7 +78,7 @@ gr3: $(TINYXML_OBJS) $(OBJS) grmain.o
 gr4: $(TINYXML_OBJS) $(OBJS) grmain.o
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
-lhs:	$(TINYXML_OBJS) rand.o paramsbase.o params.o lhs.o
+lhs:	$(TINYXML_OBJS) rand.o lhsmain.o
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
 depend:	.depend

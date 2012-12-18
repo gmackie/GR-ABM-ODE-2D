@@ -40,7 +40,7 @@ struct Pos
   {
     return !memcmp(v, p.v, sizeof(int)*2);
   }
-  Pos(const boost::property_tree::iptree& p, const Pos& center)
+  Pos(const boost::property_tree::ptree& p, const Pos& center)
   {
     boost::optional<std::string> pos = p.get_optional<std::string>("pos");
     if(pos)

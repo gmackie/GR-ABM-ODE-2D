@@ -2,7 +2,7 @@
 Params::Params() :
 #define P(type, n, p, defau, d, u, min, max)  \
   _##p##_##n(type(defau)), \
-  _##p##_##n##Desc(type(min), type(max), #n, boost::optional<type>(defau), d, u, make_path(#p)),
+  _##p##_##n##Desc(type(min), type(max), #n, boost::optional<type>(defau), std::string(d), std::string(u), make_path(#p)),
 #include "params.def"
   dummy()
 {

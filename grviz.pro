@@ -11,7 +11,6 @@ QT += core gui opengl
 
 HEADERS += scalardatasets/scalartotmtbdataset.h \
     simulation/params.h \
-    simulation/paramsbase.h \
     simulation/grdiffusionadeswap.h \
     simulation/grdiffusionftcsswap.h \
     simulation/grsimulationgrid.h \
@@ -93,8 +92,6 @@ HEADERS += scalardatasets/scalartotmtbdataset.h \
     simulation/numericalMethods.h \
     scalardatasets/scalarindexeddataset.h
 SOURCES += \
-    simulation/params.cpp \
-    simulation/paramsbase.cpp \
     simulation/grdiffusionadeswap.cpp \
     simulation/grdiffusionftcsswap.cpp \
     simulation/grsimulationgrid.cpp \

@@ -1,71 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>ParamWindowClass</class>
- <widget class="QWidget" name="ParamWindowClass">
+ <class>ParamWindow</class>
+ <widget class="QWidget" name="ParamWindow">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>784</width>
-    <height>225</height>
+    <width>736</width>
+    <height>300</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Parameters</string>
+   <string>Parameter Window</string>
   </property>
-  <layout class="QHBoxLayout" name="horizontalLayout">
+  <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <layout class="QVBoxLayout" name="verticalLayout">
+    <widget class="QTreeView" name="treeView">
+     <property name="alternatingRowColors">
+      <bool>true</bool>
+     </property>
+     <property name="rootIsDecorated">
+      <bool>true</bool>
+     </property>
+     <property name="uniformRowHeights">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QTreeWidget" name="treeWidget">
-       <property name="selectionBehavior">
-        <enum>QAbstractItemView::SelectRows</enum>
+      <widget class="QPushButton" name="pushButtonSave">
+       <property name="text">
+        <string>Save</string>
        </property>
-       <attribute name="headerDefaultSectionSize">
-        <number>200</number>
-       </attribute>
-       <attribute name="headerMinimumSectionSize">
-        <number>50</number>
-       </attribute>
-       <column>
-        <property name="text">
-         <string>Name</string>
-        </property>
-       </column>
-       <column>
-        <property name="text">
-         <string>Value</string>
-        </property>
-       </column>
-       <column>
-        <property name="text">
-         <string>Unit</string>
-        </property>
-       </column>
-       <column>
-        <property name="text">
-         <string>Description</string>
-        </property>
-       </column>
       </widget>
      </item>
      <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_2">
-       <item>
-        <widget class="QPushButton" name="pushButtonLoad">
-         <property name="text">
-          <string>&amp;Load</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="pushButtonSave">
-         <property name="text">
-          <string>&amp;Save</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
+      <widget class="QPushButton" name="pushButtonLoad">
+       <property name="text">
+        <string>Load</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>

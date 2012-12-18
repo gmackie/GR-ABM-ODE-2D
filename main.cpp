@@ -5,7 +5,8 @@
 #include "gui/agentswidget.h"
 #include "visualization/agentsvisualization.h"
 #include "scalardatasets/scalaragentgrid.h"
-#include "simulation/params.h"
+#include "simulation/lungparams.h"
+#include "simulation/xmlhandler.h"
 #include "simulation/recruitmentprob.h"
 #include "simulation/recruitmentlnode.h"
 #include "simulation/recruitmentlnodepure.h"
@@ -101,6 +102,7 @@ int main(int argc, char *argv[])
   int testPeriod[NOUTCOMES] = { _OUTCOME_TEST_PERIOD, _OUTCOME_TEST_PERIOD };
   OutcomeMethod outcomeMethod[NOUTCOMES] = { OUTCOME_NONE, OUTCOME_NONE };
   const char* testName[NOUTCOMES] = { "test1", "test2" };
+  boost::property_tree::ptree pt;
 
   // For enabling granuloma visualization and setting the dataset to use from the command line.
   std::string granvizDataSetName;
@@ -123,6 +125,7 @@ int main(int argc, char *argv[])
   ("help,h", "Help message")
   ("input-file,i", po::value<std::string>(&inputFileName), "Input file name")
   ("seed,s", po::value(&seed))
+  ("growth-samples", po::value<unsigned>()->default_value(10), "Number of samples for growth rate statistics")
   ("dim,d", po::value(&dim)->default_value(100))
   ("diffusion", po::value<int>(&diffMethod)->default_value(4),
    "Diffusion method:\n0 - FTCS\n1 - BTCS (SOR, correct)\n2 - BTCS (SOR, wrong)\n3 - FTCS Grid Swap\n4 - ADE Grid Swap")
@@ -218,12 +221,17 @@ int main(int argc, char *argv[])
       // Must be done before making GrSimulation.
       // Also must be done before creating a lymph ODE recruitment object,
       // since the base lymph ODE class, RecruitmentLnODE, uses parameters in its constructor.
-      if (!Params::getInstance(Pos(dim, dim))->fromXml(inputFileName.c_str()))
-        return 1;
-      Params::getInstance()->setParam(PARAM_TNFODE_EN, vm.count("tnfr-dynamics") || vm.count("NFkB-dynamics"));
-      Params::getInstance()->setParam(PARAM_IL10ODE_EN, vm.count("il10r-dynamics"));
-      Params::getInstance()->setParam(PARAM_NFKBODE_EN, vm.count("NFkB-dynamics"));
-      Params::getInstance()->setParam(PARAM_RAND_GROWTHRATE_EN, vm.count("rand-growth"));
+      std::auto_ptr<ParamFileHandler> handler(new XMLHandler("GR"));
+      std::ifstream _if(inputFileName.c_str());
+      LungParam::getInstance().load(_if, handler.get(), pt);
+      if(!handler->good())
+        throw std::runtime_error("Unable to get parameters from file, cannot continue...");
+
+      LungParam::getInstance().set_NFkBdynamics(vm.count("tnfr-dynamics") || vm.count("NFkB-dynamics"));
+      LungParam::getInstance().set_TNFdynamics (vm.count("il10r-dynamics"));
+      LungParam::getInstance().set_IL10dynamics(vm.count("NFkB-dynamics"));
+      LungParam::getInstance().set_RandomizeGrowthRate(vm.count("rand-growth"));
+      LungParam::getInstance().set_growthRateSamples(vm["growth-samples"].as<unsigned>());
 
       switch (vm["diffusion"].as<int>())
         {
@@ -333,7 +341,7 @@ int main(int argc, char *argv[])
   AgentsVisualization agentsVisualization(dim, &agentGrid);
   MainInterface itfc(Pos(dim, dim), &agentsVisualization, &agentGrid);
   GLWindow glWindow(&itfc);
-  ParamWindow paramWindow(&itfc);
+  ParamWindow paramWindow(itfc.getSimulation(), LungParam::getInstance(), pt);
   MainWindow w(&itfc, &glWindow, &paramWindow, new StatWidget(itfc.getSimulation().getStats()), new AgentsWidget(&agentsVisualization), paramDir);
 
   /* set recruitment method */
@@ -421,7 +429,7 @@ int main(int argc, char *argv[])
     }
   else
     {
-      gr.init(); // Molecular tracking not available in gui version of the model.
+      gr.init(pt, true); // Molecular tracking not available in gui version of the model.
       gr.setAreaThreshold(_AREA_THRESHOLD);
     }
   itfc.getSimulation().update();

@@ -93,9 +93,9 @@ struct TreeVisitor {
 
 ParamWindow::ParamWindow(Simulation& _sim, Params& _params, boost::property_tree::ptree& _pt, QWidget *parent) :
   QWidget(parent),
-  sim(_sim),
   params(_params),
   pt(_pt),
+  sim(_sim),
   ui(new Ui::ParamWindow)
 {
   QItemEditorFactory* factory = new QItemEditorFactory();
@@ -137,7 +137,8 @@ void ParamWindow::on_pushButtonSave_clicked()
   if(selected.startsWith("XML")) handler = new XMLHandler("GR");
   else if(selected.startsWith("JSON")) handler = new JSONHandler("GR");
   else if(selected.startsWith("INFO")) handler = new INFOHandler("GR");
-  else QMessageBox::critical(this, tr("Error"), tr("Invalid format specified"));
+  else if(fileName.isNull()) return;  // Cancelled
+  else { QMessageBox::critical(this, tr("Error"), tr("Invalid format specified")); return; }
   std::ofstream f(fileName.toStdString().c_str());
   params.save(f, handler, pt);  //No need to lock here, just reading to file
   delete handler;
@@ -152,7 +153,8 @@ void ParamWindow::on_pushButtonLoad_clicked()
   if(selected.startsWith("XML")) handler = new XMLHandler("GR");
   else if(selected.startsWith("JSON")) handler = new JSONHandler("GR");
   else if(selected.startsWith("INFO")) handler = new INFOHandler("GR");
-  else QMessageBox::critical(this, tr("Error"), tr("Invalid format specified"));
+  else if(fileName.isNull()) return;
+  else { QMessageBox::critical(this, tr("Error"), tr("Invalid format specified")); return; }
   std::ifstream f(fileName.toStdString().c_str());
   try {
     Params tmp;

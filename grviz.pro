@@ -90,7 +90,8 @@ HEADERS += scalardatasets/scalartotmtbdataset.h \
     gui/graphviewer.h \
     gui/agenthistogram.h \
     simulation/numericalMethods.h \
-    scalardatasets/scalarindexeddataset.h
+    scalardatasets/scalarindexeddataset.h \
+    simulation/params.h
 SOURCES += \
     simulation/grdiffusionadeswap.cpp \
     simulation/grdiffusionftcsswap.cpp \
@@ -152,7 +153,8 @@ SOURCES += \
     simulation.cpp \
     snapshot.cpp \
     gui/graphviewer.cpp \
-    gui/agenthistogram.cpp
+    gui/agenthistogram.cpp \
+    simulation/params.cpp
 FORMS += gui/agentswidget.ui \
     gui/statwidget.ui \
     gui/paramwindow.ui \

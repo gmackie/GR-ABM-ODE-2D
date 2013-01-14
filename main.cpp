@@ -26,6 +26,10 @@
 #include <boost/program_options.hpp>
 #include <string>
 
+#include "simulation/xmlhandler.h"
+#include "simulation/jsonhandler.h"
+#include "simulation/infohandler.h"
+
 namespace po = boost::program_options;
 
 void printUsage(char* pArgv0, po::options_description& desc)
@@ -203,10 +207,12 @@ int main(int argc, char *argv[])
 
       tnfrDynamics = vm.count("tnfr-dynamics");
       nfkbDynamics = vm.count("NFkB-dynamics");
+      
+      ParamFileHandler* handler = NULL;
 
       if (!vm.count("input-file"))
         {
-          QString fileName = QFileDialog::getOpenFileName(NULL, "Load parameters", "", "*.xml");
+          QString fileName = QFileDialog::getOpenFileName(NULL, "Load parameters", "", QObject::tr("XML Files (*.xml);;JSON Files (*.json);;INFO Files (*.info)"));
           if (fileName == QString::null)
             {
               std::cerr << "Input file missing" << std::endl;
@@ -214,6 +220,18 @@ int main(int argc, char *argv[])
             }
           else
             {
+              if(fileName.endsWith("xml"))
+              {
+                handler = new XMLHandler("GR");
+              }
+              if(fileName.endsWith("json"))
+              {
+                handler = new JSONHandler("GR");
+              }
+              if(fileName.endsWith("info"))
+              {
+                handler = new INFOHandler("GR");
+              } 
               inputFileName = fileName.toLatin1().data();
             }
         }
@@ -221,9 +239,10 @@ int main(int argc, char *argv[])
       // Must be done before making GrSimulation.
       // Also must be done before creating a lymph ODE recruitment object,
       // since the base lymph ODE class, RecruitmentLnODE, uses parameters in its constructor.
-      std::auto_ptr<ParamFileHandler> handler(new XMLHandler("GR"));
+      
+      //std::auto_ptr<ParamFileHandler> handler(new XMLHandler("GR"));
       std::ifstream _if(inputFileName.c_str());
-      LungParam::getInstance().load(_if, handler.get(), pt);
+      LungParam::getInstance().load(_if, handler, pt);
       if(!handler->good())
         throw std::runtime_error("Unable to get parameters from file, cannot continue...");
 

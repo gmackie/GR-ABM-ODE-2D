@@ -6,7 +6,6 @@
  */
 
 #include "gr.h"
-#include "xmlhandler.h"
 #include "lungparams.h"
 #include "grsimulation.h"
 #include "stat.h"
@@ -24,6 +23,9 @@
 #include <iostream>
 #include <sstream>
 #include <fstream>
+#include "xmlhandler.h"
+#include "jsonhandler.h"
+#include "infohandler.h"
 
 namespace po = boost::program_options;
 using namespace std;
@@ -943,9 +945,18 @@ int main(int argc, char** argv)
   // Also must be done before creating a lymph ODE recruitment object,
   // since the base lymph ODE class, RecruitmentLnODE, uses parameters in its constructor.
   boost::property_tree::ptree pt;
-  std::auto_ptr<ParamFileHandler> handler(new XMLHandler("GR"));
+
+  ParamFileHandler* handler = NULL;
+  if(paramFile.substr(paramFile.find_last_of(".") + 1) == "xml")
+	  handler = new XMLHandler("GR");	
+  if(paramFile.substr(paramFile.find_last_of(".") + 1) == "json")
+	  handler = new JSONHandler("GR");	
+  if(paramFile.substr(paramFile.find_last_of(".") + 1) == "info")
+	  handler = new INFOHandler("GR");	
+  if(!handler)
+    throw std::runtime_error("Unable to find parameter file, cannot continue...");
   std::ifstream _if(paramFile.c_str());
-  LungParam::getInstance().load(_if, handler.get(), pt);
+  LungParam::getInstance().load(_if, handler, pt);
   if(!handler->good())
     throw std::runtime_error("Unable to get parameters from file, cannot continue...");
 

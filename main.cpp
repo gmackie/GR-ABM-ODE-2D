@@ -235,7 +235,15 @@ int main(int argc, char *argv[])
               inputFileName = fileName.toLatin1().data();
             }
         }
-
+	else
+	{
+		if(inputFileName.substr(inputFileName.find_last_of(".") + 1) == "xml")
+			handler = new XMLHandler("GR");
+		if(inputFileName.substr(inputFileName.find_last_of(".") + 1) == "json")
+			handler = new JSONHandler("GR");
+		if(inputFileName.substr(inputFileName.find_last_of(".") + 1) == "info")
+			handler = new INFOHandler("GR");
+	}
       // Must be done before making GrSimulation.
       // Also must be done before creating a lymph ODE recruitment object,
       // since the base lymph ODE class, RecruitmentLnODE, uses parameters in its constructor.

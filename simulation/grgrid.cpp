@@ -54,16 +54,16 @@ void GrGrid::initSources()
 
   const int n = (int)floor(sqrt((float) nSources));
 
-  const int dRow = _dim.x / n;
-  const int dCol = _dim.y / n;
-  const int leftover = _dim.x - n*dRow;  //Assumes square grid
+  const int dRow = (_dim.x-2) / n;
+  const int dCol = (_dim.y-2) / n;
+  const int leftover = (_dim.x-2) - n*dRow;  //Assumes square grid
 
   bool sources[_dim.x][_dim.y];
   memset(sources, 0, getSize()*sizeof(bool));
 
-  for (int i = 0; i < n; i++)
+  for (int i = 1; i < n-1; i++)
     {
-      for (int j = 0; j < n; j++)
+      for (int j = 1; j < n-1; j++)
         {
           const int row = g_Rand.getInt(dRow);
           const int col = g_Rand.getInt(dCol);
@@ -78,8 +78,8 @@ void GrGrid::initSources()
   // pick remaining sources
   while ((int)_sources.size() < nSources)
     {
-      const int row = g_Rand.getInt(_dim.x);
-      const int col = g_Rand.getInt(_dim.y);
+      const int row = g_Rand.getInt(_dim.x-1,1);
+      const int col = g_Rand.getInt(_dim.y-1,1);
 
       if (!sources[row][col])
         {

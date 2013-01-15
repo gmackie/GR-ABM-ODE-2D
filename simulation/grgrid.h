@@ -53,7 +53,7 @@ typedef Indexer2D Indexer;
   GRID       (int, nRecruitmentsTcyt) \
   GRID       (int, nRecruitmentsTreg) \
   GRID       (int, nSecretions)       \
-  GRID       (int, nCells)            \
+  GRID       (Scalar, nCells)            \
   PADDED_GRID(Scalar, TNF)            \
   PADDED_GRID(Scalar, macAttractant)  \
   PADDED_GRID(Scalar, INH)            \

@@ -975,7 +975,7 @@ void GrSimulation::growExtMtb()
                 // Bacteria that survive can die from antibiotics in caseated compartments given that the local concentration is high enough. We can also
                 // later adjust kill rate for caseum (i.e. if local conditions such as oxygen and pH affect drug activity).
                 dExtMtb = -adj_kill_rate * extMtb;
-                assert(-dExtMtb<extMtb);
+                assert(-dExtMtb<=extMtb);
                 extMtb += dExtMtb;
 
                 ++_stats.getNrCaseated();
@@ -1006,7 +1006,7 @@ void GrSimulation::growExtMtb()
                     dExtMtb = 0.0 - adj_kill_rate * extMtb;
                 else
                     dExtMtb = growthRate * extMtb * (1.0 - extMtb / upperBound) - adj_kill_rate * extMtb;
-                assert(-dExtMtb<extMtb);
+                assert(-dExtMtb<=extMtb);
 
                 extMtb += dExtMtb;
                 _stats.getTotExtMtb() += (extMtb);

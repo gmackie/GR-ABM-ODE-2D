@@ -78,7 +78,7 @@ static void diffuse_u(const Scalar* __restrict__ grid_u, Scalar* __restrict__ ne
 
 
 // Use this for diffusion assuming no flux boundary conditions
-static void diffuse_u_nofluxbc(const Scalar* __restrict__ grid_u, Scalar* __restrict__ newgrid_u, const Pos& dim, const Scalar cutOff, const int* __restrict__ nCells, const Scalar minD, const Scalar maxD)
+static void diffuse_u_nofluxbc(const Scalar* __restrict__ grid_u, Scalar* __restrict__ newgrid_u, const Pos& dim, const Scalar cutOff, const Scalar* __restrict__ nCells, const Scalar minD, const Scalar maxD)
 {
 
     register Scalar up_u, dn_u, lt_u, rt_u, ct_u;
@@ -194,7 +194,7 @@ static void diffuse_v(const Scalar* __restrict__ grid_v, Scalar* __restrict__ ne
 
 // Use this for diffusion assuming no flux boundary conditions
 ////Assumes padding on borders
-static void diffuse_v_nofluxbc(const Scalar* __restrict__ grid_v, Scalar* __restrict__ newgrid_v, const Pos& dim, const Scalar cutOff, const int* __restrict__ nCells, const Scalar minD, const Scalar maxD)
+static void diffuse_v_nofluxbc(const Scalar* __restrict__ grid_v, Scalar* __restrict__ newgrid_v, const Pos& dim, const Scalar cutOff, const Scalar* __restrict__ nCells, const Scalar minD, const Scalar maxD)
 {
 
     register Scalar up_v, dn_v, lt_v, rt_v, ct_v;

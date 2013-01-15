@@ -13,7 +13,8 @@
 Vascular::Vascular()
     : //_bloodConcentrationIL10(0.0), // blood concentration of IL10 in mol/L
       //_bloodConcentrationTNF(0.0), // blood concentration of TNF in mol/L
-      _bloodConcentrationINH(0.0) //blood concentration of INH in mol/L
+      _bloodConcentrationINH(0.0), //blood concentration of INH in mol/L
+      _bloodConcentrationRIF(0.0)       //blood concentration of RIF in mol/L
 { 
 }
 
@@ -30,6 +31,7 @@ void Vascular::solveVascularSources(GrGrid& grid, double dt, const int time, int
         //addDose(realTime, _PARAM(PARAM_GR_VASCULAR_IL10_DOSE), _PARAM(PARAM_GR_VASCULAR_IL10_DOSE_INTERVAL), _bloodConcentrationIL10);
         //addDose(realTime, _PARAM(PARAM_GR_VASCULAR_TNF_DOSE), _PARAM(PARAM_GR_VASCULAR_TNF_DOSE_INTERVAL), _bloodConcentrationTNF);
         addDose(realTime, _PARAM(_bloodINHdose), _PARAM(_dosageIntervalINH), _bloodConcentrationINH);
+        addDose(realTime, _PARAM(_bloodRIFdose), _PARAM(_dosageIntervalRIF), _bloodConcentrationRIF);
 
         const std::vector<Pos>& sources = grid.getSources();
 
@@ -50,21 +52,28 @@ void Vascular::solveVascularSources(GrGrid& grid, double dt, const int time, int
 
 
             // INH
-            double localINH = getAverageOfNeighbours(grid.INH(), *it, grid.getRange());
-            double INHChange = calculateFluxChange(localINH, _bloodConcentrationINH, dt);
+            double localINH = getAverageOfNeighbours(grid.INH(), *it, grid.getRange(), MW_INH);
+            double INHChange = calculateFluxChange(localINH, _bloodConcentrationINH, dt, _PARAM(_vascularPermeabilityINH), MW_INH);
             grid.incINH(*it, INHChange);
-            modulateBlood(_bloodConcentrationINH, INHChange);
+            modulateBlood(_bloodConcentrationINH, INHChange, MW_INH);
+
+            // RIF
+            double localRIF = getAverageOfNeighbours(grid.RIF(), *it, grid.getRange(), MW_RIF);
+            double RIFChange = calculateFluxChange(localRIF, _bloodConcentrationRIF, dt, _PARAM(_vascularPermeabilityRIF), MW_RIF);
+            grid.incRIF(*it, RIFChange);
+            modulateBlood(_bloodConcentrationRIF, RIFChange, MW_RIF);
 
 
         }
         //updateBloodODE(_bloodConcentrationIL10, _PARAM(PARAM_GR_VASCULAR_IL10_CLEARANCE), dt);
         //updateBloodODE(_bloodConcentrationTNF, _PARAM(PARAM_GR_VASCULAR_TNF_CLEARANCE), dt);
         updateBloodODE(_bloodConcentrationINH, _PARAM(_degRateINH_Plasma_Fast_Acet), dt);
+        updateBloodODE(_bloodConcentrationRIF, _PARAM(_degRateRIF_Plasma), dt);
     }
 }
 
 
-double Vascular::getAverageOfNeighbours(Scalar* grid, const Pos& pos, const Pos& dim)
+double Vascular::getAverageOfNeighbours(Scalar* grid, const Pos& pos, const Pos& dim, const Scalar MW)
 {
     double sumC = 0.0;
 
@@ -77,7 +86,7 @@ double Vascular::getAverageOfNeighbours(Scalar* grid, const Pos& pos, const Pos&
 
 //    std::cout << "Up: " << up << "  Lt: " << lt << "  Dn: " << dn << "  Rt: " << rt << std::endl;
 
-    sumC = (up + dn + lt + rt)/(4.0 * NAV * VOL);
+    sumC = (up + dn + lt + rt)/(4.0)/MW;
 
     return (sumC); // Returns average concentration mol/L
 }

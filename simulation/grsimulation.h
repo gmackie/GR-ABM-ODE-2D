@@ -116,6 +116,7 @@ private:
   void solveMolecularScaleAdaptive(double dt);
   void adjustTNFDegradation(double dt);
   void adjustFauxDegradation(double dt);
+  void consumeDrugs(GrGrid grid, double dt);
   void growExtMtb();
   void shuffleCells();
   void checkTCellRecruitmentStart();

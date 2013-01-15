@@ -114,8 +114,7 @@ protected:
   Mac();
 
 public:
-  double getIntMtbGrowthRate(const int time);
-
+  double getIntMtbGrowthRate(const int time, double INH_C);
   Mac(int birthtime, int row, int col, Mac::State state, double intMtb, bool NFkB, bool stat1);
   ~Mac();
 
@@ -339,7 +338,7 @@ inline void Mac::setC1rrChemTNF(double value)
   _c1rrChemTNF = value;
 }
 
-inline double Mac::getIntMtbGrowthRate(const int time)
+inline double Mac::getIntMtbGrowthRate(const int time, double INH_C)
 {
   double intMtbGrowthRate =  _growthRate;
 
@@ -351,6 +350,18 @@ inline double Mac::getIntMtbGrowthRate(const int time)
       // This ensures that the overall growth rate is positive. If applied to the entire base growth rate the effective
       // base growth rate can easily become < 1, i.e. negative growth.
       intMtbGrowthRate = 1 + (intMtbGrowthRate - 1) *_PARAM(Mtb_growthRateFactorPostAdaptiveIntMtb);
+
+
+      // some fraction of intMtb will die if INH has been added
+      // The killing rate is defined relative to the fraction of the base growth rate, for growth rate 1.025 (in the parameter file), the killing rate is compared to the .025.
+      // If the growth rate fraction is 0.025 and the killing rate is 0.05, the effective growth rate 1 + 0.025 - 0.05 will be < 1, i.e. negative growth. This is valid only if the effective growth rate > 0.
+
+      double INH_Emax = _PARAM(_intraActivityINH);
+      double INH_C50 = _PARAM(_C50_INH); // milligram/L
+      double adj_kill_rate = INH_Emax * ((INH_C) / ( INH_C50 + INH_C ));
+      intMtbGrowthRate = intMtbGrowthRate - adj_kill_rate;
+      assert(intMtbGrowthRate>=0);
+
     }
 
   return intMtbGrowthRate;

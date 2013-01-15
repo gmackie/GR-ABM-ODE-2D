@@ -57,6 +57,7 @@ typedef Indexer2D Indexer;
   PADDED_GRID(Scalar, TNF)            \
   PADDED_GRID(Scalar, macAttractant)  \
   PADDED_GRID(Scalar, INH)            \
+  PADDED_GRID(Scalar, RIF)            \
   PADDED_GRID(Scalar, CCL2)           \
   PADDED_GRID(Scalar, CCL5)           \
   PADDED_GRID(Scalar, CXCL9)          \

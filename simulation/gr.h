@@ -90,6 +90,12 @@
 // Number of Sig Figs of ODE Solver (Scaled to Power - i.e. 6 sig figs is 1e6)
 #define ABS_TOL 1000000
 
+// Molecular weight of INH (mg/mol)
+#define MW_INH 137139
+
+// Molecular weight of RIF (mg/mol)
+#define MW_RIF 822940
+
 // Define the Cash-Karp Butcher Table
 #define CK_B_2_1 (1.0/5.0)
 #define CK_B_3_1 (3.0/40.0)

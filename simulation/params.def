@@ -14,11 +14,13 @@ P(double, diffusivityChemokines, , ,	"Chemokine diffusivity", "cm^2/s", 0, )
 P(double, diffusivityIL10, , ,	"IL10 diffusivity", "cm^2/s", 0, )
 P(double, diffusivityINH, , ,	"INH diffusivity", "cm^2/s", 0, )
 P(double, minDiffusivityINH, , ,	"Minimum diffusivity of INH in compartments with max cells", "cm^2/s", 0, )
+P(double, diffusivityRIF, , ,	"RIF diffusivity", "cm^2/s", 0, )
+P(double, minDiffusivityRIF, , ,	"Minimum diffusivity of RIF in compartments with max cells", "cm^2/s", 0, )
 P(double, degRateTNF , , ,"TNF degradation rate (per 1s)", "", 0, )
 P(double, degRateIL10, , ,"IL10 degradation rate (per 1s)", "", 0, )
 P(double, degRateChemokines, , ,"Chemokine degradation rate (per 1s)", "", 0, )
-P(double, degRateINH, , ,"INH degradation rate (per 6s)", "", 0, )
-P(double, degRateConstINH, , ,"INH degradation rate constant", "", 0, )
+P(double, degRateConstINH, , ,"INH degradation rate on the grid constant", "", 0, )
+P(double, degRateConstRIF, , ,"RIF degradation rate on the grid constant", "", 0, )
 P(double, ChemokinekDeg, , , "Chemokine degradation rate constant", "1/s", 0, )
 P(double, minChemotaxis, , , "Chemotaxis sensivity range (lower bound)", "#molecules", 0, )
 P(double, maxChemotaxis, , , "Chemotaxis sensivity range (upper bound)", "#molecules", 0, )
@@ -28,16 +30,30 @@ P(double, dIL10_Tgam,	   , , "Secretion rate of IL10 by Tgam", "#molecules/6s", 
 P(double, dIL10_Tcyt,	   , , "Secretion rate of IL10 by Tcyt", "#molecules/6s", 0, )
 P(double, dIL10_Treg,	   , , "Secretion rate of IL10 by Treg", "#molecules/6s", 0, )
 
+// Drug activity parameters
+P(double, intraActivityINH          , , , "Max killing rate of INH intracellular", "", 0, )
+P(double, extraActivityINH          , , , "Max killing rate of INH extracellular", "", 0, )
+P(double, cellUptakeINH             , , , "Ratio of intra:extracellular concentration of INH", "", 0, )
+P(double, C50_INH                   , , , "Halfsat for killing activity of INH", "mg/L", 0,  )
+P(double, ConsumptionRate_INH       , , , "Rate of INH consumption by bacteria - coarse", "M/s/bacterium", 0, )
+P(double, ConsumptionHalfSat_INH    , , , "HalfSat for INH consumption by bacteria - coarse", "mg/L"  , 0, )
+P(double, intraActivityRIF          , , , "Max killing rate of RIF intracellular", "", 0, )
+P(double, extraActivityRIF          , , , "Max killing rate of RIF extracellular", "", 0, )
+P(double, cellUptakeRIF             , , , "Ratio of intra:extracellular concentration of RIF", "", 0, )
+P(double, C50_RIF                   , , , "Halfsat for killing activity of RIF", "mg/L", 0,  )
+
 // Blood compartment parameters
-P(double, vascularPermeability, , , "Vascular permeability of cytokines", "cm/s", 0, )
-P(double, bloodVolume, , , "Blood compartment total volume", "L", 0, )
-//{ "bloodIL10clearance",                 GR_NODE,	false,	true,	0.0,	0,	"1/s",              "Blood compartment clearance rate of IL10" },
+P(double, vascularPermeabilityINH       , , , "Vascular permeability of INH", "cm/s", 0, )
+P(double, vascularPermeabilityRIF       , , , "Vascular permeability of RIF", "cm/s", 0, )
+P(double, bloodVolume                   , , , "Blood compartment total volume", "L", 0, )//{ "bloodIL10clearance",                 GR_NODE,	false,	true,	0.0,	0,	"1/s",              "Blood compartment clearance rate of IL10" },
 //{ "bloodTNFclearance",                  GR_NODE,	false,	true,	0.0,	0,	"1/s",              "Blood compartment clearance rate of TNF" },
 P(double, degRateINH_Plasma_Fast_Acet, , , "Blood compartment clearance rate of INH in fast acetylators", "1/s", 0, )
 P(double, degRateINH_Plasma_Slow_Acet, , , "Blood compartment clearance rate of INH in slow acetylators", "1/s", 0, )
+P(double, degRateRIF_Plasma             , , , "Blood compartment clearance rate of RIF", "1/s", 0, )
 //{ "bloodIL10dose",                      GR_NODE,	false,	true,	0.0,	0,	"#molecules",       "Blood compartment dose of IL10" },
 //{ "bloodTNFdose",                       GR_NODE,	false,	true,	0.0,	0,	"#molecules",       "Blood compartment dose of TNF" },
 P(double, bloodINHdose, , , "Blood compartment dose of INH", "#molecules", 0, )
+P(double, bloodRIFdose, , , "Blood compartment dose of RIF", "#molecules", 0, )
 
 // molecular TNF-associated parameters
 P(double, kSynthMac,			, , "Basal rate of mTNF synthesis by a macrophage",         "#/cell.sec",	0, )
@@ -283,6 +299,7 @@ P(double, dosageStartTime,            , , "Time to begin dosing strategy", "#tim
 //{ "dosageIntervalIL10",                 GR_NODE,	true,	true,	10.0,	10,	"#timesteps",       "Time interval of IL10 doses" },
 //{ "dosageIntervalTNF",                  GR_NODE,	true,	true,	10.0,	10,	"#timesteps",       "Time interval of TNF doses" },
 P(double, dosageIntervalINH,          , , "Time interval of INH doses", "#timesteps", 0, )
+P(double, dosageIntervalRIF,          , , "Time interval of RIF doses", "#timesteps", 0, )
 P(int, maxAge,								        Mac, , "Maximal macrophage age", "#timesteps", 0, )
 P(int, maxAgeAct,							        Mac, , "Maximal activated macrophage age", "#timesteps", 0, )
 P(int, initNumber,							      Mac, , "Initial number of resting macrophages on the grid", "", 0, )

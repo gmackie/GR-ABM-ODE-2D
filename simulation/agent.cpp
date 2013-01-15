@@ -1472,7 +1472,7 @@ int Agent::getDestinationOrdinal(GrGrid& grid, bool ccl2, bool ccl5, bool cxcl9,
 
       // linear search
       double r = g_Rand.getReal();
-      for (k = 0; k < 9 && cumProb[k] < r; k++);
+      for (k = 0; k < 9 && cumProb[k] < r; k++) ;
     }
   else
     {

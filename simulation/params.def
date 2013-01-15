@@ -295,11 +295,11 @@ P(double, sourceDensity,                        ,	0.2, "Density of vascular sour
 P(int, nrSources,							        ,	0.0, "Number of vascular sources on the grid", "", 0, )
 P(int, nrKillingsCaseation,				    , , "Number of killings for a compartment to become caseated", "", 0, )
 P(int, NFkBTimeCoefficient,				    , , "Number of NF-kB time-steps within a single diffusion time-step", "-", 0, )
-P(double, dosageStartTime,            , , "Time to begin dosing strategy", "#timesteps", 0, )
+P(int, dosageStartTime,            , , "Time to begin dosing strategy", "#timesteps", 0, )
 //{ "dosageIntervalIL10",                 GR_NODE,	true,	true,	10.0,	10,	"#timesteps",       "Time interval of IL10 doses" },
 //{ "dosageIntervalTNF",                  GR_NODE,	true,	true,	10.0,	10,	"#timesteps",       "Time interval of TNF doses" },
-P(double, dosageIntervalINH,          , , "Time interval of INH doses", "#timesteps", 0, )
-P(double, dosageIntervalRIF,          , , "Time interval of RIF doses", "#timesteps", 0, )
+P(int, dosageIntervalINH,          , , "Time interval of INH doses", "#timesteps", 0, )
+P(int, dosageIntervalRIF,          , , "Time interval of RIF doses", "#timesteps", 0, )
 P(int, maxAge,								        Mac, , "Maximal macrophage age", "#timesteps", 0, )
 P(int, maxAgeAct,							        Mac, , "Maximal activated macrophage age", "#timesteps", 0, )
 P(int, initNumber,							      Mac, , "Initial number of resting macrophages on the grid", "", 0, )

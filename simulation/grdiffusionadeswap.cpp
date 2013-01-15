@@ -116,7 +116,7 @@ static void diffuse_u_nofluxbc(const Scalar* __restrict__ grid_u, Scalar* __rest
             //Get diffusion constants specific for this compartment and time
             // Diffusion Constants for drugs
 
-            int cellDens = nCells[Indexer::ind(dim,i,j)];
+            Scalar cellDens = nCells[Indexer::ind(dim,i,j)];
             cellDens = cellDens > 0.2 ? 2:cellDens;
             const Scalar u_diffuse = maxD - (cellDens / 2.0) * (maxD-minD);
             const Scalar lambda = u_diffuse * dt * ((1.0/dx2) + (1.0/dy2));
@@ -236,7 +236,7 @@ static void diffuse_v_nofluxbc(const Scalar* __restrict__ grid_v, Scalar* __rest
             //Get diffusion constants specific for this compartment and time
             // Diffusion Constants for drug
 
-            int cellDens = nCells[Indexer::ind(dim,i,j)];
+            Scalar cellDens = nCells[Indexer::ind(dim,i,j)];
             cellDens = cellDens > 0.2 ? 2:cellDens;
             const Scalar v_diffuse = maxD - (cellDens / 2.0) * (maxD-minD);
             const Scalar lambda = v_diffuse * dt * ((1.0/dx2) + (1.0/dy2));

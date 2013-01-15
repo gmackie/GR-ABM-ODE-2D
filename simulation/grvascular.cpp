@@ -24,7 +24,7 @@ Vascular::~Vascular()
 
 void Vascular::solveVascularSources(GrGrid& grid, double dt, const int time, int DiffStep)
 {
-    int realTime = time*600 + DiffStep*_PARAM(_timestepDiffusion);
+    int realTime = static_cast<int>(time*600 + DiffStep*_PARAM(_timestepDiffusion));
 
     if (isDoseStartTime(realTime))
     {

@@ -254,9 +254,12 @@ int main(int argc, char *argv[])
       if(!handler->good())
         throw std::runtime_error("Unable to get parameters from file, cannot continue...");
 
-      LungParam::getInstance().set_NFkBdynamics(vm.count("tnfr-dynamics") || vm.count("NFkB-dynamics"));
-      LungParam::getInstance().set_TNFdynamics (vm.count("il10r-dynamics"));
-      LungParam::getInstance().set_IL10dynamics(vm.count("NFkB-dynamics"));
+
+
+	  LungParam::getInstance().set_NFkBdynamics(vm.count("NFkB-dynamics"));
+	  LungParam::getInstance().set_TNFdynamics (vm.count("tnfr-dynamics") || vm.count("NFkB-dynamics"));
+	  LungParam::getInstance().set_IL10dynamics(vm.count("il10r-dynamics"));
+
       LungParam::getInstance().set_RandomizeGrowthRate(vm.count("rand-growth"));
       LungParam::getInstance().set_growthRateSamples(vm["growth-samples"].as<unsigned>());
 

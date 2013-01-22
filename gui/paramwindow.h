@@ -29,7 +29,7 @@ class PrecisionEdit : public QLineEdit {
   Q_PROPERTY(double value READ value WRITE setValue USER true)
 public:
   PrecisionEdit(QWidget* parent=0) : QLineEdit(parent) {
-    this->setValidator(new QDoubleValidator());
+    this->setValidator(new QDoubleValidator(this));
   }
   virtual ~PrecisionEdit() {}
   double value() const { return text().toDouble(); }

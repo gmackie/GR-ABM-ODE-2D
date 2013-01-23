@@ -11,6 +11,8 @@ endif
 
 ifeq ($(HOSTNAME:flux-%=flux), flux)
 BOOST_PREFIX := $(BOOST_ROOT)
+else ifeq ($(NERSC_HOST), carver)
+BOOST_PREFIX := $(BOOST_DIR)
 endif
 
 override CXXFLAGS += -DSVN_VERSION="$(SVNREV)" -Wall -W -I$(BOOST_PREFIX)/include -Wno-strict-aliasing -Wno-unknown-pragmas

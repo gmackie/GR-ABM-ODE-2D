@@ -33,7 +33,8 @@ using namespace boost::filesystem;
 
 void printVersion()
 {
-  std::cout << "Version: " << GR_VERSION << std::endl;
+  std::cout << "GR version: " << GR_VERSION << std::endl;
+  std::cout << "Boost version: " << BOOST_LIB_VERSION << std::endl;
 }
 
 void printUsage(const char* pArgv0, po::options_description& desc)
@@ -820,7 +821,6 @@ void buildSim(GrSimulation* pSim, DiffusionMethod diffMethod, RecruitmentMethod 
 
 int main(int argc, char** argv)
 {
-  std::cout << std::endl;
   printVersion();
 
   unsigned long seed;

@@ -1,4 +1,5 @@
-OS := $(shell grep -E 'Ubuntu|Red Hat' /etc/issue)
+OS := $(shell grep -E -s 'Ubuntu|Red Hat' /etc/issue)
+HOSTNAME := $(shell hostname)
 
 SVNREV := $(shell svn info | grep "Last Changed Rev:" | cut -d" " -f4)
 CXX := g++
@@ -7,14 +8,24 @@ CXX := g++
 ifndef BOOST_PREFIX
 BOOST_PREFIX := /usr
 endif
-override CXXFLAGS += -DSVN_VERSION="$(SVNREV)" -Wall -W -I$(BOOST_PREFIX)/include -Wno-strict-aliasing -Wno-unknown-pragmas
+
+
+override CXXFLAGS += -DSVN_VERSION="$(SVNREV)" -Wall -W -Wno-strict-aliasing -Wno-unknown-pragmas
+override LDFLAGS += -lm -lz -lpthread
+
+ifeq ($(HOSTNAME:flux-%=flux), flux)
+override CXXFLAGS += -I$(BOOST_INC)
+override LDFLAGS += -L$(BOOST_LINK) -lboost_program_options -lboost_iostreams -lboost_serialization -lboost_filesystem -lboost_system
+else
+override CXXFLAGS += -I$(BOOST_PREFIX)/include
 
 BOOST_LIBS := boost_program_options boost_iostreams boost_serialization boost_filesystem boost_system
 # So far the best way to eleviate the issues with different distros not properly symlinking boost libraries.
 # If static building, might need to modify to search only .o or .a compiled libraries (kept generic to deal with osx & windows)
 # <- Could completely solve this problem with cmake.... >_>
 BOOST_FOUND_LIBS := $(foreach lib, $(BOOST_LIBS), $(if $(wildcard ${BOOST_PREFIX}/lib/*$(lib)*-mt*), $(lib)-mt, $(lib)))
-override LDFLAGS += -L${BOOST_PREFIX}/lib $(addprefix -l, $(BOOST_FOUND_LIBS)) -lm -lz -lpthread
+override LDFLAGS += -L${BOOST_PREFIX}/lib $(addprefix -l, $(BOOST_FOUND_LIBS))
+endif
 
 all: release
 

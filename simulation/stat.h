@@ -74,7 +74,7 @@ class Stats
 {
   friend class boost::serialization::access;
 public:
-  typedef ba::accumulator_set<Scalar, ba::stats< ba::features< ba::tag::variance, ba::tag::min, ba::tag::max, ba::tag::median > > > Stat;
+  typedef ba::accumulator_set<Scalar, ba::stats< ba::features< ba::tag::variance, ba::tag::sum, ba::tag::min, ba::tag::max, ba::tag::median > > > Stat;
   struct group_type {}; //For identifying groups
 protected:
 // --- Data Members ---
@@ -322,6 +322,7 @@ public:
     //#define AGENTSTATE_STAT(type, name, sz, desc, reset) s << boost::serialization::make_nvp( #name, _ ## name);
 #include "stat.def"
     std::fill_n(_macIntMtbStats.begin(), (size_t)Mac::NSTATES, Stat());
+    _macGrowthRateStat = Stat();
     std::fill(_intMtbFreq.begin(), _intMtbFreq.end(), 0);
     std::fill(_growthRateFreq.begin(), _growthRateFreq.end(), 0);
   }

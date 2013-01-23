@@ -405,7 +405,7 @@ void GrSimulation::init(const boost::property_tree::ptree& pt, bool xml)
         initMacs.push_back(Pos((xml ? p.get_child("<xmlattr>") : p), _grid.getCenter()));
     }
 
-    range = initpt.equal_range("Ext");
+    range = initpt.equal_range("ExtMtb");
     while(range.first != range.second) {
         const boost::property_tree::ptree& p = (range.first++)->second;
         initExtMtb.push_back(Pos((xml ? p.get_child("<xmlattr>") : p), _grid.getCenter()));
@@ -686,24 +686,8 @@ void GrSimulation::solve()
     // update extracellular Mtb
     growExtMtb();
 
-    //DBG
-	#if 0
-	namespace ba = boost::accumulators;
-	Stats::Stat& macGrowthRateStat = _stats.getMacGrowthRateStat();
-	cout << endl << "before updateStates macGrowthRateStat count: " << ba::extract::count(macGrowthRateStat)  << " mean: " << ba::extract::mean(macGrowthRateStat) << endl;
-	#endif
-    //DBG
-
     // update states and remove dead agents from lists and grid
     updateStates();
-
-    //DBG
-	#if 0
-	macGrowthRateStat = _stats.getMacGrowthRateStat();
-	cout << "after updateStates macGrowthRateStat count: " << ba::extract::count(macGrowthRateStat)  << " mean: " << ba::extract::mean(macGrowthRateStat) << endl;
-	#endif
-    //DBG
-
 
     // This must be after growExtMtb and updateStates, since updateStates updates the stats with intMtb count
     // and growExtMtb updates the stats with extMtb counts.

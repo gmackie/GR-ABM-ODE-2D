@@ -1089,10 +1089,6 @@ void Mac::disperseMtb(GrGrid& grid, double fraction)
 
 void Mac::updateStatistics(Stats& stats) const
 {
-  //DBG
-  //cout << "start ID: " << getid() << " intMtb growth rate: " << getGrowthRate() << " _PARAM(_RandomizeGrowthRate): " << _PARAM(_RandomizeGrowthRate) << endl;
-  //DBG
-
   ++stats.getNrOfAgents(MAC);
   ++stats.getNrOfMacs((Mac::State)getState());
   stats.getMacIntMtbStats((Mac::State)getState())(getIntMtb());
@@ -1110,9 +1106,6 @@ void Mac::updateStatistics(Stats& stats) const
       ++stats.getIntMtbFreq(int(getIntMtb()));
       if(_PARAM(_RandomizeGrowthRate))
       {
-          //DBG
-          //cout << "ID: " << getid() << " intMtb growth rate: " << getGrowthRate() << endl;
-          //DBG
           double m = (getGrowthRate() - _PARAM(Mtb_growthRateIntMtbMin)) /
                       (_PARAM(Mtb_growthRateIntMtbMax) - _PARAM(Mtb_growthRateIntMtbMin));
           int idx = int(m*_PARAM(_growthRateSamples));

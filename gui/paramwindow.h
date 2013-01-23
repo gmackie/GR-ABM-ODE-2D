@@ -52,15 +52,15 @@ public:
 class ParamWindow : public QWidget
 {
   Q_OBJECT
-  Params& params;
+  Params* params;
   boost::property_tree::ptree& pt;
   Simulation& sim;
   QStandardItemModel* model;
   
 public:
-  ParamWindow(Simulation& _sim, Params& _params, boost::property_tree::ptree& _pt, QWidget *parent = 0);
+  ParamWindow(Simulation& _sim, Params* _params, boost::property_tree::ptree& _pt, QWidget *parent = 0);
   ~ParamWindow();
-  void reloadParams(Params& p);
+  void reloadParams(Params* p);
   
 private slots:
   void on_pushButtonSave_clicked();

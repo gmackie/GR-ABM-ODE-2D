@@ -247,10 +247,13 @@ int main(int argc, char *argv[])
       // Must be done before making GrSimulation.
       // Also must be done before creating a lymph ODE recruitment object,
       // since the base lymph ODE class, RecruitmentLnODE, uses parameters in its constructor.
+      // Must pass the simulation grid size on the first call to LungParam::getInstance,
+      // since it is needed to define some internally defined parameters (parameters not read
+      // from the parameter file).
       
       //std::auto_ptr<ParamFileHandler> handler(new XMLHandler("GR"));
       std::ifstream _if(inputFileName.c_str());
-      LungParam::getInstance().load(_if, handler, pt);
+      LungParam::getInstance(Pos(dim, dim))->load(_if, handler, pt);
       if(!handler->good())
         throw std::runtime_error("Unable to get parameters from file, cannot continue...");
 

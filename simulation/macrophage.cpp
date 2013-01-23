@@ -1089,13 +1089,16 @@ void Mac::disperseMtb(GrGrid& grid, double fraction)
 
 void Mac::updateStatistics(Stats& stats) const
 {
-  //TODO: Implement
+  //DBG
+  //cout << "start ID: " << getid() << " intMtb growth rate: " << getGrowthRate() << " _PARAM(_RandomizeGrowthRate): " << _PARAM(_RandomizeGrowthRate) << endl;
+  //DBG
+
   ++stats.getNrOfAgents(MAC);
   ++stats.getNrOfMacs((Mac::State)getState());
   stats.getMacIntMtbStats((Mac::State)getState())(getIntMtb());
 
   if(getState() == Mac::MAC_INFECTED || getState() == Mac::MAC_CINFECTED)
-    {
+  {
       // This can happen if  _PARAM(Mac_nrIntMtbBurstCInf) < _PARAM(Mac_nrIntMtbCInf)
       // or if the intMtb growth rate is high enough for intMtb for a mac > both PARAM(PARAM_MAC_THRESHOLD_BECOME_CI_INTMTB)
       // and _PARAM(Mac_nrIntMtbBurstCInf). In either case intMtb >  _PARAM(Mac_nrIntMtbBurstCInf)
@@ -1106,15 +1109,18 @@ void Mac::updateStatistics(Stats& stats) const
 
       ++stats.getIntMtbFreq(int(getIntMtb()));
       if(_PARAM(_RandomizeGrowthRate))
-        {
+      {
+          //DBG
+          //cout << "ID: " << getid() << " intMtb growth rate: " << getGrowthRate() << endl;
+          //DBG
           double m = (getGrowthRate() - _PARAM(Mtb_growthRateIntMtbMin)) /
                       (_PARAM(Mtb_growthRateIntMtbMax) - _PARAM(Mtb_growthRateIntMtbMin));
           int idx = int(m*_PARAM(_growthRateSamples));
           assert(idx < int(stats.getGrowthRateFreq().size()));
           ++stats.getGrowthRateFreq(idx);
           stats.getMacGrowthRateStat()(getGrowthRate());
-        }
-    }
+      }
+  }
 
   if (!isDead())
     stats.getTotIntMtb() += (getIntMtb());

@@ -6,6 +6,7 @@
 #error This file should only be included in a x-macro aware header file, defining P
 #endif
 
+//type,     name,                           path,   default,    desc,                                                   units,          min,    max)
 P(double, timestepDiffusion, , 6.0, "Time step for solving the diffusion module", "s", 0, )
 P(double, timestepMolecular, , 6.0, "Time step for solving the molecular scale receptor ligand dynamics", "s", 0, )
 P(double, diffusivityTNF, , ,	"TNF diffusivity", "cm^2/s", 0, )
@@ -31,6 +32,7 @@ P(double, dIL10_Tcyt,	   , , "Secretion rate of IL10 by Tcyt", "#molecules/6s", 
 P(double, dIL10_Treg,	   , , "Secretion rate of IL10 by Treg", "#molecules/6s", 0, )
 
 // Drug activity parameters
+//type,     name,                           path,   default,    desc,                                                   units,          min,    max)
 P(double, intraActivityINH          , , , "Max killing rate of INH intracellular", "", 0, )
 P(double, extraActivityINH          , , , "Max killing rate of INH extracellular", "", 0, )
 P(double, cellUptakeINH             , , , "Ratio of intra:extracellular concentration of INH", "", 0, )
@@ -43,9 +45,11 @@ P(double, cellUptakeRIF             , , , "Ratio of intra:extracellular concentr
 P(double, C50_RIF                   , , , "Halfsat for killing activity of RIF", "mg/L", 0,  )
 
 // Blood compartment parameters
+//type,     name,                           path,   default,    desc,                                                   units,          min,    max)
 P(double, vascularPermeabilityINH       , , , "Vascular permeability of INH", "cm/s", 0, )
 P(double, vascularPermeabilityRIF       , , , "Vascular permeability of RIF", "cm/s", 0, )
-P(double, bloodVolume                   , , , "Blood compartment total volume", "L", 0, )//{ "bloodIL10clearance",                 GR_NODE,	false,	true,	0.0,	0,	"1/s",              "Blood compartment clearance rate of IL10" },
+P(double, bloodVolume                   , , , "Blood compartment total volume", "L", 0, )
+//{ "bloodIL10clearance",                 GR_NODE,	false,	true,	0.0,	0,	"1/s",              "Blood compartment clearance rate of IL10" },
 //{ "bloodTNFclearance",                  GR_NODE,	false,	true,	0.0,	0,	"1/s",              "Blood compartment clearance rate of TNF" },
 P(double, degRateINH_Plasma_Fast_Acet, , , "Blood compartment clearance rate of INH in fast acetylators", "1/s", 0, )
 P(double, degRateINH_Plasma_Slow_Acet, , , "Blood compartment clearance rate of INH in slow acetylators", "1/s", 0, )
@@ -56,6 +60,7 @@ P(double, bloodINHdose, , , "Blood compartment dose of INH", "#molecules", 0, )
 P(double, bloodRIFdose, , , "Blood compartment dose of RIF", "#molecules", 0, )
 
 // molecular TNF-associated parameters
+//type,     name,                           path,   default,    desc,                                                   units,          min,    max)
 P(double, kSynthMac,			, , "Basal rate of mTNF synthesis by a macrophage",         "#/cell.sec",	0, )
 P(double, kSynthTcell,		, , "Basal rate of mTNF synthesis by a T cell",             "#/cell.sec", 0, )
 P(double, kTrans,         , , "Rate of translation of TNF mRNA to mTNF",              "1/sec",      0, )
@@ -88,6 +93,7 @@ P(double, stdTNFR2Tcell,	, , "Standard deviation of density of TNFR2 on T cells"
 // end of molecular TNF-associated parameters
 
 // molecular IL10 associated parameters
+//type,     name,                           path,   default,    desc,                                                   units,          min,    max)
 P(double, IkSynthMacInf, , , "sIL10 synthesis rate for infected Macs",	                  "#/cell.s", 0, )
 P(double, IkSynthMacAct,  , , "sIL10 synthesis rate for activated Macs",	                "#/cell.s", 0, )
 P(double, halfSatIL10mRNA, , , "Half Sat for TNF induction of IL10 in activated Macs",    "#/cell"  , 0, )
@@ -106,6 +112,7 @@ P(double, Ikdeg,         , , "Degredation rate constant for ODE IL10",          
 // end of molecular IL10 associated parameters
 
 // TNF and IL10 linking parameters
+//type,     name,                           path,   default,    desc,                                                   units,          min,    max)
 P(double, LinkRNADelta, , , "Logistic function parameter value - changes slope",             "",             0, )
 P(double, LinkRNAGamma, , , "Logistic function parameter value - changes where IC50 occurs", "",	           0, )
 P(double, LinkLogAlpha, , , "Coarse grained TNF/IL10 dose dependence parameter alpha",       "log10(ng/mL)", 0, )
@@ -114,6 +121,7 @@ P(double, LinkLogBeta,  , , "Coarse grained TNF/IL10 dose dependence parameter b
 
 
 // intracellular NFkB signaling pathway parameters
+//type,     name,                           path,   default,    desc,                                                   units,          min,    max)
 P(double, KN,						, 0, "number of IKKK molecules",                                            "#/cell", 0, )
 P(double, KNN,					, 0, "number of IKK molecules",                                             "#/cell", 0, )
 P(double, meanNFkB,			, 0, "avearge number of total NFkB molecules",                              "#/cell", 0, )
@@ -168,6 +176,7 @@ P(double, kIAP,					, 0, "IAP inhibitory effect on k_apoptosis",                
 // End of intracellular NFkB signaling pathway parameters
 
 
+//type,     name,                           path,   default,    desc,                                                   units,          min,    max)
 P(double, thresholdApoptosisTNF,				        ,	, "TNF threshold for TNF-induced apoptosis",                 "fraction",	 , )
 P(double, kApoptosis,							              ,	, "Rate of apoptosis happening",                             "1/s",				 , )
 P(double, thresholdApoptosisTNF_Molecular, 	    ,	, "TNF threshold for TNF-induced apoptosis",                 "#molecules", , )
@@ -181,6 +190,13 @@ P(double, effectRecCCL5, 						            ,	0.0, "Effect of CCL5 on recruitment
 P(double, effectRecCXCL9, 						          ,	0.0, "Effect of CXCL9 on recruitment", "", , )
 P(double, IC50ChemokineIL10,                    , , "IC50 of IL10 inhibition of chemokine secretion - All chemokines are the same", "#molecules/mL", , )
 P(double, dAttractant, 						              ,	, "Secretion rate of macrophage attractant secreted by debris", "", , )
+
+// Mac parameters
+//type,		name,							path,	default,	desc,													units,			min,	max)
+P(int,		maxAge,							Mac,	,			"Maximal macrophage age",								"#timesteps",	0,			)
+P(int,		maxAgeAct,						Mac,	,			"Maximal activated macrophage age",						"#timesteps",	0,			)
+P(int,		initNumber,						Mac,	0,			"Initial number of resting macrophages on the grid",	"",				0,			)
+P(double,	initDensity,					Mac,	0.0,		"Initial density of resting macrophages on the grid",	"",				0.0,	1.0)
 P(double, dCCL2, 								                Mac, , "Secretion rate of CCL2", "#molecules/6s",	, )
 P(double, dCCL5, 								                Mac, , "Secretion rate of CCL5", "#molecules/6s",	, )
 P(double, dCXCL9, 								              Mac, , "Secretion rate of CXCL9", "#molecules/6s", , )
@@ -201,7 +217,6 @@ P(double, nrExtMtbUptakeAct, 			              Mac, , "Number of extracellular ba
 P(double, thresholdRec, 					              Mac, , "TNF/chemokine threshold for macrophage recruitment", "", , )
 P(double, probRec, 							                Mac, , "Probability of recruiting a macrophage", "", 0.0, 1.0)
 P(double, movementBonusFactor, 				          Mac, 1.0, "Bonus factor for neighbor compartment with highest chemical concentration", "", , )
-P(double, initDensity, 						              Mac, 0.0, "Initial density of resting macrophages on the grid", "", 0.0, 1.0)
 P(double, thresholdICOS, 						            Mac, , "Threshold for ICOS-L inhibition on a Mac by IL10", "", , )
 P(double, recruitmentHalfSatTNF, 				        Mac, , "Half-saturation paramter for Mac TNF-dependent recruitment", "", , )
 P(double, recruitmentHalfSatChemokine, 		      Mac, , "Half-saturation paramter for Mac chemokine-dependent recruitment", "", , )
@@ -210,11 +225,30 @@ P(double, thresholdRecChemokine,                Mac, , "Threshold of Mac Recruit
 P(double, thresholdRecTNF,                      Mac, , "Threshold of Mac Recruitment for TNF", "", , )
 P(double, stat1ActivationTime,                  Mac, , "Time a Macrophage is STAT1 Activated", "", , )
 P(double, nfkbActivationTime,                   Mac, , "Time a Macrophage is NFkB Activated", "", , )
+P(int, movementRest,						      Mac, , "Time required for a resting macrophage to move one micro-compartment", "#timesteps", 0, )
+P(int, movementInf,						        Mac, , "Time required for an infected macrophage to move one micro-compartment", "#timesteps", 0, )
+P(int, movementAct,					        	Mac, , "Time required for an active macrophage to move one micro-compartment", "#timesteps", 0, )
+P(int, maxTimeReg,							      Mac, , "Time span during which a macrophage remains down-regulated", "#timesteps", 0, )
+// End of Mac parameters
+
+// Tcell parameters
+//type,     name,                           path,   default,    desc,                                                   units,          min,    max)
 P(double, mtbRecEnabled, 						            Tcell, , "The tot mtb count above which T cell recruitment is enabled", "#mtb", , )
 P(double, probRec, 							                Tcell, , "Probability of recruiting a T cell", "", 0.0, 1.0)
 P(double, probMoveToMac, 						            Tcell, , "Probability of a T cell moving onto a compartment already containing a macrophage", "", 0.0, 1.0)
 P(double, probMoveToTcell, 					            Tcell, , "Probability of a T cell moving onto a compartment already containing another T cell", "", 0.0, 1.0)
 P(double, movementBonusFactor, 				          Tcell, 1.0, "Bonus factor for neighbor compartment with highest chemical concentration", "", , )
+P(int, maxAge,								        Tcell, , "Maximal T cell age", "#timesteps", 0, )
+P(int, timeRecEnabled,						    Tcell, , "Time after which T cell recruitment is enabled", "#timesteps", 0, )
+P(int, lymphProxyScalingStart,		    Tcell, , "Time when T cell lymph ode proxy recruitment switches from linear to scaled linear calculations for T cell fluxes.", "#timesteps", 0, )
+P(int, lymphProxyFactorStart,			    Tcell, , "Time when T cell lymph ode proxy recruitment switches from scaled linear to linear*factor1 calculations for T cell fluxes.", "#timesteps", 0, )
+P(int, lymphProxyFactorEnd,				    Tcell, , "Time when T cell lymph ode proxy recruitment switches from linear*factor1 to nonlinear*factor2 calculations for T cell fluxes.", "#timesteps", 0, )
+P(int, lymphProxyFactorNonlinearEnd,	Tcell, , "Time when T cell lymph ode proxy recruitment switches from nonlinear*factor2 to full nonlinear calculations for T cell fluxes.", "#timesteps", 0, )
+P(int, lymphProxyMtbThreshold,  		  Tcell, , "Mtb count at which T cell fluxes are computed for T cell lymph ode proxy recruitment, after lymphproxScalingStart time.", "#timesteps", 0, )
+// End of Tcell parameters
+
+// Tgam parameters
+//type,     name,                           path,   default,    desc,                                                   units,          min,    max)
 P(double, recruitmentHalfSatTNF, 				        Tcell_Tgam,	, "Half-saturation paramter for Tcell TNF-dependent recruitment", "", , )
 P(double, recruitmentHalfSatChemokine, 		      Tcell_Tgam,	, "Half-saturation paramter for Tcell chemokine-dependent recruitment", "", , )
 P(double, maxRecProb,                           Tcell_Tgam,	, "Max probability of recruiting a Tgam - Scales recruitment function", "", 0.0, 1.0)
@@ -228,6 +262,12 @@ P(double, rateICOS,                             Tcell_Tgam,	, "Probability rate 
 P(double, rateAgDegree,                         Tcell_Tgam,	, "Probability rate of 2degree antigen stimulation", "", , )
 P(double, thresholdRecChemokine,                Tcell_Tgam,	, "Threshold of Tgam Recruitment for Chemokines", "", , )
 P(double, thresholdRecTNF,                      Tcell_Tgam,	, "Threshold of Tgam Recruitment for TNF", "", , )
+P(int, maxTimeReg,							      Tcell_Tgam, , "Time span during which a Tgam cell remains down-regulated" , "#timesteps", 0, )
+P(int, maxTimeDouble,						      Tcell_Tgam, , "Time span during which a Tgam cell remains double producer", "#timesteps", 0, )
+// End of Tgam parameters
+
+// Tcyt parameters
+//type,     name,                           path,   default,    desc,                                                   units,          min,    max)
 P(double, thresholdRec, 						            Tcell_Tcyt,	, "TNF/chemokine threshold for Tcyt recruitment", "", , )
 P(double, probRec, 							                Tcell_Tcyt,	, "Probability of recruiting a Tcyt cell", "", 0.0, 1.0)
 P(double, probKillMac, 						              Tcell_Tcyt,	, "Probability of a Tcyt cell killing a (chronically) infected macrophage", "", 0.0, 1.0)
@@ -237,6 +277,11 @@ P(double, recruitmentHalfSatTNF, 				        Tcell_Tcyt,	, "Half-saturation para
 P(double, recruitmentHalfSatChemokine, 		      Tcell_Tcyt,	, "Half-saturation paramter for Tcell chemokine-dependent recruitment", "", , )
 P(double, thresholdRecChemokine,                Tcell_Tcyt,	, "Threshold of TCYT Recruitment for Chemokines", "", , )
 P(double, thresholdRecTNF,                      Tcell_Tcyt,	, "Threshold of TCYT Recruitment for TNF", "", , )
+P(int, maxTimeReg,							      Tcell_Tcyt, , "Time span during which a Tcyt cell remains down-regulated" , "#timesteps", 0, )
+// End of Tcyt parameters
+
+// Treg parameters
+//type,     name,                           path,   default,    desc,                                                   units,          min,    max)
 P(double, thresholdRec, 						            Tcell_Treg,	, "TNF/chemokine threshold for Treg recruitment", "", , )
 P(double, probRec, 							                Tcell_Treg,	, "Probability of recruiting a Treg cell", "", 0.0, 1.0)
 P(double, probTregDeactivate, 					        Tcell_Treg,	, "Probability of successful downregulation by a Treg", "", 0.0, 1.0)
@@ -247,6 +292,10 @@ P(double, recruitmentHalfSatTNF, 				        Tcell_Treg,	, "Half-saturation para
 P(double, recruitmentHalfSatChemokine, 		      Tcell_Treg,	, "Half-saturation paramter for Tcell chemokine-dependent recruitment", "", , )
 P(double, thresholdRecChemokine,                Tcell_Treg,	, "Threshold of TREG Recruitment for Chemokines", "", , )
 P(double, thresholdRecTNF,                      Tcell_Treg,	, "Threshold of TREG Recruitment for TNF", "", , )
+// End of Treg parameters
+
+// Mtb parameters
+//type,     name,                           path,   default,    desc,                                                   units,          min,    max)
 P(double, growthRateIntMtb, 					          Mtb, , "Growth rate of intracellular bacteria", "", , )
 P(double, growthRateIntMtbMin,                  Mtb, , "Growth rate of intracellular bacteria minimum", "", , )
 P(double, growthRateIntMtbMax,	                Mtb, , "Growth rate of intracellular bacteria maximum", "", , )
@@ -259,6 +308,10 @@ P(double, growthExtMtbBound, 		                Mtb, , "Upper bound on the number
 P(double, deathRateExtMtbCaseated,              Mtb, , "Upper bound on the number of extracellular bacteria used in growth function", "#bacteria", , )
 P(double, mtbStoppingThreshold,                 ,	0.0, "Stop simulation if mtb count above this threshold and simulation is at the time step specified by mtbStopppingTimeStep", "#bacteria", , )
 P(double, mtbStoppingThreshold2,                ,	0.0, "Stop simulation if mtb count above this threshold and simulation is at the time step specified by mtbStopppingTimeStep", "#bacteria", , )
+// End of Mtb parameters
+
+// Lymph node ODE parameters
+//type,     name,                           path,   default,    desc,                                                   units,          min,    max)
 P(double, muMDC_LN, 					                  ,	, "ODE stuff", "", , )
 P(double, muN4, 							                  ,	, "ODE stuff", "", , )
 P(double, k13, 								                  ,	, "ODE stuff", "", , )
@@ -290,9 +343,11 @@ P(double, scalingLung, 				                  ,	1.0, "ODE stuff - scaling factor 
 P(double, scalingLN, 					                  ,	1.0, "ODE stuff - scaling factor for T cell fluxes to account for GR size", "", , )
 P(double, initN4, 						                  ,	, "ODE stuff - N4(0)", "", , )
 P(double, initN8, 						                  ,	, "ODE stuff - N8(0)", "", , )
-P(double, sourceDensity,                        ,	0.2, "Density of vascular sources on the grid", "", 0.0, 1.0)
+// End of Lymph node ODE parameters
 
-P(int, nrSources,							        ,	0.0, "Number of vascular sources on the grid", "", 0, )
+//type,     name,                           path,   default,    desc,                                                   units,          min,    max)
+P(double,	sourceDensity,					,		0.2,		"Density of vascular sources on the grid",				"",				0.0,	1.0)
+P(int,		nrSources,						,		0.0,		"Number of vascular sources on the grid",				"",				0,			)
 P(int, nrKillingsCaseation,				    , , "Number of killings for a compartment to become caseated", "", 0, )
 P(int, NFkBTimeCoefficient,				    , , "Number of NF-kB time-steps within a single diffusion time-step", "-", 0, )
 P(int, dosageStartTime,            , , "Time to begin dosing strategy", "#timesteps", 0, )
@@ -300,23 +355,6 @@ P(int, dosageStartTime,            , , "Time to begin dosing strategy", "#timest
 //{ "dosageIntervalTNF",                  GR_NODE,	true,	true,	10.0,	10,	"#timesteps",       "Time interval of TNF doses" },
 P(int, dosageIntervalINH,          , , "Time interval of INH doses", "#timesteps", 0, )
 P(int, dosageIntervalRIF,          , , "Time interval of RIF doses", "#timesteps", 0, )
-P(int, maxAge,								        Mac, , "Maximal macrophage age", "#timesteps", 0, )
-P(int, maxAgeAct,							        Mac, , "Maximal activated macrophage age", "#timesteps", 0, )
-P(int, initNumber,							      Mac, , "Initial number of resting macrophages on the grid", "", 0, )
-P(int, maxAge,								        Tcell, , "Maximal T cell age", "#timesteps", 0, )
-P(int, timeRecEnabled,						    Tcell, , "Time after which T cell recruitment is enabled", "#timesteps", 0, )
-P(int, lymphProxyScalingStart,		    Tcell, , "Time when T cell lymph ode proxy recruitment switches from linear to scaled linear calculations for T cell fluxes.", "#timesteps", 0, )
-P(int, lymphProxyFactorStart,			    Tcell, , "Time when T cell lymph ode proxy recruitment switches from scaled linear to linear*factor1 calculations for T cell fluxes.", "#timesteps", 0, )
-P(int, lymphProxyFactorEnd,				    Tcell, , "Time when T cell lymph ode proxy recruitment switches from linear*factor1 to nonlinear*factor2 calculations for T cell fluxes.", "#timesteps", 0, )
-P(int, lymphProxyFactorNonlinearEnd,	Tcell, , "Time when T cell lymph ode proxy recruitment switches from nonlinear*factor2 to full nonlinear calculations for T cell fluxes.", "#timesteps", 0, )
-P(int, lymphProxyMtbThreshold,  		  Tcell, , "Mtb count at which T cell fluxes are computed for T cell lymph ode proxy recruitment, after lymphproxScalingStart time.", "#timesteps", 0, )
-P(int, maxTimeReg,							      Tcell_Tgam, , "Time span during which a Tgam cell remains down-regulated" , "#timesteps", 0, )
-P(int, maxTimeDouble,						      Tcell_Tgam, , "Time span during which a Tgam cell remains double producer", "#timesteps", 0, )
-P(int, maxTimeReg,							      Tcell_Tcyt, , "Time span during which a Tcyt cell remains down-regulated" , "#timesteps", 0, )
-P(int, movementRest,						      Mac, , "Time required for a resting macrophage to move one micro-compartment", "#timesteps", 0, )
-P(int, movementInf,						        Mac, , "Time required for an infected macrophage to move one micro-compartment", "#timesteps", 0, )
-P(int, movementAct,					        	Mac, , "Time required for an active macrophage to move one micro-compartment", "#timesteps", 0, )
-P(int, maxTimeReg,							      Mac, , "Time span during which a macrophage remains down-regulated", "#timesteps", 0, )
 P(int, mtbStopppingTimeStep,				  ,	0.0, "Time step at which to check mtbStoppingThreshold", "#timesteps", 0, )
 P(int, mtbStopppingTimeStep2,				  ,	0.0, "Time step at which to check mtbStoppingThreshold", "#timesteps", 0, )
 P(int, areaCellDensityStoppingThreshold,	,	0, "Stop simulation if area by cell density above this threshold and simulation is at the time step specified by areaCellDensityStopppingTimeStep", "um^2", 0, )

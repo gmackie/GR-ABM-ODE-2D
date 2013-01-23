@@ -974,16 +974,16 @@ int main(int argc, char** argv)
   if(!handler)
     throw std::runtime_error("Unable to find parameter file, cannot continue...");
   std::ifstream _if(paramFile.c_str());
-  LungParam::getInstance().load(_if, handler, pt);
+  LungParam::getInstance(pdim)->load(_if, handler, pt);
   if(!handler->good())
     throw std::runtime_error("Unable to get parameters from file, cannot continue...");
 
-  LungParam::getInstance().set_NFkBdynamics(vm.count("NFkB-dynamics"));
-  LungParam::getInstance().set_TNFdynamics (vm.count("tnfr-dynamics") || vm.count("NFkB-dynamics"));
-  LungParam::getInstance().set_IL10dynamics(vm.count("il10r-dynamics"));
+  LungParam::getInstance()->set_NFkBdynamics(vm.count("NFkB-dynamics"));
+  LungParam::getInstance()->set_TNFdynamics (vm.count("tnfr-dynamics") || vm.count("NFkB-dynamics"));
+  LungParam::getInstance()->set_IL10dynamics(vm.count("il10r-dynamics"));
 
-  LungParam::getInstance().set_RandomizeGrowthRate(vm.count("rand-growth"));
-  LungParam::getInstance().set_growthRateSamples(vm["growth-samples"].as<unsigned>());
+  LungParam::getInstance()->set_RandomizeGrowthRate(vm.count("rand-growth"));
+  LungParam::getInstance()->set_growthRateSamples(vm["growth-samples"].as<unsigned>());
 
   DiffusionMethod diffMethodEnum;
   switch (vm["diffusion"].as<unsigned>())

@@ -89,7 +89,8 @@ HEADERS += scalardatasets/scalartotmtbdataset.h \
     gui/agenthistogram.h \
     simulation/numericalMethods.h \
     scalardatasets/scalarindexeddataset.h \
-    simulation/params.h
+    simulation/params.h \
+    simulation/lungparams.h
 SOURCES += \
     simulation/grdiffusionadeswap.cpp \
     simulation/grdiffusionftcsswap.cpp \
@@ -148,7 +149,8 @@ SOURCES += \
     snapshot.cpp \
     gui/graphviewer.cpp \
     gui/agenthistogram.cpp \
-    simulation/params.cpp
+    simulation/params.cpp \
+    simulation/lungparams.cpp
 FORMS += gui/agentswidget.ui \
     gui/statwidget.ui \
     gui/paramwindow.ui \

@@ -29,7 +29,6 @@ typedef enum {	GR_CONTAINMENT, GR_CONTAINMENT_INCONSISTENT, GR_CLEARANCE,
 namespace ba = boost::accumulators;
 
 
-// --- iostream members for boost::array<> ---
 inline std::ostream& operator<<(std::ostream& s, const GrStatus& a)
 {
   s<<(int)a;
@@ -42,6 +41,8 @@ inline std::istream& operator>>(std::istream& s, GrStatus& a)
   a = (GrStatus)x;
   return s;
 }
+
+// --- iostream members for boost::array<> ---
 template<typename T, size_t N>
 inline std::ostream& operator<<(std::ostream& s, const boost::array<T, N>& a)
 {
@@ -95,6 +96,7 @@ protected:
 #include "stat.def"
 
 //--- Custom Members ---
+
   boost::array<Stat, Mac::NSTATES> _macIntMtbStats;
   Stat _macGrowthRateStat;
   std::vector<unsigned> _intMtbFreq;
@@ -164,6 +166,22 @@ public:
 
 // --- Custom Accessors ---
 
+  Stat& getMacIntMtbStats(Mac::State i)
+  {
+    return _macIntMtbStats[i];
+  }
+  const Stat& getMacIntMtbStats(Mac::State i) const
+  {
+    return _macIntMtbStats[i];
+  }
+
+  Stat& getMacGrowthRateStat() {
+    return _macGrowthRateStat;
+  }
+  const Stat& getMacGrowthRateStat() const {
+    return _macGrowthRateStat;
+  }
+
   unsigned& getIntMtbFreq(size_t i)
   {
     return _intMtbFreq[i];
@@ -196,22 +214,6 @@ public:
   void setGrowthRateFreq(size_t i, const unsigned& v)
   {
     _growthRateFreq[i] = v;
-  }
-
-  Stat& getMacGrowthRateStat() {
-    return _macGrowthRateStat;
-  }
-  const Stat& getMacGrowthRateStat() const {
-    return _macGrowthRateStat;
-  }
-
-  Stat& getMacIntMtbStats(Mac::State i)
-  {
-    return _macIntMtbStats[i];
-  }
-  const Stat& getMacIntMtbStats(Mac::State i) const
-  {
-    return _macIntMtbStats[i];
   }
 
 // --- Visitor Methods ---
@@ -319,9 +321,9 @@ public:
 #define STATE_STAT(type, name, agent_t, desc, reset) ARRAY_STAT(type, name, agent_t::NSTATES, desc, reset)
     //#define AGENTSTATE_STAT(type, name, sz, desc, reset) s << boost::serialization::make_nvp( #name, _ ## name);
 #include "stat.def"
+    std::fill_n(_macIntMtbStats.begin(), (size_t)Mac::NSTATES, Stat());
     std::fill(_intMtbFreq.begin(), _intMtbFreq.end(), 0);
     std::fill(_growthRateFreq.begin(), _growthRateFreq.end(), 0);
-    std::fill_n(_macIntMtbStats.begin(), (size_t)Mac::NSTATES, Stat());
   }
 
   /*** Custom Functions ***/

@@ -9,6 +9,7 @@
 #include <QComboBox>
 #include <QLineEdit>
 #include <QFileDialog>
+#include <sstream>
 #include <assert.h>
 
 #include "simulation/xmlhandler.h"
@@ -19,19 +20,31 @@
 template<typename T>
 class EditableTreeItem : public QStandardItem {
   T& _data;
-  boost::optional<Range<T> > range;
+  Params::ParamDescriptor<T> _desc;
 public:
-  EditableTreeItem(T& value, const boost::optional<Range<T> >& _range) : QStandardItem(), _data(value), range(_range) {
+  EditableTreeItem(T& value, const Params::ParamDescriptor<T>& desc) : QStandardItem(), _data(value), _desc(desc) {
     setEditable(true);
     setData(QVariant::fromValue(_data), Qt::EditRole);
   }
   int type() const { return UserType + 1; }
-  QStandardItem* clone() const { return new EditableTreeItem<T>(_data, range); }
+
+  QStandardItem* clone() const { return new EditableTreeItem<T>(_data, _desc); }
+
   void setData ( const QVariant & value, int role = Qt::UserRole + 1 ) {
+
+    boost::optional<Range<T> > range = _desc.range;
+
     if(role == Qt::EditRole || role == Qt::DisplayRole) {
       assert(value.canConvert<T>());
       T tmp = qvariant_cast<T>(value);
-      if(!!range && !range->contains(tmp)) { QMessageBox::warning(NULL, "Invalid parameter", "Parameter value out of range", QMessageBox::Ok); return; }
+      if(!!range && !range->contains(tmp))
+      {
+        stringstream ss;
+        ss << "Parameter " << _desc.name << " value of " << tmp << " is out of range [" << range->min << ", " << range->max << "]";
+        
+        QMessageBox::warning(NULL, "Invalid parameter", ss.str().c_str(), QMessageBox::Ok); return;
+      }
+
       _data = tmp;
     }
     QStandardItem::setData(value, role);
@@ -82,7 +95,7 @@ struct TreeVisitor {
     QList<QStandardItem*> items;
     items << new QStandardItem(QString::fromStdString(desc.name));
     items.back()->setEditable(false);
-    items << new EditableTreeItem<T>(val, desc.range);
+    items << new EditableTreeItem<T>(val, desc);
     items << new QStandardItem(QString::fromStdString(desc.units));
     items.back()->setEditable(false);
     items << new QStandardItem(QString::fromStdString(desc.desc));
@@ -91,7 +104,7 @@ struct TreeVisitor {
   }
 };
 
-ParamWindow::ParamWindow(Simulation& _sim, Params& _params, boost::property_tree::ptree& _pt, QWidget *parent) :
+ParamWindow::ParamWindow(Simulation& _sim, Params* _params, boost::property_tree::ptree& _pt, QWidget *parent) :
   QWidget(parent),
   params(_params),
   pt(_pt),
@@ -112,7 +125,7 @@ ParamWindow::ParamWindow(Simulation& _sim, Params& _params, boost::property_tree
   ui->treeView->setModel(model);
 }
 
-void ParamWindow::reloadParams(Params &p) {
+void ParamWindow::reloadParams(Params* p) {
   model->clear();
   model->insertColumns(0,4);
   model->setHeaderData(0, Qt::Horizontal, "Name");
@@ -120,7 +133,7 @@ void ParamWindow::reloadParams(Params &p) {
   model->setHeaderData(2, Qt::Horizontal, "Units");
   model->setHeaderData(3, Qt::Horizontal, "Description");
   TreeVisitor visitor(model->invisibleRootItem());
-  p.visitProperties(visitor);
+  p->visitProperties(visitor);
 }
 
 ParamWindow::~ParamWindow()
@@ -140,7 +153,7 @@ void ParamWindow::on_pushButtonSave_clicked()
   else if(fileName.isNull()) return;  // Cancelled
   else { QMessageBox::critical(this, tr("Error"), tr("Invalid format specified")); return; }
   std::ofstream f(fileName.toStdString().c_str());
-  params.save(f, handler, pt);  //No need to lock here, just reading to file
+  params->save(f, handler, pt);  //No need to lock here, just writing to file
   delete handler;
 }
 
@@ -157,13 +170,13 @@ void ParamWindow::on_pushButtonLoad_clicked()
   else { QMessageBox::critical(this, tr("Error"), tr("Invalid format specified")); return; }
   std::ifstream f(fileName.toStdString().c_str());
   try {
-    Params tmp;
+    Params tmp(sim.getSize());
     tmp.load(f, handler, pt);
     if(!handler->good())
       throw std::runtime_error("See log for details");
     sim.lock(); //Writer lock!
     sim.modelLock();
-    params = tmp;
+    *params = tmp;
     sim.unlock();
     sim.modelUnlock();
   } catch(std::exception& e) {

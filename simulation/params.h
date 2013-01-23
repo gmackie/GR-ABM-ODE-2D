@@ -5,6 +5,7 @@
 #include <vector>
 #include "range.h"
 #include <algorithm>
+#include "pos.h"
 
 #ifndef uint
 typedef unsigned int uint;
@@ -37,14 +38,13 @@ public:
   struct ParamDescriptor {
     boost::optional<Range<T> > range; /// Valid range for the parameter
     boost::optional<T> def;           /// Default value for parameter
+    bool wasRead; // Whether this parameter had its value read from a parmeter file or not.
     std::string name, desc, units, path;
     ParamDescriptor(T min, T max, std::string n, boost::optional<T> defau, std::string d, std::string u, std::string p)
-    : def(defau), name(n), desc(d), units(u), path(p) { if(min != max) range = Range<T>(min, max); }
+    : def(defau), wasRead(false), name(n), desc(d), units(u), path(p) { if(min != max) range = Range<T>(min, max); }
   };
 
 private:
-  ///Called from the destructor
-  //void initialize();
 
   /// Convert token string to ptree path (_ -> .)
   static const std::string make_path(const char path[]) {
@@ -64,13 +64,21 @@ private:
     }
   };
 
+  // Define any computed parameters including any that are computed based on other parameters.
+  void computeParams();
+
   /* Definitions */
+
 #define P(type, name, path, def, desc, units, min, max) type _##path##_##name; ParamDescriptor<type> _##path##_##name##Desc;
 #include "params.def"
-  int dummy;
+
+  // Needed for some parameters computed based on other parameter values and the simulation dimensions.
+  // For example, source count or initial mac count based on density values.
+  Pos _dim; 
+
 
 public:
-  Params();
+  Params(const Pos& dim=Pos(-1,-1));
 
   /// @name Accessors
   /// @{
@@ -146,25 +154,35 @@ public:
   //Reader visiting
   template<typename T>
   void visit(T& val, Params::ParamDescriptor<T>& desc) {
+
     //Read in
     using namespace boost::property_tree;
     boost::optional<T> v = pt->get_optional<T>(getFullPath(root, desc.name, desc.path));
-    if(!!v) val = *v;
-    else if(!!desc.def) val = *(desc.def);
+
+    if(!!v)
+    {
+      val = *v;
+      desc.wasRead = true;
+    }
+    else if(!!desc.def)
+    {
+      val = *(desc.def);
+    }
     else {
-      std::clog<<"Invalid or missing parameter: "<< desc.path << '.' << desc.name << std::endl;
+      std::cerr<<"Invalid or missing parameter: "<< desc.path << '.' << desc.name << std::endl;
       error = MISSING;
       return;
     }
+
     if(desc.range && !desc.range->contains(val)) {
-      std::clog<<"Parameter outside of range: " << desc.path << '.' << desc.name << std::endl;
+      std::cerr<<"Parameter outside of range: " << desc.path << '.' << desc.name << std::endl;
       error = RANGE;
     }
   }
   //Writer visiting
   template<typename T>
   void visit(const T& val, const Params::ParamDescriptor<T>& desc) {
-    if(desc.def && *(desc.def) == val) return;  //It's the same as the default, skip it
+    if(!desc.wasRead) return;  //Not read from a parameter file, skip it
     pt->put(getFullPath(root, desc.name, desc.path), val);
   }
 };
@@ -179,6 +197,7 @@ inline void Params::load(std::istream& file, ParamFileHandler* reader, boost::pr
  assert(reader!=NULL);
  reader->read(file, pt);
  reader->visit(*this, pt);
+ computeParams();
 }
 
 #endif // PARAMS_H

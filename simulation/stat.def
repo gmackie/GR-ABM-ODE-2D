@@ -75,6 +75,7 @@ STAT(int, AreaTNF,          "", 1)
 STAT(int, AreaCellDensity,  "", 1)
 STAT(int, NrCaseated,       "", 1)
 ARRAY_STAT(GrStatus, Status, NOUTCOMES, "", 0)
+STAT(Scalar, DrugConcentrationArea, "Area Under Drug Concentration Curve", 0)
 
 GROUP_STATS("Recruitment Stats", "")
 AGENT_STAT(int, NrQueued,     "", 1)

@@ -94,6 +94,7 @@ struct LHS {
   template<typename T>
   typename boost::enable_if<boost::is_integral<T> >::type
   addValues(Range<T>& range) {
+
     intBins.push_back(std::vector<int>(nSamples));
     std::vector<int>& bins = intBins.back();
     size_t count = nSamples / (range.max - range.min + 1);
@@ -148,8 +149,13 @@ LHS<Param, ParamFileHandler>::RangeEnumerator::visit(T& val, typename Param::tem
     Range<T> range = kid->get_value<Range<T> >();
     if(!!desc.range && !desc.range->contains(range))
       throw std::runtime_error(std::string("Invalid range for parameter: ") + desc.path+'.'+desc.name);
+
+    desc.wasRead = true;
+
     if(range.min == range.max)
+    {
       val = range.min;
+    }
     else { //Build the sample list
       lhs->addValues(range);
       return;
@@ -162,7 +168,10 @@ LHS<Param, ParamFileHandler>::RangeEnumerator::visit(T& val, typename Param::tem
     if(values.size() == 0)
       throw std::runtime_error(std::string("Invalid format for parameter: ")+desc.path+'.'+desc.name);
     else if(values.size() == 1)
+    {
       val = values[0];  //Sample list is constant
+      desc.wasRead = true;
+    }
     else {
       if(!!desc.range)
         for(typeof(values.begin()) it = values.begin();it!=values.end();it++)
@@ -170,11 +179,14 @@ LHS<Param, ParamFileHandler>::RangeEnumerator::visit(T& val, typename Param::tem
             throw std::runtime_error(std::string("Invalid value for ") + desc.path+'.'+desc.name+": "+ boost::lexical_cast<std::string>(*it));
       //Build the sample list
       lhs->addValues(values);
+      desc.wasRead = true;
       return;
     }
   }
   else if(!!desc.def)
-    val = *(desc.def);
+    {
+      val = *(desc.def);
+    }
   else {
     std::cerr<<"Warning - Parameter value cannot be determined: "<<desc.path<<'.'<<desc.name<<std::endl;
     val = 0;
@@ -214,7 +226,13 @@ inline void LHS<Param, ParamFileHandler>::performLHS() {
   {
     ParamBuilder visitor(this);
     param.visitProperties(visitor);
-    assert(param.validate());
+
+    if (!param.validate())
+    {
+      std::cerr << "Sample " << i << " had validation errors." << std::endl;
+      exit(1);
+    }
+
     std::ofstream file((boost::lexical_cast<std::string>(i+1) + ".xml").c_str());
     param.save(file, handler, pt);
   }

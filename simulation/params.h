@@ -59,7 +59,7 @@ private:
     template<typename T>
     void visit(const T& val, const Params::ParamDescriptor<T>& desc) {
       bool res = !(!!desc.range && !desc.range->contains(val));
-      if(!res) std::clog<<"Invalid parameter for "<<desc.path<<'.'<<desc.name<<std::endl;
+      if(!res) std::cerr<<"Invalid parameter for "<<desc.path<<'.'<<desc.name<<std::endl;
       good &= res;
     }
   };

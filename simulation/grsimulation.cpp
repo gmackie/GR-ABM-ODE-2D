@@ -1184,18 +1184,18 @@ void GrSimulation::setDiffusionMethod(DiffusionMethod method)
     case DIFF_SOR_WRONG:
         _pDiffusion = new GrDiffusionWrongBTCS(); break;
     case DIFF_REC_EQ:
-        std::clog<<"*** WARNING: DIFF_REC_EQ disabled, defaulting to DIFF_REC_EQ_SWAP"<<std::endl;
+        std::cerr<<"*** WARNING: DIFF_REC_EQ disabled, defaulting to DIFF_REC_EQ_SWAP"<<std::endl;
     case DIFF_REC_EQ_SWAP:
         _pDiffusion = new GrDiffusionFTCS_Swap(); break;
     case DIFF_ADE_SWAP:
         if(_PARAM(_timestepDiffusion) > 30)
-            std::clog<<("*** WARNING: This diffusion method is inaccurate for timesteps greater than 30 seconds")<<std::endl;
+            std::cerr<<("*** WARNING: This diffusion method is inaccurate for timesteps greater than 30 seconds")<<std::endl;
         _pDiffusion = new GrDiffusionADE_Swap(); break;
     default:
         assert(!"Invalid diffusion method"); break;
     }
     if(method != DIFF_ADE_SWAP && _PARAM(_timestepDiffusion) > 12)
-        std::clog<<("*** WARNING: This diffusion method is unstable for timesteps greater than 12 seconds")<<std::endl;
+        std::cerr<<("*** WARNING: This diffusion method is unstable for timesteps greater than 12 seconds")<<std::endl;
 }
 
 RecruitmentMethod GrSimulation::getRecruitmentMethod()

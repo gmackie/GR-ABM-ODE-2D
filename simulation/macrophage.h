@@ -356,12 +356,14 @@ inline double Mac::getIntMtbGrowthRate(const int time, double INH_C)
       // The killing rate is defined relative to the fraction of the base growth rate, for growth rate 1.025 (in the parameter file), the killing rate is compared to the .025.
       // If the growth rate fraction is 0.025 and the killing rate is 0.05, the effective growth rate 1 + 0.025 - 0.05 will be < 1, i.e. negative growth. This is valid only if the effective growth rate > 0.
 
-      double INH_Emax = _PARAM(_intraActivityINH);
-      double INH_C50 = _PARAM(_C50_INH); // milligram/L
-      double adj_kill_rate = INH_Emax * ((INH_C) / ( INH_C50 + INH_C ));
-      intMtbGrowthRate = intMtbGrowthRate - adj_kill_rate;
-      assert(intMtbGrowthRate>=0);
-
+      if (_PARAM(_DrugDynamics))
+      {
+          double INH_Emax = _PARAM(_intraActivityINH);
+          double INH_C50 = _PARAM(_C50_INH); // milligram/L
+          double adj_kill_rate = INH_Emax * ((INH_C) / ( INH_C50 + INH_C ));
+          intMtbGrowthRate = intMtbGrowthRate - adj_kill_rate;
+          assert(intMtbGrowthRate>=0);
+      }
     }
 
   return intMtbGrowthRate;

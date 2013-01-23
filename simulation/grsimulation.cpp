@@ -642,7 +642,8 @@ void GrSimulation::solve()
     for (int DiffStep = 0; DiffStep < _numDiffusionPerAgent; DiffStep++)
     {
         _pDiffusion->diffuse(_grid);
-        consumeDrugs(_grid.getGrid(),_PARAM(_timestepDiffusion));
+        if (_PARAM(_DrugDynamics))
+            consumeDrugs(_grid.getGrid(),_PARAM(_timestepDiffusion));
         secreteFromMacrophages(tnfDepletion, il10Depletion, _PARAM(_timestepDiffusion));
         secreteFromTcells(tnfDepletion, il10Depletion, _PARAM(_timestepDiffusion));
         secreteFromCaseations(_PARAM(_timestepDiffusion));
@@ -661,9 +662,12 @@ void GrSimulation::solve()
                     adjustFauxDegradation(_PARAM(_timestepMolecular));
                 //adjustTNFDegradation(_PARAM(_timestepMolecular));
             }
-        _pVascular->solveVascularSources(_grid.getGrid(), _PARAM(_timestepDiffusion),_time, DiffStep);
-        _stats.getBloodConcINH() = _pVascular->getBloodConcentrationINH();
-        _stats.getBloodConcRIF() = _pVascular->getBloodConcentrationRIF();
+        if (_PARAM(_DrugDynamics))
+        {
+            _pVascular->solveVascularSources(_grid.getGrid(), _PARAM(_timestepDiffusion),_time, DiffStep);
+            _stats.getBloodConcINH() = _pVascular->getBloodConcentrationINH();
+            _stats.getBloodConcRIF() = _pVascular->getBloodConcentrationRIF();
+        }
 
     }
 
@@ -949,12 +953,17 @@ void GrSimulation::growExtMtb()
             double growthRate = _PARAM(Mtb_growthRateExtMtb) - 1;
             if(_PARAM(_RandomizeGrowthRate))
                 growthRate = getGrid().growthRate(p) - 1;
-            double INH_Emax = _PARAM(_extraActivityINH);
-            double INH_C50 = _PARAM(_C50_INH); // milligram/L
+
+            double adj_kill_rate = 0.0;
+            if (_PARAM(_DrugDynamics))
+            {
+                double INH_Emax = _PARAM(_extraActivityINH);
+                double INH_C50 = _PARAM(_C50_INH); // milligram/L
+                double INH_C = g.INH(p);        // get concentration from grid in mg/L
+                adj_kill_rate = INH_Emax * ((INH_C) / ( INH_C50 + INH_C ));
+            }
 
             Scalar& extMtb = g.extMTB(p);
-            double INH_C = g.INH(p);        // get concentration from grid in mg/L
-            double adj_kill_rate = INH_Emax * ((INH_C) / ( INH_C50 + INH_C ));
 
             if (g.isCaseated(p))
             {
@@ -1014,8 +1023,6 @@ void GrSimulation::growExtMtb()
 
             _stats.getTotMacAttractant() += (g.macAttractant(p));
             _stats.getTotTNF() += (g.TNF(p));
-            _stats.getTotINH() += (g.INH(p));
-            _stats.getTotRIF() += (g.RIF(p));
             _stats.getTotIL10() += (g.il10(p));
             _stats.getTotCCL2() += (g.CCL2(p));
             _stats.getTotCCL5() += (g.CCL5(p));
@@ -1027,13 +1034,22 @@ void GrSimulation::growExtMtb()
             if (g.getCellDensity(p) >= _areaThresholdCellDensity)
             {
                 ++_stats.getAreaCellDensity();
-                _stats.getTotINHGran() += g.INH(p);
-                _stats.getTotRIFGran() += g.RIF(p);
             }
-            else
+
+            if (_PARAM(_DrugDynamics))
             {
-                _stats.getTotINHNorm() += g.INH(p);
-                _stats.getTotRIFNorm() += g.RIF(p);
+                _stats.getTotINH() += (g.INH(p));
+                _stats.getTotRIF() += (g.RIF(p));
+                if (g.getCellDensity(p) >= _areaThresholdCellDensity)
+                {
+                    _stats.getTotINHGran() += g.INH(p);
+                    _stats.getTotRIFGran() += g.RIF(p);
+                }
+                else
+                {
+                    _stats.getTotINHNorm() += g.INH(p);
+                    _stats.getTotRIFNorm() += g.RIF(p);
+                }
             }
         }
     }

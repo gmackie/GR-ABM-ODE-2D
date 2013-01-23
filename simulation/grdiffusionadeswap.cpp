@@ -324,9 +324,10 @@ static void diffuse_degrade(GrGrid& nextGrid)
     const Scalar IL10degRate = exp(-1.0 *  _PARAM(_Ikdeg) * dt);
     const Scalar CHEMOKINEdegRate = exp(-1.0 *  _PARAM(_ChemokinekDeg) * dt);
 
-    const Scalar INHdegRate = exp(-1.0 *  _PARAM(_degRateConstINH) * dt);
-    const Scalar RIFdegRate = exp(-1.0 *  _PARAM(_degRateConstRIF) * dt);
+    if (_PARAM(_DrugDynamics))
+    {
 
+    }
     //Degradation equation here is separated based on operator splitting causing it to lag
     //behind diffusion.  We make the assumption diffuse << degrade to
     //show degradation is much slower and incurs no stability issues. This argument should hold for
@@ -365,12 +366,17 @@ static void diffuse_degrade(GrGrid& nextGrid)
             nextGrid.setCXCL9(p, nextGrid.CXCL9(p) * CHEMOKINEdegRate);
             //            nextGrid.incCXCL9(p, (-1.0 * nextGrid.CXCL9(p) * _PARAM(_ChemokinekDeg) * dt));
 
-            // Degradation of INH
-            nextGrid.setINH(p, nextGrid.INH(p) * INHdegRate);
+            if (_PARAM(_DrugDynamics))
+            {
+                const Scalar INHdegRate = exp(-1.0 *  _PARAM(_degRateConstINH) * dt);
+                const Scalar RIFdegRate = exp(-1.0 *  _PARAM(_degRateConstRIF) * dt);
 
-            // Degradation of RIF
-            nextGrid.setRIF(p, nextGrid.RIF(p) * RIFdegRate);
+                // Degradation of INH
+                nextGrid.setINH(p, nextGrid.INH(p) * INHdegRate);
 
+                // Degradation of RIF
+                nextGrid.setRIF(p, nextGrid.RIF(p) * RIFdegRate);
+            }
 
 
             if (_PARAM(_dAttractant) != 0)
@@ -408,18 +414,7 @@ void GrDiffusionADE_Swap::diffuse(GrSimulationGrid& grSim) const
             ::diffuse_v(grid.v_TNF(), nextGrid.v_TNF(), grid.getRange(), _PARAM(_diffusivityTNF), _cutOffValue);
             ::diffuse_avg(nextGrid.u_TNF(), nextGrid.v_TNF(), nextGrid.TNF(), grid.getRange());
         }
-    #pragma omp section
-        {
-            ::diffuse_u_nofluxbc(grid.u_INH(), nextGrid.u_INH(), grid.getRange(), _cutOffValue, grid.nCells(), _PARAM(_minDiffusivityINH), _PARAM(_diffusivityINH));
-            ::diffuse_v_nofluxbc(grid.v_INH(), nextGrid.v_INH(), grid.getRange(), _cutOffValue, grid.nCells(), _PARAM(_minDiffusivityINH), _PARAM(_diffusivityINH));
-            ::diffuse_avg(nextGrid.u_INH(), nextGrid.v_INH(), nextGrid.INH(), grid.getRange());
-        }
-    #pragma omp section
-        {
-            ::diffuse_u_nofluxbc(grid.u_RIF(), nextGrid.u_RIF(), grid.getRange(), _cutOffValue, grid.nCells(), _PARAM(_minDiffusivityRIF), _PARAM(_diffusivityRIF));
-            ::diffuse_v_nofluxbc(grid.v_RIF(), nextGrid.v_RIF(), grid.getRange(), _cutOffValue, grid.nCells(), _PARAM(_minDiffusivityRIF), _PARAM(_diffusivityRIF));
-            ::diffuse_avg(nextGrid.u_RIF(), nextGrid.v_RIF(), nextGrid.RIF(), grid.getRange());
-        }
+
     #pragma omp section
         {
             ::diffuse_u(grid.u_shedTNFR2(), nextGrid.u_shedTNFR2(), grid.getRange(), _PARAM(_diffusivityShedTNFR2), _cutOffValue);
@@ -450,6 +445,21 @@ void GrDiffusionADE_Swap::diffuse(GrSimulationGrid& grSim) const
             ::diffuse_u(grid.u_il10(), nextGrid.u_il10(), grid.getRange(), _PARAM(_diffusivityIL10), _cutOffValue);
             ::diffuse_v(grid.v_il10(), nextGrid.v_il10(), grid.getRange(), _PARAM(_diffusivityIL10), _cutOffValue);
             ::diffuse_avg(nextGrid.u_il10(), nextGrid.v_il10(), nextGrid.il10(), grid.getRange());
+        }
+    if (_PARAM(_DrugDynamics))
+        {
+            #pragma omp section
+            {
+                ::diffuse_u_nofluxbc(grid.u_INH(), nextGrid.u_INH(), grid.getRange(), _cutOffValue, grid.nCells(), _PARAM(_minDiffusivityINH), _PARAM(_diffusivityINH));
+                ::diffuse_v_nofluxbc(grid.v_INH(), nextGrid.v_INH(), grid.getRange(), _cutOffValue, grid.nCells(), _PARAM(_minDiffusivityINH), _PARAM(_diffusivityINH));
+                ::diffuse_avg(nextGrid.u_INH(), nextGrid.v_INH(), nextGrid.INH(), grid.getRange());
+            }
+            #pragma omp section
+            {
+                ::diffuse_u_nofluxbc(grid.u_RIF(), nextGrid.u_RIF(), grid.getRange(), _cutOffValue, grid.nCells(), _PARAM(_minDiffusivityRIF), _PARAM(_diffusivityRIF));
+                ::diffuse_v_nofluxbc(grid.v_RIF(), nextGrid.v_RIF(), grid.getRange(), _cutOffValue, grid.nCells(), _PARAM(_minDiffusivityRIF), _PARAM(_diffusivityRIF));
+                ::diffuse_avg(nextGrid.u_RIF(), nextGrid.v_RIF(), nextGrid.RIF(), grid.getRange());
+            }
         }
     } //omp parallel
 

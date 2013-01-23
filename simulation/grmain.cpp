@@ -277,14 +277,18 @@ public:
     write("repExtMtb");
     write("NonRepl Ext. Mtb.");
     write("Tot Mtb.");
-    write("INH");
-    write("BloodINH");
-    write("INH_Granuloma");
-    write("INH_NormalTissue");
-    write("RIF");
-    write("BloodRIF");
-    write("RIF_Granuloma");
-    write("RIF_NormalTissue");
+
+    if (_PARAM(_DrugDynamics))
+    {
+        write("INH");
+        write("BloodINH");
+        write("INH_Granuloma");
+        write("INH_NormalTissue");
+        write("RIF");
+        write("BloodRIF");
+        write("RIF_Granuloma");
+        write("RIF_NormalTissue");
+    }
 
     write("TNF");
     write("IntTNFR1");
@@ -375,34 +379,36 @@ public:
     write(stats.getTotNonRepExtMtb());
     write((stats.getTotIntMtb() + stats.getTotExtMtb()));
 
-    size_t sz = sim.getGrid().getSize();          //get nr of compartments on the grid
-    // INH outputs
-    write(stats.getTotINH() / sz)   ;
-    write(stats.getBloodConcINH() * MW_INH);        // (mol/L) * (mg/mol) -> mg/L
-    int gransz = stats.getAreaCellDensity();
-    if (gransz == 0)
+    if (_PARAM(_DrugDynamics))
     {
-        write(0.0);
-    }
-    else
-    {
-        write(stats.getTotINHGran() / gransz);
-    }
-    write(stats.getTotINHNorm() / (sz - gransz));
+        size_t sz = sim.getGrid().getSize();          //get nr of compartments on the grid
+        // INH outputs
+        write(stats.getTotINH() / sz)   ;
+        write(stats.getBloodConcINH() * MW_INH);        // (mol/L) * (mg/mol) -> mg/L
+        int gransz = stats.getAreaCellDensity();
+        if (gransz == 0)
+        {
+            write(0.0);
+        }
+        else
+        {
+            write(stats.getTotINHGran() / gransz);
+        }
+        write(stats.getTotINHNorm() / (sz - gransz));
 
-    // RIF outputs
-    write(stats.getTotRIF() / sz);
-    write(stats.getBloodConcRIF() * MW_RIF);        // (mol/L) * (mg/mol) -> mg/L
-    if (gransz == 0)
-    {
-        write(0.0);
+        // RIF outputs
+        write(stats.getTotRIF() / sz);
+        write(stats.getBloodConcRIF() * MW_RIF);        // (mol/L) * (mg/mol) -> mg/L
+        if (gransz == 0)
+        {
+            write(0.0);
+        }
+        else
+        {
+            write(stats.getTotRIFGran() / gransz);
+        }
+        write(stats.getTotRIFNorm() / (sz - gransz));
     }
-    else
-    {
-        write(stats.getTotRIFGran() / gransz);
-    }
-    write(stats.getTotRIFNorm() / (sz - gransz));
-
 
     write(stats.getTotTNF());
     write(stats.getTotTNFR1int());
@@ -895,7 +901,8 @@ int main(int argc, char** argv)
   ("odesolver", po::value<size_t>()->default_value(4), odestream.str().c_str())
   ("Treg-induction", "Allow Tregs to be induced from Tgams in the model")
   ("tnf-depletion", po::value<int>()->default_value(-1), "The time step at which to stop secreting tnf, including by tnfr dynamics. -1: no depletion")
-  ("il10-depletion", po::value<int>()->default_value(-1), "The time step at which to stop secreting il10, including by il10r dynamics. -1: no depletion");
+  ("il10-depletion", po::value<int>()->default_value(-1), "The time step at which to stop secreting il10, including by il10r dynamics. -1: no depletion")
+  ("drug-dynamics", "Use drug dynamics in the model");
 
 
   po::options_description lhs_opts("LHS");
@@ -984,6 +991,8 @@ int main(int argc, char** argv)
 
   LungParam::getInstance()->set_RandomizeGrowthRate(vm.count("rand-growth"));
   LungParam::getInstance()->set_growthRateSamples(vm["growth-samples"].as<unsigned>());
+  LungParam::getInstance()->set_DrugDynamics(vm.count("drug-dynamics"));
+
 
   DiffusionMethod diffMethodEnum;
   switch (vm["diffusion"].as<unsigned>())

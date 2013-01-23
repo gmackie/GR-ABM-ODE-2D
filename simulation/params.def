@@ -366,5 +366,7 @@ P(bool, TNFdynamics,  , false, "TNF dynamics" , "boolean", , )
 P(bool, IL10dynamics, , false, "IL10 dynamics", "boolean", , )
 P(bool, RandomizeGrowthRate, , false, "Randomize growth rate", "boolean", , )
 P(bool, growthRateSamples, , false, "Number of samples for growthRate frequency statistic", "boolean", , )
+P(bool, DrugDynamics, , false, "Drug Dynamics", "boolean", , )
+
 
 #undef P

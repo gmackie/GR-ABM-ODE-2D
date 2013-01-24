@@ -22,6 +22,7 @@ public:
   virtual ~Tcell();
   void moveTcell(GrGrid& grid, bool ccl2, bool ccl5, bool cxcl9);
   static bool isTcell(const Agent* pAgent);
+  bool returnRandMacFromMoore(GrGrid& grid, Pos& vectorPos);
   /**
   * @copydoc GrSimulation::serialize
   */

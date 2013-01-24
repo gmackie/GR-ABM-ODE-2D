@@ -42,12 +42,16 @@ void Treg::move(GrGrid& grid)
 void Treg::secrete(GrGrid& grid, bool, bool, bool, bool il10rDynamics, bool il10Depletion, double mdt)
 {
 
-  _kISynth = _PARAM(_IkSynthTcell);
+  secIL10(grid, mdt, 1.0, _pos, il10rDynamics, il10Depletion, _PARAM(_IkSynthTcell), (_PARAM(dIL10_Treg)), _kISynth);
+
+ #if 0
+    _kISynth = _PARAM(_IkSynthTcell);
 
   if (!il10rDynamics && !il10Depletion)
     {
       grid.incil10(_pos, (_PARAM(_dIL10_Treg) * mdt));
     }
+#endif
 
 }
 
@@ -58,38 +62,18 @@ void Treg::deactivate(const int, Stats&)
 void Treg::computeNextState(const int time, GrGrid& grid, Stats& stats, bool tnfrDynamics, bool, bool, bool)
 {
   // check if it is time to die
-  if (timeToDie(time))
-    {
+  if (timeToDie(time))  {
       _nextState = TREG_DEAD;
     }
 
   // Always pass in false for nfkbDynamics for T cell apoptosis since they DO NOT have NFkB dynamics
-  else if (TNFinducedApoptosis(grid, tnfrDynamics, false))
-    {
+  else if (TNFinducedApoptosis(grid, tnfrDynamics, false))  {
       ++stats.getTcellApoptosisTNF();
       _nextState = TREG_DEAD;
       grid.incKillings(_pos);
     }
 
-//	else if (tnfrDynamics && intCompareGT(_intBoundTNFR1, _PARAM(_thresholdApoptosisTNF_Molecular)) &&
-//			 intCompareGT(1 - exp(-_PARAM(_kApoptosis_Molecular) * (_intBoundTNFR1 - _PARAM(_thresholdApoptosisTNF_Molecular))), g_Rand.getReal()))
-//	{
-//		// TNF induced apoptosis
-//		++stats.getTcellApoptosisTNF();
-//		_nextState = TREG_DEAD;
-//        grid.incKillings(_pos);
-//	}
-//	else if (!tnfrDynamics && tnfBoundFraction > _PARAM(_thresholdApoptosisTNF) &&
-//			 g_Rand.getReal() < 1 - exp(-_PARAM(_kApoptosis) * (tnfBoundFraction - _PARAM(_thresholdApoptosisTNF))))
-//	{
-//		// TNF induced apoptosis
-//		++stats.getTcellApoptosisTNF();
-//		_nextState = TREG_DEAD;
-//        grid.incKillings(_pos);
-//	}
-
-  else
-    {
+  else  {
       switch (_state)
         {
         case TREG_DEAD:
@@ -113,11 +97,10 @@ void Treg::computeNextState(const int time, GrGrid& grid, Stats& stats, bool tnf
 // loaded then the agent will be deserialized and added to a cell list, but it will fail to be
 // added to its grid compartment because an agent can't be added to a caseated compartment.
 // This will leave the simulation in an inconsistent state.
+
 void Treg::handleResting(const int time, GrGrid& grid, Stats& stats)
 {
-//    Scalar currentTNF = grid.TNF(_pos); // Get TNF concentration for scaling Treg deactivation
-//    Scalar currentIL10 = grid.il10(_pos); // Get IL10 concentration for scaling Treg deactivation
-
+#if 0
   Scalar IL10toTNFWeight = (_PARAM(_IkOn) * (_surfIL10R + _surfBoundIL10R)) / (_PARAM(_kOn1) * (_surfBoundTNFR1 + _surfTNFR1)); // Comparing Kd allows us to scale the bound receptors such that the numbers do not favor TNFs higher affinity
   Scalar numberFractionTNF;
   if (_surfBoundTNFR1 == 0.0 && _surfBoundIL10R == 0.0)
@@ -126,6 +109,7 @@ void Treg::handleResting(const int time, GrGrid& grid, Stats& stats)
     numberFractionTNF = (IL10toTNFWeight * _surfBoundTNFR1)/((IL10toTNFWeight * _surfBoundTNFR1) + _surfBoundIL10R); // Calculate the scaled number fraction of TNF (Like mol/weight fraction)
 
 //    std::cout << "Pos: " << _pos << "  Xtnf: " << numberFractionTNF << std::endl;
+#endif
 
   for (int i = -1; i <= 1; i++)
     {
@@ -139,30 +123,47 @@ void Treg::handleResting(const int time, GrGrid& grid, Stats& stats)
               if(pAgent && !pAgent->isDead() && !pAgent->isDeadNext())
                 {
                   Scalar coinFlip = g_Rand.getReal();
-
-                  // Scale Treg deactivation by TNF and IL10 concentration (only monitor molecules we have) as a proxy for
-                  // feedback to TGF-b cell-cell contact mechanism
-                  // TNF is a MM type eqn
-                  // IL10 is an exponential decay
-                  // These are inverse equations of each other since TNF would upregulate the 'Monitor Molecule' while IL10 would
-                  // downregulate the 'Monitor Molecule'
-//                      Scalar scaledProbTNF = ((_PARAM(Tcell_Treg_probTregDeactivate) * currentTNF)/(currentTNF + _PARAM(PARAM_TREG_DEACTIVATE_HALF_SAT_TNF)));
-//                      Scalar scaledProbIL10 = _PARAM(Tcell_Treg_probTregDeactivate) * exp(-_PARAM(PARAM_TREG_DEACTIVATE_HALF_SAT_IL10) * currentIL10);
-
-//                      std::cout << "Scaled Prob: " << scaledProbTNF + scaledProbIL10 << std::endl;
-
-//                      Scalar scaledProb = std::min((scaledProbTNF + scaledProbIL10), _PARAM(Tcell_Treg_probTregDeactivate));
-
+                  if (calcDeactivationProbability(coinFlip, _surfIL10R, _surfBoundIL10R, _surfTNFR1, _surfBoundTNFR1))  {
+                      grid.agent(p, k)->deactivate(time, stats);
+                  }
+#if 0
                   Scalar scaledProb = _PARAM(Tcell_Treg_probTregDeactivate) * ((numberFractionTNF * _PARAM(Tcell_Treg_deactivateSlope)) + _PARAM(Tcell_Treg_deactivateIntercept));
 //                      std::cout << "Pos :" << _pos << "  IL10: " << grid.il10(_pos) << "  TNF: " << grid.TNF(_pos) << "  Scaled Prob: " << scaledProb << std::endl;
                   if (coinFlip  <= scaledProb)
                     {
                       grid.agent(p, k)->deactivate(time, stats);
                     }
+#endif
                 }
             }
         }
     }
+}
+
+bool Treg::calcDeactivationProbability(const Scalar rnum, const Scalar il10r, const Scalar boundil10r, const Scalar tnfr1, const Scalar boundtnfr1)
+{
+
+    // This function roughly simulates the deactivation mechanisms that are
+    // not occuring through IL-10. We use boundTNFR1 and boundIL10R to scale the
+    // probability of deactivation such that if there is a large amount of IL-10 present
+    // the probability is lowered, while if a large amount of TNF is present the probability is raised.
+    // This allows for 'compensation' of other deactivation mechanisms when IL-10 is not present.
+
+    Scalar numberFractionTNF;
+
+    // Calculate the weight of IL10 to TNF based on total receptor number
+    // and the relative strength of binding. This prevents one receptor system
+    // from dominating the calculation if it has more receptors or binds faster
+    Scalar IL10toTNFWeight = (_PARAM(_IkOn) * (il10r + boundil10r)) / (_PARAM(_kOn1) * (tnfr1 + boundtnfr1));
+
+    if (boundtnfr1 == 0.0 && boundil10r == 0.0)
+      numberFractionTNF = 0.0;
+    else
+      numberFractionTNF = (IL10toTNFWeight * boundtnfr1)/((IL10toTNFWeight * boundtnfr1) + boundil10r); // Calculate the scaled number fraction of boundTNFR1 (Like mol/weight fraction)
+
+    Scalar scaledProb = _PARAM(Tcell_Treg_probTregDeactivate) * ((numberFractionTNF * _PARAM(Tcell_Treg_deactivateSlope)) + _PARAM(Tcell_Treg_deactivateIntercept));
+
+    return (rnum <= scaledProb);
 }
 
 void Treg::updateState()

@@ -37,6 +37,7 @@ private:
   Treg::State _state;
   Treg::State _nextState;
   void handleResting(const int time, GrGrid& grid, Stats& stats);
+  bool calcDeactivationProbability(const Scalar rnum, const Scalar il10r, const Scalar boundil10r, const Scalar tnfr1, const Scalar boundtnfr1);
 
 protected:
   friend class boost::serialization::access;

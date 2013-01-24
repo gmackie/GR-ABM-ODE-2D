@@ -27,6 +27,7 @@ private:
 
   void handleActive(const int time, GrGrid& grid, Stats& stats);
   void handleDownRegulated(const int time, GrGrid& grid, Stats& stats);
+  void ctlKilling(GrGrid& grid, Stats& stats);
 
 protected:
   friend class boost::serialization::access;

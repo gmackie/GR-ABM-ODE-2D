@@ -34,6 +34,9 @@ private:
   void handleDownRegulated(const int time, GrGrid& grid, Stats& stats);
   void handleActiveDouble(const int time, GrGrid& grid, Stats& stats);
   void handleInducedReg(const int time, GrGrid& grid, Stats& stats);
+  void fasLigandKilling(GrGrid &grid, Stats &stats);
+  void checkMacTgamInduced(GrGrid& grid);
+  bool checkTgamTransition(GrGrid& grid);
 
 protected:
   friend class boost::serialization::access;

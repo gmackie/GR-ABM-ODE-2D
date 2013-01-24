@@ -100,8 +100,7 @@ void Agent::writeValarrayFromMembers(GrGrid& grid, valarray<double>& inputVector
   // and getting soluble values from the grid
   int vectorsize = inputVector.size();
 
-  if (vectorsize == 3)
-    {
+  if (vectorsize == 3)  {
       // sIL10
       inputVector[0] = grid.il10(_pos);
 //        inputVector[0] = grid.il10(_pos) / (NAV * VOL);
@@ -111,8 +110,7 @@ void Agent::writeValarrayFromMembers(GrGrid& grid, valarray<double>& inputVector
       inputVector[2] = _surfBoundIL10R;
     }
 
-  if (vectorsize > 3)
-    {
+  if (vectorsize > 3)  {
 
       // mTNFRNA
       inputVector[0] = _mTNFRNA;
@@ -137,8 +135,7 @@ void Agent::writeValarrayFromMembers(GrGrid& grid, valarray<double>& inputVector
       inputVector[9] = grid.shedTNFR2(_pos);
 //        inputVector[9] = grid.shedTNFR2(_pos) / (NAV * VOL);
 
-      if (vectorsize == 13)
-        {
+      if (vectorsize == 13)  {
           // sIL10
           inputVector[10] = grid.il10(_pos);
 //            inputVector[10] = grid.il10(_pos) / (NAV * VOL);
@@ -148,8 +145,7 @@ void Agent::writeValarrayFromMembers(GrGrid& grid, valarray<double>& inputVector
           inputVector[12] = _surfBoundIL10R;
         }
 
-      if (vectorsize == 36 || vectorsize == 39)
-        {
+      if (vectorsize == 36 || vectorsize == 39)  {
           inputVector[10] = _IKKKa;
           inputVector[11] = _IKKn;
           inputVector[12] = _IKKa;
@@ -181,8 +177,7 @@ void Agent::writeValarrayFromMembers(GrGrid& grid, valarray<double>& inputVector
           inputVector[37] = _normalizedIAP;
 #endif
 
-          if (vectorsize == 39)
-            {
+          if (vectorsize == 39)  {
               // sIL10
               inputVector[36] = grid.il10(_pos);
 //                inputVector[36] = grid.il10(_pos) / (NAV * VOL);
@@ -202,8 +197,7 @@ void Agent::writeMembersFromValarray(GrGrid& grid, const valarray<double>& input
   // the output vector of the numerical solver
   int vectorsize = inputVector.size();
 
-  if (vectorsize == 3)
-    {
+  if (vectorsize == 3)  {
       // sIL10
       grid.setil10(_pos, (inputVector[0]));
 //        grid.setil10(_pos, (NAV * VOL * inputVector[0]));
@@ -213,8 +207,7 @@ void Agent::writeMembersFromValarray(GrGrid& grid, const valarray<double>& input
       _surfBoundIL10R = inputVector[2];
     }
 
-  if (vectorsize > 3)
-    {
+  if (vectorsize > 3)  {
 
       // mTNFRNA
       _mTNFRNA = inputVector[0];
@@ -239,8 +232,7 @@ void Agent::writeMembersFromValarray(GrGrid& grid, const valarray<double>& input
       grid.setshedTNFR2(_pos, (inputVector[9]));
 //        grid.setshedTNFR2(_pos, (NAV * VOL * inputVector[9]));
 
-      if (vectorsize == 13)
-        {
+      if (vectorsize == 13)  {
           // sIL10
           grid.setil10(_pos, (inputVector[10]));
 //            grid.setil10(_pos, (NAV * VOL * inputVector[10]));
@@ -250,8 +242,7 @@ void Agent::writeMembersFromValarray(GrGrid& grid, const valarray<double>& input
           _surfBoundIL10R = inputVector[12];
         }
 
-      if (vectorsize == 36 || vectorsize == 39)
-        {
+      if (vectorsize == 36 || vectorsize == 39)  {
           _IKKKa = inputVector[10];
           _IKKn = inputVector[11];
           _IKKa = inputVector[12];
@@ -290,8 +281,7 @@ void Agent::writeMembersFromValarray(GrGrid& grid, const valarray<double>& input
           grid.incCCL5(_pos, (_PARAM(_e3Chem) * inputVector[29] * _PARAM(_timestepMolecular)));
           grid.incCXCL9(_pos, (2 * _PARAM(_e3Chem) * inputVector[29] * _PARAM(_timestepMolecular)));
 
-          if (vectorsize == 39)
-            {
+          if (vectorsize == 39)  {
               // sIL10
               grid.setil10(_pos, (inputVector[36]));
 //                grid.setil10(_pos, (NAV * VOL * inputVector[36]));
@@ -318,10 +308,6 @@ void Agent::checkTolerance(valarray<double>& veccheck)
           TempStoreLarge = (veccheck[i] * (ABS_TOL/(pow(10,TempStorePower))));
           modf(TempStoreLarge, &intpart);
           intpartStore = (int)intpart;
-//            if (fracpart >= 0.5)
-//            {
-//                intpartStore += (int)(ceil(fracpart));
-//            }
           TempStoreLarge = (intpartStore / (ABS_TOL/(pow(10,TempStorePower))));
           veccheck[i] = TempStoreLarge;
         }
@@ -340,14 +326,11 @@ bool Agent::intCompareGT(const double param1, const double param2)
 
   bool result = 0;
 
-  if (fabs(floor(log10(param1)) - floor(log10(param2))) < 2  )
-    {
-      if (floor(log10(param1)) < floor(log10(param2)))
-        {
+  if (fabs(floor(log10(param1)) - floor(log10(param2))) < 2  )  {
+      if (floor(log10(param1)) < floor(log10(param2)))  {
           StorePower = floor(log10(param1));
         }
-      else
-        {
+      else  {
           StorePower = floor(log10(param2));
         }
 
@@ -360,27 +343,15 @@ bool Agent::intCompareGT(const double param1, const double param2)
       intpart1Store = (int)intpart1;
       intpart2Store = (int)intpart2;
 
-      if (intpart1Store > intpart2Store)
-        {
+      if (intpart1Store > intpart2Store)  {
           result = 1;
         }
-
-//        std::cout << param1 << "   " << param2 << std::endl;
-//        std::cout << intpart1Store << "   " << intpart2Store << std::endl;
-
     }
-  else
-    {
-      if (param1 > param2)
-        {
+  else  {
+      if (param1 > param2)  {
           result = 1;
         }
-
-//        std::cout << param1 << "   " << param2 << std::endl;
     }
-
-//    std::cout << result << std::endl;
-
   return result;
 }
 
@@ -1288,14 +1259,11 @@ void Agent::solveNFkBODEsEquilibrium(double dt)
    */
 }
 
-
-
 bool Agent::TNFinducedApoptosis(GrGrid &grid, bool tnfrDynamics, bool nfkbDynamics)
 {
   bool Threshold, Probability;
 
-  if (!nfkbDynamics && tnfrDynamics)
-    {
+  if (!nfkbDynamics && tnfrDynamics)  {
 
       Scalar testintBoundTNFR1 = std::min(_intBoundTNFR1, _PARAM(_saturationApoptosisTNF_Molecular));
 
@@ -1303,24 +1271,21 @@ bool Agent::TNFinducedApoptosis(GrGrid &grid, bool tnfrDynamics, bool nfkbDynami
       Probability = intCompareGT(1 - exp(-_PARAM(_kApoptosis_Molecular) * (testintBoundTNFR1 - _PARAM(_thresholdApoptosisTNF_Molecular))), g_Rand.getReal());
 
     }
-  else if (nfkbDynamics)
-    {
+  else if (nfkbDynamics)  {
       double nfkb_adjusted_k_apoptosis = _PARAM(_kApoptosis_NFkB_Molecular) * (_PARAM(_kIAP)/(_PARAM(_kIAP) + _normalizedIAP));
 
       Threshold = intCompareGT(_intBoundTNFR1, _PARAM(_thresholdApoptosisTNF_Molecular));
       Probability = intCompareGT(1 - exp(-nfkb_adjusted_k_apoptosis * (_intBoundTNFR1 - _PARAM(_thresholdApoptosisTNF_Molecular))), g_Rand.getReal());
 
     }
-  else if (!tnfrDynamics)
-    {
+  else if (!tnfrDynamics)  {
       double tnfBoundFraction = grid.TNF(_pos) / (grid.TNF(_pos) + _PARAM(_KD1) * 48.16e11);
 
       Threshold = intCompareGT(tnfBoundFraction, _PARAM(_thresholdApoptosisTNF));
       Probability = intCompareGT(1 - exp(-_PARAM(_kApoptosis) * (tnfBoundFraction - _PARAM(_thresholdApoptosisTNF))), g_Rand.getReal());
 
     }
-  else
-    {
+  else  {
       throw std::runtime_error("Invalid TNF Induced Apoptosis Calculation -- Criteria Not Met For Molecular/Non-Molecular Options");
     }
 
@@ -1332,39 +1297,27 @@ bool Agent::TNFinducedNFkB(GrGrid &grid, bool tnfrDynamics, bool nfkbDynamics)
 {
   bool Threshold, Probability;
 
-  if (!nfkbDynamics && tnfrDynamics)
-    {
+  if (!nfkbDynamics && tnfrDynamics)  {
       Scalar testsurfBoundTNFR1;
-
       testsurfBoundTNFR1 = std::min(_surfBoundTNFR1, (_PARAM(Mac_saturationFracNFkBTNF_Molecular) * (_surfTNFR1 + _surfBoundTNFR1)));
-
       Threshold = intCompareGT(_surfBoundTNFR1, _PARAM(Mac_thresholdNFkBTNF_Molecular));
       Probability = intCompareGT(1 - exp(-_PARAM(Mac_kNFkB_Molecular) * (testsurfBoundTNFR1 - _PARAM(Mac_thresholdNFkBTNF_Molecular))), g_Rand.getReal());
     }
-
-
-  else if (nfkbDynamics)
-    {
+  else if (nfkbDynamics)  {
       Threshold = intCompareGT(_normalizedACT, _PARAM(_actThreshold));
       Probability = intCompareGT(1 - exp(-_PARAM(_activationRate) * (_normalizedACT - _PARAM(_actThreshold))), g_Rand.getReal());
     }
-
-
-  else if (!tnfrDynamics)
-    {
+  else if (!tnfrDynamics)  {
       double tnfBoundFraction = grid.TNF(_pos) / (grid.TNF(_pos) + _PARAM(_KD1) * 48.16e11);
 
       Threshold = intCompareGT(tnfBoundFraction, _PARAM(Mac_thresholdNFkBTNF));
       Probability = intCompareGT(1 - exp(-_PARAM(Mac_kNFkB) * (tnfBoundFraction - _PARAM(Mac_thresholdNFkBTNF))), g_Rand.getReal());
     }
-
-  else
-    {
+  else  {
       throw std::runtime_error("Invalid TNF Induced NFkB Calculation -- Criteria Not Met For Molecular/Non-Molecular Options");
     }
 
   return Threshold && Probability;
-
 }
 
 
@@ -1383,27 +1336,19 @@ void Agent::calcIkmRNA(GrGrid& grid, double& kmRNA, double ksynth, bool il10rDyn
 
 void Agent::solveDegradation(GrGrid& grid, double dt, bool tnfrDynamics, bool il10rDynamics, Scalar meanTNFR1, Scalar iIL10R)
 {
-  if (!tnfrDynamics)
-    {
+  if (!tnfrDynamics){
       // simulate the effect of TNF internalization by cells in the form of degradation. Only for TNF
-      double dtnf;
       double tnf = grid.TNF(_pos);
-      dtnf = -_PARAM(_kInt1) * (tnf / (tnf + _PARAM(_KD1) * NAV * VOL)) * meanTNFR1 * dt * _PARAM(_fracConsumeTNF);
+      double dtnf = -1.0 * _PARAM(_kInt1) * (tnf / (tnf + _PARAM(_KD1) * NAV * VOL)) * meanTNFR1 * dt * _PARAM(_fracConsumeTNF);
       grid.incTNF(_pos, dtnf);
     }
-
-  if (!il10rDynamics)
-    {
-
-      double dil10;
-      double il10 = grid.il10(_pos);
+  if (!il10rDynamics){
 
       // simulate the effect of IL10 internalization in the form of degradation. Only for IL10
-      dil10 = -_PARAM(_IkInt) * (il10 / (il10 + _PARAM(_IkD) * NAV * VOL)) * iIL10R * dt * _PARAM(_fracConsumeIL10);
+      double il10 = grid.il10(_pos);
+      double dil10 = -1.0 * _PARAM(_IkInt) * (il10 / (il10 + _PARAM(_IkD) * NAV * VOL)) * iIL10R * dt * _PARAM(_fracConsumeIL10);
       grid.incil10(_pos, dil10);
-
     }
-
 }
 
 Pos Agent::moveAgent(GrGrid& grid, bool ccl2, bool ccl5, bool cxcl9, bool attractant, double bonusFactor)

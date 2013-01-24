@@ -74,3 +74,27 @@ void Tcell::moveTcell(GrGrid& grid, bool ccl2, bool ccl5, bool cxcl9)
         }
     }
 }
+
+bool Tcell::returnRandMacFromMoore(GrGrid& grid, Pos& vectorPos)
+{
+    vector<int> PossibleOrdinal;
+
+    for (int k=0; k<9; k++)  {
+        Pos p(this->compartmentOrdinalToCoordinates(k, grid.getRange()));
+        if(grid.hasAgentType(MAC, p))  {
+            PossibleOrdinal.push_back(k);
+          }
+      }
+
+    // If there are no Macs then do not kill anything
+    if ((int) PossibleOrdinal.size() == 0)  {
+        return false;
+      }
+
+    int PossibleOrds = PossibleOrdinal.size();
+    int RandNum = g_Rand.getInt(PossibleOrds, 0);
+
+    vectorPos = this->compartmentOrdinalToCoordinates(PossibleOrdinal[RandNum], grid.getRange());
+
+    return true;
+}

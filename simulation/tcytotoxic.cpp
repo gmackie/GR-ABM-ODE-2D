@@ -43,14 +43,18 @@ void Tcyt::move(GrGrid& grid)
 
 void Tcyt::secrete(GrGrid& grid, bool tnfrDynamics, bool, bool tnfDepletion, bool il10rDynamics, bool il10Depletion, double mdt)
 {
-  if (_deactivationTime != -1)
-    {
-      _kSynth = 0;
-      _kmRNA = 0;
-      _kISynth = 0;
-      return;
-    }
 
+     // This may not be necessary anymore since we can just use the TCYT_DOWN_REGULATED state in a switch statement like TGAM
+  if (_deactivationTime != -1)  {
+      secTNF(grid, mdt, 0.0, _pos, tnfrDynamics, tnfDepletion, 0.0, 0.0, 0.0, _kmRNA, _kSynth);
+      secIL10(grid, mdt, 0.0, _pos, il10rDynamics, il10Depletion, 0.0, 0.0, _kISynth);
+      return;
+  }
+
+  secTNF(grid, mdt, 0.1, _pos, tnfrDynamics, tnfDepletion, _PARAM(_kSynthTcell), _PARAM(_kRNATcell), _PARAM(Mac_dTNF_Tcyt), _kmRNA, _kSynth);
+  secIL10(grid, mdt, 0.0, _pos, il10rDynamics, il10Depletion, _PARAM(_IkSynthTcell), (_PARAM(dIL10_Tcyt)), _kISynth);
+
+    #if 0
   _kSynth = _PARAM(_kSynthTcell)/10;
   _kmRNA = _PARAM(_kRNATcell)/10;
 //    calcIkmRNA(grid, _kmRNA, _kSynth, il10rDynamics);
@@ -67,44 +71,24 @@ void Tcyt::secrete(GrGrid& grid, bool tnfrDynamics, bool, bool tnfDepletion, boo
     {
       grid.setil10(_pos, (_PARAM(_dIL10_Tcyt) * mdt));
     }
+    #endif
 
 }
 
 void Tcyt::computeNextState(const int time, GrGrid& grid, Stats& stats, bool tnfrDynamics, bool, bool, bool)
 {
   // check if it is time to die
-  if (timeToDie(time))
-    {
+  if (timeToDie(time))  {
       _nextState = TCYT_DEAD;
     }
 
   // Always pass in false for nfkbDynamics for T cell apoptosis since they DO NOT have NFkB dynamics
-  else if (TNFinducedApoptosis(grid, tnfrDynamics, false))
-    {
+  else if (TNFinducedApoptosis(grid, tnfrDynamics, false))  {
       ++stats.getTcellApoptosisTNF();
       _nextState = TCYT_DEAD;
       grid.incKillings(_pos);
     }
-
-//	else if (tnfrDynamics && intCompareGT(_intBoundTNFR1, _PARAM(_thresholdApoptosisTNF_Molecular)) &&
-//			 intCompareGT(1 - exp(-_PARAM(_kApoptosis_Molecular) * (_intBoundTNFR1 - _PARAM(_thresholdApoptosisTNF_Molecular))), g_Rand.getReal()))
-//	{
-//		// TNF induced apoptosis
-//		++stats.getTcellApoptosisTNF();
-//		_nextState = TCYT_DEAD;
-//        grid.incKillings(_pos);
-//	}
-//	else if (!tnfrDynamics && tnfBoundFraction > _PARAM(_thresholdApoptosisTNF) &&
-//			 g_Rand.getReal() < 1 - exp(-_PARAM(_kApoptosis) * (tnfBoundFraction - _PARAM(_thresholdApoptosisTNF))))
-//	{
-//		// TNF induced apoptosis
-//		++stats.getTcellApoptosisTNF();
-//		_nextState = TCYT_DEAD;
-//        grid.incKillings(_pos);
-//	}
-
-  else
-    {
+  else  {
       switch (_state)
         {
         case TCYT_DEAD:
@@ -125,124 +109,9 @@ void Tcyt::computeNextState(const int time, GrGrid& grid, Stats& stats, bool tnf
 
 void Tcyt::handleActive(const int, GrGrid& grid, Stats& stats)
 {
-  vector<int> PossibleOrdinal;
-
-  if (g_Rand.getReal() < _PARAM(Tcell_Tcyt_probKillMac))
-    {
-      for (int k=0; k<9; k++)
-        {
-          Pos p(this->compartmentOrdinalToCoordinates(k, grid.getRange()));
-          if(grid.hasAgentType(MAC, p))
-            {
-              PossibleOrdinal.push_back(k);
-            }
-        }
-
-      // If there are no Macs then do not kill anything
-      if ((int) PossibleOrdinal.size() == 0)
-        {
-          return;
-        }
-
-      int PossibleOrds = PossibleOrdinal.size();
-      int RandNum = g_Rand.getInt(PossibleOrds, 0);
-
-      Pos coord = this->compartmentOrdinalToCoordinates(PossibleOrdinal[RandNum], grid.getRange());
-      Mac* pMac = dynamic_cast<Mac*>(grid.agent(coord, 0));
-      if (!pMac) pMac = dynamic_cast<Mac*>(grid.agent(coord, 1));
-      assert(pMac);
-
-      // If the mac died on this time step ignore it.
-      if (pMac->getNextState() == Mac::MAC_DEAD)
-        {
-          return;
-        }
-
-      if (pMac->getState() == Mac::MAC_INFECTED)
-        {
-          pMac->setIntMtb(0);
-          pMac->kill();
-          ++stats.getKillCytotoxic();
-          // contribute to caseation
-          if (!grid.incKillings(coord))
-            _nextState = TCYT_ACTIVE;
-        }
-      else if (pMac->getState() == Mac::MAC_CINFECTED)
-        {
-          double r = g_Rand.getReal();
-          if (r < _PARAM(Tcell_Tcyt_probKillMacCleanly))
-            {
-              pMac->setIntMtb(0);
-              pMac->kill();
-              ++stats.getKillCytotoxic();
-              if (!grid.incKillings(coord))
-                _nextState = TCYT_ACTIVE;
-            }
-          else
-            {
-              // kill, half the intracellular bacteria disperse to the Moore neighborhood
-//                std::cout << "Cytotoxic" << std::endl;
-              pMac->disperseMtb(grid, 0.5);
-              pMac->setIntMtb(0);
-              pMac->kill();
-              ++stats.getKillCytotoxic();
-              if (!grid.incKillings(coord))
-                _nextState = TCYT_ACTIVE;
-            }
-        }
+    if (g_Rand.getReal() < _PARAM(Tcell_Tcyt_probKillMac))  {
+        ctlKilling(grid, stats);
     }
-//    OLD WAY OF CTL KILLING
-
-//    if (grid.hasAgentType(MAC, _pos))
-//    {
-//        Mac* pMac = dynamic_cast<Mac*>(grid.agent(_pos, 0));
-//        if (!pMac) pMac = dynamic_cast<Mac*>(grid.agent(_pos, 1));
-
-//        assert(pMac);
-
-//        // If the mac died on this time step ignore it.
-//        if (pMac->getNextState() == Mac::MAC_DEAD)
-//        {
-//            return;
-//        }
-
-//        if (g_Rand.getReal() < _PARAM(Tcell_Tcyt_probKillMac))
-//        {
-//            if (pMac->getState() == Mac::MAC_INFECTED)
-//            {
-//                pMac->setIntMtb(0);
-//                pMac->kill();
-//                ++stats.getKillCytotoxic();
-
-//                // contribute to caseation
-//                if (!grid.incKillings(_pos))
-//                    _nextState = TCYT_ACTIVE;
-//            }
-//            else if (pMac->getState() == Mac::MAC_CINFECTED)
-//            {
-//                double r = g_Rand.getReal();
-//                if (r < _PARAM(Tcell_Tcyt_probKillMacCleanly))
-//                {
-//                    pMac->setIntMtb(0);
-//                    pMac->kill();
-//                    ++stats.getKillCytotoxic();
-//                    if (!grid.incKillings(_pos))
-//                        _nextState = TCYT_ACTIVE;
-//                }
-//                else
-//                {
-//                    // kill, half the intracellular bacteria disperse to the Moore neighborhood
-//                    pMac->disperseMtb(grid, 0.5);
-
-//                    pMac->setIntMtb(0);
-//                    pMac->kill();
-//                    ++stats.getKillCytotoxic();
-//                    if (!grid.incKillings(_pos))
-//                        _nextState = TCYT_ACTIVE;
-//                }
-//            }
-//        }
-//    }
 }
 
 void Tcyt::handleDownRegulated(const int time, GrGrid&, Stats&)
@@ -255,6 +124,50 @@ void Tcyt::handleDownRegulated(const int time, GrGrid&, Stats&)
   else
     {
       _nextState = TCYT_DOWN_REGULATED;
+    }
+}
+
+void Tcyt::ctlKilling(GrGrid& grid, Stats& stats)
+{
+    Pos coord;
+    if (returnRandMacFromMoore(grid, coord))
+     {
+        Mac* pMac = dynamic_cast<Mac*>(grid.agent(coord, 0));
+        if (!pMac) pMac = dynamic_cast<Mac*>(grid.agent(coord, 1));
+        assert(pMac);
+
+        // If the mac died on this time step ignore it.
+        if (pMac->getNextState() == Mac::MAC_DEAD)  {
+            return;
+          }
+
+        if (pMac->getState() == Mac::MAC_INFECTED)  {
+            pMac->setIntMtb(0);
+            pMac->kill();
+            ++stats.getKillCytotoxic();
+            // contribute to caseation
+            if (!grid.incKillings(coord))
+              _nextState = TCYT_ACTIVE;
+          }
+        else if (pMac->getState() == Mac::MAC_CINFECTED)  {
+            double r = g_Rand.getReal();
+            if (r < _PARAM(Tcell_Tcyt_probKillMacCleanly))  {
+                pMac->setIntMtb(0);
+                pMac->kill();
+                ++stats.getKillCytotoxic();
+                if (!grid.incKillings(coord))
+                  _nextState = TCYT_ACTIVE;
+              }
+            else  {
+                // kill, half the intracellular bacteria disperse to the Moore neighborhood
+                pMac->disperseMtb(grid, 0.5);
+                pMac->setIntMtb(0);
+                pMac->kill();
+                ++stats.getKillCytotoxic();
+                if (!grid.incKillings(coord))
+                  _nextState = TCYT_ACTIVE;
+              }
+          }
     }
 }
 

@@ -60,6 +60,7 @@ private:
   int _deactivationTime;
   int _stat1Time;
   int _nfkbTime;
+  int _icosTime;
   double _growthRate;
 
   /**
@@ -189,6 +190,7 @@ public:
   void apoptosis(GrGrid& grid);
   bool checkSTAT1(GrGrid& grid, const int time);
   bool checkNFkB(GrGrid& grid, const int time, bool tnfInducedNFkB);
+  bool checkICOS(GrGrid& grid, const int time, bool il10rDynamics);
   bool isDead() const;
   bool isDeadNext();
   static bool isMac(const Agent* pAgent);
@@ -380,6 +382,7 @@ inline void Mac::visitProperties(Visitor& v)
   v.visit("deactivationTime", _deactivationTime, "");
   v.visit("stat1Time", _stat1Time, "");
   v.visit("nfkbTime", _nfkbTime, "");
+  v.visit("icosTime", _icosTime, "");
   v.visit("growthRate", _growthRate, "");
   Agent::visitProperties(v);
 }
@@ -394,6 +397,7 @@ inline void Mac::visitProperties(Visitor& v) const
   v.visit("deactivationTime", _deactivationTime, "");
   v.visit("stat1Time", _stat1Time, "");
   v.visit("nfkbTime", _nfkbTime, "");
+  v.visit("icosTime", _icosTime, "");
   v.visit("growthRate", _growthRate, "");
   Agent::visitProperties(v);
 }
@@ -414,6 +418,7 @@ void Mac::serialize(Archive& ar, const unsigned int /*version*/) {
   ar & boost::serialization::make_nvp("deactivationTime", _deactivationTime);
   ar & boost::serialization::make_nvp("stat1Time", _stat1Time);
   ar & boost::serialization::make_nvp("nfkbTime", _nfkbTime);
+  ar & boost::serialization::make_nvp("icosTime", _icosTime);
   ar & boost::serialization::make_nvp("growthRate", _growthRate);
 }
 

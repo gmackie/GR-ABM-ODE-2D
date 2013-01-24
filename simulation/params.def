@@ -25,16 +25,25 @@ P(double, degRateConstRIF, , ,"RIF degradation rate on the grid constant", "", 0
 P(double, ChemokinekDeg, , , "Chemokine degradation rate constant", "1/s", 0, )
 P(double, minChemotaxis, , , "Chemotaxis sensivity range (lower bound)", "#molecules", 0, )
 P(double, maxChemotaxis, , , "Chemotaxis sensivity range (upper bound)", "#molecules", 0, )
-P(double, dTNF_Tgam,		 , , "Secretion rate of TNF by Tgam" ,  "#molecules/6s", 0, )
-P(double, dTNF_Tcyt,	   , , "Secretion rate of TNF by Tcyt" ,  "#molecules/6s", 0, )
-P(double, dIL10_Tgam,	   , , "Secretion rate of IL10 by Tgam", "#molecules/6s", 0, )
-P(double, dIL10_Tcyt,	   , , "Secretion rate of IL10 by Tcyt", "#molecules/6s", 0, )
-P(double, dIL10_Treg,	   , , "Secretion rate of IL10 by Treg", "#molecules/6s", 0, )
 
-// Tuneable Resolution Parameters
-P(double, fracConsumeIL10,          , , "Scaling factor for coarse grained IL10 dynamics",           "",         0, )
-P(double, fracConsumeTNF,          , , "Scaling factor for coarse grained TNF dynamics",           "",         0, )
-// End of Tuneable Resolution Parameters
+// Tuneable Resolution Parameters - Core ABM
+
+P(double, fracConsumeIL10,                                          , ,         "Scaling factor for coarse grained IL10 dynamics",                  "",                     0,      )
+P(double, fracConsumeTNF,                                           , ,         "Scaling factor for coarse grained TNF dynamics",                   "",                     0,      )
+P(double, dTNF,                            Tcell_Tgam               , ,         "Secretion rate of TNF by Tgam" ,                                   "#molecules/s",         0,      )
+P(double, dTNF,                            Tcell_Tcyt               , ,         "Secretion rate of TNF by Tcyt" ,                                   "#molecules/s",         0,      )
+P(double, dTNF,                            Tcell_Treg               , ,         "Secretion rate of TNF by Treg" ,                                   "#molecules/s",         0,      )
+P(double, dIL10,                           Tcell_Tgam               , ,         "Secretion rate of IL10 by Tgam",                                   "#molecules/s",         0,      )
+P(double, dIL10,                           Tcell_Tcyt               , ,         "Secretion rate of IL10 by Tcyt",                                   "#molecules/s",         0,      )
+P(double, dIL10,                           Tcell_Treg               , ,         "Secretion rate of IL10 by Treg",                                   "#molecules/s",         0,      )
+P(double, dAttractant,                                              , ,         "Secretion rate of macrophage attractant secreted by debris",       "#molecules/s",         0,      )
+P(double, dCCL2,                                Mac                 , ,         "Secretion rate of CCL2 by Mac",                                    "#molecules/s",         0,      )
+P(double, dCCL5,                                Mac                 , ,         "Secretion rate of CCL5 by Mac",                                    "#molecules/s",         0,      )
+P(double, dCXCL9,                               Mac                 , ,         "Secretion rate of CXCL9 by Mac",                                   "#molecules/s",         0,      )
+P(double, dTNF,                                 Mac                 , ,         "Secretion rate of TNF by Mac",                                     "#molecules/s",         0,      )
+P(double, dIL10,                                Mac                 , ,         "Secretion rate of IL10 by Mac",                                    "#molecules/s",         0,      )
+
+// End of Tuneable Resolution Parameters - Core ABM
 
 // Drug activity parameters
 //type,     name,                           path,   default,    desc,                                                   units,          min,    max)
@@ -200,11 +209,6 @@ P(int,		maxAge,							Mac,	,			"Maximal macrophage age",								"#timesteps",	0,
 P(int,		maxAgeAct,						Mac,	,			"Maximal activated macrophage age",						"#timesteps",	0,			)
 P(int,		initNumber,						Mac,	0,			"Initial number of resting macrophages on the grid",	"",				0,			)
 P(double,	initDensity,					Mac,	0.0,		"Initial density of resting macrophages on the grid",	"",				0.0,	1.0)
-P(double, dCCL2, 								                Mac, , "Secretion rate of CCL2", "#molecules/6s",	, )
-P(double, dCCL5, 								                Mac, , "Secretion rate of CCL5", "#molecules/6s",	, )
-P(double, dCXCL9, 								              Mac, , "Secretion rate of CXCL9", "#molecules/6s", , )
-P(double, dTNF, 								                Mac, , "Secretion rate of TNF", "#molecules/6s", , )
-P(double, dIL10, 								                Mac, , "Secretion rate of IL10", "#molecules/6s", , )
 P(double, thresholdNFkBTNF, 					          Mac, , "TNF threshold for NFkB activation", "fraction", , )
 P(double, kNFkB, 								                Mac, , "Rate of NFkB activation", "1/s", , )
 P(double, thresholdNFkBTNF_Molecular, 			    Mac, , "TNF threshold for NFkB activation", "#molecules", , )

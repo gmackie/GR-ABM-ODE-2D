@@ -131,16 +131,16 @@ void Tgam::secrete(GrGrid& grid, bool tnfrDynamics, bool, bool tnfDepletion, boo
 
   switch(_state)  {
   case Tgam::TGAM_ACTIVE_DOUBLE:
-      secIL10(grid, mdt, 0.5, _pos, il10rDynamics, il10Depletion, _PARAM(_IkSynthTcell), (_PARAM(dIL10_Treg)), _kISynth);
-      secTNF(grid, mdt, 1.0, _pos, tnfrDynamics, tnfDepletion, _PARAM(_kSynthTcell), _PARAM(_kRNATcell), _PARAM(Mac_dTNF_Tcyt), _kmRNA, _kSynth);
+      secIL10(grid, mdt, 0.5, _pos, il10rDynamics, il10Depletion, _PARAM(_IkSynthTcell), (_PARAM(Tcell_Treg_dIL10)), _kISynth);
+      secTNF(grid, mdt, 1.0, _pos, tnfrDynamics, tnfDepletion, _PARAM(_kSynthTcell), _PARAM(_kRNATcell), _PARAM(Tcell_Tgam_dTNF), _kmRNA, _kSynth);
       break;
   case Tgam::TGAM_INDUCED_REG:
-      secIL10(grid, mdt, 1.0, _pos, il10rDynamics, il10Depletion, _PARAM(_IkSynthTcell), (_PARAM(dIL10_Treg)), _kISynth);
-      secTNF(grid, mdt, 1.0, _pos, tnfrDynamics, tnfDepletion, _PARAM(_kSynthTcell), _PARAM(_kRNATcell), _PARAM(Mac_dTNF_Tcyt), _kmRNA, _kSynth);
+      secIL10(grid, mdt, 1.0, _pos, il10rDynamics, il10Depletion, _PARAM(_IkSynthTcell), (_PARAM(Tcell_Treg_dIL10)), _kISynth);
+      secTNF(grid, mdt, 1.0, _pos, tnfrDynamics, tnfDepletion, _PARAM(_kSynthTcell), _PARAM(_kRNATcell), _PARAM(Tcell_Tgam_dTNF), _kmRNA, _kSynth);
       break;
   case Tgam::TGAM_ACTIVE:
-      secIL10(grid, mdt, 0.0, _pos, il10rDynamics, il10Depletion, 0.0, 0.0, _kISynth);
-      secTNF(grid, mdt, 1.0, _pos, tnfrDynamics, tnfDepletion, _PARAM(_kSynthTcell), _PARAM(_kRNATcell), _PARAM(Mac_dTNF_Tcyt), _kmRNA, _kSynth);
+      secIL10(grid, mdt, 0.0, _pos, il10rDynamics, il10Depletion, _PARAM(_IkSynthTcell), _PARAM(Tcell_Tgam_dIL10), _kISynth);
+      secTNF(grid, mdt, 1.0, _pos, tnfrDynamics, tnfDepletion, _PARAM(_kSynthTcell), _PARAM(_kRNATcell), _PARAM(Tcell_Tgam_dTNF), _kmRNA, _kSynth);
       break;
   case Tgam::TGAM_DOWN_REGULATED:
       secTNF(grid, mdt, 0.0, _pos, tnfrDynamics, tnfDepletion, 0.0, 0.0, 0.0, _kmRNA, _kSynth);

@@ -42,7 +42,7 @@ void Treg::move(GrGrid& grid)
 void Treg::secrete(GrGrid& grid, bool, bool, bool, bool il10rDynamics, bool il10Depletion, double mdt)
 {
 
-  secIL10(grid, mdt, 1.0, _pos, il10rDynamics, il10Depletion, _PARAM(_IkSynthTcell), (_PARAM(dIL10_Treg)), _kISynth);
+  secIL10(grid, mdt, 1.0, _pos, il10rDynamics, il10Depletion, _PARAM(_IkSynthTcell), (_PARAM(Tcell_Treg_dIL10)), _kISynth);
 
  #if 0
     _kISynth = _PARAM(_IkSynthTcell);

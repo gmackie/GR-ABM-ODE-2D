@@ -181,7 +181,7 @@ void Mac::secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDe
             if(_NFkB)  {
                 secChemokines(grid, mdt, 0.5, _pos, _PARAM(Mac_dCCL2), _PARAM(Mac_dCCL5), _PARAM(Mac_dCXCL9));
                 secTNF(grid, mdt, 0.5, _pos, tnfrDynamics, tnfDepletion, _PARAM(_kSynthMac), _PARAM(_kRNAMac), _PARAM(Mac_dTNF), _kmRNA, _kSynth);
-                secIL10(grid, mdt, 0.0, _pos, il10rDynamics, il10Depletion, 0.0, 0.0, _kISynth);
+                secIL10(grid, mdt, 0.0, _pos, il10rDynamics, il10Depletion, _PARAM(_IkSynthMacInf), _PARAM(Mac_dIL10), _kISynth);
                 ++grid.nSecretions(_pos);
             }
             else  {

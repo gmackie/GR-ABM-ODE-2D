@@ -51,8 +51,8 @@ void Tcyt::secrete(GrGrid& grid, bool tnfrDynamics, bool, bool tnfDepletion, boo
       return;
   }
 
-  secTNF(grid, mdt, 0.1, _pos, tnfrDynamics, tnfDepletion, _PARAM(_kSynthTcell), _PARAM(_kRNATcell), _PARAM(Mac_dTNF_Tcyt), _kmRNA, _kSynth);
-  secIL10(grid, mdt, 0.0, _pos, il10rDynamics, il10Depletion, _PARAM(_IkSynthTcell), (_PARAM(dIL10_Tcyt)), _kISynth);
+  secTNF(grid, mdt, 0.1, _pos, tnfrDynamics, tnfDepletion, _PARAM(_kSynthTcell), _PARAM(_kRNATcell), _PARAM(Tcell_Tcyt_dTNF), _kmRNA, _kSynth);
+  secIL10(grid, mdt, 0.0, _pos, il10rDynamics, il10Depletion, _PARAM(_IkSynthTcell), (_PARAM(Tcell_Tcyt_dIL10)), _kISynth);
 
     #if 0
   _kSynth = _PARAM(_kSynthTcell)/10;

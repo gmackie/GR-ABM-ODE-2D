@@ -23,7 +23,7 @@ private:
 public:
   GrDiffusionFTCS_Swap();
   ~GrDiffusionFTCS_Swap();
-  void diffuse(GrSimulationGrid& grid) const;
+  void diffuse(GrSimulationGrid& grid, const int time) const;
   DiffusionMethod getMethod() const;
   /*virtual*/
   GrDiffusion* clone() const

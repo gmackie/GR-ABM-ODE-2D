@@ -725,7 +725,7 @@ void Mac::handleInfected(const int time, GrGrid& grid, Stats& stats, bool /*nfkb
 {
   // intracellular bacteria reproduce
   double INH_C = 0.0;
-  if (_PARAM(_DrugDynamics))
+  if (_PARAM(_DrugDynamics) && (time >= _PARAM(_dosageStartTime)))
         INH_C = grid.INH(_pos);
 
   _intMtb *= getIntMtbGrowthRate(time, INH_C);
@@ -807,7 +807,7 @@ void Mac::handleChronicallyInfected(const int time, GrGrid& grid, Stats& stats)
 
   // intracellular bacteria reproduce
   double INH_C = 0.0;
-  if (_PARAM(_DrugDynamics))
+  if (_PARAM(_DrugDynamics) && (time >= _PARAM(_dosageStartTime)))
       INH_C = grid.INH(_pos);
 
   _intMtb *= getIntMtbGrowthRate(time, INH_C);

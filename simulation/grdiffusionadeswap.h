@@ -34,7 +34,7 @@ private:
 public:
   GrDiffusionADE_Swap();
   virtual ~GrDiffusionADE_Swap();
-  void diffuse(GrSimulationGrid& grid) const;
+  void diffuse(GrSimulationGrid& grid, const int time) const;
   /*virtual*/
   GrDiffusion* clone() const
   {

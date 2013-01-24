@@ -47,7 +47,7 @@ static void diffuse(const Scalar* grid, Scalar* newgrid, const Pos& dim, const S
     }
 }*/
 
-void GrDiffusionFTCS_Swap::diffuse(GrSimulationGrid& grSim) const
+void GrDiffusionFTCS_Swap::diffuse(GrSimulationGrid& grSim, const int time) const
 {
   GrGrid& grid = grSim.getCurrentGrid();
   GrGrid& nextGrid = grSim.getNextGrid();

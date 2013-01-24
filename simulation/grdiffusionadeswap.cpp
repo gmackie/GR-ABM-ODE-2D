@@ -316,7 +316,7 @@ static void diffuse_avg_ratio(Scalar* newgrid_u, Scalar* newgrid_v, Scalar* newg
 }
 
 // This function is used to degrade the molecules on the grid after they have diffused.
-static void diffuse_degrade(GrGrid& nextGrid)
+static void diffuse_degrade(GrGrid& nextGrid, const int time)
 {
     const Scalar dt = _PARAM(_timestepDiffusion);
 
@@ -324,10 +324,7 @@ static void diffuse_degrade(GrGrid& nextGrid)
     const Scalar IL10degRate = exp(-1.0 *  _PARAM(_Ikdeg) * dt);
     const Scalar CHEMOKINEdegRate = exp(-1.0 *  _PARAM(_ChemokinekDeg) * dt);
 
-    if (_PARAM(_DrugDynamics))
-    {
 
-    }
     //Degradation equation here is separated based on operator splitting causing it to lag
     //behind diffusion.  We make the assumption diffuse << degrade to
     //show degradation is much slower and incurs no stability issues. This argument should hold for
@@ -366,7 +363,7 @@ static void diffuse_degrade(GrGrid& nextGrid)
             nextGrid.setCXCL9(p, nextGrid.CXCL9(p) * CHEMOKINEdegRate);
             //            nextGrid.incCXCL9(p, (-1.0 * nextGrid.CXCL9(p) * _PARAM(_ChemokinekDeg) * dt));
 
-            if (_PARAM(_DrugDynamics))
+            if (_PARAM(_DrugDynamics) && (time >= _PARAM(_dosageStartTime)))
             {
                 const Scalar INHdegRate = exp(-1.0 *  _PARAM(_degRateConstINH) * dt);
                 const Scalar RIFdegRate = exp(-1.0 *  _PARAM(_degRateConstRIF) * dt);
@@ -398,7 +395,7 @@ static void diffuse_degrade(GrGrid& nextGrid)
 }
 
 
-void GrDiffusionADE_Swap::diffuse(GrSimulationGrid& grSim) const
+void GrDiffusionADE_Swap::diffuse(GrSimulationGrid& grSim, const int time) const
 {
     GrGrid& grid = grSim.getCurrentGrid();
     GrGrid& nextGrid = grSim.getNextGrid();
@@ -446,7 +443,7 @@ void GrDiffusionADE_Swap::diffuse(GrSimulationGrid& grSim) const
             ::diffuse_v(grid.v_il10(), nextGrid.v_il10(), grid.getRange(), _PARAM(_diffusivityIL10), _cutOffValue);
             ::diffuse_avg(nextGrid.u_il10(), nextGrid.v_il10(), nextGrid.il10(), grid.getRange());
         }
-    if (_PARAM(_DrugDynamics))
+        if (_PARAM(_DrugDynamics) && (time >= _PARAM(_dosageStartTime)))
         {
             #pragma omp section
             {
@@ -463,7 +460,7 @@ void GrDiffusionADE_Swap::diffuse(GrSimulationGrid& grSim) const
         }
     } //omp parallel
 
-    ::diffuse_degrade(nextGrid);
+    ::diffuse_degrade(nextGrid, time);
 
     grSim.swap();
 }

@@ -26,7 +26,7 @@ public:
   /**
   * @brief Diffuse selected chemicals on the grid
   */
-  virtual void diffuse(GrSimulationGrid& grid) const = 0;
+  virtual void diffuse(GrSimulationGrid& grid, const int time) const = 0;
   /**
   * @return The enumerated type of the method
   */

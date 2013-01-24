@@ -641,8 +641,8 @@ void GrSimulation::solve()
     // Agent time step is 600 s (10 min)
     for (int DiffStep = 0; DiffStep < _numDiffusionPerAgent; DiffStep++)
     {
-        _pDiffusion->diffuse(_grid);
-        if (_PARAM(_DrugDynamics))
+        _pDiffusion->diffuse(_grid, _time);
+        if (_PARAM(_DrugDynamics) && (_time >= _PARAM(_dosageStartTime)))
             consumeDrugs(_grid.getGrid(),_PARAM(_timestepDiffusion));
         secreteFromMacrophages(tnfDepletion, il10Depletion, _PARAM(_timestepDiffusion));
         secreteFromTcells(tnfDepletion, il10Depletion, _PARAM(_timestepDiffusion));
@@ -662,7 +662,7 @@ void GrSimulation::solve()
                     adjustFauxDegradation(_PARAM(_timestepMolecular));
                 //adjustTNFDegradation(_PARAM(_timestepMolecular));
             }
-        if (_PARAM(_DrugDynamics))
+        if (_PARAM(_DrugDynamics) && (_time >= _PARAM(_dosageStartTime)))
         {
             _pVascular->solveVascularSources(_grid.getGrid(), _PARAM(_timestepDiffusion),_time, DiffStep);
             _stats.getBloodConcINH() = _pVascular->getBloodConcentrationINH();
@@ -955,7 +955,7 @@ void GrSimulation::growExtMtb()
                 growthRate = getGrid().growthRate(p) - 1;
 
             double adj_kill_rate = 0.0;
-            if (_PARAM(_DrugDynamics))
+            if (_PARAM(_DrugDynamics) && (_time >= _PARAM(_dosageStartTime)))
             {
                 double INH_Emax = _PARAM(_extraActivityINH);
                 double INH_C50 = _PARAM(_C50_INH); // milligram/L
@@ -1036,7 +1036,7 @@ void GrSimulation::growExtMtb()
                 ++_stats.getAreaCellDensity();
             }
 
-            if (_PARAM(_DrugDynamics))
+            if (_PARAM(_DrugDynamics) && (_time >= _PARAM(_dosageStartTime)))
             {
                 _stats.getTotINH() += (g.INH(p));
                 _stats.getTotRIF() += (g.RIF(p));

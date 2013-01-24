@@ -20,7 +20,7 @@ class GrDiffusionWrongBTCS: public GrDiffusion
 public:
   GrDiffusionWrongBTCS();
   virtual ~GrDiffusionWrongBTCS();
-  void diffuse(GrSimulationGrid& grid) const;
+  void diffuse(GrSimulationGrid& grid, const int time) const;
   DiffusionMethod getMethod() const;
   GrDiffusion* clone() const
   {

@@ -597,7 +597,7 @@ void GrSimulation::solve()
     }
 
     // Get cell density information to use for adjusting diffusion (for Drug Diffusion)
-    if (_PARAM(_DrugDynamics))  {
+    if (_PARAM(_DrugDynamics) && (_time >= _PARAM(_dosageStartTime)))  {
         GrGrid& g = _grid.getGrid();
         Pos p;
         Pos dim = g.getRange();

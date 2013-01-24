@@ -206,7 +206,7 @@ void GrGrid::deserialize(std::istream& in)
         in >> (int&) nRecruitmentsTcyt(p);
         in >> (int&) nRecruitmentsTreg(p);
         in >> (int&) nSecretions(p);
-        in >> (Scalar&) nCells(p);
+        in >> (int&) nCells(p);
         in >> (Scalar&) macAttractant(p);
         in >> (Scalar&) TNF(p);
         in >> (Scalar&) INH(p);

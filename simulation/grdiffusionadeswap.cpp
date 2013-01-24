@@ -118,7 +118,6 @@ static void diffuse_u_nofluxbc(const Scalar* __restrict__ grid_u, Scalar* __rest
 
             Scalar cellDens = nCells[Indexer::ind(dim,i,j)];
             cellDens = cellDens > 0.2 ? 2:cellDens;
-            cellDens = 0.;
             const Scalar u_diffuse = maxD - (cellDens / 2.0) * (maxD-minD);
             const Scalar lambda = u_diffuse * dt * ((1.0/dx2) + (1.0/dy2));
             const Scalar coefficient_a = (1-lambda)/(1+lambda);
@@ -239,7 +238,6 @@ static void diffuse_v_nofluxbc(const Scalar* __restrict__ grid_v, Scalar* __rest
 
             Scalar cellDens = nCells[Indexer::ind(dim,i,j)];
             cellDens = cellDens > 0.2 ? 2:cellDens;
-            cellDens = 0.;
             const Scalar v_diffuse = maxD - (cellDens / 2.0) * (maxD-minD);
             const Scalar lambda = v_diffuse * dt * ((1.0/dx2) + (1.0/dy2));
             const Scalar coefficient_a = (1-lambda)/(1+lambda);

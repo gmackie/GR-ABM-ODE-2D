@@ -9,6 +9,8 @@
 	areaCellDensityStoppingThreshold2 = "30000"
 	timestepDiffusion = "30"
 	timestepMolecular = "6"
+	fracConsumeTNF = "0.4"
+	fracConsumeIL10 = "0.4"
 	muMDC_LN = "0.3"
 	initN4 = "100000"
 	initN8 = "84000"
@@ -59,8 +61,6 @@
 	probApoptosisTNF = "0.04"
 	minChemotaxis = "2"
 	maxChemotaxis = "2000"
-	dTNF_Tgam = "0.021"
-	dTNF_Tcyt = "0.0021"
 	kSynthMac = "0.21"
 	kSynthTcell = "0.021"
 	kTrans = "8e-05"
@@ -152,7 +152,6 @@
 	stdIL10RMac = "350"
 	meanIL10RTcell = "400"
 	stdIL10RTcell = "150"
-	Imod = "0.4"
 	LinkRNADelta = "7"
 	LinkRNAGamma = "20"
 	LinkLogAlpha = "0.81"
@@ -163,24 +162,34 @@
 	IkSynthMacAct = "0.408191"
 	halfSatIL10mRNA = "190.437"
 	IkSynthTcell = "0.73998"
-	dIL10_Tgam = "10"
-	dIL10_Tcyt = "0"
-	dIL10_Treg = "10"
-        degRateINH = "0.9905"
+
         degRateConstINH = "2e-6"
         diffusivityINH = "9e-07"
-        minDiffusivityINH = "9e-07"
+        minDiffusivityINH = "0"
         degRateINH_Plasma_Fast_Acet = "1.9254e-04"
         degRateINH_Plasma_Slow_Acet = "4.8135e-05"
         dosageStartTime = "1"
-        bloodINHdose = "0.0"
-        dosageIntervalINH = "144"
-        vascularPermeability = "2.5e-7"
+        bloodINHdose = "0"
+        dosageIntervalINH = "999999"
+        cellUptakeINH = "1.0"
+        vascularPermeabilityINH = "25"
+        intraActivityINH = "0.05"
+        extraActivityINH = "0.005"
+        C50_INH = "0.04"
+        ConsumptionRate_INH = "5e-26"
+        ConsumptionHalfSat_INH = "1e-15"
+        degRateConstRIF = "2e-6"
+        diffusivityRIF = "9e-09"
+        minDiffusivityRIF = "0"
+        degRateRIF_Plasma = "1.9254e-04"
+        bloodRIFdose = "0"
+        dosageIntervalRIF = "999999"
+        cellUptakeRIF = "1"
+        vascularPermeabilityRIF = "2.5e-7"
+        intraActivityRIF = "0.05"
+        extraActivityRIF = "0.005"
+        C50_RIF = "0.04"
         bloodVolume = "5"
-        dosageIntervalIL10 = "10"
-        dosageIntervalTNF = "10"
-
-
 	>
 	<Mac
 		initNumber = "105"
@@ -191,11 +200,11 @@
 		movementRest = "2"
 		movementAct = "47"
 		movementInf = "144"
-		dTNF = "0.21"
+		dTNF = "0.2"
 		dCCL2 = "4.1417"
 		dCCL5 = "4.1417"
 		dCXCL9 = "8.2834"
-		dIL10 = "0.5"
+		dIL10 = "0.40"
 		thresholdNFkBTNF = "0.05"
 		kNFkB = "0.016231"
 		thresholdNFkBTNF_Molecular = "65.7601"
@@ -218,6 +227,7 @@
 		recruitmentHalfSatChemokine = "5"
 		stat1ActivationTime = "250"
 		nfkbActivationTime = "10"
+		icosActivationTime = "200"
 		/>
 	<Tcell
 		mtbRecEnabled = "50"
@@ -233,6 +243,8 @@
 		probRec = "0.15"
 		>
 		<Tgam
+			dTNF = "0.021"
+			dIL10 = "0.0"		
 			maxTimeReg = "36"
 			maxTimeDouble = "144"
 			probApoptosisFasFasL = "0.0094933"
@@ -250,6 +262,8 @@
 			recruitmentHalfSatChemokine = "1.5"
 			/>
 		<Tcyt
+			dTNF = "0.0021"
+			dIL10 = "0.0"		
 			maxTimeReg = "36"
 			probKillMac = "0.00976894"
 			probKillMacCleanly = "0.75"
@@ -262,6 +276,8 @@
 			recruitmentHalfSatChemokine = "1.5"
 			/>
 		<Treg
+			dTNF = "0.0"
+			dIL10 = "0.73"
 			thresholdRec = "0.124849"
 			probRec = "0.1"
 			probTregDeactivate = "1"
@@ -276,7 +292,11 @@
 	</Tcell>
 	<Mtb
 		growthRateIntMtb = "1.0015"
+		growthRateIntMtbMin = "1.0010"
+		growthRateIntMtbMax = "1.0020"
 		growthRateExtMtb = "1.0007"
+		growthRateExtMtbMin = "1.0005"
+		growthRateExtMtbMax = "1.0010"
 		growthExtMtbBound = "200"
 		deathRateExtMtbCaseated = "1.5"
 		/>

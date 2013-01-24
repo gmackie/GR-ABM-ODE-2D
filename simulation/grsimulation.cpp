@@ -965,9 +965,8 @@ void GrSimulation::growExtMtb()
 
             Scalar& extMtb = g.extMTB(p);
 
-            if (g.isCaseated(p))
-            {
-                // Bacteria don't grow in caseated compartments
+            if (g.isCaseated(p))  {
+                // Bacteria don't gp.x in caseated compartments
 
                 // Ext Mtb in caseation has to die somehow or it will increase with the nrCaseated compartments
 
@@ -991,8 +990,7 @@ void GrSimulation::growExtMtb()
                 _stats.getTotNonRepExtMtb()+=(extMtb);
                 _stats.getTotExtMtb()+=(extMtb);
             }
-            else
-            {
+            else  {
                 // Function to evaluate whether the extMtb is 'trapped' or not... (very basic)
                 // Currently only identifies cells whose Moore neighborhood (minus its own compartment)
                 // is completley caseated

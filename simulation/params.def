@@ -264,7 +264,6 @@ P(double, maxRecProb,                           Tcell_Tgam,	, "Max probability o
 P(double, probApoptosisFasFasL, 				        Tcell_Tgam,	, "Probability of Fas/FasL induced apoptosis by a Tgam cell", "", 0.0, 1.0)
 P(double, thresholdRec, 						            Tcell_Tgam,	, "TNF/chemokine threshold for Tgam recruitment", "", , )
 P(double, probRec, 							                Tcell_Tgam,	, "Probability of recruiting a Tgam cell", "", 0.0, 1.0)
-P(double, thresholdExtMtb, 					            Tcell_Tgam,	, "Ext. Mtb threshold for successfull antigen presentation by mac", "", , )
 P(double, probAntigenPresentation,              Tcell_Tgam,	, "Probability of successfull antigen presentation by infected mac", "", 0.0, 1.0)
 P(double, rateTGFB,                             Tcell_Tgam,	, "Probability rate of TGF-B Tgam10 activation", "", , )
 P(double, rateICOS,                             Tcell_Tgam,	, "Probability rate of ICOS Tgam10 activation", "", , )

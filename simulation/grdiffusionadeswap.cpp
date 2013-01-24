@@ -344,20 +344,15 @@ static void diffuse_degrade(GrGrid& nextGrid, const int time)
         {
             // Degradation of sTNF
             nextGrid.setTNF(p, nextGrid.TNF(p) * TNFdegRate);
-            //            Total += nextGrid.TNF(p);
-            //            nextGrid.incTNF(p, (-1.0 * nextGrid.TNF(p) * _PARAM(_kDeg) * dt));
 
             // Degradation of il10
             nextGrid.setil10(p, nextGrid.il10(p) * IL10degRate);
-            //            nextGrid.setil10(p, (-1.0 * nextGrid.il10(p) * _PARAM(_Ikdeg) * dt));
 
             // Degradation of CCL2
             nextGrid.setCCL2(p, nextGrid.CCL2(p) * CHEMOKINEdegRate);
-            //            nextGrid.incCCL2(p, (-1.0 * nextGrid.CCL2(p) * _PARAM(_ChemokinekDeg) * dt));
 
             // Degradation of CCL5
             nextGrid.setCCL5(p, nextGrid.CCL5(p) * CHEMOKINEdegRate);
-            //            nextGrid.incCCL5(p, (-1.0 * nextGrid.CCL5(p) * _PARAM(_ChemokinekDeg) * dt));
 
             // Degradation of CXCL9
             nextGrid.setCXCL9(p, nextGrid.CXCL9(p) * CHEMOKINEdegRate);
@@ -390,8 +385,6 @@ static void diffuse_degrade(GrGrid& nextGrid, const int time)
             nextGrid.incTNF(p, (1.0 * nextGrid.shedTNFR2(p) * _PARAM(_KD2) * _PARAM(_kOn2) * dt));
 
         }
-
-    //    std::cout << "Total Conc: " << Total << std::endl;
 }
 
 

@@ -319,11 +319,9 @@ static void diffuse_avg_ratio(Scalar* newgrid_u, Scalar* newgrid_v, Scalar* newg
 static void diffuse_degrade(GrGrid& nextGrid, const int time)
 {
     const Scalar dt = _PARAM(_timestepDiffusion);
-
     const Scalar TNFdegRate = exp(-1.0 *  _PARAM(_kDeg) * dt);
     const Scalar IL10degRate = exp(-1.0 *  _PARAM(_Ikdeg) * dt);
     const Scalar CHEMOKINEdegRate = exp(-1.0 *  _PARAM(_ChemokinekDeg) * dt);
-
 
     //Degradation equation here is separated based on operator splitting causing it to lag
     //behind diffusion.  We make the assumption diffuse << degrade to
@@ -358,8 +356,7 @@ static void diffuse_degrade(GrGrid& nextGrid, const int time)
             nextGrid.setCXCL9(p, nextGrid.CXCL9(p) * CHEMOKINEdegRate);
             //            nextGrid.incCXCL9(p, (-1.0 * nextGrid.CXCL9(p) * _PARAM(_ChemokinekDeg) * dt));
 
-            if (_PARAM(_DrugDynamics) && (time >= _PARAM(_dosageStartTime)))
-            {
+            if (_PARAM(_DrugDynamics) && (time >= _PARAM(_dosageStartTime)))  {
                 const Scalar INHdegRate = exp(-1.0 *  _PARAM(_degRateConstINH) * dt);
                 const Scalar RIFdegRate = exp(-1.0 *  _PARAM(_degRateConstRIF) * dt);
 
@@ -370,9 +367,7 @@ static void diffuse_degrade(GrGrid& nextGrid, const int time)
                 nextGrid.setRIF(p, nextGrid.RIF(p) * RIFdegRate);
             }
 
-
-            if (_PARAM(_dAttractant) != 0)
-            {
+            if (_PARAM(_dAttractant) != 0)  {
                 // Degradation of MacAttractant
                 nextGrid.setmacAttractant(p, nextGrid.macAttractant(p) * CHEMOKINEdegRate);
                 //                nextGrid.incmacAttractant(p, (-1.0 * nextGrid.macAttractant(p) * _PARAM(_ChemokinekDeg) * dt));
@@ -414,14 +409,12 @@ void GrDiffusionADE_Swap::diffuse(GrSimulationGrid& grSim, const int time) const
 
     #pragma omp section
         {
-            if (_PARAM(_dAttractant) != 0)
-            {
+        if (_PARAM(_dAttractant) != 0)  {
                 std::cout << "Why is this running?!?" << std::endl;
                 ::diffuse_u(grid.u_macAttractant(), nextGrid.u_macAttractant(), grid.getRange(), _PARAM(_diffusivityChemokines), _cutOffValue);
                 ::diffuse_v(grid.v_macAttractant(), nextGrid.v_macAttractant(), grid.getRange(), _PARAM(_diffusivityChemokines), _cutOffValue);
                 ::diffuse_avg(nextGrid.u_macAttractant(), nextGrid.v_macAttractant(), nextGrid.macAttractant(), grid.getRange());
             }
-
         }
     #pragma omp section
         {
@@ -436,8 +429,7 @@ void GrDiffusionADE_Swap::diffuse(GrSimulationGrid& grSim, const int time) const
             ::diffuse_v(grid.v_il10(), nextGrid.v_il10(), grid.getRange(), _PARAM(_diffusivityIL10), _cutOffValue);
             ::diffuse_avg(nextGrid.u_il10(), nextGrid.v_il10(), nextGrid.il10(), grid.getRange());
         }
-        if (_PARAM(_DrugDynamics) && (time >= _PARAM(_dosageStartTime)))
-        {
+        if (_PARAM(_DrugDynamics) && (time >= _PARAM(_dosageStartTime)))  {
             #pragma omp section
             {
                 ::diffuse_u_nofluxbc(grid.u_INH(), nextGrid.u_INH(), grid.getRange(), _cutOffValue, grid.nCells(), _PARAM(_minDiffusivityINH), _PARAM(_diffusivityINH));

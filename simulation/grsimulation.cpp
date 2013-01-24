@@ -436,7 +436,6 @@ void GrSimulation::init(const boost::property_tree::ptree& pt, bool xml)
 
     }
 
-
     // Place initial extracellular bacteria on the grid
     for (PosVector::const_iterator it = initExtMtb.begin(); it != initExtMtb.end(); it++)
     {
@@ -455,32 +454,6 @@ void GrSimulation::init(const boost::property_tree::ptree& pt, bool xml)
         std::cerr << "The number of initial resting macrophages to place on the grid, " << count << ", is > the number of grid compartments, " << nrGridCompartments << "." << std::endl;
         exit(1);
     }
-
-    //    _grid.getGrid().setTNF(200, 200, 10000);
-
-    // DBG
-    // Testing for trapped extMtb
-
-    //    for (int i=-1; i<=1; i++)
-    //    {
-    //        for (int j=-1; j<=1; j++)
-    //        {
-    //            Pos modp(_grid.getGrid().mod_row(50 + i), _grid.getGrid().mod_col(50 + j));
-
-    //            if (i==0 && j==0)
-    //            {
-    ////                _grid.getGrid().extMTB(modp) += 1;
-    //                continue;
-    //            }
-    //            else
-    //                for (int k=1; k<=20; k++)
-    //                    _grid.getGrid().incKillings(modp);
-    //        }
-    //    }
-
-    //    // DBG
-
-
 
     while (count > 0)
     {
@@ -613,27 +586,27 @@ void GrSimulation::solve()
     bool tnfDepletion = false;
     bool il10Depletion = false;
 
-    if (_tnfDepletionTimeStep >= 0 && _time >= _tnfDepletionTimeStep)
-    {
+    if (_tnfDepletionTimeStep >= 0 && _time >= _tnfDepletionTimeStep)  {
         tnfDepletion = true;
         _tnfrDynamics = false;
     }
 
-    if (_il10DepletionTimeStep >= 0 && _time >= _il10DepletionTimeStep)
-    {
+    if (_il10DepletionTimeStep >= 0 && _time >= _il10DepletionTimeStep)  {
         il10Depletion = true;
         _il10rDynamics = false;
     }
 
-    // Get cell density information to use for adjusting diffusion
-    GrGrid& g = _grid.getGrid();
-    Pos p;
-    Pos dim = g.getRange();
-    for (p.x = 0; p.x < dim.x; p.x++)
-    {
-        for (p.y = 0; p.y < dim.y; p.y++)
+    // Get cell density information to use for adjusting diffusion (for Drug Diffusion)
+    if (_PARAM(_DrugDynamics))  {
+        GrGrid& g = _grid.getGrid();
+        Pos p;
+        Pos dim = g.getRange();
+        for (p.x = 0; p.x < dim.x; p.x++)
         {
-            g.nCells(p) = g.getCellDensity(p);
+            for (p.y = 0; p.y < dim.y; p.y++)
+            {
+                g.nCells(p) = g.getCellDensity(p);
+            }
         }
     }
     
@@ -641,29 +614,47 @@ void GrSimulation::solve()
     // Agent time step is 600 s (10 min)
     for (int DiffStep = 0; DiffStep < _numDiffusionPerAgent; DiffStep++)
     {
+        // Calculate signle diffusion time step
         _pDiffusion->diffuse(_grid, _time);
-        if (_PARAM(_DrugDynamics) && (_time >= _PARAM(_dosageStartTime)))
+
+        // Consume drugs on the grid if they are turned on
+        if (_PARAM(_DrugDynamics) && (_time >= _PARAM(_dosageStartTime)))  {
             consumeDrugs(_grid.getGrid(),_PARAM(_timestepDiffusion));
+        }
+
+        // Secrete from cells every diffusion time step (independent of molecular dynamics)
         secreteFromMacrophages(tnfDepletion, il10Depletion, _PARAM(_timestepDiffusion));
         secreteFromTcells(tnfDepletion, il10Depletion, _PARAM(_timestepDiffusion));
         secreteFromCaseations(_PARAM(_timestepDiffusion));
+
+        // If molecular scale dynamics and an adaptive solver are chosen
+        // Solve the ODEs using the adaptive Molecular Scale
         if ((_nfkbDynamics || _tnfrDynamics || _il10rDynamics) && _adaptive) {
+            // Solve molecular scale dynamics with an adaptive solver
             solveMolecularScaleAdaptive(_PARAM(_timestepDiffusion));
-            if (!_il10rDynamics || !_tnfrDynamics)
-                for (int MolStep = 0; MolStep < _numMolecularPerDiffusion; MolStep++)  //Degradation needs to be on molecular timestep
+            // If not using all molecular scale dynamics then adjust the CORE ABM consumption
+            if (!_il10rDynamics || !_tnfrDynamics)  {
+                for (int MolStep = 0; MolStep < _numMolecularPerDiffusion; MolStep++)  {
                     adjustFauxDegradation(_PARAM(_timestepMolecular));
-        }
-        else
-            for (int MolStep = 0; MolStep < _numMolecularPerDiffusion; MolStep++)
-            {
-                if (_nfkbDynamics || _tnfrDynamics || _il10rDynamics)
-                    solveMolecularScale(_PARAM(_timestepMolecular));
-                if (!_il10rDynamics || !_tnfrDynamics)
-                    adjustFauxDegradation(_PARAM(_timestepMolecular));
-                //adjustTNFDegradation(_PARAM(_timestepMolecular));
+                }
             }
-        if (_PARAM(_DrugDynamics) && (_time >= _PARAM(_dosageStartTime)))
-        {
+        }
+        // If molecular scale dynamics and a non-adaptive solver are chosen
+        // Solve the ODEs using the non-adaptive solver loop
+        else
+            for (int MolStep = 0; MolStep < _numMolecularPerDiffusion; MolStep++)  {
+                // Solve molecular scale dynamics with a non-adaptive solver
+                if (_nfkbDynamics || _tnfrDynamics || _il10rDynamics)  {
+                    solveMolecularScale(_PARAM(_timestepMolecular));
+                }
+                // If not using all molecular scale dynamics then adjust the CORE ABM consumption
+                if (!_il10rDynamics || !_tnfrDynamics)  {
+                    adjustFauxDegradation(_PARAM(_timestepMolecular));
+                }
+            }
+
+        // Solve vascular dynamics for drugs if turned on
+        if (_PARAM(_DrugDynamics) && (_time >= _PARAM(_dosageStartTime)))  {
             _pVascular->solveVascularSources(_grid.getGrid(), _PARAM(_timestepDiffusion),_time, DiffStep);
             _stats.getBloodConcINH() = _pVascular->getBloodConcentrationINH();
             _stats.getBloodConcRIF() = _pVascular->getBloodConcentrationRIF();
@@ -699,8 +690,7 @@ void GrSimulation::solve()
     checkTCellRecruitmentStart();
 
     // shuffle order of cells every hour for randomization in movement
-    if (_time % 6 == 0)
-    {
+    if (_time % 6 == 0)  {
         shuffleCells();
     }
 
@@ -1049,35 +1039,6 @@ void GrSimulation::growExtMtb()
                     _stats.getTotRIFNorm() += g.RIF(p);
                 }
             }
-        }
-    }
-}
-
-void GrSimulation::adjustTNFDegradation(double dt)
-{	
-    Pos pos;
-    GrGrid& grid = _grid.getGrid();
-    for (pos.x = 0; pos.x < grid.getRange().x; pos.x++)
-    {
-        for (pos.y = 0; pos.y < grid.getRange().y; pos.y++)
-        {
-            // simulate the effect of TNF internalization by cells in the form of degradation. only for TNF
-            double dtnf;
-            Scalar tnf = grid.TNF(pos);
-            if (grid.hasAgentType(MAC, pos))
-            {
-                dtnf = -_PARAM(_kInt1) * (tnf / (tnf + _PARAM(_KD1) * 48.16e11)) * 1500 * dt * 0.4;
-                tnf += dtnf;
-            }
-            
-            if (grid.hasTcell(pos))
-            {
-                dtnf = -_PARAM(_kInt1) * (tnf / (tnf + _PARAM(_KD1) * 48.16e11)) * 800 * dt * 0.4;
-                tnf += dtnf;
-            }
-            
-            // dtnf = -_PARAM(_kInt1) * (tnf / (tnf + _PARAM(_KD1) * 48.16e11)) * 800 * (cell.hasTcell()) * dt * 0.4;
-            // tnf += dtnf;
         }
     }
 }

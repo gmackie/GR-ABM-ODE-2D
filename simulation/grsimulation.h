@@ -114,7 +114,6 @@ private:
   void secreteFromCaseations(double mdt);
   void solveMolecularScale(double dt);
   void solveMolecularScaleAdaptive(double dt);
-  void adjustTNFDegradation(double dt);
   void adjustFauxDegradation(double dt);
   void consumeDrugs(GrGrid grid, double dt);
   void growExtMtb();

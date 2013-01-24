@@ -166,6 +166,7 @@ int main(int argc, char *argv[])
   ("NFkB-dynamics", "Use molecular level intracellular NFkB dynamics in the model")
   ("rand-growth", "Randomize inter- and extra-cellular bacteria growth rates")
   ("adaptive", "Use adaptive time-step dynamics")
+  ("drug-dynamics", "Use drug dynamics in the model");
   ("Treg-induction", "Allow Tregs to be induced from Tgams in the model")
   ("tnf-depletion", po::value<int>(&tnfDepletionTimeStep)->default_value(-1), "The time step at which to stop secreting tnf, including by tnfr dynamics. -1: no depletion")
   ("il10-depletion", po::value<int>(&il10DepletionTimeStep)->default_value(-1), "The time step at which to stop secreting il10, including by il10r dynamics. -1: no depletion")
@@ -260,11 +261,12 @@ int main(int argc, char *argv[])
 
 
 	  LungParam::getInstance()->set_NFkBdynamics(vm.count("NFkB-dynamics"));
-	  LungParam::getInstance()->set_TNFdynamics (vm.count("tnfr-dynamics") || vm.count("NFkB-dynamics"));
+      LungParam::getInstance()->set_TNFdynamics(vm.count("tnfr-dynamics") || vm.count("NFkB-dynamics"));
 	  LungParam::getInstance()->set_IL10dynamics(vm.count("il10r-dynamics"));
 
       LungParam::getInstance()->set_RandomizeGrowthRate(vm.count("rand-growth"));
       LungParam::getInstance()->set_growthRateSamples(vm["growth-samples"].as<unsigned>());
+      LungParam::getInstance()->set_DrugDynamics(vm.count("drug-dynamics"));
 
       switch (vm["diffusion"].as<int>())
         {

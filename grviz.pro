@@ -22,6 +22,7 @@ HEADERS += scalardatasets/scalartotmtbdataset.h \
     simulation/recruitmentbase.h \
     simulation/stat.h \
     simulation/stat.def \
+    simulation/params.def \
     scalardatasets/scalarcelldensitydataset.h \
     scalardatasets/scalartnfattrextmtb.h \
     scalardatasets/scalaragentgridbase.h \

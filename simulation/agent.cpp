@@ -1817,3 +1817,43 @@ void Agent::adaptiveODE2Cell(Agent* other, GrGrid& grid, double t, double dt, OD
   assert(!"Took too many steps");
 }
 #endif
+
+void Agent::setChemokines(GrGrid& grid, const double mdt, const double stateFactor, const Pos pos, const double dCCL2, const double dCCL5, const double dCXCL9)
+{
+    double il10 = ((grid.il10(pos) * MW_IL10 * 1e6)/(NAV * VOL)); // Convert IL10 back to ng/mL
+
+    if (il10 > _PARAM(_IC50ChemokineIL10))  {
+        grid.incCCL2(pos, (stateFactor * 0.5 * dCCL2 * mdt));
+        grid.incCCL5(pos, (stateFactor * 0.5 * dCCL5 * mdt));
+        grid.incCXCL9(pos, (stateFactor * 0.5 * dCXCL9 * mdt));
+      }
+    else  {
+        grid.incCCL2(pos, (stateFactor * dCCL2 * mdt));
+        grid.incCCL5(pos, (stateFactor * dCCL5 * mdt));
+        grid.incCXCL9(pos, (stateFactor * dCXCL9 * mdt));
+      }
+}
+
+
+void Agent::setTNF(GrGrid& grid, const double mdt, const double stateFactor, const Pos pos, const bool tnfrDynamics, const bool tnfDepletion, const double kSynth, const double kRNA, const double dTNF, Scalar& kRNAset, Scalar& kSynthset)
+{
+    // Set the Synth and RNA rate for TNF molecular scale dynamics
+    kSynthset = stateFactor * kSynth;
+    kmRNAset = stateFactor * kRNA;
+
+    if (!tnfrDynamics && !tnfDepletion)  {
+        double il10 = ((grid.il10(pos) * MW_IL10 * 1e6)/(NAV * VOL)); // Convert IL10 back to ng/mL
+        double tnfMOD = (1.0/(1.0 + exp((log(il10) + _PARAM(_LinkLogAlpha))/_PARAM(_LinkLogBeta)))); // calculate the fraction of inhibition
+        grid.incTNF(pos, (tnfMOD * stateFactor * dTNF * mdt));
+      }
+}
+
+void Agent::setIL10(GrGrid& grid, const double mdt, const double stateFactor, const Pos pos, const bool il10rDynamics, const bool il10Depletion, const double kISynth, const double dIL10, Scalar& kIsynthset)
+{
+    // Set the Synth for IL10 molecular scale dynamics
+    kIsynthset = stateFactor * kISynth;
+
+    if (!il10rDynamics && !il10Depletion)  {
+        grid.incil10(pos, (stateFactor * dIL10 * mdt));
+      }
+}

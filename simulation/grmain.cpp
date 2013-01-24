@@ -165,6 +165,7 @@ public:
     for(unsigned i=0; i<sz; i++)
       {
         stringstream ss;
+        unsigned test = _PARAM(_growthRateSamples);
         double f0=double(i) / _PARAM(_growthRateSamples) *
                   (_PARAM(Mtb_growthRateIntMtbMax) - _PARAM(Mtb_growthRateIntMtbMin))
                   + _PARAM(Mtb_growthRateIntMtbMin);
@@ -350,6 +351,17 @@ public:
     write("TgamRecruited");
     write("TcytRecruited");
     write("TregRecruited");
+    write("INHmin");
+    write("INHmax");
+    write("INHSpread");
+    int sz = _PARAM(_numDrugBinsForDistr);
+    for(unsigned i=0; i<sz; i++)
+      {
+        stringstream ss;
+        double f0=double(i);
+        ss<<f0;
+        write(ss.str());
+      }
     endRow();
 
   }
@@ -485,6 +497,22 @@ public:
       write(stats.getNrQueuedDie((AgentType)i));
     for(size_t i=TGAM; i<NAGENTS; i++)
       write(stats.getNrRecruited((AgentType)i));
+    const Stats::Stat& v = stats.getdrugDistStatINH();
+    if(ba::extract::count(v) > 0)
+    {
+        write(ba::extract::min(v));
+        write(ba::extract::max(v));
+        write(ba::extract::max(v) - ba::extract::min(v));
+    }
+    else
+    {
+        write(0);
+        write(0);
+        write(0);
+    }
+
+    const std::vector<unsigned>& vf = stats.getdrugDistFreqINH();
+    for(unsigned i=0; i<vf.size(); i++) write(vf[i]);
 
     oCSVStream::endRow();
   }

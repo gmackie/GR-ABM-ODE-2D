@@ -597,7 +597,7 @@ void GrSimulation::solve()
     }
 
     // Get cell density information to use for adjusting diffusion (for Drug Diffusion)
-    if (_PARAM(_DrugDynamics))  {
+    if (_PARAM(_DrugDynamics) && (_time >= _PARAM(_dosageStartTime) ))  {
         GrGrid& g = _grid.getGrid();
         Pos p;
         Pos dim = g.getRange();
@@ -677,6 +677,9 @@ void GrSimulation::solve()
 
     // compute next state every 10 minutes
     computeNextStates();
+
+    // update drugs consumed by Mtb
+    consumeDrugs(_grid.getGrid(),AGENT_TIME_STEP);
 
     // update extracellular Mtb
     growExtMtb();
@@ -935,6 +938,10 @@ void GrSimulation::growExtMtb()
 
     GrGrid& g = _grid.getGrid();
     const Pos& dim = g.getRange();
+
+    const Stats::Stat& vINH = _stats.getdrugDistStatINH();
+    double minINH = ba::extract::min(vINH);
+    double maxINH = ba::extract::max(vINH);
     Pos p;
     for (p.x = 0; p.x < dim.x; p.x++)
     {
@@ -1009,6 +1016,7 @@ void GrSimulation::growExtMtb()
                 _stats.getTotExtMtb() += (extMtb);
             }
 
+            size_t sz = _grid.getSize();          //get nr of compartments on the grid
             _stats.getTotMacAttractant() += (g.macAttractant(p));
             _stats.getTotTNF() += (g.TNF(p));
             _stats.getTotIL10() += (g.il10(p));
@@ -1067,23 +1075,6 @@ void GrSimulation::adjustFauxDegradation(double dt)
 void GrSimulation::consumeDrugs(GrGrid grid, double dt)
 {
     Pos pos;
-    for (pos.x = 0; pos.x < grid.getRange().x; pos.x++)
-    {
-          for (pos.y = 0; pos.y < grid.getRange().y; pos.y++)
-          {
-              // simulate the consumption of drugs by extracellular bacteria
-              double dINH;
-              Scalar INH = grid.INH(pos);   //  mg/L
-              double mtb = grid.extMTB(pos);
-
-              if (grid.extMTB(pos)!=0)
-              {
-                  dINH = -_PARAM(_ConsumptionRate_INH) * (INH / (INH + _PARAM(_ConsumptionRate_INH))) * dt * mtb;  // M
-                  dINH = dINH * MW_INH;    // mg/L
-                  grid.incINH(pos, dINH);
-              }
-          }
-    }
     for (MacList::iterator it = _macList.begin(); it != _macList.end(); it++)
     {
         if (Mac::isMac(*it,Mac::MAC_INFECTED)||Mac::isMac(*it,Mac::MAC_CINFECTED))
@@ -1103,6 +1094,28 @@ void GrSimulation::consumeDrugs(GrGrid grid, double dt)
             assert(INHafter>=0);
         }
     }
+    Pos p;
+
+    for (p.x = 0; p.x < grid.getRange().x; p.x++)
+    {
+          for (p.y = 0; p.y < grid.getRange().y; p.y++)
+          {
+              // simulate the consumption of drugs by extracellular bacteria
+              double dINH;
+              Scalar INH = grid.INH(p);   //  mg/L
+              double mtb = grid.extMTB(p);
+
+              if (grid.extMTB(pos)!=0)
+              {
+                  dINH = -_PARAM(_ConsumptionRate_INH) * (INH / (INH + _PARAM(_ConsumptionRate_INH))) * dt * mtb;  // M
+                  dINH = dINH * MW_INH;    // mg/L
+                  grid.incINH(p, dINH);
+              }
+              // Update INH stats here since it's the last thing we do with drugs before we growExtMtb
+              _stats.getdrugDistStatINH()(grid.INH(p));
+          }
+    }
+
 }
 
 

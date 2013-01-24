@@ -99,8 +99,10 @@ protected:
 
   boost::array<Stat, Mac::NSTATES> _macIntMtbStats;
   Stat _macGrowthRateStat;
+  Stat _drugDistStatINH;
   std::vector<unsigned> _intMtbFreq;
   std::vector<unsigned> _growthRateFreq;
+  std::vector<unsigned> _drugDistFreqINH;
 
 public:
 
@@ -109,6 +111,7 @@ public:
   Stats() :
     _intMtbFreq(int(_PARAM(Mac_nrIntMtbBurstCInf)) + 1, 0)
     , _growthRateFreq(_PARAM(_growthRateSamples), 0)
+    , _drugDistFreqINH(_PARAM(_numDrugBinsForDistr), 0)
   {
     clear();
   }
@@ -216,6 +219,14 @@ public:
     _growthRateFreq[i] = v;
   }
 
+  Stat& getdrugDistStatINH() {
+    return _drugDistStatINH;
+  }
+  const Stat& getdrugDistStatINH() const {
+    return _drugDistStatINH;
+  }
+
+
 // --- Visitor Methods ---
 
   /*! \brief visit each stat
@@ -270,6 +281,7 @@ public:
     //#define AGENTSTATE_STAT(type, name, sz, desc, reset) ar & boost::serialization::make_nvp( #name, _ ## name);
 #include "stat.def"
     ar & boost::serialization::make_nvp("intMtbFreq", _intMtbFreq);
+    ar & boost::serialization::make_nvp("drugDistFreqINH", _drugDistFreqINH);
   }
 
   void serialize(std::ostream& s) const
@@ -283,6 +295,9 @@ public:
     s << _intMtbFreq.size() << std::endl;
     for (size_t i = 0; i < _intMtbFreq.size(); i++)
       s << _intMtbFreq[i] << std::endl;
+    s << _drugDistFreqINH.size() << std::endl;
+    for (size_t i = 0; i < _drugDistFreqINH.size(); i++)
+      s << _drugDistFreqINH[i] << std::endl;
   }
 
   /**
@@ -309,6 +324,8 @@ public:
 #define STATE_STAT(type, name, agent_t, desc, reset) ARRAY_STAT(type, name, agent_t::NSTATES, desc, reset)
     //#define AGENTSTATE_STAT(type, name, sz, desc, reset) s << boost::serialization::make_nvp( #name, _ ## name);
 #include "stat.def"
+      _drugDistStatINH = Stats::Stat();
+      std::fill(_drugDistFreqINH.begin(), _drugDistFreqINH.end(), 0);
   }
   /**
   * @brief Resets all resetable stats (reset=2) to the value of the default constructor
@@ -352,6 +369,9 @@ inline void Stats::serialize(std::ostream& s, const unsigned int /* file_version
   s << _intMtbFreq.size() << std::endl;
   for (size_t i = 0; i < _intMtbFreq.size(); i++)
     s << _intMtbFreq[i] << std::endl;
+  s << _drugDistFreqINH.size() << std::endl;
+  for (size_t i = 0; i < _drugDistFreqINH.size(); i++)
+    s << _drugDistFreqINH[i] << std::endl;
 }
 
 template<>
@@ -368,6 +388,9 @@ inline void Stats::serialize(std::istream& s, const unsigned int /* file_version
   assert(tmp == _intMtbFreq.size());
   for (size_t i = 0; i < _intMtbFreq.size(); i++)
     s >> _intMtbFreq[i];
+  assert(tmp == _drugDistFreqINH.size());
+  for (size_t i = 0; i < _drugDistFreqINH.size(); i++)
+    s >> _drugDistFreqINH[i];
 }
 
 #endif

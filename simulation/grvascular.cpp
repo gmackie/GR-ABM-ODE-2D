@@ -52,9 +52,11 @@ void Vascular::solveVascularSources(GrGrid& grid, double dt, const int time, int
 
 
             // INH
+            double oldINH = grid.INH(*it);
             double localINH = getAverageOfNeighbours(grid.INH(), *it, grid.getRange(), MW_INH);
             double INHChange = calculateFluxChange(localINH, _bloodConcentrationINH, dt, _PARAM(_vascularPermeabilityINH), MW_INH);
             grid.incINH(*it, INHChange);
+            double newINH = grid.INH(*it);
             modulateBlood(_bloodConcentrationINH, INHChange, MW_INH);
 
             // RIF
@@ -77,16 +79,17 @@ double Vascular::getAverageOfNeighbours(Scalar* grid, const Pos& pos, const Pos&
 {
     double sumC = 0.0;
 
-    Scalar up, dn, lt, rt;
+    Scalar up, dn, lt, rt, ct;
 
     up = grid[Indexer::padInd(dim,((pos.x)-1),pos.y)];
     lt = grid[Indexer::padInd(dim,((pos.x)),((pos.y)-1))];
     dn = grid[Indexer::padInd(dim,((pos.x)+1),pos.y)];
     rt = grid[Indexer::padInd(dim,((pos.x)),((pos.y)+1))];
+    ct = grid[Indexer::padInd(dim,((pos.x)),((pos.y)))];
 
 //    std::cout << "Up: " << up << "  Lt: " << lt << "  Dn: " << dn << "  Rt: " << rt << std::endl;
 
-    sumC = (up + dn + lt + rt)/(4.0)/MW;
+    sumC = (up + dn + lt + rt + ct)/(5.0)/MW;
 
     return (sumC); // Returns average concentration mol/L
 }

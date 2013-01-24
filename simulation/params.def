@@ -201,7 +201,6 @@ P(double, effectRecCCL2, 						            ,	0.0, "Effect of CCL2 on recruitment
 P(double, effectRecCCL5, 						            ,	0.0, "Effect of CCL5 on recruitment",  "", , )
 P(double, effectRecCXCL9, 						          ,	0.0, "Effect of CXCL9 on recruitment", "", , )
 P(double, IC50ChemokineIL10,                    , , "IC50 of IL10 inhibition of chemokine secretion - All chemokines are the same", "#molecules/mL", , )
-P(double, dAttractant, 						              ,	, "Secretion rate of macrophage attractant secreted by debris", "", , )
 
 // Mac parameters
 //type,		name,							path,	default,	desc,													units,			min,	max)
@@ -224,7 +223,6 @@ P(double, nrExtMtbUptakeAct, 			              Mac, , "Number of extracellular ba
 P(double, thresholdRec, 					              Mac, , "TNF/chemokine threshold for macrophage recruitment", "", , )
 P(double, probRec, 							                Mac, , "Probability of recruiting a macrophage", "", 0.0, 1.0)
 P(double, movementBonusFactor, 				          Mac, 1.0, "Bonus factor for neighbor compartment with highest chemical concentration", "", , )
-P(double, initDensity, 						              Mac, 0.0, "Initial density of resting macrophages on the grid", "", 0.0, 1.0)
 P(double, thresholdICOS, 						            Mac, , "Threshold for ICOS-L inhibition on a Mac by IL10", "", , )
 P(double, recruitmentHalfSatTNF, 				        Mac, , "Half-saturation paramter for Mac TNF-dependent recruitment", "", , )
 P(double, recruitmentHalfSatChemokine, 		      Mac, , "Half-saturation paramter for Mac chemokine-dependent recruitment", "", , )

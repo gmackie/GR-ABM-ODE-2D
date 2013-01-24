@@ -31,6 +31,11 @@ P(double, dIL10_Tgam,	   , , "Secretion rate of IL10 by Tgam", "#molecules/6s", 
 P(double, dIL10_Tcyt,	   , , "Secretion rate of IL10 by Tcyt", "#molecules/6s", 0, )
 P(double, dIL10_Treg,	   , , "Secretion rate of IL10 by Treg", "#molecules/6s", 0, )
 
+// Tuneable Resolution Parameters
+P(double, fracConsumeIL10,          , , "Scaling factor for coarse grained IL10 dynamics",           "",         0, )
+P(double, fracConsumeTNF,          , , "Scaling factor for coarse grained TNF dynamics",           "",         0, )
+// End of Tuneable Resolution Parameters
+
 // Drug activity parameters
 //type,     name,                           path,   default,    desc,                                                   units,          min,    max)
 P(double, intraActivityINH          , , , "Max killing rate of INH intracellular", "", 0, )
@@ -107,7 +112,6 @@ P(double, meanIL10RMac,  , , "Mean density of IL10R on macrophages",            
 P(double, stdIL10RMac,   , , "Standard deviation of mean density of IL10R on macrophages","#/cell",	  0, )
 P(double, meanIL10RTcell,, , "Mean density of IL10R on T cells",                          "#/cell",	  0, )
 P(double, stdIL10RTcell, , , "Standard deviation of mean density of IL10R on T cells",    "#/cell",	  0, )
-P(double, Imod,          , , "Scaling factor for coarse grained IL10 dynamics",           "",         0, )
 P(double, Ikdeg,         , , "Degredation rate constant for ODE IL10",                    "1/s",      0, )
 // end of molecular IL10 associated parameters
 

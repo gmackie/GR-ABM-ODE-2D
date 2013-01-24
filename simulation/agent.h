@@ -376,10 +376,10 @@ public:
   void adaptiveODE(GrGrid& grid, double t, double dt, ODESolvers::ODEMethod method);
   void adaptiveODE2Cell(Agent* other, GrGrid& grid, double t, double dt, ODESolvers::ODEMethod method);
 
-  void setNFkB();
-  void setChemokines(GrGrid& grid, const double mdt, const double stateFactor, const Pos pos, const double dCCL2, const double dCCL5, const double dCXCL9);
-  void setTNF(GrGrid& grid, const double mdt, const double stateFactor, const Pos pos, const bool tnfrDynamics, const bool tnfDepletion, const double kSynth, const double kRNA, const double dTNF, Scalar& kRNAset, Scalar& kSynthset);
-  void setIL10(GrGrid& grid, const double mdt, const double stateFactor, const Pos pos, const bool il10rDynamics, const bool il10Depletion, const double kISynth, const double dIL10, Scalar& kIsynthset);
+  void secNFkB(const double c1rChem, const double c1rTNF, const double c1rrChemTNF, Scalar& c1rChemset, Scalar& c1rTNFset, Scalar& c1rrChemTNFset);
+  void secChemokines(GrGrid& grid, const double mdt, const double stateFactor, const Pos pos, const double dCCL2, const double dCCL5, const double dCXCL9);
+  void secTNF(GrGrid& grid, const double mdt, const double stateFactor, const Pos pos, const bool tnfrDynamics, const bool tnfDepletion, const double kSynth, const double kRNA, const double dTNF, Scalar& kRNAset, Scalar& kSynthset);
+  void secIL10(GrGrid& grid, const double mdt, const double stateFactor, const Pos pos, const bool il10rDynamics, const bool il10Depletion, const double kISynth, const double dIL10, Scalar& kIsynthset);
 
   bool TNFinducedApoptosis(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics);
   bool TNFinducedNFkB(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics);

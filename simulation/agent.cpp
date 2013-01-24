@@ -1385,11 +1385,10 @@ void Agent::solveDegradation(GrGrid& grid, double dt, bool tnfrDynamics, bool il
 {
   if (!tnfrDynamics)
     {
-
       // simulate the effect of TNF internalization by cells in the form of degradation. Only for TNF
       double dtnf;
       double tnf = grid.TNF(_pos);
-      dtnf = -_PARAM(_kInt1) * (tnf / (tnf + _PARAM(_KD1) * NAV * VOL)) * meanTNFR1 * dt * 0.4;
+      dtnf = -_PARAM(_kInt1) * (tnf / (tnf + _PARAM(_KD1) * NAV * VOL)) * meanTNFR1 * dt * _PARAM(_fracConsumeTNF);
       grid.incTNF(_pos, dtnf);
     }
 
@@ -1400,7 +1399,7 @@ void Agent::solveDegradation(GrGrid& grid, double dt, bool tnfrDynamics, bool il
       double il10 = grid.il10(_pos);
 
       // simulate the effect of IL10 internalization in the form of degradation. Only for IL10
-      dil10 = -_PARAM(_IkInt) * (il10 / (il10 + _PARAM(_IkD) * NAV * VOL)) * iIL10R * dt * _PARAM(_Imod);
+      dil10 = -_PARAM(_IkInt) * (il10 / (il10 + _PARAM(_IkD) * NAV * VOL)) * iIL10R * dt * _PARAM(_fracConsumeIL10);
       grid.incil10(_pos, dil10);
 
     }
@@ -1818,7 +1817,7 @@ void Agent::adaptiveODE2Cell(Agent* other, GrGrid& grid, double t, double dt, OD
 }
 #endif
 
-void Agent::setChemokines(GrGrid& grid, const double mdt, const double stateFactor, const Pos pos, const double dCCL2, const double dCCL5, const double dCXCL9)
+void Agent::secChemokines(GrGrid& grid, const double mdt, const double stateFactor, const Pos pos, const double dCCL2, const double dCCL5, const double dCXCL9)
 {
     double il10 = ((grid.il10(pos) * MW_IL10 * 1e6)/(NAV * VOL)); // Convert IL10 back to ng/mL
 
@@ -1834,12 +1833,11 @@ void Agent::setChemokines(GrGrid& grid, const double mdt, const double stateFact
       }
 }
 
-
-void Agent::setTNF(GrGrid& grid, const double mdt, const double stateFactor, const Pos pos, const bool tnfrDynamics, const bool tnfDepletion, const double kSynth, const double kRNA, const double dTNF, Scalar& kRNAset, Scalar& kSynthset)
+void Agent::secTNF(GrGrid& grid, const double mdt, const double stateFactor, const Pos pos, const bool tnfrDynamics, const bool tnfDepletion, const double kSynth, const double kRNA, const double dTNF, Scalar& kRNAset, Scalar& kSynthset)
 {
     // Set the Synth and RNA rate for TNF molecular scale dynamics
     kSynthset = stateFactor * kSynth;
-    kmRNAset = stateFactor * kRNA;
+    kRNAset = stateFactor * kRNA;
 
     if (!tnfrDynamics && !tnfDepletion)  {
         double il10 = ((grid.il10(pos) * MW_IL10 * 1e6)/(NAV * VOL)); // Convert IL10 back to ng/mL
@@ -1848,7 +1846,7 @@ void Agent::setTNF(GrGrid& grid, const double mdt, const double stateFactor, con
       }
 }
 
-void Agent::setIL10(GrGrid& grid, const double mdt, const double stateFactor, const Pos pos, const bool il10rDynamics, const bool il10Depletion, const double kISynth, const double dIL10, Scalar& kIsynthset)
+void Agent::secIL10(GrGrid& grid, const double mdt, const double stateFactor, const Pos pos, const bool il10rDynamics, const bool il10Depletion, const double kISynth, const double dIL10, Scalar& kIsynthset)
 {
     // Set the Synth for IL10 molecular scale dynamics
     kIsynthset = stateFactor * kISynth;
@@ -1856,4 +1854,11 @@ void Agent::setIL10(GrGrid& grid, const double mdt, const double stateFactor, co
     if (!il10rDynamics && !il10Depletion)  {
         grid.incil10(pos, (stateFactor * dIL10 * mdt));
       }
+}
+
+void Agent::secNFkB(const double c1rChem, const double c1rTNF, const double c1rrChemTNF, Scalar& c1rChemset, Scalar& c1rTNFset, Scalar& c1rrChemTNFset)
+{
+    c1rChemset = c1rChem;
+    c1rTNFset = c1rTNF;
+    c1rrChemTNFset = c1rrChemTNF;
 }

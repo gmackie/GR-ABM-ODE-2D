@@ -82,19 +82,44 @@ void Mac::move(GrGrid& grid)
 
 void Mac::secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDepletion, bool il10rDynamics, bool il10Depletion, double mdt)
 {
-  if (_deactivationTime != -1)
-    {
-      _kSynth = 0;
-      _kmRNA = 0;
-      _c1rChem = 0;
-      _c1rTNF = 0;
-      _c1rrChemTNF = 0;
-      _kISynth = 0;
+  if (_deactivationTime != -1)  {
+      secTNF(grid, mdt, 0.0, _pos, tnfrDynamics, tnfDepletion, 0.0, 0.0, 0.0, _kmRNA, _kSynth);
+      secNFkB(0.0, 0.0, 0.0, _c1rChem, _c1rTNF, _c1rrChemTNF);
+      secIL10(grid, mdt, 0.0, _pos, il10rDynamics, il10Depletion, 0.0, 0.0, _kISynth);
       return;
     }
 
-  if (nfkbDynamics) // TNF and chemokines are secreted as a function of NFkB dynamics
-    {
+  // TNF and chemokines are secreted as a function of NFkB dynamics
+  if (nfkbDynamics)  {
+      switch(_state)  {
+      case Mac::MAC_RESTING:
+          secNFkB((_PARAM(_epsilon2)*_PARAM(_c1r)), (_PARAM(_epsilon2)*_PARAM(_c1r)), 0.0, _c1rChem, _c1rTNF, _c1rrChemTNF);
+          secIL10(grid, mdt, 0.0, _pos, il10rDynamics, il10Depletion, 0.0, 0.0, _kISynth);
+          ++grid.nSecretions(_pos);
+          break;
+      case Mac::MAC_INFECTED:
+          secNFkB((_PARAM(_c1r)), (_PARAM(_c1r)), (_PARAM(_epsilon1)*_PARAM(_c1r)), _c1rChem, _c1rTNF, _c1rrChemTNF);
+          secIL10(grid, mdt, 1.0, _pos, il10rDynamics, il10Depletion, _PARAM(_IkSynthMacInf), (0.15 * _PARAM(Mac_dIL10)), _kISynth);
+          ++grid.nSecretions(_pos);
+          break;
+      case Mac::MAC_CINFECTED:
+          secNFkB((_PARAM(_c1r)), (_PARAM(_c1r)), (_PARAM(_c1r)), _c1rChem, _c1rTNF, _c1rrChemTNF);
+          secIL10(grid, mdt, 1.5, _pos, il10rDynamics, il10Depletion, _PARAM(_IkSynthMacInf), (0.15 * _PARAM(Mac_dIL10)), _kISynth);
+          ++grid.nSecretions(_pos);
+          break;
+      case Mac::MAC_ACTIVE:
+          secNFkB((_PARAM(_c1r)), (_PARAM(_c1r)), (_PARAM(_c1r)), _c1rChem, _c1rTNF, _c1rrChemTNF);
+          secIL10(grid, mdt, 1.0, _pos, il10rDynamics, il10Depletion, _PARAM(_IkSynthMacAct), (_PARAM(Mac_dIL10)), _kISynth);
+          _kISynth = _kISynth * (_surfBoundTNFR1 / (_surfBoundTNFR1 + _PARAM(_halfSatIL10mRNA))); // Modulate Ma IL-10 synthesis for rough M1/M2 plasticity
+          ++grid.nSecretions(_pos);
+          break;
+      case Mac::MAC_DEAD:
+          break;
+      default:
+          throw std::runtime_error("NFkB Secretion Function - Invalid Macrophage State");
+      }
+
+      #if 0
       if (_state == Mac::MAC_RESTING)
         {
           _c1rChem = _PARAM(_epsilon2) * _PARAM(_c1r);
@@ -143,52 +168,51 @@ void Mac::secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDe
               grid.incil10(_pos, 2.0 * _PARAM(Mac_dIL10) * mdt);
             }
         }
+      #endif
     }
 
-  else
-    // TNF, IL10, and chemokines are secreted independent of NFkB dynamics
-    // IL10 dynamics are independent of the state of _NFkB
-    {
-      switch(_state)
-      {
+  // TNF, IL10, and chemokines are secreted independent of NFkB dynamics
+  // IL10 dynamics are independent of the state of _NFkB
+  else  {
+      switch(_state)  {
         case Mac::MAC_RESTING:
             if(_NFkB)  {
-                setChemokines(grid, mdt, 0.5, _pos, _PARAM(Mac_dCCL2), _PARAM(Mac_dCCL5), _PARAM(Mac_dCXCL9));
-                setTNF(grid, mdt, 0.5, _pos, tnfrDynamics, tnfDepletion, _PARAM(_kSynthMac), _PARAM(_kRNAMac), _PARAM(Mac_dTNF), _kmRNA, _kSynth);
-                setIL10(grid, mdt, 0.0, _pos, il10rDynamics, il10Depletion, 0.0, 0.0, _kISynth);
+                secChemokines(grid, mdt, 0.5, _pos, _PARAM(Mac_dCCL2), _PARAM(Mac_dCCL5), _PARAM(Mac_dCXCL9));
+                secTNF(grid, mdt, 0.5, _pos, tnfrDynamics, tnfDepletion, _PARAM(_kSynthMac), _PARAM(_kRNAMac), _PARAM(Mac_dTNF), _kmRNA, _kSynth);
+                secIL10(grid, mdt, 0.0, _pos, il10rDynamics, il10Depletion, 0.0, 0.0, _kISynth);
                 ++grid.nSecretions(_pos);
             }
             else  {
-                setTNF(grid, mdt, 0.0, _pos, tnfrDynamics, tnfDepletion, 0.0, 0.0, 0.0, _kmRNA, _kSynth);
-                setIL10(grid, mdt, 0.0, _pos, il10rDynamics, il10Depletion, 0.0, 0.0, _kISynth);
+                secTNF(grid, mdt, 0.0, _pos, tnfrDynamics, tnfDepletion, 0.0, 0.0, 0.0, _kmRNA, _kSynth);
+                secIL10(grid, mdt, 0.0, _pos, il10rDynamics, il10Depletion, 0.0, 0.0, _kISynth);
             }
             break;
         case Mac::MAC_INFECTED:
             if(_NFkB)  {
-                setChemokines(grid, mdt, 1.0, _pos, _PARAM(Mac_dCCL2), _PARAM(Mac_dCCL5), _PARAM(Mac_dCXCL9));
-                setTNF(grid, mdt, 1.0, _pos, tnfrDynamics, tnfDepletion, _PARAM(_kSynthMac), _PARAM(_kRNAMac), _PARAM(Mac_dTNF), _kmRNA, _kSynth);
-                setIL10(grid, mdt, 1.0, _pos, il10rDynamics, il10Depletion, _PARAM(_IkSynthMacInf), (0.15 * _PARAM(Mac_dIL10)), _kISynth);
+                secChemokines(grid, mdt, 1.0, _pos, _PARAM(Mac_dCCL2), _PARAM(Mac_dCCL5), _PARAM(Mac_dCXCL9));
+                secTNF(grid, mdt, 1.0, _pos, tnfrDynamics, tnfDepletion, _PARAM(_kSynthMac), _PARAM(_kRNAMac), _PARAM(Mac_dTNF), _kmRNA, _kSynth);
+                secIL10(grid, mdt, 1.0, _pos, il10rDynamics, il10Depletion, _PARAM(_IkSynthMacInf), (0.15 * _PARAM(Mac_dIL10)), _kISynth);
                 ++grid.nSecretions(_pos);
-            };
+            }
             else  {
-                setChemokines(grid, mdt, 0.5, _pos, _PARAM(Mac_dCCL2), _PARAM(Mac_dCCL5), _PARAM(Mac_dCXCL9));
-                setTNF(grid, mdt, 0.5, _pos, tnfrDynamics, tnfDepletion, _PARAM(_kSynthMac), _PARAM(_kRNAMac), _PARAM(Mac_dTNF), _kmRNA, _kSynth);
-                setIL10(grid, mdt, 1.0, _pos, il10rDynamics, il10Depletion, _PARAM(_IkSynthMacInf), (0.15 * _PARAM(Mac_dIL10)), _kISynth);
+                secChemokines(grid, mdt, 0.5, _pos, _PARAM(Mac_dCCL2), _PARAM(Mac_dCCL5), _PARAM(Mac_dCXCL9));
+                secTNF(grid, mdt, 0.5, _pos, tnfrDynamics, tnfDepletion, _PARAM(_kSynthMac), _PARAM(_kRNAMac), _PARAM(Mac_dTNF), _kmRNA, _kSynth);
+                secIL10(grid, mdt, 1.0, _pos, il10rDynamics, il10Depletion, _PARAM(_IkSynthMacInf), (0.15 * _PARAM(Mac_dIL10)), _kISynth);
                 ++grid.nSecretions(_pos);
             }
             break;
         case Mac::MAC_CINFECTED:
             assert(_NFkB);
-            setChemokines(grid, mdt, 1.0, _pos, _PARAM(Mac_dCCL2), _PARAM(Mac_dCCL5), _PARAM(Mac_dCXCL9));
-            setTNF(grid, mdt, 1.0, _pos, tnfrDynamics, tnfDepletion, _PARAM(_kSynthMac), _PARAM(_kRNAMac), _PARAM(Mac_dTNF), _kmRNA, _kSynth);
-            setIL10(grid, mdt, 1.5, _pos, il10rDynamics, il10Depletion, _PARAM(_IkSynthMacInf), (0.22 * _PARAM(Mac_dIL10)), _kISynth);
+            secChemokines(grid, mdt, 1.0, _pos, _PARAM(Mac_dCCL2), _PARAM(Mac_dCCL5), _PARAM(Mac_dCXCL9));
+            secTNF(grid, mdt, 1.0, _pos, tnfrDynamics, tnfDepletion, _PARAM(_kSynthMac), _PARAM(_kRNAMac), _PARAM(Mac_dTNF), _kmRNA, _kSynth);
+            secIL10(grid, mdt, 1.5, _pos, il10rDynamics, il10Depletion, _PARAM(_IkSynthMacInf), (0.22 * _PARAM(Mac_dIL10)), _kISynth);
             ++grid.nSecretions(_pos);
             break;
         case Mac::MAC_ACTIVE:
             assert(_NFkB && _stat1);
-            setChemokines(grid, mdt, 1.0, _pos, _PARAM(Mac_dCCL2), _PARAM(Mac_dCCL5), _PARAM(Mac_dCXCL9));
-            setTNF(grid, mdt, 1.0, _pos, tnfrDynamics, tnfDepletion, _PARAM(_kSynthMac), _PARAM(_kRNAMac), _PARAM(Mac_dTNF), _kmRNA, _kSynth);
-            setIL10(grid, mdt, 1.0, _pos, il10rDynamics, il10Depletion, _PARAM(_IkSynthMacAct), (_PARAM(Mac_dIL10)), _kISynth);
+            secChemokines(grid, mdt, 1.0, _pos, _PARAM(Mac_dCCL2), _PARAM(Mac_dCCL5), _PARAM(Mac_dCXCL9));
+            secTNF(grid, mdt, 1.0, _pos, tnfrDynamics, tnfDepletion, _PARAM(_kSynthMac), _PARAM(_kRNAMac), _PARAM(Mac_dTNF), _kmRNA, _kSynth);
+            secIL10(grid, mdt, 1.0, _pos, il10rDynamics, il10Depletion, _PARAM(_IkSynthMacAct), (_PARAM(Mac_dIL10)), _kISynth);
             _kISynth = _kISynth * (_surfBoundTNFR1 / (_surfBoundTNFR1 + _PARAM(_halfSatIL10mRNA))); // Modulate Ma IL-10 synthesis for rough M1/M2 plasticity
             ++grid.nSecretions(_pos);
             break;
@@ -414,7 +438,6 @@ void Mac::secrete(GrGrid& grid, bool tnfrDynamics, bool nfkbDynamics, bool tnfDe
     #endif
     }
 }
-
 
 void Mac::updateState()
 {

@@ -180,7 +180,6 @@ P(double, kIAP,					, 0, "IAP inhibitory effect on k_apoptosis",                
 // End of intracellular NFkB signaling pathway parameters
 
 
-//type,     name,                           path,   default,    desc,                                                   units,          min,    max)
 P(double, thresholdApoptosisTNF,				        ,	, "TNF threshold for TNF-induced apoptosis",                 "fraction",	 , )
 P(double, kApoptosis,							              ,	, "Rate of apoptosis happening",                             "1/s",				 , )
 P(double, thresholdApoptosisTNF_Molecular, 	    ,	, "TNF threshold for TNF-induced apoptosis",                 "#molecules", , )
@@ -221,6 +220,7 @@ P(double, nrExtMtbUptakeAct, 			              Mac, , "Number of extracellular ba
 P(double, thresholdRec, 					              Mac, , "TNF/chemokine threshold for macrophage recruitment", "", , )
 P(double, probRec, 							                Mac, , "Probability of recruiting a macrophage", "", 0.0, 1.0)
 P(double, movementBonusFactor, 				          Mac, 1.0, "Bonus factor for neighbor compartment with highest chemical concentration", "", , )
+P(double, initDensity, 						              Mac, 0.0, "Initial density of resting macrophages on the grid", "", 0.0, 1.0)
 P(double, thresholdICOS, 						            Mac, , "Threshold for ICOS-L inhibition on a Mac by IL10", "", , )
 P(double, recruitmentHalfSatTNF, 				        Mac, , "Half-saturation paramter for Mac TNF-dependent recruitment", "", , )
 P(double, recruitmentHalfSatChemokine, 		      Mac, , "Half-saturation paramter for Mac chemokine-dependent recruitment", "", , )
@@ -229,6 +229,7 @@ P(double, thresholdRecChemokine,                Mac, , "Threshold of Mac Recruit
 P(double, thresholdRecTNF,                      Mac, , "Threshold of Mac Recruitment for TNF", "", , )
 P(double, stat1ActivationTime,                  Mac, , "Time a Macrophage is STAT1 Activated", "", , )
 P(double, nfkbActivationTime,                   Mac, , "Time a Macrophage is NFkB Activated", "", , )
+P(double, icosActivationTime,                   Mac, , "Time a Macrophage is ICOS Activated", "", , )
 P(int, movementRest,						      Mac, , "Time required for a resting macrophage to move one micro-compartment", "#timesteps", 0, )
 P(int, movementInf,						        Mac, , "Time required for an infected macrophage to move one micro-compartment", "#timesteps", 0, )
 P(int, movementAct,					        	Mac, , "Time required for an active macrophage to move one micro-compartment", "#timesteps", 0, )
@@ -349,9 +350,9 @@ P(double, initN4, 						                  ,	, "ODE stuff - N4(0)", "", , )
 P(double, initN8, 						                  ,	, "ODE stuff - N8(0)", "", , )
 // End of Lymph node ODE parameters
 
-//type,     name,                           path,   default,    desc,                                                   units,          min,    max)
-P(double,	sourceDensity,					,		0.2,		"Density of vascular sources on the grid",				"",				0.0,	1.0)
-P(int,		nrSources,						,		0.0,		"Number of vascular sources on the grid",				"",				0,			)
+//type,     name,                           path,   default,    desc,                        
+P(double, sourceDensity,                        ,	0.2, "Density of vascular sources on the grid", "", 0.0, 1.0)
+P(int, nrSources,							        ,	0.0, "Number of vascular sources on the grid", "", 0, )
 P(int, nrKillingsCaseation,				    , , "Number of killings for a compartment to become caseated", "", 0, )
 P(int, NFkBTimeCoefficient,				    , , "Number of NF-kB time-steps within a single diffusion time-step", "-", 0, )
 P(int, dosageStartTime,            , , "Time to begin dosing strategy", "#timesteps", 0, )

@@ -102,13 +102,19 @@ protected:
   std::vector<unsigned> _intMtbFreq;
   std::vector<unsigned> _growthRateFreq;
 
+  // Total drug concentration on the grid is kept for a number of time steps
+  // specified as a parameter file parameter, so a Boost array cannot be used
+  // because that requires specifying the size at compile time.
+  std::vector<Scalar> _drugConcentrationINH;
+
 public:
 
 // --- Constructor ---
 
   Stats() :
-    _intMtbFreq(int(_PARAM(Mac_nrIntMtbBurstCInf)) + 1, 0)
+      _intMtbFreq(int(_PARAM(Mac_nrIntMtbBurstCInf)) + 1, 0)
     , _growthRateFreq(_PARAM(_growthRateSamples), 0)
+    , _drugConcentrationINH(_PARAM(_drugConcentrationStatInterval), 0.0)
   {
     clear();
   }
@@ -215,6 +221,28 @@ public:
   {
     _growthRateFreq[i] = v;
   }
+
+  Scalar& getDrugConcentrationINH(size_t i)
+  {
+    return _drugConcentrationINH[i];
+  }
+
+  Scalar getDrugConcentrationINH(size_t i) const
+  {
+    return _drugConcentrationINH[i];
+  }
+
+  const std::vector<Scalar>& getDrugConcentrationINH() const
+  {
+    return _drugConcentrationINH;
+  }
+
+  void setDrugConcentrationINH(size_t i, const Scalar v)
+  {
+    _drugConcentrationINH[i] = v;
+  }
+
+
 
 // --- Visitor Methods ---
 

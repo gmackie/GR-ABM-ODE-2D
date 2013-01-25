@@ -117,6 +117,7 @@ private:
   void adjustFauxDegradation(double dt);
   void consumeDrugs(GrGrid grid, double dt);
   void growExtMtb();
+  void updateDrugConcentrationStats();
   void shuffleCells();
   void checkTCellRecruitmentStart();
 

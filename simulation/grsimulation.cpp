@@ -655,7 +655,7 @@ void GrSimulation::solve()
 
         // Solve vascular dynamics for drugs if turned on
         if (_PARAM(_DrugDynamics) && (_time >= _PARAM(_dosageStartTime)))  {
-            _pVascular->solveVascularSources(_grid.getGrid(), _PARAM(_timestepDiffusion),_time, DiffStep);
+            _pVascular->solveVascularSources(_grid.getGrid(), _PARAM(_timestepDiffusion), _time, DiffStep);
             _stats.getBloodConcINH() = _pVascular->getBloodConcentrationINH();
             _stats.getBloodConcRIF() = _pVascular->getBloodConcentrationRIF();
         }
@@ -680,6 +680,8 @@ void GrSimulation::solve()
 
     // update extracellular Mtb
     growExtMtb();
+
+	updateDrugConcentrationStats();
 
     // update states and remove dead agents from lists and grid
     updateStates();
@@ -1041,6 +1043,52 @@ void GrSimulation::growExtMtb()
             }
         }
     }
+}
+
+// Update the area under the curve of average drug concentration for the entire grid vs. time,
+// for an interval of consecutive time steps, specified by the _drugConcentrationStatInterval
+// parameter file parameter.
+//
+// Stat DrugConcentration contains the total concentration of the drug on the grid for the last 
+// _drugConcentrationStatInterval time steps. However, they are not in order by time step since
+// that would require extra moving of vector elements (deleting the first element in the vector
+// by moving up all the subsequent elements and then entering the total grid drug concentration
+// for the current time step to the end of the vector). Instead we use timestep % interval to
+// choose the index into the vector for the value for the oldest timestep and replace that with 
+// the newest version. For example, if we are tracking for an interval of 3 time steps the drug
+// concentration vector would be the following to time steps 1 to 7:
+// ts	drugconc	vector
+// 0	0			[ 0.0, 0.0, 0.0] 0 elements defined
+// 1    3.2			[ 0.0, 3.2, 0.0] 1 element  defined
+// 2	2.1			[ 0.0, 3.2, 2.1] 2 elements defined
+// 3	4.3			[ 4.3, 3.2, 2.1] 3 elements defined
+// 4	1.7			[ 4.3, 1.7, 2.1] 3 elements defined
+// 5	8.4			[ 4.3, 1.7, 8.4] 3 elements defined
+//
+// The number of elements defined will be less than the _drugConcentrationStatInterval
+// parameter, so the drugConcentrationArea value will not be correct until 
+// the simulation time step >= _drugConcentrationStatInterval. This is not
+// considered a problem since the drugConcentrationArea value is needed for the end of
+// a simulation, and the _drugConcentrationStatInterval parameter will be very small
+// compared to the length of a simulation.
+//
+// For now we do this specifically for INH. We may add support for other drugs later.
+
+void GrSimulation::updateDrugConcentrationStats()
+{
+	_stats.setDrugConcentrationINH(_time % _PARAM(_drugConcentrationStatInterval), _stats.getTotINH());
+
+	std::vector<Scalar> drugConc =_stats.getDrugConcentrationINH();
+	Scalar drugConcentrationArea = 0.0;
+
+	for (size_t i = 0; i < drugConc.size(); ++i)
+	{
+		drugConcentrationArea += drugConc[i];
+	}
+
+	// Convert from total grid concentration to grid concentration average per
+	// grid compartment.
+	_stats.setDrugConcentrationAreaINH(drugConcentrationArea / _grid.getSize());
 }
 
 void GrSimulation::adjustFauxDegradation(double dt)

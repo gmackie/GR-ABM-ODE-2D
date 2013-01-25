@@ -277,19 +277,15 @@ public:
     write("repExtMtb");
     write("NonRepl Ext. Mtb.");
     write("Tot Mtb.");
-
-    if (_PARAM(_DrugDynamics))
-    {
-        write("INH");
-        write("BloodINH");
-        write("INH_Granuloma");
-        write("INH_NormalTissue");
-        write("RIF");
-        write("BloodRIF");
-        write("RIF_Granuloma");
-        write("RIF_NormalTissue");
-    }
-
+	write("INH");
+	write("BloodINH");
+	write("INH_Granuloma");
+	write("INH_NormalTissue");
+	write("INH_AUC");
+	write("RIF");
+	write("BloodRIF");
+	write("RIF_Granuloma");
+	write("RIF_NormalTissue");
     write("TNF");
     write("IntTNFR1");
     write("TotMiMa kmRNA");
@@ -379,36 +375,34 @@ public:
     write(stats.getTotNonRepExtMtb());
     write((stats.getTotIntMtb() + stats.getTotExtMtb()));
 
-    if (_PARAM(_DrugDynamics))
-    {
-        size_t sz = sim.getGrid().getSize();          //get nr of compartments on the grid
-        // INH outputs
-        write(stats.getTotINH() / sz)   ;
-        write(stats.getBloodConcINH() * MW_INH);        // (mol/L) * (mg/mol) -> mg/L
-        int gransz = stats.getAreaCellDensity();
-        if (gransz == 0)
-        {
-            write(0.0);
-        }
-        else
-        {
-            write(stats.getTotINHGran() / gransz);
-        }
-        write(stats.getTotINHNorm() / (sz - gransz));
+	size_t sz = sim.getGrid().getSize();          //get nr of compartments on the grid
+	// INH outputs
+	write(stats.getTotINH() / sz)   ;
+	write(stats.getBloodConcINH() * MW_INH);        // (mol/L) * (mg/mol) -> mg/L
+	int gransz = stats.getAreaCellDensity();
+	if (gransz == 0)
+	{
+		write(0.0);
+	}
+	else
+	{
+		write(stats.getTotINHGran() / gransz);
+	}
+	write(stats.getTotINHNorm() / (sz - gransz));
+	write(stats.getDrugConcentrationAreaINH());
 
-        // RIF outputs
-        write(stats.getTotRIF() / sz);
-        write(stats.getBloodConcRIF() * MW_RIF);        // (mol/L) * (mg/mol) -> mg/L
-        if (gransz == 0)
-        {
-            write(0.0);
-        }
-        else
-        {
-            write(stats.getTotRIFGran() / gransz);
-        }
-        write(stats.getTotRIFNorm() / (sz - gransz));
-    }
+	// RIF outputs
+	write(stats.getTotRIF() / sz);
+	write(stats.getBloodConcRIF() * MW_RIF);        // (mol/L) * (mg/mol) -> mg/L
+	if (gransz == 0)
+	{
+		write(0.0);
+	}
+	else
+	{
+		write(stats.getTotRIFGran() / gransz);
+	}
+	write(stats.getTotRIFNorm() / (sz - gransz));
 
     write(stats.getTotTNF());
     write(stats.getTotTNFR1int());

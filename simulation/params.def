@@ -28,6 +28,7 @@ P(double, maxChemotaxis, , , "Chemotaxis sensivity range (upper bound)", "#molec
 
 // Tuneable Resolution Parameters - Core ABM
 
+//type,   name,                            path,                    default,  desc,                                                               units,                  min, max)
 P(double, fracConsumeIL10,                                          , ,         "Scaling factor for coarse grained IL10 dynamics",                  "",                     0,      )
 P(double, fracConsumeTNF,                                           , ,         "Scaling factor for coarse grained TNF dynamics",                   "",                     0,      )
 P(double, dTNF,                            Tcell_Tgam               , ,         "Secretion rate of TNF by Tgam" ,                                   "#molecules/s",         0,      )
@@ -46,17 +47,19 @@ P(double, dIL10,                                Mac                 , ,         
 // End of Tuneable Resolution Parameters - Core ABM
 
 // Drug activity parameters
-//type,     name,                           path,   default,    desc,                                                   units,          min,    max)
-P(double, intraActivityINH          , , , "Max killing rate of INH intracellular", "", 0, )
-P(double, extraActivityINH          , , , "Max killing rate of INH extracellular", "", 0, )
-P(double, cellUptakeINH             , , , "Ratio of intra:extracellular concentration of INH", "", 0, )
-P(double, C50_INH                   , , , "Halfsat for killing activity of INH", "mg/L", 0,  )
-P(double, ConsumptionRate_INH       , , , "Rate of INH consumption by bacteria - coarse", "M/s/bacterium", 0, )
-P(double, ConsumptionHalfSat_INH    , , , "HalfSat for INH consumption by bacteria - coarse", "mg/L"  , 0, )
-P(double, intraActivityRIF          , , , "Max killing rate of RIF intracellular", "", 0, )
-P(double, extraActivityRIF          , , , "Max killing rate of RIF extracellular", "", 0, )
-P(double, cellUptakeRIF             , , , "Ratio of intra:extracellular concentration of RIF", "", 0, )
-P(double, C50_RIF                   , , , "Halfsat for killing activity of RIF", "mg/L", 0,  )
+//type,   name,                           path, default,  desc,                                                             units,           min,    max)
+P(double, intraActivityINH,               ,     ,         "Max killing rate of INH intracellular",                          "",              0,         )
+P(double, extraActivityINH,               ,     ,         "Max killing rate of INH extracellular",                          "",              0,         )
+P(double, cellUptakeINH,                  ,     ,         "Ratio of intra:extracellular concentration of INH",              "",              0,         )
+P(double, C50_INH,                        ,     ,         "Halfsat for killing activity of INH",                            "mg/L",          0,         )
+P(double, ConsumptionRate_INH,            ,     ,         "Rate of INH consumption by bacteria - coarse",                   "M/s/bacterium", 0,         )
+P(double, ConsumptionHalfSat_INH,         ,     ,         "HalfSat for INH consumption by bacteria - coarse",               "mg/L",          0,         )
+P(double, intraActivityRIF,               ,     ,         "Max killing rate of RIF intracellular",                          "",              0,         )
+P(double, extraActivityRIF,               ,     ,         "Max killing rate of RIF extracellular",                          "",              0,         )
+P(double, cellUptakeRIF,                  ,     ,         "Ratio of intra:extracellular concentration of RIF",              "",              0,         )
+P(double, C50_RIF,                        ,     ,         "Halfsat for killing activity of RIF",                            "mg/L",          0,         )
+P(int,    drugConcentrationStatInterval,  ,     ,         "Number of time steps to track total grid drug concentration",    "",              0,         )
+// End of Drug activity parameters
 
 // Blood compartment parameters
 //type,     name,                           path,   default,    desc,                                                   units,          min,    max)
@@ -72,6 +75,7 @@ P(double, degRateRIF_Plasma             , , , "Blood compartment clearance rate 
 //{ "bloodTNFdose",                       GR_NODE,	false,	true,	0.0,	0,	"#molecules",       "Blood compartment dose of TNF" },
 P(double, bloodINHdose, , , "Blood compartment dose of INH", "#molecules", 0, )
 P(double, bloodRIFdose, , , "Blood compartment dose of RIF", "#molecules", 0, )
+// End of Blood compartment parameters
 
 // molecular TNF-associated parameters
 //type,     name,                           path,   default,    desc,                                                   units,          min,    max)

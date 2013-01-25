@@ -82,7 +82,7 @@ public:
 
   /// @name Accessors
   /// @{
-#define P(type, name, path, def, desc, units, min, max) \
+#define P(type, name, path, def, units, min, max, desc) \
   const type& get##path##_##name() const { return _##path##_##name; } \
   const ParamDescriptor<type>& get##path##_##name##Desc() const { return _##path##_##name##Desc; } \
   type& get##path##_##name() { return _##path##_##name; } \
@@ -93,13 +93,13 @@ public:
   /* Visitors */
   template<typename Visitor>
   void visitProperties(Visitor& visitor) const {
-    #define P(type, name, path, def, desc, units, min, max) \
+    #define P(type, name, path, def, units, min, max, desc) \
       visitor.visit(_##path##_##name, _##path##_##name##Desc);
     #include "params.def"
   }
   template<typename Visitor>
   void visitProperties(Visitor& visitor) {
-    #define P(type, name, path, def, desc, units, min, max) \
+    #define P(type, name, path, def, units, min, max, desc) \
       visitor.visit(_##path##_##name, _##path##_##name##Desc);
     #include "params.def"
   }

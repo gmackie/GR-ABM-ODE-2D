@@ -43,8 +43,12 @@ struct Pos
   Pos(const boost::property_tree::ptree& p, const Pos& center)
   {
     boost::optional<std::string> pos = p.get_optional<std::string>("pos");
+    boost::optional<int> _x = p.get_optional<int>("row");
+    boost::optional<int> _y = p.get_optional<int>("col");
     if(pos)
       {
+        if(_x || _y)
+          throw std::runtime_error("cannot define 'row' and 'col' with 'pos', cannot continue...");
         if(*pos == std::string("center"))
           {
             *this = center;
@@ -57,8 +61,8 @@ struct Pos
       }
     else
       {
-        boost::optional<int> _x = p.get_optional<int>("row");
-        boost::optional<int> _y = p.get_optional<int>("col");
+        if(!_x || !_y)
+          throw std::runtime_error("Missing param 'row' or 'col', cannot continue...");
         x = _x ? *_x : 0;
         y = _y ? *_y : 0;
       }
@@ -97,16 +101,20 @@ inline std::ostream& operator<<(std::ostream& s, const Pos& p)
 }
 inline std::istream& operator>>(std::istream& s, Pos& p)
 {
-  unsigned char tmp;
-  s>>tmp;
-  assert(tmp == '(');
-  s>>p.x;
-  s>>tmp;
-  assert(tmp == ',');
-  s>>p.y;
-  s>>tmp;
-  assert(tmp == ')');
-  return s;
+    unsigned char tmp; 
+    s>>tmp;
+    if(tmp != '(')                                                             
+      throw std::runtime_error("Invalid pos, cannot cont");
+    s>>p.x;
+    s>>tmp;
+    if(tmp == ',')                                                             
+      throw std::runtime_error("Invalid pos, cannot cont");                    
+    s>>p.y;
+    s>>tmp;                                                                    
+    if(tmp == ')')
+      throw std::runtime_error("Invalid pos, cannot cont");                    
+    return s;
+
 }
 
 #endif //POS_H
